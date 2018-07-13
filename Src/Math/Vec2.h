@@ -18,6 +18,7 @@ namespace Math
 
     public:
 
+        using Component = T;
         using Self = Vec2<T>;
 
         AGZ_FORCE_INLINE Vec2()
@@ -65,7 +66,7 @@ namespace Math
         AGZ_FORCE_INLINE Self &operator/=(const Self &rhs) { x /= rhs.x; y /= rhs.y; return *this; }
 
         AGZ_FORCE_INLINE bool operator==(const Self &rhs) { return x == rhs.x && y == rhs.y; }
-        AGZ_FORCE_INLINE bool operator!=(const Self &rhs) { return x != rhs.x && y != rhs.y; }
+        AGZ_FORCE_INLINE bool operator!=(const Self &rhs) { return x != rhs.x || y != rhs.y; }
 
         template<typename U>
         AGZ_FORCE_INLINE Self &operator+=(const U &rhs) { x += rhs; y += rhs; return *this; }
@@ -102,19 +103,17 @@ namespace Math
     };
 
     template<typename T1, typename T2> AGZ_FORCE_INLINE
-        auto operator+(const T1 &lhs, const Vec2<T2> &rhs) { return Vec2(lhs + rhs.x, lhs + rhs.y); }
+        auto operator+(const T1 &lhs, const Vec2<T2> &rhs) { return Vec2<decltype(lhs + rhs.x)>(lhs + rhs.x, lhs + rhs.y); }
     template<typename T1, typename T2> AGZ_FORCE_INLINE
-        auto operator+(const Vec2<T1> &lhs, const T2 &rhs) { return Vec2(lhs.x + rhs, lhs.y + rhs); }
+        auto operator+(const Vec2<T1> &lhs, const T2 &rhs) { return Vec2<decltype(lhs.x + rhs)>(lhs.x + rhs, lhs.y + rhs); }
     template<typename T1, typename T2> AGZ_FORCE_INLINE
-        auto operator-(const T1 &lhs, const Vec2<T2> &rhs) { return Vec2(lhs - rhs.x, lhs - rhs.y); }
+        auto operator-(const Vec2<T1> &lhs, const T2 &rhs) { return Vec2<decltype(lhs.x - rhs)>(lhs.x - rhs, lhs.y - rhs); }
     template<typename T1, typename T2> AGZ_FORCE_INLINE
-        auto operator-(const Vec2<T1> &lhs, const T2 &rhs) { return Vec2(lhs.x - rhs, lhs.y - rhs); }
+        auto operator*(const T1 &lhs, const Vec2<T2> &rhs) { return Vec2<decltype(lhs * rhs.x)>(lhs * rhs.x, lhs * rhs.y); }
     template<typename T1, typename T2> AGZ_FORCE_INLINE
-        auto operator*(const T1 &lhs, const Vec2<T2> &rhs) { return Vec2(lhs * rhs.x, lhs * rhs.y); }
+        auto operator*(const Vec2<T1> &lhs, const T2 &rhs) { return Vec2<decltype(lhs.x * rhs)>(lhs.x * rhs, lhs.y * rhs); }
     template<typename T1, typename T2> AGZ_FORCE_INLINE
-        auto operator*(const Vec2<T1> &lhs, const T2 &rhs) { return Vec2(lhs.x * rhs, lhs.y * rhs); }
-    template<typename T1, typename T2> AGZ_FORCE_INLINE
-        auto operator/(const Vec2<T1> &lhs, const T2 &rhs) { return Vec2(lhs.x / rhs, lhs.y / rhs); }
+        auto operator/(const Vec2<T1> &lhs, const T2 &rhs) { return Vec2<decltype(lhs.x / rhs)>(lhs.x / rhs, lhs.y / rhs); }
 
     template<typename T1, typename T2>
     AGZ_FORCE_INLINE auto Dot(const Vec2<T1> &lhs, const Vec2<T2> &rhs)
@@ -143,6 +142,7 @@ namespace Math
     template<typename T>
     AGZ_FORCE_INLINE auto Clamp(const Vec2<T> &vec, T minv, T maxv)
     {
-        return Vec2(Scalar::Clamp(vec.x, minv, maxv), Scalar::Clamp(vec.y, minv, maxv));
+        return Vec2<decltype(Scalar::Clamp(vec.x, minv, maxv))>(
+            Scalar::Clamp(vec.x, minv, maxv), Scalar::Clamp(vec.y, minv, maxv));
     }
 }

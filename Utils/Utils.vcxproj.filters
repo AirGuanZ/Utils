@@ -13,5 +13,11 @@
     <ClInclude Include="..\Src\Math\Vec2.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Math\Vec3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Math\Vec4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
