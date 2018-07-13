@@ -29,4 +29,9 @@
   <ItemGroup>
     <ClCompile Include="..\Src\Common.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Src\Math\Mat4.inl">
+      <Filter>Math</Filter>
+    </None>
+  </ItemGroup>
 </Project>

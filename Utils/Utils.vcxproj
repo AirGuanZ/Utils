@@ -30,6 +30,9 @@
   <ItemGroup>
     <ClCompile Include="..\Src\Common.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Src\Math\Mat4.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{8E5BB8AB-2C07-4815-807F-EA23991B3F93}</ProjectGuid>
