@@ -153,7 +153,7 @@ template<typename T>
 inline typename Mat4<T>::Self Mat4<T>::Scale(const Vec3<T> &s)
 {
     constexpr T I = ONE<T>(), O = ZERO<T>();
-    return Self(s.x, Z, O, O,
+    return Self(s.x, O, O, O,
                 O, s.y, O, O,
                 O, O, s.z, O,
                 O, O, O,   I);

@@ -24,7 +24,12 @@ TEST_CASE("Mat4")
     {
         Vec4d v(1.0, 2.0, 3.0, 1.0);
 
-        REQUIRE(ApproxEq(Mat4d::Translate({ 3.0, 2.0, 1.0 }) * v,
-                         Vec4d(4.0, 4.0, 4.0, 1.0), 1e-5));
+        Mat4d m = Mat4d::Translate({ 3.0, 2.0, 1.0 });
+        REQUIRE(ApproxEq(m * v, Vec4d(4.0, 4.0, 4.0, 1.0), 1e-5));
+        REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
+
+        m = Mat4d::Scale({ 1.0, 2.0, 3.0 });
+        REQUIRE(ApproxEq(m * v, Vec4d(1.0, 4.0, 9.0, 1.0), 1e-5));
+        REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
     }
 }
