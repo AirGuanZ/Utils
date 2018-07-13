@@ -20,15 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Common.h" />
+    <ClInclude Include="..\Src\Math\Angle.h" />
     <ClInclude Include="..\Src\Math\Mat4.h" />
     <ClInclude Include="..\Src\Math\Prelude.h" />
     <ClInclude Include="..\Src\Math\Scalar.h" />
     <ClInclude Include="..\Src\Math\Vec2.h" />
     <ClInclude Include="..\Src\Math\Vec3.h" />
     <ClInclude Include="..\Src\Math\Vec4.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\Src\Common.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\Mat4.inl" />

@@ -23,7 +23,7 @@ public:
     using Self = Vec2<T>;
 
     AGZ_FORCE_INLINE Vec2()
-        : x(Scalar::ZERO<T>()), y(Scalar::ZERO<T>())
+        : x(Math::ZERO<T>()), y(Math::ZERO<T>())
     {
 
     }
@@ -80,25 +80,25 @@ public:
 
     static const Self &ZERO()
     {
-        static const Self ret(Scalar::ZERO<T>(), Scalar::ZERO<T>());
+        static const Self ret(Math::ZERO<T>(), Math::ZERO<T>());
         return ret;
     }
 
     static const Self &ONES()
     {
-        static const Self ret(Scalar::ONE<T>(), Scalar::ONE<T>());
+        static const Self ret(Math::ONE<T>(), Math::ONE<T>());
         return ret;
     }
 
     static const Self &UNIT_X()
     {
-        static const Self ret(Scalar::ONE<T>(), Scalar::ZERO<T>());
+        static const Self ret(Math::ONE<T>(), Math::ZERO<T>());
         return ret;
     }
 
     static const Self &UNIT_Y()
     {
-        static const Self ret(Scalar::ZERO<T>(), Scalar::ONE<T>());
+        static const Self ret(Math::ZERO<T>(), Math::ONE<T>());
         return ret;
     }
 };
@@ -131,7 +131,7 @@ AGZ_FORCE_INLINE auto LengthSquare(const Vec2<T> &vec)
 template<typename T>
 AGZ_FORCE_INLINE auto Length(const Vec2<T> &vec)
 {
-    return Scalar::Sqrt(LengthSquare(vec));
+    return Sqrt(LengthSquare(vec));
 }
 
 template<typename T>
@@ -143,9 +143,12 @@ AGZ_FORCE_INLINE auto Normalize(const Vec2<T> &vec)
 template<typename T>
 AGZ_FORCE_INLINE auto Clamp(const Vec2<T> &vec, T minv, T maxv)
 {
-    return Vec2<decltype(Scalar::Clamp(vec.x, minv, maxv))>(
-        Scalar::Clamp(vec.x, minv, maxv), Scalar::Clamp(vec.y, minv, maxv));
+    return Vec2<decltype(Clamp(vec.x, minv, maxv))>(
+        Clamp(vec.x, minv, maxv), Clamp(vec.y, minv, maxv));
 }
+
+using Vec2f = Vec2<float>;
+using Vec2d = Vec2<double>;
 
 AGZ_NS_END(Math)
 AGZ_NS_END(AGZ)

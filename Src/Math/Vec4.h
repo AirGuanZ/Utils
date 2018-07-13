@@ -24,7 +24,7 @@ public:
     using Self = Vec4<T>;
 
     AGZ_FORCE_INLINE Vec4()
-        : x(Scalar::ZERO<T>()), y(Scalar::ZERO<T>()), z(Scalar::ZERO<T>()), w(Scalar::ZERO<T>())
+        : x(Math::ZERO<T>()), y(Math::ZERO<T>()), z(Math::ZERO<T>()), w(Math::ZERO<T>())
     {
 
     }
@@ -83,37 +83,37 @@ public:
 
     static const Self &ZERO()
     {
-        static const Self ret(Scalar::ZERO<T>(), Scalar::ZERO<T>(), Scalar::ZERO<T>(), Scalar::ZERO<T>());
+        static const Self ret(Math::ZERO<T>(), Math::ZERO<T>(), Math::ZERO<T>(), Math::ZERO<T>());
         return ret;
     }
 
     static const Self &ONES()
     {
-        static const Self ret(Scalar::ONE<T>(), Scalar::ONE<T>(), Scalar::ONE<T>(), Scalar::ONE<T>());
+        static const Self ret(Math::ONE<T>(), Math::ONE<T>(), Math::ONE<T>(), Math::ONE<T>());
         return ret;
     }
 
     static const Self &UNIT_X()
     {
-        static const Self ret(Scalar::ONE<T>(), Scalar::ZERO<T>(), Scalar::ZERO<T>(), Scalar::ZERO<T>());
+        static const Self ret(Math::ONE<T>(), Math::ZERO<T>(), Math::ZERO<T>(), Math::ZERO<T>());
         return ret;
     }
 
     static const Self &UNIT_Y()
     {
-        static const Self ret(Scalar::ZERO<T>(), Scalar::ONE<T>(), Scalar::ZERO<T>(), Scalar::ZERO<T>());
+        static const Self ret(Math::ZERO<T>(), Math::ONE<T>(), Math::ZERO<T>(), Math::ZERO<T>());
         return ret;
     }
 
     static const Self &UNIT_Z()
     {
-        static const Self ret(Scalar::ZERO<T>(), Scalar::ZERO<T>(), Scalar::ONE<T>(), Scalar::ZERO<T>());
+        static const Self ret(Math::ZERO<T>(), Math::ZERO<T>(), Math::ONE<T>(), Math::ZERO<T>());
         return ret;
     }
 
     static const Self &UNIT_W()
     {
-        static const Self ret(Scalar::ZERO<T>(), Scalar::ZERO<T>(), Scalar::ZERO<T>(), Scalar::ONE<T>());
+        static const Self ret(Math::ZERO<T>(), Math::ZERO<T>(), Math::ZERO<T>(), Math::ONE<T>());
         return ret;
     }
 };
@@ -146,7 +146,8 @@ AGZ_FORCE_INLINE auto LengthSquare(const Vec4<T> &vec)
 template<typename T>
 AGZ_FORCE_INLINE auto Length(const Vec4<T> &vec)
 {
-    return Scalar::Sqrt(LengthSquare(vec));
+    using namespace Scalar;
+    return Sqrt(LengthSquare(vec));
 }
 
 template<typename T>
@@ -158,12 +159,24 @@ AGZ_FORCE_INLINE auto Normalize(const Vec4<T> &vec)
 template<typename T>
 AGZ_FORCE_INLINE auto Clamp(const Vec4<T> &vec, T minv, T maxv)
 {
-    return Vec4<decltype(Scalar::Clamp(vec.x, minv, maxv))>(
-        Scalar::Clamp(vec.x, minv, maxv),
-        Scalar::Clamp(vec.y, minv, maxv),
-        Scalar::Clamp(vec.z, minv, maxv),
-        Scalar::Clamp(vec.w, minv, maxv));
+    return Vec4<decltype(Clamp(vec.x, minv, maxv))>(
+                         Clamp(vec.x, minv, maxv),
+                         Clamp(vec.y, minv, maxv),
+                         Clamp(vec.z, minv, maxv),
+                         Clamp(vec.w, minv, maxv));
 }
+
+template<typename T>
+AGZ_FORCE_INLINE bool ApproxEq(const Vec4<T> &lhs, const Vec4<T> &rhs, T epsilon)
+{
+    return ApproxEq(lhs.x, rhs.x, epsilon) &&
+           ApproxEq(lhs.y, rhs.y, epsilon) &&
+           ApproxEq(lhs.z, rhs.z, epsilon) &&
+           ApproxEq(lhs.w, rhs.w, epsilon);
+}
+
+using Vec4f = Vec4<float>;
+using Vec4d = Vec4<double>;
 
 AGZ_NS_END(Math)
 AGZ_NS_END(AGZ)

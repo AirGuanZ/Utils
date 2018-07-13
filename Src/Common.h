@@ -16,6 +16,6 @@ AGZ_NS_BEG(AGZ)
 
 struct Uninitialized_t { };
 
-extern Uninitialized_t UNINITIALIZED;
+inline Uninitialized_t UNINITIALIZED;
 
 AGZ_NS_END(AGZ)

@@ -1,0 +1,55 @@
+#pragma once
+
+#include "../Common.h"
+
+AGZ_NS_BEG(AGZ)
+AGZ_NS_BEG(Math)
+
+template<typename T, int I>
+struct AngleTemplate
+{
+    T value;
+
+    AngleTemplate() : value(T(0.0)) { }
+    AngleTemplate(T v) : value(v) { }
+    AngleTemplate(Uninitialized_t) { }
+};
+
+template<typename T>
+using Rad = AngleTemplate<T, 0>;
+
+template<typename T>
+using Deg = AngleTemplate<T, 1>;
+
+template<typename T, int I>
+AGZ_FORCE_INLINE auto operator+(AngleTemplate<T, I> lhs, AngleTemplate<T, I> rhs)
+{
+    return AngleTemplate<T, I>{ lhs.value + rhs.value };
+}
+
+template<typename T, int I>
+AGZ_FORCE_INLINE auto operator-(AngleTemplate<T, I> lhs, AngleTemplate<T, I> rhs)
+{
+    return AngleTemplate<T, I>{ lhs.value - rhs.value };
+}
+
+template<typename T, int I>
+AGZ_FORCE_INLINE auto operator*(AngleTemplate<T, I> lhs, T rhs)
+{
+    return AngleTemplate<T, I>{ lhs.value * rhs };
+}
+
+template<typename T, int I>
+AGZ_FORCE_INLINE auto operator*(T lhs, AngleTemplate<T, I> rhs)
+{
+    return rhs * lhs;
+}
+
+template<typename T, int I>
+AGZ_FORCE_INLINE auto operator/(AngleTemplate<T, I> lhs, T rhs)
+{
+    return AngleTemplate<T, I>{ lhs.value / rhs };
+}
+
+AGZ_NS_END(Math)
+AGZ_NS_END(AGZ)

@@ -24,7 +24,7 @@ public:
     using Self = Vec3<T>;
 
     AGZ_FORCE_INLINE Vec3()
-        : x(Scalar::ZERO<T>()), y(Scalar::ZERO<T>()), z(Scalar::ZERO<T>())
+        : x(Math::ZERO<T>()), y(Math::ZERO<T>()), z(Math::ZERO<T>())
     {
 
     }
@@ -82,31 +82,31 @@ public:
 
     static const Self &ZERO()
     {
-        static const Self ret(Scalar::ZERO<T>(), Scalar::ZERO<T>(), Scalar::ZERO<T>());
+        static const Self ret(Math::ZERO<T>(), Math::ZERO<T>(), Math::ZERO<T>());
         return ret;
     }
 
     static const Self &ONES()
     {
-        static const Self ret(Scalar::ONE<T>(), Scalar::ONE<T>(), Scalar::ONE<T>());
+        static const Self ret(Math::ONE<T>(), Math::ONE<T>(), Math::ONE<T>());
         return ret;
     }
 
     static const Self &UNIT_X()
     {
-        static const Self ret(Scalar::ONE<T>(), Scalar::ZERO<T>(), Scalar::ZERO<T>());
+        static const Self ret(Math::ONE<T>(), Math::ZERO<T>(), Math::ZERO<T>());
         return ret;
     }
 
     static const Self &UNIT_Y()
     {
-        static const Self ret(Scalar::ZERO<T>(), Scalar::ONE<T>(), Scalar::ZERO<T>());
+        static const Self ret(Math::ZERO<T>(), Math::ONE<T>(), Math::ZERO<T>());
         return ret;
     }
 
     static const Self &UNIT_Z()
     {
-        static const Self ret(Scalar::ZERO<T>(), Scalar::ZERO<T>(), Scalar::ONE<T>());
+        static const Self ret(Math::ZERO<T>(), Math::ZERO<T>(), Math::ONE<T>());
         return ret;
     }
 };
@@ -139,7 +139,7 @@ AGZ_FORCE_INLINE auto LengthSquare(const Vec3<T> &vec)
 template<typename T>
 AGZ_FORCE_INLINE auto Length(const Vec3<T> &vec)
 {
-    return Scalar::Sqrt(LengthSquare(vec));
+    return Sqrt(LengthSquare(vec));
 }
 
 template<typename T>
@@ -151,11 +151,22 @@ AGZ_FORCE_INLINE auto Normalize(const Vec3<T> &vec)
 template<typename T>
 AGZ_FORCE_INLINE auto Clamp(const Vec3<T> &vec, T minv, T maxv)
 {
-    return Vec3<decltype(Scalar::Clamp(vec.x, minv, maxv))>(
-        Scalar::Clamp(vec.x, minv, maxv),
-        Scalar::Clamp(vec.y, minv, maxv),
-        Scalar::Clamp(vec.z, minv, maxv));
+    return Vec3<decltype(Clamp(vec.x, minv, maxv))>(
+                Clamp(vec.x, minv, maxv),
+                Clamp(vec.y, minv, maxv),
+                Clamp(vec.z, minv, maxv));
 }
+
+template<typename T>
+AGZ_FORCE_INLINE bool ApproxEq(const Vec3<T> &lhs, const Vec3<T> &rhs, T epsilon)
+{
+    return ApproxEq(lhs.x, rhs.x, epsilon) &&
+           ApproxEq(lhs.y, rhs.y, epsilon) &&
+           ApproxEq(lhs.z, rhs.z, epsilon);
+}
+
+using Vec3f = Vec3<float>;
+using Vec3d = Vec3<double>;
 
 AGZ_NS_END(Math)
 AGZ_NS_END(AGZ)

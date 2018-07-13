@@ -11,15 +11,14 @@ inline Mat4<T>::Mat4(T v)
     m[0][1] = m[0][2] = m[0][3] =
     m[1][0] = m[1][2] = m[1][3] =
     m[2][0] = m[2][1] = m[2][3] =
-    m[3][0] = m[3][1] = m[3][2] = Scalar::ZERO<T>();
+    m[3][0] = m[3][1] = m[3][2] = ZERO<T>();
     m[0][0] = m[1][1] = m[2][2] = m[3][3] = v;
 }
 
 template<typename T>
 inline Mat4<T>::Mat4(const typename Mat4<T>::Data &_m)
 {
-    static_assert(std::is_trivially_copyable<Component>::value,
-                  "Matrix component must be trivially copyable");
+    static_assert(std::is_trivially_copyable<Component>::value);
     std::memcpy(m, _m, sizeof(m));
 }
 
@@ -108,6 +107,59 @@ inline Vec4<T> Mat4<T>::operator*(const Vec4<T> &p)
 }
 
 template<typename T>
+inline typename Mat4<T>::Self Mat4<T>::Translate(const Vec3<T> &v)
+{
+    constexpr T I = ONE<T>(), O = ZERO<T>();
+    return Self(I, O, O, v.x,
+                O, I, O, v.y,
+                O, O, I, v.z,
+                O, O, O, I);
+}
+
+template<typename T>
+template<typename U>
+inline typename Mat4<T>::Self Mat4<T>::Rotate(const Vec3<T> &_axis, U angle)
+{
+    T m[4][4];
+    Vec3<T> axis = Normalize(_axis);
+    auto sinv = Sin(angle), cosv = Cos(angle);
+
+    constexpr T I = ONE<T>(), O = ZERO<T>();
+
+    m[0][0] = axis.x * axis.x + (I - axis.x * axis.x) * cosv;
+    m[0][1] = axis.x * axis.y * (I - cosv) - axis.z * sinv;
+    m[0][2] = axis.x * axis.z * (I - cosv) + axis.y * sinv;
+    m[0][3] = O;
+
+    m[1][0] = axis.x * axis.y * (I - cosv) + axis.z * sinv;
+    m[1][1] = axis.y * axis.y + (I - axis.y * axis.y) * cosv;
+    m[1][2] = axis.y * axis.z * (I - cosv) - axis.x * sinv;
+    m[1][3] = O;
+
+    m[2][0] = axis.x * axis.z * (I - cosv) - axis.y * sinv;
+    m[2][1] = axis.y * axis.z * (I - cosv) + axis.x * sinv;
+    m[2][2] = axis.z * axis.z + (I - axis.z * axis.z) * cosv;
+    m[2][3] = O;
+
+    m[3][0] = O;
+    m[3][1] = O;
+    m[3][2] = O;
+    m[3][3] = I;
+
+    return Mat4<T>(m);
+}
+
+template<typename T>
+inline typename Mat4<T>::Self Mat4<T>::Scale(const Vec3<T> &s)
+{
+    constexpr T I = ONE<T>(), O = ZERO<T>();
+    return Self(s.x, Z, O, O,
+                O, s.y, O, O,
+                O, O, s.z, O,
+                O, O, O,   I);
+}
+
+template<typename T>
 inline Vec4<T> ApplyToPoint(const Mat4<T> &m, const Vec4<T> &v)
 {
     return m * p;
@@ -117,7 +169,7 @@ template<typename T>
 inline Vec3<T> ApplyToPoint(const Mat4<T> &m, const Vec3<T> &p)
 {
     Vec4<T> ret = m * Vec4<T>(p.x, p.y, p.z, 1.0);
-    T dw = Scalar::ONE<T>() / ret.w;
+    T dw = ONE<T>() / ret.w;
     return Vec3<T>(dw * ret.x, dw * ret.y, dw * ret.z);
 }
 
@@ -163,9 +215,9 @@ inline Mat4<float> Inverse<float>(const Mat4<float> &m)
                 {
                     if(ipiv[k] == 0)
                     {
-                        if(Scalar::Abs(minv[j][k]) >= big)
+                        if(Abs(minv[j][k]) >= big)
                         {
-                            big = Scalar::Abs(minv[j][k]);
+                            big = Abs(minv[j][k]);
                             irow = j;
                             icol = k;
                         }
@@ -208,7 +260,7 @@ inline Mat4<float> Inverse<float>(const Mat4<float> &m)
                 std::swap(minv[k][indxr[j]], minv[k][indxc[j]]);
         }
     }
-    return Mat4<float>::Mat4(minv);
+    return Mat4<float>(minv);
 }
 
 template<>
@@ -230,9 +282,9 @@ inline Mat4<double> Inverse<double>(const Mat4<double> &m)
                 {
                     if(ipiv[k] == 0)
                     {
-                        if(Scalar::Abs(minv[j][k]) >= big)
+                        if(Abs(minv[j][k]) >= big)
                         {
-                            big = Scalar::Abs(minv[j][k]);
+                            big = Abs(minv[j][k]);
                             irow = j;
                             icol = k;
                         }

@@ -25,9 +25,9 @@
     <ClInclude Include="..\Src\Math\Mat4.h">
       <Filter>Math</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\Src\Common.cpp" />
+    <ClInclude Include="..\Src\Math\Angle.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\Mat4.inl">

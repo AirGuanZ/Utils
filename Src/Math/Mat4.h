@@ -30,7 +30,7 @@ public:
 
     Mat4(Uninitialized_t) { }
 
-    Mat4() : Mat4(Scalar::ONE<T>()) { }
+    Mat4() : Mat4(ONE<T>()) { }
 
     explicit Mat4(T v);
 
@@ -52,6 +52,13 @@ public:
     Self operator*(const Self &rhs) const;
     
     Vec4<T> operator*(const Vec4<T> &p);
+
+    static Self Translate(const Vec3<T> &v);
+
+    template<typename U>
+    static Self Rotate(const Vec3<T> &axis, U angle);
+
+    static Self Scale(const Vec3<T> &s);
 };
 
 template<typename T>
@@ -71,6 +78,9 @@ inline Mat4<T> Transpose(const Mat4<T> &m);
 
 template<typename T>
 inline Mat4<T> Inverse(const Mat4<T> &m);
+
+using Mat4f = Mat4<float>;
+using Mat4d = Mat4<double>;
 
 AGZ_NS_END(Math)
 AGZ_NS_END(AGZ)
