@@ -153,7 +153,7 @@ AGZ_FORCE_INLINE auto Length(const Vec4<T> &vec)
 template<typename T>
 AGZ_FORCE_INLINE auto Normalize(const Vec4<T> &vec)
 {
-    return vec / Length(v);
+    return vec / Length(vec);
 }
 
 template<typename T>

@@ -31,5 +31,15 @@ TEST_CASE("Mat4")
         m = Mat4d::Scale({ 1.0, 2.0, 3.0 });
         REQUIRE(ApproxEq(m * v, Vec4d(1.0, 4.0, 9.0, 1.0), 1e-5));
         REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
+
+        v = Vec4d::UNIT_X();
+        m = Mat4d::Rotate(Vec3d::UNIT_Z(), Deg<double>(90.0));
+        REQUIRE(ApproxEq(m * v, Vec4d::UNIT_Y(), 1e-5));
+        REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
+
+        v = Vec4d::UNIT_Y();
+        m = Mat4d::Rotate(Vec3d::UNIT_X(), PI<Rad<double>>() / 2.0);
+        REQUIRE(ApproxEq(m * v, Vec4d::UNIT_Z(), 1e-5));
+        REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
     }
 }
