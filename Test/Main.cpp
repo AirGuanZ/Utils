@@ -1,9 +1,9 @@
 #include <iostream>
-#include <Math\Vec2.h>
+#include <Math\Prelude.h>
 
 int main()
 {
-    using namespace Math;
+    using namespace AGZ::Math;
     using namespace std;
 
     Vec2<float> v1(1.5f, 2.0f);

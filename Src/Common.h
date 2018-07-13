@@ -6,5 +6,16 @@
     #define AGZ_FORCE_INLINE inline
 #endif
 
+#define AGZ_NS_BEG(N) namespace N {
+#define AGZ_NS_END(N) }
+
 #include <cassert>
 #define AGZ_ASSERT(X) assert(X)
+
+AGZ_NS_BEG(AGZ)
+
+struct Uninitialized_t { };
+
+extern Uninitialized_t UNINITIALIZED;
+
+AGZ_NS_END(AGZ)
