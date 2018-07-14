@@ -38,4 +38,15 @@
       <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Src\Math\SwizzleVec4.inl">
+      <Filter>Math</Filter>
+    </None>
+    <None Include="..\Src\Math\SwizzleVec3.inl">
+      <Filter>Math</Filter>
+    </None>
+    <None Include="..\Src\Math\SwizzleVec2.inl">
+      <Filter>Math</Filter>
+    </None>
+  </ItemGroup>
 </Project>

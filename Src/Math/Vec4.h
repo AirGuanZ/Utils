@@ -2,6 +2,8 @@
 
 #include "../Common.h"
 #include "Scalar.h"
+#include "Vec2.h"
+#include "Vec3.h"
 
 AGZ_NS_BEG(AGZ)
 AGZ_NS_BEG(Math)
@@ -44,6 +46,32 @@ public:
 
     template<typename U, typename F>
     Vec4<U> Map(F &&f) const { return Vec4<U>(f(x), f(y), f(z), f(w)); }
+
+#include "SwizzleVec4.inl"
+
+#define x r
+#define y g
+#define z b
+#define w a
+
+#include "SwizzleVec4.inl"
+
+#undef x
+#undef y
+#undef z
+#undef w
+
+#define x u
+#define y v
+#define z m
+#define w n
+
+#include "SwizzleVec4.inl"
+
+#undef x
+#undef y
+#undef z
+#undef w
 
     AGZ_FORCE_INLINE       T &operator[](size_t idx) { AGZ_ASSERT(idx < 4); return (&x)[idx]; }
     AGZ_FORCE_INLINE const T &operator[](size_t idx) const { AGZ_ASSERT(idx < 4); return (&x)[idx]; }
