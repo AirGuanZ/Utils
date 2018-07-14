@@ -23,29 +23,15 @@ public:
     using Component = T;
     using Self = Vec4<T>;
 
-    AGZ_FORCE_INLINE Vec4()
-        : x(Math::ZERO<T>()), y(Math::ZERO<T>()), z(Math::ZERO<T>()), w(Math::ZERO<T>())
-    {
+    AGZ_FORCE_INLINE Vec4() : x(Math::ZERO<T>()), y(Math::ZERO<T>()), z(Math::ZERO<T>()), w(Math::ZERO<T>()) { }
 
-    }
+    explicit AGZ_FORCE_INLINE Vec4(Uninitialized_t) { }
 
-    explicit AGZ_FORCE_INLINE Vec4(const T &value)
-        : x(v), y(v), z(v), w(v)
-    {
+    explicit AGZ_FORCE_INLINE Vec4(const T &value) : x(v), y(v), z(v), w(v) { }
 
-    }
+    AGZ_FORCE_INLINE Vec4(const T &x, const T &y, const T &z, const T &w) : x(x), y(y), z(z), w(w) { }
 
-    AGZ_FORCE_INLINE Vec4(const T &x, const T &y, const T &z, const T &w)
-        : x(x), y(y), z(z), w(w)
-    {
-
-    }
-
-    AGZ_FORCE_INLINE Vec4(const Self &other)
-        : x(other.x), y(other.y), z(other.z), w(other.w)
-    {
-
-    }
+    AGZ_FORCE_INLINE Vec4(const Self &other) : x(other.x), y(other.y), z(other.z), w(other.w) { }
 
     AGZ_FORCE_INLINE Self &operator=(const Self &other)
     {

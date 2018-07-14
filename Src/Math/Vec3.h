@@ -23,29 +23,15 @@ public:
     using Component = T;
     using Self = Vec3<T>;
 
-    AGZ_FORCE_INLINE Vec3()
-        : x(Math::ZERO<T>()), y(Math::ZERO<T>()), z(Math::ZERO<T>())
-    {
+    AGZ_FORCE_INLINE Vec3() : x(Math::ZERO<T>()), y(Math::ZERO<T>()), z(Math::ZERO<T>()) { }
 
-    }
+    explicit AGZ_FORCE_INLINE Vec3(Uninitialized_t) { }
 
-    explicit AGZ_FORCE_INLINE Vec3(const T &value)
-        : x(v), y(v), z(v)
-    {
+    explicit AGZ_FORCE_INLINE Vec3(const T &value) : x(v), y(v), z(v) { }
 
-    }
+    AGZ_FORCE_INLINE Vec3(const T &x, const T &y, const T &z) : x(x), y(y), z(z) { }
 
-    AGZ_FORCE_INLINE Vec3(const T &x, const T &y, const T &z)
-        : x(x), y(y), z(z)
-    {
-
-    }
-
-    AGZ_FORCE_INLINE Vec3(const Self &other)
-        : x(other.x), y(other.y), z(other.z)
-    {
-
-    }
+    AGZ_FORCE_INLINE Vec3(const Self &other) : x(other.x), y(other.y), z(other.z) { }
 
     AGZ_FORCE_INLINE Self &operator=(const Self &other)
     {

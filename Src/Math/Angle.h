@@ -51,5 +51,11 @@ AGZ_FORCE_INLINE auto operator/(AngleTemplate<T, I> lhs, T rhs)
     return AngleTemplate<T, I>{ lhs.value / rhs };
 }
 
+using Degf = Deg<float>;
+using Degd = Deg<double>;
+
+using Radf = Rad<float>;
+using Radd = Rad<double>;
+
 AGZ_NS_END(Math)
 AGZ_NS_END(AGZ)
