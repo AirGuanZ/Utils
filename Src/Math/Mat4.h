@@ -68,6 +68,11 @@ public:
     static Self RotateZ(U angle);
 
     static Self Scale(const Vec3<T> &s);
+
+    template<typename U>
+    static Self Perspective(U fovY, T ratio, T near, T far);
+
+    static Self LookAt(const Vec3<T> &src, const Vec3<T> &dst, const Vec3<T> &up);
 };
 
 template<typename T>

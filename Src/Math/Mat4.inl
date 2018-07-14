@@ -1,3 +1,5 @@
+#pragma once
+
 #include <algorithm>
 
 #include "Scalar.h"
@@ -197,9 +199,36 @@ inline typename Mat4<T>::Self Mat4<T>::Scale(const Vec3<T> &s)
 }
 
 template<typename T>
+template<typename U>
+inline typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T near, T far)
+{
+    T invDis = ONE<T>() / (far - near);
+    constexpr T I = ONE<T>(), O = ZERO<T>();
+    auto invTan = ONE<T>() / Tan(T(0.5) * fovY);
+    return Scale(Vec3<T>(invTan / ratio, invTan, ONE<T>()))
+         * Mat4<T>(I, O, O, O,
+                   O, I, O, O,
+                   O ,O, far * invDis, -far * near * invDis,
+                   O, O, I, O);
+}
+
+template<typename T>
+inline typename Mat4<T>::Self Mat4<T>::LookAt(const Vec3<T>& src, const Vec3<T>& dst, const Vec3<T>& up)
+{
+    constexpr T I = ONE<T>(), O = ZERO<T>();
+    auto D = Normalize(dst - src);
+    auto R = Normalize(Cross(up, D));
+    auto U = Cross(D, R);
+    return Inverse(Mat4<T>(R.x, U.x, D.x, src.x,
+                           R.y, U.y, D.y, src.y,
+                           R.z, U.z, D.z, src.z,
+                           O,   O,   O,   I));
+}
+
+template<typename T>
 inline Vec4<T> ApplyToPoint(const Mat4<T> &m, const Vec4<T> &v)
 {
-	return m * p;
+	return m * v;
 }
 
 template<typename T>
