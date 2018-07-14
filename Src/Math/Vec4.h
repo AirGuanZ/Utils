@@ -146,7 +146,6 @@ AGZ_FORCE_INLINE auto LengthSquare(const Vec4<T> &vec)
 template<typename T>
 AGZ_FORCE_INLINE auto Length(const Vec4<T> &vec)
 {
-    using namespace Scalar;
     return Sqrt(LengthSquare(vec));
 }
 

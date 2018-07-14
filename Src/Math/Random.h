@@ -11,11 +11,13 @@ AGZ_NS_BEG(Random)
 
 template<typename T, typename S> struct Uniform_t;
 
+using SharedRandomEngineType = std::minstd_rand;
+
 struct SharedRandomEngine_t
 {
-    static auto &GetEng()
+    static AGZ_FORCE_INLINE auto &GetEng()
     {
-        static thread_local std::default_random_engine eng;
+        static thread_local SharedRandomEngineType eng;
         return eng;
     }
 };
@@ -60,7 +62,15 @@ MAKE_REAL_UNIFORM_T(double);
 #undef MAKE_REAL_UNIFORM_T
 
 template<typename T, typename S = SharedRandomEngine_t>
-inline Uniform_t<T, S> Uniform;
+AGZ_FORCE_INLINE T Uniform(T min, T max)
+{
+    return Uniform_t<T, S>()(min, max);
+}
+
+AGZ_FORCE_INLINE void SetSharedRandomEngineSeed(SharedRandomEngineType::result_type seed)
+{
+    SharedRandomEngine_t().GetEng().seed(seed);
+}
 
 AGZ_NS_END(Random)
 AGZ_NS_END(Math)

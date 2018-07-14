@@ -28,9 +28,9 @@ public:
     using Component = T;
     using Self = Mat4<T>;
 
-    Mat4(Uninitialized_t) { }
-
     Mat4() : Mat4(ONE<T>()) { }
+
+    explicit Mat4(Uninitialized_t) { }
 
     explicit Mat4(T v);
 
@@ -57,6 +57,15 @@ public:
 
     template<typename U>
     static Self Rotate(const Vec3<T> &axis, U angle);
+
+    template<typename U>
+    static Self RotateX(U angle);
+
+    template<typename U>
+    static Self RotateY(U angle);
+
+    template<typename U>
+    static Self RotateZ(U angle);
 
     static Self Scale(const Vec3<T> &s);
 };

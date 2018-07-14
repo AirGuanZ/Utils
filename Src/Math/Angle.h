@@ -11,8 +11,8 @@ struct AngleTemplate
     T value;
 
     AngleTemplate() : value(T(0.0)) { }
-    AngleTemplate(T v) : value(v) { }
-    AngleTemplate(Uninitialized_t) { }
+    explicit AngleTemplate(T v) : value(v) { }
+    explicit AngleTemplate(Uninitialized_t) { }
 };
 
 template<typename T>

@@ -1,8 +1,12 @@
-#include <Math\Prelude.h>
+#include <iostream>
+
+#include <Math/Prelude.h>
 
 #include "Catch.hpp"
+#include "Math/Random.h"
 
 using namespace AGZ::Math;
+using namespace std;
 
 TEST_CASE("Mat4")
 {
@@ -39,6 +43,16 @@ TEST_CASE("Mat4")
 
         v = Vec4d::UNIT_Y();
         m = Mat4d::Rotate(Vec3d::UNIT_X(), PI<Rad<double>>() / 2.0);
+        REQUIRE(ApproxEq(m * v, Vec4d::UNIT_Z(), 1e-5));
+        REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
+
+        v = Vec4d::UNIT_X();
+        m = Mat4d::RotateZ(Deg<double>(90.0));
+        REQUIRE(ApproxEq(m * v, Vec4d::UNIT_Y(), 1e-5));
+        REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
+
+        v = Vec4d::UNIT_Y();
+        m = Mat4d::RotateX(PI<Rad<double>>() / 2.0);
         REQUIRE(ApproxEq(m * v, Vec4d::UNIT_Z(), 1e-5));
         REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
     }
