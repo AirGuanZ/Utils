@@ -62,5 +62,10 @@ TEST_CASE("Mat4")
         REQUIRE(ApproxEq(Cross(Vec3d::UNIT_X(), Vec3d::UNIT_Y()), Vec3d::UNIT_Z(), 1e-5));
         REQUIRE(ApproxEq(Cross(Vec3d::UNIT_Y(), Vec3d::UNIT_Z()), Vec3d::UNIT_X(), 1e-5));
         REQUIRE(ApproxEq(Cross(Vec3d::UNIT_Z(), Vec3d::UNIT_X()), Vec3d::UNIT_Y(), 1e-5));
+
+        REQUIRE(ApproxEq(Dot(Vec4d::UNIT_X(), Vec4d::UNIT_Z()), 0.0, 1e-7));
+        REQUIRE(ApproxEq(Dot(Mat4d::RotateY(Degd(90.0)) * Vec4d(1.0, 0.0, 4.0, 0.0),
+                             Vec4d(1.0, 0.0, 4.0, 0.0)),
+                         0.0, 1e-7));
     }
 }

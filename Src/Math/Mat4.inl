@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "Scalar.h"
+#include "Tri.h"
 
 AGZ_NS_BEG(AGZ)
 AGZ_NS_BEG(Math)
