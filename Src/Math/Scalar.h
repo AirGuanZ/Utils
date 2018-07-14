@@ -17,26 +17,6 @@ template<typename T> struct Abs_impl<Deg<T>> { static AGZ_FORCE_INLINE Deg<T> Ab
 
 template<typename T> AGZ_FORCE_INLINE T Abs(T v) { return Abs_impl<T>::Abs(v); }
 
-namespace Aux
-{
-    struct ScalarZERO_t
-    {
-        constexpr operator int()    const { return 0; }
-        constexpr operator float()  const { return 0.0f; }
-        constexpr operator double() const { return 0.0; }
-    };
-
-    struct ScalarONE_t
-    {
-        constexpr operator int()    const { return 1; }
-        constexpr operator float()  const { return 1.0f; }
-        constexpr operator double() const { return 1.0; }
-    };
-}
-
-inline Aux::ScalarZERO_t ZERO;
-inline Aux::ScalarONE_t ONE;
-
 template<typename T> AGZ_FORCE_INLINE T      Sqrt(T);
 template<>           AGZ_FORCE_INLINE float  Sqrt<float>(float value)   { return std::sqrtf(value); }
 template<>           AGZ_FORCE_INLINE double Sqrt<double>(double value) { return std::sqrt(value); }

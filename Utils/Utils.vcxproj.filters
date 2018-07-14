@@ -38,9 +38,4 @@
       <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Src\Math\Mat4.inl">
-      <Filter>Math</Filter>
-    </None>
-  </ItemGroup>
 </Project>

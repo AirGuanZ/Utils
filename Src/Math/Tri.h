@@ -28,6 +28,8 @@ template<>           AGZ_FORCE_INLINE float  Sin_rawimpl<float>(float rad) { ret
 template<>           AGZ_FORCE_INLINE double Sin_rawimpl<double>(double rad) { return std::sin(rad); }
 
 template<typename T> struct Sin_impl;
+template<>           struct Sin_impl<float>  { static AGZ_FORCE_INLINE auto Sin(float rad)  { return Sin_rawimpl<float>(rad); } };
+template<>           struct Sin_impl<double> { static AGZ_FORCE_INLINE auto Sin(double rad) { return Sin_rawimpl<double>(rad); } };
 template<typename T> struct Sin_impl<Rad<T>> { static AGZ_FORCE_INLINE auto Sin(Rad<T> rad) { return Sin_rawimpl<T>(rad.value); } };
 template<typename T> struct Sin_impl<Deg<T>> { static AGZ_FORCE_INLINE auto Sin(Deg<T> deg) { return Sin_rawimpl<T>(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
 
@@ -36,6 +38,8 @@ template<>           AGZ_FORCE_INLINE float  Cos_rawimpl<float>(float rad) { ret
 template<>           AGZ_FORCE_INLINE double Cos_rawimpl<double>(double rad) { return std::cos(rad); }
 
 template<typename T> struct Cos_impl;
+template<>           struct Cos_impl<float>  { static AGZ_FORCE_INLINE auto Cos(float rad)  { return Cos_rawimpl<float>(rad); } };
+template<>           struct Cos_impl<double> { static AGZ_FORCE_INLINE auto Cos(double rad) { return Cos_rawimpl<double>(rad); } };
 template<typename T> struct Cos_impl<Rad<T>> { static AGZ_FORCE_INLINE auto Cos(Rad<T> rad) { return Cos_rawimpl<T>(rad.value); } };
 template<typename T> struct Cos_impl<Deg<T>> { static AGZ_FORCE_INLINE auto Cos(Deg<T> deg) { return Cos_rawimpl<T>(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
 

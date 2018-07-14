@@ -3,17 +3,17 @@
 #include <Math/Prelude.h>
 
 #include "Catch.hpp"
-#include "Math/Random.h"
 
 using namespace AGZ::Math;
 using namespace std;
 
 TEST_CASE("Mat4")
 {
-    SECTION("Deg & Rad")
+    SECTION("Angle")
     {
-        REQUIRE(ApproxEq(PI<Radd>().value, 3.1415926, 1e-3));
+        REQUIRE(ApproxEq(PI<Radd>().value, 3.1415926, 1e-5));
         REQUIRE(ApproxEq(PI<Degd>().value, 180.0, 1e-7));
+        REQUIRE(ApproxEq(PI<double>(), 3.1415926, 1e-5));
 
         REQUIRE(ApproxEq(Sin(PI<Degd>()), 0.0, 1e-5));
         REQUIRE(ApproxEq(Cos(PI<Degd>()), -1.0, 1e-5));
@@ -67,5 +67,17 @@ TEST_CASE("Mat4")
         REQUIRE(ApproxEq(Dot(Mat4d::RotateY(Degd(90.0)) * Vec4d(1.0, 0.0, 4.0, 0.0),
                              Vec4d(1.0, 0.0, 4.0, 0.0)),
                          0.0, 1e-7));
+
+        REQUIRE(ApproxEq(2.f * Vec2f(1.0, 2.0) + Vec2f(2.0, 3.0), Vec2f(4.0, 7.0), 1e-5f));
+        REQUIRE(ApproxEq(Vec3f(1.0, 2.0, 3.0) * Vec3f(2.0, 3.0, 4.0), Vec3f(2.0, 6.0, 12.0), 1e-5f));
+    }
+
+    SECTION("Color")
+    {
+        REQUIRE(ApproxEq((Color4f)COLOR::RED, Color4f(1.f, 0.f, 0.f, 1.f), 1e-10f));
+        REQUIRE(ApproxEq((Color4f)COLOR::GREEN, Color4f(0.f, 1.f, 0.f, 1.f), 1e-10f));
+
+        REQUIRE(ApproxEq(Clamp(Color4d(-4.0, 8.0, 0.0, 1.0), 0.0, 1.0), Color4d(0.f, 1.f, 0.f, 1.f), 1e-10));
+        REQUIRE(ApproxEq(2.0 * Color3d(-4.0, 8.0, 0.0) + Color3d(8.0, -15.0, 1.0), Color3d(0.f, 1.f, 1.f), 1e-7));
     }
 }
