@@ -39,6 +39,9 @@ public:
         return *this;
     }
 
+    template<typename U, typename F>
+    Vec2<U> Map(F &&f) const { return Vec2<U>(f(x), f(y)); }
+
     AGZ_FORCE_INLINE       T &operator[](size_t idx) { AGZ_ASSERT(idx < 2); return (&x)[idx]; }
     AGZ_FORCE_INLINE const T &operator[](size_t idx) const { AGZ_ASSERT(idx < 2); return (&x)[idx]; }
 
