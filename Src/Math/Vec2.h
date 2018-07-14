@@ -2,7 +2,6 @@
 
 #include "../Common.h"
 #include "Scalar.h"
-#include "Vec3.h"
 
 AGZ_NS_BEG(AGZ)
 AGZ_NS_BEG(Math)
