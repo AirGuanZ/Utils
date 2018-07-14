@@ -124,6 +124,14 @@ Vec3<T1> operator*(const Vec3<T1> &lhs, const T2 &rhs) { return Vec3<T1>(lhs.x *
 template<typename T1, typename T2> AGZ_FORCE_INLINE
 Vec3<T1> operator/(const Vec3<T1> &lhs, const T2 &rhs) { return Vec3<T1>(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs); }
 
+template<typename T>
+AGZ_FORCE_INLINE auto Cross(const Vec3<T> &lhs, const Vec3<T> &rhs)
+{
+    return Vec3<T>(lhs.y * rhs.z - lhs.z * rhs.y,
+                   lhs.z * rhs.x - lhs.x * rhs.z,
+                   lhs.x * rhs.y - lhs.y * rhs.x);
+}
+
 template<typename T1, typename T2>
 AGZ_FORCE_INLINE auto Dot(const Vec3<T1> &lhs, const Vec3<T2> &rhs)
 {

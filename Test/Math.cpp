@@ -56,4 +56,11 @@ TEST_CASE("Mat4")
         REQUIRE(ApproxEq(m * v, Vec4d::UNIT_Z(), 1e-5));
         REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
     }
+
+    SECTION("Vec")
+    {
+        REQUIRE(ApproxEq(Cross(Vec3d::UNIT_X(), Vec3d::UNIT_Y()), Vec3d::UNIT_Z(), 1e-5));
+        REQUIRE(ApproxEq(Cross(Vec3d::UNIT_Y(), Vec3d::UNIT_Z()), Vec3d::UNIT_X(), 1e-5));
+        REQUIRE(ApproxEq(Cross(Vec3d::UNIT_Z(), Vec3d::UNIT_X()), Vec3d::UNIT_Y(), 1e-5));
+    }
 }
