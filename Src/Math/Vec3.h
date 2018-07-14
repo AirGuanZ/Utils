@@ -23,7 +23,7 @@ public:
     using Component = T;
     using Self = Vec3<T>;
 
-    AGZ_FORCE_INLINE Vec3() : x(Math::ZERO<T>()), y(Math::ZERO<T>()), z(Math::ZERO<T>()) { }
+    AGZ_FORCE_INLINE Vec3() : x(Math::ZERO), y(Math::ZERO), z(Math::ZERO) { }
 
     explicit AGZ_FORCE_INLINE Vec3(Uninitialized_t) { }
 
@@ -68,31 +68,31 @@ public:
 
     static const Self &ZERO()
     {
-        static const Self ret(Math::ZERO<T>(), Math::ZERO<T>(), Math::ZERO<T>());
+        static const Self ret(Math::ZERO, Math::ZERO, Math::ZERO);
         return ret;
     }
 
     static const Self &ONES()
     {
-        static const Self ret(Math::ONE<T>(), Math::ONE<T>(), Math::ONE<T>());
+        static const Self ret(Math::ONE, Math::ONE, Math::ONE);
         return ret;
     }
 
     static const Self &UNIT_X()
     {
-        static const Self ret(Math::ONE<T>(), Math::ZERO<T>(), Math::ZERO<T>());
+        static const Self ret(Math::ONE, Math::ZERO, Math::ZERO);
         return ret;
     }
 
     static const Self &UNIT_Y()
     {
-        static const Self ret(Math::ZERO<T>(), Math::ONE<T>(), Math::ZERO<T>());
+        static const Self ret(Math::ZERO, Math::ONE, Math::ZERO);
         return ret;
     }
 
     static const Self &UNIT_Z()
     {
-        static const Self ret(Math::ZERO<T>(), Math::ZERO<T>(), Math::ONE<T>());
+        static const Self ret(Math::ZERO, Math::ZERO, Math::ONE);
         return ret;
     }
 };

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <cstring>
+#include <type_traits>
 
 #include "Scalar.h"
 #include "Tri.h"
@@ -19,7 +21,7 @@ inline Mat4<T>::Mat4(T v)
 }
 
 template<typename T>
-inline Mat4<T>::Mat4(const typename Mat4<T>::Data &_m)
+inline Mat4<T>::Mat4(const Data &_m)
 {
 	static_assert(std::is_trivially_copyable<Component>::value);
 	std::memcpy(m, _m, sizeof(m));
@@ -56,7 +58,7 @@ inline const Mat4<T> &Mat4<T>::IDENTITY()
 }
 
 template<typename T>
-inline bool Mat4<T>::operator==(const typename Mat4<T>::Self &other) const
+inline bool Mat4<T>::operator==(const Self &other) const
 {
 	for(int c = 0; c < 4; ++c)
 	{
@@ -70,7 +72,7 @@ inline bool Mat4<T>::operator==(const typename Mat4<T>::Self &other) const
 }
 
 template<typename T>
-inline bool Mat4<T>::operator!=(const typename Mat4<T>::Self &other) const
+inline bool Mat4<T>::operator!=(const Self &other) const
 {
 	for(int c = 0; c < 4; ++c)
 	{
@@ -84,7 +86,7 @@ inline bool Mat4<T>::operator!=(const typename Mat4<T>::Self &other) const
 }
 
 template<typename T>
-inline typename Mat4<T>::Self Mat4<T>::operator*(const typename Mat4<T>::Self &rhs) const
+inline typename Mat4<T>::Self Mat4<T>::operator*(const Self &rhs) const
 {
 	Self ret(UNINITIALIZED);
 	for(int r = 0; r < 4; ++r)
@@ -112,7 +114,7 @@ inline Vec4<T> Mat4<T>::operator*(const Vec4<T> &p)
 template<typename T>
 inline typename Mat4<T>::Self Mat4<T>::Translate(const Vec3<T> &v)
 {
-	constexpr T I = ONE<T>(), O = ZERO<T>();
+	constexpr T I = ONE, O = ZERO;
 	return Self(I, O, O, v.x,
 				O, I, O, v.y,
 				O, O, I, v.z,
@@ -127,7 +129,7 @@ inline typename Mat4<T>::Self Mat4<T>::Rotate(const Vec3<T> &_axis, U angle)
 	Vec3<T> axis = Normalize(_axis);
 	auto sinv = Sin(angle), cosv = Cos(angle);
 
-	constexpr T I = ONE<T>(), O = ZERO<T>();
+    constexpr T I = ONE, O = ZERO;
 
 	m[0][0] = axis.x * axis.x + (I - axis.x * axis.x) * cosv;
 	m[0][1] = axis.x * axis.y * (I - cosv) - axis.z * sinv;
@@ -156,7 +158,7 @@ template<typename T>
 template<typename U>
 inline typename Mat4<T>::Self Mat4<T>::RotateX(U angle)
 {
-	constexpr T I = ONE<T>(), O = ZERO<T>();
+    constexpr T I = ONE, O = ZERO;
 	const auto S = Sin(angle), C = Cos(angle);
 	return Mat4<T>(I,  O,  O,  O,
 				   O,  C,  -S, O,
@@ -168,7 +170,7 @@ template <typename T>
 template <typename U>
 inline typename Mat4<T>::Self Mat4<T>::RotateY(U angle)
 {
-	constexpr T I = ONE<T>(), O = ZERO<T>();
+    constexpr T I = ONE, O = ZERO;
 	const auto S = Sin(angle), C = Cos(angle);
 	return Mat4<T>(C,  O,  S,  O,
 				   O,  I,  O,  O,
@@ -180,7 +182,7 @@ template <typename T>
 template <typename U>
 inline typename Mat4<T>::Self Mat4<T>::RotateZ(U angle)
 {
-	constexpr T I = ONE<T>(), O = ZERO<T>();
+    constexpr T I = ONE, O = ZERO;
 	const auto S = Sin(angle), C = Cos(angle);
 	return Mat4<T>(C,  -S, O,  O,
 				   S,  C,  O,  O,
@@ -191,7 +193,7 @@ inline typename Mat4<T>::Self Mat4<T>::RotateZ(U angle)
 template<typename T>
 inline typename Mat4<T>::Self Mat4<T>::Scale(const Vec3<T> &s)
 {
-	constexpr T I = ONE<T>(), O = ZERO<T>();
+    constexpr T I = ONE, O = ZERO;
 	return Self(s.x, O, O, O,
 				O, s.y, O, O,
 				O, O, s.z, O,
@@ -202,10 +204,10 @@ template<typename T>
 template<typename U>
 inline typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T near, T far)
 {
-    T invDis = ONE<T>() / (far - near);
-    constexpr T I = ONE<T>(), O = ZERO<T>();
-    auto invTan = ONE<T>() / Tan(T(0.5) * fovY);
-    return Scale(Vec3<T>(invTan / ratio, invTan, ONE<T>()))
+    T invDis = ONE / (far - near);
+    constexpr T I = ONE, O = ZERO;
+    auto invTan = ONE / Tan(T(0.5) * fovY);
+    return Scale(Vec3<T>(invTan / ratio, invTan, ONE))
          * Mat4<T>(I, O, O, O,
                    O, I, O, O,
                    O ,O, far * invDis, -far * near * invDis,
@@ -215,7 +217,7 @@ inline typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T near, T fa
 template<typename T>
 inline typename Mat4<T>::Self Mat4<T>::LookAt(const Vec3<T>& src, const Vec3<T>& dst, const Vec3<T>& up)
 {
-    constexpr T I = ONE<T>(), O = ZERO<T>();
+    constexpr T I = ONE, O = ZERO;
     auto D = Normalize(dst - src);
     auto R = Normalize(Cross(up, D));
     auto U = Cross(D, R);
@@ -235,7 +237,7 @@ template<typename T>
 inline Vec3<T> ApplyToPoint(const Mat4<T> &m, const Vec3<T> &p)
 {
 	Vec4<T> ret = m * Vec4<T>(p.x, p.y, p.z, 1.0);
-	T dw = ONE<T>() / ret.w;
+	T dw = ONE / ret.w;
 	return Vec3<T>(dw * ret.x, dw * ret.y, dw * ret.z);
 }
 

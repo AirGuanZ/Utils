@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\Src\Common.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />
+    <ClInclude Include="..\Src\Math\Color.h" />
     <ClInclude Include="..\Src\Math\Mat4.h" />
     <ClInclude Include="..\Src\Math\Prelude.h" />
     <ClInclude Include="..\Src\Math\Random.h" />

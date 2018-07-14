@@ -34,6 +34,9 @@
     <ClInclude Include="..\Src\Math\Tri.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Math\Color.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\Mat4.inl">

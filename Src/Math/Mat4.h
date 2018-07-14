@@ -1,8 +1,5 @@
 #pragma once
 
-#include <cstring>
-#include <type_traits>
-
 #include "../Common.h"
 #include "Scalar.h"
 #include "Vec3.h"
@@ -28,7 +25,7 @@ public:
     using Component = T;
     using Self = Mat4<T>;
 
-    Mat4() : Mat4(ONE<T>()) { }
+    Mat4() : Mat4(ONE) { }
 
     explicit Mat4(Uninitialized_t) { }
 
