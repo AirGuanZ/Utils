@@ -9,10 +9,10 @@
 ### Scalar
 
 ```c++
-Abs(n)                // |n|
-Sqrt(n)               // sqrt(n)
-Clamp(n, minv, maxv)  // min(maxv, max(minv, n))
-Approx(lhs, rhs, eps) // |lhs - rhs| <= eps
+Abs(n)                  // |n|
+Sqrt(n)                 // sqrt(n)
+Clamp(n, minv, maxv)    // min(maxv, max(minv, n))
+ApproxEq(lhs, rhs, eps) // |lhs - rhs| <= eps
 ```
 
 ### Veci & Mat4
