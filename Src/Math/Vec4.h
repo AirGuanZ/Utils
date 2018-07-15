@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include "../Common.h"
 #include "Scalar.h"
 #include "Vec2.h"
@@ -22,6 +24,7 @@ public:
 
 public:
 
+    using Data = T[4];
     using Component = T;
     using Self = Vec4<T>;
 
@@ -30,6 +33,12 @@ public:
     explicit AGZ_FORCE_INLINE Vec4(Uninitialized_t) { }
 
     explicit AGZ_FORCE_INLINE Vec4(T value) : x(v), y(v), z(v), w(v) { }
+
+    explicit AGZ_FORCE_INLINE Vec4(const T *data)
+    {
+        static_assert(std::is_trivially_copyable_v<T>);
+        std::memcpy(&x, data, sizeof(Data));
+    }
 
     AGZ_FORCE_INLINE Vec4(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) { }
 

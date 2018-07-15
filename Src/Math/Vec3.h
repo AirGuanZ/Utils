@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include "../Common.h"
 #include "Scalar.h"
 #include "Vec2.h"
@@ -21,6 +23,7 @@ public:
 
 public:
 
+    using Data = T[3];
     using Component = T;
     using Self = Vec3<T>;
 
@@ -33,6 +36,12 @@ public:
     AGZ_FORCE_INLINE Vec3(const T &x, const T &y, const T &z) : x(x), y(y), z(z) { }
 
     AGZ_FORCE_INLINE Vec3(const Self &other) : x(other.x), y(other.y), z(other.z) { }
+
+    explicit AGZ_FORCE_INLINE Vec3(const T *data)
+    {
+        static_assert(std::is_trivially_copyable_v<T>);
+        std::memcpy(&x, data, sizeof(Data));
+    }
 
     AGZ_FORCE_INLINE Self &operator=(const Self &other)
     {

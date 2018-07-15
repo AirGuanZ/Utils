@@ -30,6 +30,10 @@
     <ClInclude Include="..\Src\Math\Vec2.h" />
     <ClInclude Include="..\Src\Math\Vec3.h" />
     <ClInclude Include="..\Src\Math\Vec4.h" />
+    <ClInclude Include="..\Src\SIMD\Prelude.h" />
+    <ClInclude Include="..\Src\SIMD\SSE.h" />
+    <ClInclude Include="..\Src\Time\Bench.h" />
+    <ClInclude Include="..\Src\Time\Prelude.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec2.inl" />

@@ -7,7 +7,7 @@
 using namespace AGZ::Math;
 using namespace std;
 
-TEST_CASE("Mat4")
+TEST_CASE("Math")
 {
     SECTION("Angle")
     {
@@ -61,8 +61,10 @@ TEST_CASE("Mat4")
     {
         Mat4d proj = Mat4d::Perspective(Degd(60.0), 640.0 / 480.0, 0.1, 100.0);
         REQUIRE((proj * Vec4d(0.0, 0.0, 0.0, 1.0)).z < 0.0);
-        REQUIRE(ApproxEq(Homogenize(proj * Vec4d(0.0, 10.0 / Sqrt(3.0), 10.0, 1.0)).y, 1.0, 1e-5));
-        REQUIRE(ApproxEq(Homogenize(proj * Vec4d(10.0 / Sqrt(3.0) * 640.0 / 480.0, 0.0, 10.0, 1.0)).x, 1.0, 1e-5));
+        REQUIRE(ApproxEq(Homogenize(proj * Vec4d(0.0, 10.0 / Sqrt(3.0), 10.0, 1.0)).y,
+                         1.0, 1e-5));
+        REQUIRE(ApproxEq(Homogenize(proj * Vec4d(10.0 / Sqrt(3.0) * 640.0 / 480.0, 0.0, 10.0, 1.0)).x,
+                         1.0, 1e-5));
     }
 
     SECTION("Vec")
@@ -90,5 +92,13 @@ TEST_CASE("Mat4")
 
         REQUIRE(ApproxEq(Clamp(Color4d(-4.0, 8.0, 0.0, 1.0), 0.0, 1.0), Color4d(0.f, 1.f, 0.f, 1.f), 1e-10));
         REQUIRE(ApproxEq(2.0 * Color3d(-4.0, 8.0, 0.0) + Color3d(8.0, -15.0, 1.0), Color3d(0.f, 1.f, 1.f), 1e-7));
+    }
+
+    SECTION("Random")
+    {
+        using namespace Random;
+        Uniform(1, 2);
+        Uniform(1u, 2u);
+        Uniform(1.0f, 2.0f);
     }
 }
