@@ -30,6 +30,7 @@ Vec3f v5 = v3.xxy(); // Fiexible swizzling
 
 Mat4f identity  = Mat4f(1.f);                              // Identity
 Mat4f rotate_xy = Mat4f::Rotate({ 1.f, 2.f }, Degf(90.0)); // Rotation
+Mat4f inv_rotxy = Inverse(rotate_xy); 					   // Inverse matrix
 //... Common graphics-used matrix
 ```
 
@@ -38,7 +39,7 @@ Mat4f rotate_xy = Mat4f::Rotate({ 1.f, 2.f }, Degf(90.0)); // Rotation
 ```c++
 Radf pi_rad = PI<Radf>();     // Pi in (float) radian
 Degd pi_deg = PI<Degd>();     // Pi in (double) degree
-Degd hpi_rad = pi_rad / 2.f;  // Pi/2 in (float) radian
+Degf hpi_rad = pi_rad / 2.f;  // Pi/2 in (float) radian
 float sin_hpi = Sin(hpi_rad); // Common trigonometric functions
 ```
 

@@ -296,12 +296,11 @@ inline typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T near, T fa
 {
     T invDis = T(1) / (far - near);
     constexpr T I = T(1), O = T(0);
-    auto invTan = T(1) / Tan(T(0.5) * fovY);
-    return Scale(Vec3<T>(invTan / ratio, invTan, T(1)))
-        * Mat4<T>(I, O, O, O,
-                  O, I, O, O,
-                  O, O, far * invDis, -far * near * invDis,
-                  O, O, I, O);
+    auto cot = Cot(T(0.5) * fovY);
+    return Mat4<T>(cot/ratio, O,   O,            O,
+                   O,         cot, O,            O,
+                   O,         O,   far * invDis, -far * near * invDis,
+                   O,         O,   I,            O);
 }
 
 template<typename T>

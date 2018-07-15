@@ -179,6 +179,13 @@ AGZ_FORCE_INLINE bool ApproxEq(const Vec4<T> &lhs, const Vec4<T> &rhs, T epsilon
            ApproxEq(lhs.w, rhs.w, epsilon);
 }
 
+template<typename T>
+AGZ_FORCE_INLINE Vec4<T> Homogenize(const Vec4<T> &vec)
+{
+    T inv_w = T(1) / vec.w;
+    return Vec4<T>(vec.x * inv_w, vec.y * inv_w, vec.z * inv_w, T(1));
+}
+
 using Vec4f = Vec4<float>;
 using Vec4d = Vec4<double>;
 

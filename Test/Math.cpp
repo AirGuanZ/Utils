@@ -57,6 +57,14 @@ TEST_CASE("Mat4")
         REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
     }
 
+    SECTION("Proj")
+    {
+        Mat4d proj = Mat4d::Perspective(Degd(60.0), 640.0 / 480.0, 0.1, 100.0);
+        REQUIRE((proj * Vec4d(0.0, 0.0, 0.0, 1.0)).z < 0.0);
+        REQUIRE(ApproxEq(Homogenize(proj * Vec4d(0.0, 10.0 / Sqrt(3.0), 10.0, 1.0)).y, 1.0, 1e-5));
+        REQUIRE(ApproxEq(Homogenize(proj * Vec4d(10.0 / Sqrt(3.0) * 640.0 / 480.0, 0.0, 10.0, 1.0)).x, 1.0, 1e-5));
+    }
+
     SECTION("Vec")
     {
         REQUIRE(ApproxEq(Cross(Vec3d::UNIT_X(), Vec3d::UNIT_Y()), Vec3d::UNIT_Z(), 1e-5));
