@@ -16,7 +16,7 @@ public:
 
     union
     {
-        __m128 m;
+        __m128 d;
         float data[4];
         struct { float x, y, z, w; };
         struct { float r, g, b, a; };
@@ -29,7 +29,7 @@ public:
     using Self = f32x4;
     
     AGZ_FORCE_INLINE f32x4()
-        : m(_mm_setzero_ps())
+        : d(_mm_setzero_ps())
     {
         
     }
@@ -40,64 +40,62 @@ public:
     }
 
     AGZ_FORCE_INLINE f32x4(float x, float y, float z, float w)
-        : m(_mm_set_ps(w, z, y, x))
+        : d(_mm_set_ps(w, z, y, x))
     {
         
     }
 
     explicit AGZ_FORCE_INLINE f32x4(float v)
-        : m(_mm_set_ps1(v))
+        : d(_mm_set_ps1(v))
     {
         
     }
 
     explicit AGZ_FORCE_INLINE f32x4(const float *data)
-        : m(_mm_load_ps(data))
+        : d(_mm_load_ps(data))
     {
         
     }
 
     explicit AGZ_FORCE_INLINE f32x4(const __m128 other)
-        : m(other)
+        : d(other)
     {
         
     }
 
     explicit AGZ_FORCE_INLINE f32x4(const Vec4f &v)
-        : m(_mm_load_ps(&v.x))
+        : d(_mm_load_ps(&v.x))
     {
 
     }
 
     AGZ_FORCE_INLINE f32x4(const Self &other)
-        : m(other.m)
+        : d(other.d)
     {
 
     }
 
     AGZ_FORCE_INLINE Vec4f AsVec() const
     {
-        float d[4];
-        _mm_store_ps(d, m);
-        return Vec4f(d);
+        return Vec4f(data);
     }
 
     AGZ_FORCE_INLINE float &operator[](size_t idx) { AGZ_ASSERT(idx < 4); return data[idx]; }
     AGZ_FORCE_INLINE float operator[](size_t idx) const { AGZ_ASSERT(idx < 4); return data[idx]; }
 
-    AGZ_FORCE_INLINE Self operator+(const Self &rhs) const { return Self(_mm_add_ps(m, rhs.m)); }
-    AGZ_FORCE_INLINE Self operator-(const Self &rhs) const { return Self(_mm_sub_ps(m, rhs.m)); }
-    AGZ_FORCE_INLINE Self operator*(const Self &rhs) const { return Self(_mm_mul_ps(m, rhs.m)); }
-    AGZ_FORCE_INLINE Self operator/(const Self &rhs) const { return Self(_mm_div_ps(m, rhs.m)); }
+    AGZ_FORCE_INLINE Self operator+(const Self &rhs) const { return Self(_mm_add_ps(d, rhs.d)); }
+    AGZ_FORCE_INLINE Self operator-(const Self &rhs) const { return Self(_mm_sub_ps(d, rhs.d)); }
+    AGZ_FORCE_INLINE Self operator*(const Self &rhs) const { return Self(_mm_mul_ps(d, rhs.d)); }
+    AGZ_FORCE_INLINE Self operator/(const Self &rhs) const { return Self(_mm_div_ps(d, rhs.d)); }
 
-    AGZ_FORCE_INLINE bool operator<(const Self &rhs) const { return _mm_movemask_ps(_mm_cmplt_ps(m, rhs.m)) == 0x0f; }
+    AGZ_FORCE_INLINE bool operator<(const Self &rhs) const { return _mm_movemask_ps(_mm_cmplt_ps(d, rhs.d)) == 0x0f; }
 };
 
 static_assert(sizeof(f32x4) == 16 && alignof(f32x4) == 16);
 
-AGZ_FORCE_INLINE f32x4 Abs(const f32x4 &v) { return f32x4(_mm_and_ps(v.m, _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff)))); }
+AGZ_FORCE_INLINE f32x4 Abs(const f32x4 &v) { return f32x4(_mm_and_ps(v.d, _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff)))); }
 
-AGZ_FORCE_INLINE f32x4 Sqrt(const f32x4 &v) { return f32x4(_mm_sqrt_ps(v.m)); }
+AGZ_FORCE_INLINE f32x4 Sqrt(const f32x4 &v) { return f32x4(_mm_sqrt_ps(v.d)); }
 
 AGZ_FORCE_INLINE bool ApproxEq(const f32x4 &lhs, const f32x4 &rhs, float epsilon)
 {
