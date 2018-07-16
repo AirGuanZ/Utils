@@ -49,7 +49,7 @@ public:
         
     }
 
-    explicit AGZ_FORCE_INLINE f32x4(const __m128 &other)
+    explicit AGZ_FORCE_INLINE f32x4(const __m128 other)
         : m(other)
     {
         

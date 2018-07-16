@@ -106,5 +106,27 @@ TEST_CASE("Math")
                          Vec4f(4.0f, 3.0f, 2.0f, 1.0f).Map<float>(
                             [](float x) { return Sqrt(x); }),
                          1e-5f));
+        
+        AGZ::Time::Bench::
+        Run("Nor version", 20, [](){
+            Vec4f data[100000];
+            for(auto &v : data)
+                v = Vec4f(1.0f, 2.0f, 3.0f, 4.0f);
+            for(int i = 0; i != 100; ++i)
+            {
+                for(auto &v : data)
+                    v = Sqrt(v);
+            }
+        }).
+        Run("SSE version", 20, [](){
+            Vec4f data[100000];
+            for(auto &v : data)
+                v = Vec4f(1.0f, 2.0f, 3.0f, 4.0f);
+            for(int i = 0; i != 100; ++i)
+            {
+                for(auto &v : data)
+                    v = Sqrt(f32x4(v)).AsVec();
+            }
+        });
     }
 }

@@ -31,9 +31,9 @@ public:
 
     explicit AGZ_FORCE_INLINE Vec3(Uninitialized_t) { }
 
-    explicit AGZ_FORCE_INLINE Vec3(const T &value) : x(v), y(v), z(v) { }
+    explicit AGZ_FORCE_INLINE Vec3(T value) : x(value), y(value), z(value) { }
 
-    AGZ_FORCE_INLINE Vec3(const T &x, const T &y, const T &z) : x(x), y(y), z(z) { }
+    AGZ_FORCE_INLINE Vec3(T x, T y, T z) : x(x), y(y), z(z) { }
 
     AGZ_FORCE_INLINE Vec3(const Self &other) : x(other.x), y(other.y), z(other.z) { }
 
@@ -172,6 +172,12 @@ AGZ_FORCE_INLINE auto Clamp(const Vec3<T> &vec, T minv, T maxv)
                     Clamp(vec.x, minv, maxv),
                     Clamp(vec.y, minv, maxv),
                     Clamp(vec.z, minv, maxv));
+}
+
+template<typename T>
+AGZ_FORCE_INLINE auto Sqrt(const Vec3<T> &v)
+{
+    return Vec3<decltype(Sqrt(v.x))>(Sqrt(v.x), Sqrt(v.y), Sqrt(v.y));
 }
 
 template<typename T>
