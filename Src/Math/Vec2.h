@@ -5,8 +5,7 @@
 #include "../Common.h"
 #include "Scalar.h"
 
-AGZ_NS_BEG(AGZ)
-AGZ_NS_BEG(Math)
+AGZ_NS_BEG(AGZ::Math)
 
 template<typename T>
 class Vec2
@@ -153,5 +152,4 @@ AGZ_FORCE_INLINE bool ApproxEq(const Vec2<T> &lhs, const Vec2<T> &rhs, T epsilon
 using Vec2f = Vec2<float>;
 using Vec2d = Vec2<double>;
 
-AGZ_NS_END(Math)
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::Math)

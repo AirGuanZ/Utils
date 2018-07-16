@@ -6,8 +6,7 @@
 #include "../Common.h"
 #include "Angle.h"
 
-AGZ_NS_BEG(AGZ)
-AGZ_NS_BEG(Math)
+AGZ_NS_BEG(AGZ::Math)
 
 template<typename T> struct Abs_impl;
 template<>           struct Abs_impl<float>  { static constexpr float Abs(float v) { return std::fabsf(v); } };
@@ -25,5 +24,4 @@ template<typename T> AGZ_FORCE_INLINE T Clamp(T v, T minv, T maxv) { return (std
 
 template<typename T, typename U> AGZ_FORCE_INLINE bool ApproxEq(T lhs, T rhs, U epsilon) { return Abs(lhs - rhs) <= epsilon; }
 
-AGZ_NS_END(Math)
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::Math)

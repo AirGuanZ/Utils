@@ -5,8 +5,7 @@
 #include "../Common.h"
 #include "Angle.h"
 
-AGZ_NS_BEG(AGZ)
-AGZ_NS_BEG(Math)
+AGZ_NS_BEG(AGZ::Math)
 
 template<typename T> struct PI_impl;
 template<>           struct PI_impl<float>  { static constexpr float  PI() { return 3.141592653589793238462643383f; } };
@@ -49,5 +48,4 @@ template<typename T> AGZ_FORCE_INLINE auto Cos(T angle) { return Cos_impl<T>::Co
 template<typename T> AGZ_FORCE_INLINE auto Tan(T angle) { return Sin<T>(angle) / Cos<T>(angle); }
 template<typename T> AGZ_FORCE_INLINE auto Cot(T angle) { return Cos<T>(angle) / Sin<T>(angle); }
 
-AGZ_NS_END(Math)
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::Math)

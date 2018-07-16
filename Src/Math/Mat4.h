@@ -10,8 +10,7 @@
 #include "Vec3.h"
 #include "Vec4.h"
 
-AGZ_NS_BEG(AGZ)
-AGZ_NS_BEG(Math)
+AGZ_NS_BEG(AGZ::Math)
 
 /*
     Row-major 4x4 matrix
@@ -440,5 +439,4 @@ inline Mat4<double> Inverse<double>(const Mat4<double> &m)
     return InverseForFloat(m);
 }
 
-AGZ_NS_END(Math)
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::Math)

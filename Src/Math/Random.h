@@ -5,9 +5,7 @@
 
 #include "../Common.h"
 
-AGZ_NS_BEG(AGZ)
-AGZ_NS_BEG(Math)
-AGZ_NS_BEG(Random)
+AGZ_NS_BEG(AGZ::Math::Random)
 
 using SharedEngine = std::default_random_engine;
 
@@ -67,6 +65,4 @@ AGZ_FORCE_INLINE void SetSharedSeed(SharedEngine::result_type seed)
     SHARED_RNG.GetEng().seed(seed);
 }
 
-AGZ_NS_END(Random)
-AGZ_NS_END(Math)
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::Math::Random)

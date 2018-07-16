@@ -67,11 +67,11 @@ public:
 
     }
 
-    Vec4f AsVec() const
+    AGZ_FORCE_INLINE Vec4f AsVec() const
     {
-        Vec4f ret(UNINITIALIZED);
-        _mm_store_ps(&ret.x, m);
-        return ret;
+        float d[4];
+        _mm_store_ps(d, m);
+        return Vec4f(d);
     }
 
     AGZ_FORCE_INLINE Self operator+(const Self &rhs) const { return Self(_mm_add_ps(m, rhs.m)); }

@@ -2,8 +2,7 @@
 
 #include "../Common.h"
 
-AGZ_NS_BEG(AGZ)
-AGZ_NS_BEG(Math)
+AGZ_NS_BEG(AGZ::Math)
 
 template<typename T, int I>
 struct AngleTemplate
@@ -57,5 +56,4 @@ using Degd = Deg<double>;
 using Radf = Rad<float>;
 using Radd = Rad<double>;
 
-AGZ_NS_END(Math)
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::Math)

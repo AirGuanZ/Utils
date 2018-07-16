@@ -7,8 +7,7 @@
 #include "Vec2.h"
 #include "Vec3.h"
 
-AGZ_NS_BEG(AGZ)
-AGZ_NS_BEG(Math)
+AGZ_NS_BEG(AGZ::Math)
 
 template<typename T>
 class Vec4
@@ -198,5 +197,4 @@ AGZ_FORCE_INLINE Vec4<T> Homogenize(const Vec4<T> &vec)
 using Vec4f = Vec4<float>;
 using Vec4d = Vec4<double>;
 
-AGZ_NS_END(Math)
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::Math)
