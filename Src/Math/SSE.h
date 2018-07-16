@@ -13,6 +13,7 @@ AGZ_NS_BEG(AGZ::Math)
 class alignas(16) f32x4
 {
 public:
+
     union
     {
         __m128 m;
@@ -23,10 +24,10 @@ public:
     };
 
 public:
+
     using Component = float;
     using Self = f32x4;
-
-public:
+    
     AGZ_FORCE_INLINE f32x4()
         : m(_mm_setzero_ps())
     {
