@@ -1,5 +1,6 @@
-#include <iostream>
+#include <algorithm>
 
+#include <Time/Prelude.h>
 #include <Math/Prelude.h>
 
 #include "Catch.hpp"
@@ -94,11 +95,16 @@ TEST_CASE("Math")
         REQUIRE(ApproxEq(2.0 * Color3d(-4.0, 8.0, 0.0) + Color3d(8.0, -15.0, 1.0), Color3d(0.f, 1.f, 1.f), 1e-7));
     }
 
-    SECTION("Random")
+
+    SECTION("f32x4")
     {
-        using namespace Random;
-        Uniform(1, 2);
-        Uniform(1u, 2u);
-        Uniform(1.0f, 2.0f);
+        f32x4 a(1.0f, 2.0f, 3.0f, 4.0f);
+        f32x4 b(2.0f, 3.0f, 4.0f, 5.0f);
+        REQUIRE(ApproxEq(a + b, f32x4(3.0, 5.0, 7.0, 9.0), 1e-7f));
+
+        REQUIRE(ApproxEq(Sqrt(f32x4(4.0f, 3.0f, 2.0f, 1.0f)).AsVec(),
+                         Vec4f(4.0f, 3.0f, 2.0f, 1.0f).Map<float>(
+                            [](float x) { return Sqrt(x); }),
+                         1e-5f));
     }
 }

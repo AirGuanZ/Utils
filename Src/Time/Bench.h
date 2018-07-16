@@ -13,44 +13,54 @@ AGZ_NS_BEG(Time)
 AGZ_NS_BEG(Bench)
 
 template<typename F>
-void Bench_impl(F &&func, int repeat)
+void Bench_impl(int repeat, F &&func)
 {
-    auto ms = decltype(std::chrono::system_clock::now() - std::chrono::system_clock::now())(0);
+    using C = std::chrono::high_resolution_clock;
+    auto ms = decltype(C::now() - C::now())(0);
     for(int i = 0; i < repeat; ++i)
     {
-        auto begin = std::chrono::system_clock::now();
+        auto begin = C::now();
         func();
-        ms = ms + std::chrono::system_clock::now() - begin;
+        ms = ms + C::now() - begin;
     }
-    std::cout << (ms / repeat).count() << "ms" << std::endl;
+    std::cout << "[Repeat] " << repeat << " [Time] "
+              << (std::chrono::duration_cast<std::chrono::milliseconds>(ms) / repeat).count()
+              << "ms" << std::endl;
 }
 
 class Bench_t
 {
 public:
     template<typename F>
-    AGZ_FORCE_INLINE const Bench_t &Run(F &&func, int repeat = 1) const
+    AGZ_FORCE_INLINE const Bench_t &Run(int repeat, F &&func) const
     {
-        Bench_impl(std::forward<F>(func), repeat);
+        Bench_impl(repeat, std::forward<F>(func));
+        return *this;
+    }
+
+    template<typename F>
+    AGZ_FORCE_INLINE const Bench_t &Run(const std::string &name, int repeat, F &&func) const
+    {
+        std::cout << "[Benchmark] " << name << " ";
+        Bench_impl(repeat, std::forward<F>(func));
         return *this;
     }
 };
 
 template<typename F>
-AGZ_FORCE_INLINE Bench_t Run(F &&func, int repeat = 1)
+AGZ_FORCE_INLINE Bench_t Run(int repeat, F &&func)
 {
-    Bench_impl(std::forward<F>(func), repeat);
+    Bench_impl(repeat, std::forward<F>(func));
     return Bench_t();
 }
 
 template<typename F>
-AGZ_FORCE_INLINE Bench_t NamedRun(const std::string &name, F &&func, int repeat = 1)
+AGZ_FORCE_INLINE Bench_t Run(const std::string &name, int repeat, F &&func)
 {
     std::cout << "[Benchmark] " << name << " ";
-    return Run(std::forward<F>(func), repeat);
+    Bench_impl(repeat, std::forward<F>(func));
+    return Bench_t();
 }
-
-#define AGZ_TIME_BENCH(N, R, F) (::AGZ::Time::Bench::NamedRun(N, F, R))
 
 AGZ_NS_END(Bench)
 

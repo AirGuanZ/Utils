@@ -18,4 +18,6 @@ struct Uninitialized_t { };
 
 inline Uninitialized_t UNINITIALIZED;
 
+#define AGZ_USE_SSE
+
 AGZ_NS_END(AGZ)

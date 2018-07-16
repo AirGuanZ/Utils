@@ -4,9 +4,6 @@
     <Filter Include="Math">
       <UniqueIdentifier>{e8bb4a33-5f13-46a8-9205-8a1ef2cf1159}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SIMD">
-      <UniqueIdentifier>{eec3160c-1b2d-448a-87af-b07965e2ae38}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Time">
       <UniqueIdentifier>{15091514-2cd3-4493-9b2f-351e4869b3dd}</UniqueIdentifier>
     </Filter>
@@ -43,17 +40,14 @@
     <ClInclude Include="..\Src\Math\Color.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\SIMD\SSE.h">
-      <Filter>SIMD</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Time\Bench.h">
       <Filter>Time</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\SIMD\Prelude.h">
-      <Filter>SIMD</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Time\Prelude.h">
       <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Math\SSE.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

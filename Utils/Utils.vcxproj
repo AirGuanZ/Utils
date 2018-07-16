@@ -26,12 +26,11 @@
     <ClInclude Include="..\Src\Math\Prelude.h" />
     <ClInclude Include="..\Src\Math\Random.h" />
     <ClInclude Include="..\Src\Math\Scalar.h" />
+    <ClInclude Include="..\Src\Math\SSE.h" />
     <ClInclude Include="..\Src\Math\Tri.h" />
     <ClInclude Include="..\Src\Math\Vec2.h" />
     <ClInclude Include="..\Src\Math\Vec3.h" />
     <ClInclude Include="..\Src\Math\Vec4.h" />
-    <ClInclude Include="..\Src\SIMD\Prelude.h" />
-    <ClInclude Include="..\Src\SIMD\SSE.h" />
     <ClInclude Include="..\Src\Time\Bench.h" />
     <ClInclude Include="..\Src\Time\Prelude.h" />
   </ItemGroup>

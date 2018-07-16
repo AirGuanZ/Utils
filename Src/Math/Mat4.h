@@ -391,7 +391,7 @@ inline Mat4<T> InverseForFloat(const Mat4<T> &_m)
             std::swap(m[irow][3], m[icol][3]);
         }
         indxr[i] = irow, indxc[i] = icol;
-        AGZ_ASSERT(minv[icol][icol] != T(0.));
+        AGZ_ASSERT(m[icol][icol] != T(0.));
 
         T pivinv = T(1.0) / m[icol][icol];
         m[icol][icol] = T(1.0);

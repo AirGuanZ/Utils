@@ -5,6 +5,7 @@
 #include "Mat4.h"
 #include "Random.h"
 #include "Scalar.h"
+#include "SSE.h"
 #include "Tri.h"
 #include "Vec2.h"
 #include "Vec3.h"

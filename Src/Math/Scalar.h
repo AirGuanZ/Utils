@@ -23,7 +23,7 @@ template<>           AGZ_FORCE_INLINE double Sqrt<double>(double value) { return
 
 template<typename T> AGZ_FORCE_INLINE T Clamp(T v, T minv, T maxv) { return (std::max)((std::min)(v, maxv), minv); }
 
-template<typename T> AGZ_FORCE_INLINE bool ApproxEq(T lhs, T rhs, T epsilon) { return Abs(lhs - rhs) <= epsilon; }
+template<typename T, typename U> AGZ_FORCE_INLINE bool ApproxEq(T lhs, T rhs, U epsilon) { return Abs(lhs - rhs) <= epsilon; }
 
 AGZ_NS_END(Math)
 AGZ_NS_END(AGZ)
