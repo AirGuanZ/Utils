@@ -83,6 +83,7 @@ TEST_CASE("Math")
         REQUIRE(ApproxEq(Vec3f(1.0, 2.0, 3.0) * Vec3f(2.0, 3.0, 4.0), Vec3f(2.0, 6.0, 12.0), 1e-5f));
 
         REQUIRE(ApproxEq(Vec4d(1.0, 2.0, 3.0, 4.0).abgr(), Vec4d(4.0, 3.0, 2.0, 1.0), 1e-10));
+        REQUIRE(ApproxEq(Vec4d(1.0, 2.0, 3.0, 4.0).xxz(), Vec3d(1.0, 1.0, 3.0), 1e-10));
         REQUIRE(ApproxEq(Vec4d(1.0, 2.0, 3.0, 4.0).um(), Vec2d(1.0, 3.0), 1e-10));
     }
 

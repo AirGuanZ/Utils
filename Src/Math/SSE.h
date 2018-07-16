@@ -13,7 +13,14 @@ AGZ_NS_BEG(AGZ::Math)
 class alignas(16) f32x4
 {
 public:
-    union { __m128 m; float v[4]; };
+    union
+    {
+        __m128 m;
+        float data[4];
+        struct { float x, y, z, w; };
+        struct { float r, g, b, a; };
+        struct { float u, v, m, n; };
+    };
 
 public:
     using Component = float;
@@ -73,6 +80,9 @@ public:
         _mm_store_ps(d, m);
         return Vec4f(d);
     }
+
+    AGZ_FORCE_INLINE float &operator[](size_t idx) { AGZ_ASSERT(idx < 4); return data[idx]; }
+    AGZ_FORCE_INLINE float operator[](size_t idx) const { AGZ_ASSERT(idx < 4); return data[idx]; }
 
     AGZ_FORCE_INLINE Self operator+(const Self &rhs) const { return Self(_mm_add_ps(m, rhs.m)); }
     AGZ_FORCE_INLINE Self operator-(const Self &rhs) const { return Self(_mm_sub_ps(m, rhs.m)); }
