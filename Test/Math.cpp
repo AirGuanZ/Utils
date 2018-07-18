@@ -20,8 +20,7 @@ TEST_CASE("Math")
         REQUIRE(ApproxEq(Cos(PI<Degd>()), -1.0, 1e-5));
         REQUIRE(ApproxEq(Sin(PI<Degd>() / 2.0), 1.0, 1e-5));
 
-        REQUIRE(ApproxEq(Sin(PI<Degd>() / 2.0
-                           + PI<Degd>() / 2.0),
+        REQUIRE(ApproxEq(Sin(PI<Degd>() / 2.0 + PI<Degd>() / 2.0),
                          0.0, 1e-5));
     }
 
@@ -80,9 +79,11 @@ TEST_CASE("Math")
                          0.0, 1e-7));
 
         REQUIRE(ApproxEq(2.f * Vec2f(1.0, 2.0) + Vec2f(2.0, 3.0), Vec2f(4.0, 7.0), 1e-5f));
-        REQUIRE(ApproxEq(Vec3f(1.0, 2.0, 3.0) * Vec3f(2.0, 3.0, 4.0), Vec3f(2.0, 6.0, 12.0), 1e-5f));
+        REQUIRE(ApproxEq(Vec3f(1.0, 2.0, 3.0) * Vec3f(2.0, 3.0, 4.0),
+                         Vec3f(2.0, 6.0, 12.0), 1e-5f));
 
-        REQUIRE(ApproxEq(Vec4d(1.0, 2.0, 3.0, 4.0).abgr(), Vec4d(4.0, 3.0, 2.0, 1.0), 1e-10));
+        REQUIRE(ApproxEq(Vec4d(1.0, 2.0, 3.0, 4.0).abgr(),
+                         Vec4d(4.0, 3.0, 2.0, 1.0), 1e-10));
         REQUIRE(ApproxEq(Vec4d(1.0, 2.0, 3.0, 4.0).um(), Vec2d(1.0, 3.0), 1e-10));
     }
 
@@ -91,10 +92,11 @@ TEST_CASE("Math")
         REQUIRE(ApproxEq((Color4f)COLOR::RED, Color4f(1.f, 0.f, 0.f, 1.f), 1e-10f));
         REQUIRE(ApproxEq((Color4f)COLOR::GREEN, Color4f(0.f, 1.f, 0.f, 1.f), 1e-10f));
 
-        REQUIRE(ApproxEq(Clamp(Color4d(-4.0, 8.0, 0.0, 1.0), 0.0, 1.0), Color4d(0.f, 1.f, 0.f, 1.f), 1e-10));
-        REQUIRE(ApproxEq(2.0 * Color3d(-4.0, 8.0, 0.0) + Color3d(8.0, -15.0, 1.0), Color3d(0.f, 1.f, 1.f), 1e-7));
+        REQUIRE(ApproxEq(Clamp(Color4d(-4.0, 8.0, 0.0, 1.0), 0.0, 1.0),
+                         Color4d(0.f, 1.f, 0.f, 1.f), 1e-10));
+        REQUIRE(ApproxEq(2.0 * Color3d(-4.0, 8.0, 0.0) + Color3d(8.0, -15.0, 1.0),
+                         Color3d(0.f, 1.f, 1.f), 1e-7));
     }
-
 
     SECTION("f32x4")
     {
@@ -102,7 +104,7 @@ TEST_CASE("Math")
         f32x4 b(2.0f, 3.0f, 4.0f, 5.0f);
         REQUIRE(ApproxEq(a + b, f32x4(3.0, 5.0, 7.0, 9.0), 1e-7f));
 
-        REQUIRE(ApproxEq(Sqrt(f32x4(4.0f, 3.0f, 2.0f, 1.0f)).AsVec(),
+        REQUIRE(ApproxEq(Sqrt(f32x4(4.0f, 3.0f, 2.0f, 1.0f) * F32X4::ONE).AsVec(),
                          Vec4f(4.0f, 3.0f, 2.0f, 1.0f).Map<float>(
                             [](float x) { return Sqrt(x); }),
                          1e-5f));

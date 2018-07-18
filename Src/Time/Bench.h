@@ -31,6 +31,7 @@ void Bench_impl(int repeat, F &&func)
 class Bench_t
 {
 public:
+
     template<typename F>
     AGZ_FORCE_INLINE const Bench_t &Run(int repeat, F &&func) const
     {

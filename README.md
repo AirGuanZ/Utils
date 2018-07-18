@@ -52,3 +52,13 @@ int x   = Uniform(1, 10);       // Sample an integer uniformly in [1, 10]
 float y = Uniform(-10.f, 10.f); // Sample a float uniformly in [-10, 10]
 ```
 
+### SIMD
+
+简单地拿SSE/SSE2加速`Vec4f`的运算。
+
+```c++
+f32x4 a = f32x4(1.0f, 2.0f, 3.0f, 4.0f);        // From 
+f32x4 b = f32x4(Vec4f(2.0f, 3.0f, 4.0f, 5.0f)); // From Vec4f
+f32x4 c = Sqrt(a + b);
+Vec4f d = c.AsVec(); // d: (sqrt(3), sqrt(5), sqrt(7), sqrt(9))
+```

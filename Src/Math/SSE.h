@@ -2,7 +2,7 @@
 
 #include "../Common.h"
 
-#ifdef AGZ_USE_SSE
+#ifdef AGZ_USE_SSE2
 
 #include <emmintrin.h>
 
@@ -13,13 +13,14 @@ AGZ_NS_BEG(AGZ::Math)
 class alignas(16) f32x4
 {
 public:
+
     union { __m128 m; float v[4]; };
 
 public:
+
     using Component = float;
     using Self = f32x4;
 
-public:
     AGZ_FORCE_INLINE f32x4()
         : m(_mm_setzero_ps())
     {
@@ -74,6 +75,12 @@ public:
         return Vec4f(d);
     }
 
+    Self &operator=(const Self &other)
+    {
+        m = other.m;
+        return *this;
+    }
+
     AGZ_FORCE_INLINE Self operator+(const Self &rhs) const { return Self(_mm_add_ps(m, rhs.m)); }
     AGZ_FORCE_INLINE Self operator-(const Self &rhs) const { return Self(_mm_sub_ps(m, rhs.m)); }
     AGZ_FORCE_INLINE Self operator*(const Self &rhs) const { return Self(_mm_mul_ps(m, rhs.m)); }
@@ -91,6 +98,17 @@ AGZ_FORCE_INLINE f32x4 Sqrt(const f32x4 &v) { return f32x4(_mm_sqrt_ps(v.m)); }
 AGZ_FORCE_INLINE bool ApproxEq(const f32x4 &lhs, const f32x4 &rhs, float epsilon)
 {
     return Abs(lhs - rhs) < f32x4(epsilon);
+}
+
+namespace F32X4
+{
+    inline const f32x4 ZERO = f32x4(0.0f);
+    inline const f32x4 ONE  = f32x4(1.0f);
+
+    inline const f32x4 UNIT_X = f32x4(1.0f, 0.0f, 0.0f, 0.0f);
+    inline const f32x4 UNIT_Y = f32x4(0.0f, 1.0f, 0.0f, 0.0f);
+    inline const f32x4 UNIT_Z = f32x4(0.0f, 0.0f, 1.0f, 0.0f);
+    inline const f32x4 UNIT_W = f32x4(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 AGZ_NS_END(AGZ::Math)
