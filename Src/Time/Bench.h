@@ -15,7 +15,8 @@ AGZ_NS_BEG(Bench)
 template<typename F>
 void Bench_impl(int repeat, F &&func)
 {
-    using C = std::chrono::high_resolution_clock;
+    using namespace std::chrono;
+    using C = high_resolution_clock;
     auto ms = decltype(C::now() - C::now())(0);
     for(int i = 0; i < repeat; ++i)
     {
@@ -23,8 +24,8 @@ void Bench_impl(int repeat, F &&func)
         func();
         ms = ms + C::now() - begin;
     }
-    std::cout << "[Repeat] " << repeat << " [Time] "
-              << (std::chrono::duration_cast<std::chrono::milliseconds>(ms) / repeat).count()
+    std::cout << "[Repeat] " << repeat << " [Average Time] "
+              << (duration_cast<milliseconds>(ms) / repeat).count()
               << "ms" << std::endl;
 }
 
@@ -58,9 +59,7 @@ AGZ_FORCE_INLINE Bench_t Run(int repeat, F &&func)
 template<typename F>
 AGZ_FORCE_INLINE Bench_t Run(const std::string &name, int repeat, F &&func)
 {
-    std::cout << "[Benchmark] " << name << " ";
-    Bench_impl(repeat, std::forward<F>(func));
-    return Bench_t();
+    return Bench_t().Run(name, repeat, std::forward<F>(func));
 }
 
 AGZ_NS_END(Bench)

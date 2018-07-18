@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include <type_traits>
 
 #include "../Common.h"
@@ -28,9 +29,9 @@ public:
 
     explicit AGZ_FORCE_INLINE Vec2(Uninitialized_t) { }
 
-    explicit AGZ_FORCE_INLINE Vec2(const T &value) : x(v), y(v) { }
+    explicit AGZ_FORCE_INLINE Vec2(T value) : x(value), y(value) { }
 
-    AGZ_FORCE_INLINE Vec2(const T &x, const T &y) : x(x), y(y) { }
+    AGZ_FORCE_INLINE Vec2(T x, T y) : x(x), y(y) { }
 
     AGZ_FORCE_INLINE Vec2(const Self &other) : x(other.x), y(other.y) { }
 
@@ -140,6 +141,12 @@ AGZ_FORCE_INLINE auto Clamp(const Vec2<T> &vec, T minv, T maxv)
 {
     return Vec2<decltype(Clamp(vec.x, minv, maxv))>(
         Clamp(vec.x, minv, maxv), Clamp(vec.y, minv, maxv));
+}
+
+template<typename T>
+AGZ_FORCE_INLINE auto Sqrt(const Vec2<T> &v)
+{
+    return Vec2<decltype(Sqrt(v.x))>(Sqrt(v.x), Sqrt(v.y));
 }
 
 template<typename T>

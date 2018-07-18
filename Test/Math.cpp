@@ -82,8 +82,8 @@ TEST_CASE("Math")
         REQUIRE(ApproxEq(Vec3f(1.0, 2.0, 3.0) * Vec3f(2.0, 3.0, 4.0),
                          Vec3f(2.0, 6.0, 12.0), 1e-5f));
 
-        REQUIRE(ApproxEq(Vec4d(1.0, 2.0, 3.0, 4.0).abgr(),
-                         Vec4d(4.0, 3.0, 2.0, 1.0), 1e-10));
+        REQUIRE(ApproxEq(Vec4d(1.0, 2.0, 3.0, 4.0).abgr(), Vec4d(4.0, 3.0, 2.0, 1.0), 1e-10));
+        REQUIRE(ApproxEq(Vec4d(1.0, 2.0, 3.0, 4.0).xxz(), Vec3d(1.0, 1.0, 3.0), 1e-10));
         REQUIRE(ApproxEq(Vec4d(1.0, 2.0, 3.0, 4.0).um(), Vec2d(1.0, 3.0), 1e-10));
     }
 
@@ -108,5 +108,27 @@ TEST_CASE("Math")
                          Vec4f(4.0f, 3.0f, 2.0f, 1.0f).Map<float>(
                             [](float x) { return Sqrt(x); }),
                          1e-5f));
+        
+        AGZ::Time::Bench::
+        Run("Nor version", 20, [](){
+            vector<Vec4f> data(100000);
+            for(auto &v : data)
+                v = Vec4f(1.0f, 2.0f, 3.0f, 4.0f);
+            for(int i = 0; i != 100; ++i)
+            {
+                for(auto &v : data)
+                    v = Sqrt(v);
+            }
+        }).
+        Run("SSE version", 20, [](){
+            vector<Vec4f> data(100000);
+            for(auto &v : data)
+                v = Vec4f(1.0f, 2.0f, 3.0f, 4.0f);
+            for(int i = 0; i != 100; ++i)
+            {
+                for(auto &v : data)
+                    v = Sqrt(f32x4(v)).AsVec();
+            }
+        });
     }
 }
