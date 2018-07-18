@@ -48,8 +48,10 @@ float sin_hpi = Sin(hpi_rad); // Common trigonometric functions
 我就是单纯地觉得标准库的`<random>`用起来太麻烦……
 
 ```c++
-int x   = Uniform(1, 10);       // Sample an integer uniformly in [1, 10]
-float y = Uniform(-10.f, 10.f); // Sample a float uniformly in [-10, 10]
+int x    = Uniform(1, 10);       // Sample an integer uniformly in [1, 10]
+float y  = Uniform(-10.f, 10.f); // Sample a float uniformly in [-10, 10]
+double z = Normal(1.0, 4.0);     // Sample a double with normal distribution
+                                 // mean = 1, stddev = 4.0
 ```
 
 ### SIMD
@@ -57,7 +59,7 @@ float y = Uniform(-10.f, 10.f); // Sample a float uniformly in [-10, 10]
 简单地拿SSE/SSE2加速`Vec4f`的运算。
 
 ```c++
-f32x4 a = f32x4(1.0f, 2.0f, 3.0f, 4.0f);        // From 
+f32x4 a = f32x4(1.0f, 2.0f, 3.0f, 4.0f);        // From floats
 f32x4 b = f32x4(Vec4f(2.0f, 3.0f, 4.0f, 5.0f)); // From Vec4f
 f32x4 c = Sqrt(a + b);
 Vec4f d = c.AsVec(); // d: (sqrt(3), sqrt(5), sqrt(7), sqrt(9))

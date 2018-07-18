@@ -111,7 +111,7 @@ TEST_CASE("Math")
         
         AGZ::Time::Bench::
         Run("Nor version", 20, [](){
-            vector<Vec4f> data(100000);
+            vector<Vec4f> data(10000);
             for(auto &v : data)
                 v = Vec4f(1.0f, 2.0f, 3.0f, 4.0f);
             for(int i = 0; i != 100; ++i)
@@ -121,7 +121,7 @@ TEST_CASE("Math")
             }
         }).
         Run("SSE version", 20, [](){
-            vector<Vec4f> data(100000);
+            vector<Vec4f> data(10000);
             for(auto &v : data)
                 v = Vec4f(1.0f, 2.0f, 3.0f, 4.0f);
             for(int i = 0; i != 100; ++i)
