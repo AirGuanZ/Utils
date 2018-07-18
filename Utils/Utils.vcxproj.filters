@@ -7,6 +7,9 @@
     <Filter Include="Time">
       <UniqueIdentifier>{15091514-2cd3-4493-9b2f-351e4869b3dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Buffer">
+      <UniqueIdentifier>{10d262d2-8012-4482-9276-80048e6714aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Common.h" />
@@ -48,6 +51,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\Math\SSE.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Buffer\Prelude.h">
+      <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Buffer\Buffer2D.h">
+      <Filter>Buffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

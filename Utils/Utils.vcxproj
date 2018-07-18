@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Src\Buffer\Buffer2D.h" />
+    <ClInclude Include="..\Src\Buffer\Prelude.h" />
     <ClInclude Include="..\Src\Common.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />
     <ClInclude Include="..\Src\Math\Color.h" />
