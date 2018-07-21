@@ -1,7 +1,13 @@
 #pragma once
 
 #ifdef _MSC_VER
+
     #define AGZ_FORCE_INLINE __forceinline
+
+    #include <cstdlib>
+    #define AGZ_ALIGNED_MALLOC _aligned_malloc
+    #define AGZ_ALIGNED_FREE   _aligned_free
+
 #elif defined __GNUC__
     #define AGZ_FORCE_INLINE __attribute__((always_inline))
 #else
@@ -17,8 +23,10 @@
 AGZ_NS_BEG(AGZ)
 
 struct Uninitialized_t { };
-
 inline Uninitialized_t UNINITIALIZED;
+
+struct CONS_FLAG_FROM_FN_t { };
+inline CONS_FLAG_FROM_FN_t FROM_FN;
 
 #define AGZ_USE_SSE2
 
