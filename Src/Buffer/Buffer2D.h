@@ -13,21 +13,23 @@ void DefaultElemInitializer(E *buf)
 }
 
 template<typename E>
-class Buffer2D final
+class Buffer2D
 {
     size_t w_;
     size_t h_;
     E *d_;
 
+public:
+
+    using Elem = E;
+    using Self = Buffer2D<E>;
+
     template<typename F>
     Buffer2D(size_t w, size_t h, F &&initer)
-        : w_(w), h_(w)
+        : w_(w), h_(h)
     {
         size_t s = w * h;
-        AGZ_ASSERT(s > 0);
-        d_ = static_cast<E*>(AGZ_ALIGNED_MALLOC(s * sizeof(E), alignof(E)));
-        if(!d_)
-            throw std::bad_alloc();
+        Alloc(s);
 
         for(size_t i = 0; i < s; ++i)
             initer(d_ + i);
@@ -35,13 +37,10 @@ class Buffer2D final
 
     template<typename F>
     Buffer2D(CONS_FLAG_FROM_FN_t, size_t w, size_t h, F &&initer)
-        : w_(w), h_(w)
+        : w_(w), h_(h)
     {
         size_t s = w * h;
-        AGZ_ASSERT(s > 0);
-        d_ = static_cast<E*>(AGZ_ALIGNED_MALLOC(s * sizeof(E), alignof(E)));
-        if(!d_)
-            throw std::bad_alloc();
+        Alloc(s);
 
         E *d = d_;
         for(size_t y = 0; y < h; ++y)
@@ -49,6 +48,14 @@ class Buffer2D final
             for(size_t x = 0; x < w; ++x)
                 initer(x, y, d++);
         }
+    }
+
+    void Alloc(size_t num)
+    {
+        AGZ_ASSERT(num > 0);
+        d_ = static_cast<E*>(AGZ_ALIGNED_MALLOC(num * sizeof(E), alignof(E)));
+        if(!d_)
+            throw std::bad_alloc();
     }
 
     void Free()
@@ -59,11 +66,6 @@ class Buffer2D final
             (d_ + i)->~E();
         AGZ_ALIGNED_FREE(d_);
     }
-
-public:
-
-    using Elem = E;
-    using Self = Buffer2D<E>;
 
     template<typename F = void(*)(E*)>
     static Self New(size_t w, size_t h, F &&initer = &DefaultElemInitializer<E>)
@@ -95,6 +97,22 @@ public:
         d_ = moveFrom.d_;
         moveFrom.w_ = moveFrom.h_ = 0;
         moveFrom.d_ = nullptr;
+        return *this;
+    }
+
+    Self &operator=(const Self &copyFrom)
+    {
+        if(d_)
+            Free();
+        w_ = copyFrom.w_;
+        h_ = copyFrom.h_;
+
+        size_t s = w_ * h_;
+        Alloc(s);
+
+        for(size_t i = 0; i < s; ++i)
+            new(d_ + i) E(copyFrom.d_[i]);
+
         return *this;
     }
 
