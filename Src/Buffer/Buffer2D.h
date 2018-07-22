@@ -7,9 +7,21 @@
 AGZ_NS_BEG(AGZ::Buffer)
 
 template<typename E>
-void DefaultElemInitializer(E *buf)
+void DefaultElementInitializer(E *buf)
 {
-    new(buf)E();
+    new (buf) E();
+}
+
+template<typename E, typename N>
+void DefaultElementTransformer(E *src, N *dst)
+{
+    new (dst) N(*src);
+}
+
+template<typename E, typename N>
+void DefaultConstElementTransformer(const E *src, N *dst)
+{
+    new (dst) N(*src);
 }
 
 template<typename E>
@@ -18,6 +30,29 @@ class Buffer2D
     size_t w_;
     size_t h_;
     E *d_;
+
+    void Alloc(size_t num)
+    {
+        AGZ_ASSERT(num > 0);
+        d_ = static_cast<E*>(AGZ_ALIGNED_MALLOC(num * sizeof(E), alignof(E)));
+        if(!d_)
+            throw std::bad_alloc();
+    }
+
+    void Free()
+    {
+        AGZ_ASSERT(d_ != nullptr);
+        size_t s = w_ * h_;
+        for(size_t i = 0; i < s; ++i)
+            (d_ + i)->~E();
+        AGZ_ALIGNED_FREE(d_);
+    }
+
+    AGZ_FORCE_INLINE size_t GetIdx(size_t x, size_t y) const
+    {
+        AGZ_ASSERT(x < w_ && y < h_);
+        return y * w_ + x;
+    }
 
 public:
 
@@ -50,25 +85,8 @@ public:
         }
     }
 
-    void Alloc(size_t num)
-    {
-        AGZ_ASSERT(num > 0);
-        d_ = static_cast<E*>(AGZ_ALIGNED_MALLOC(num * sizeof(E), alignof(E)));
-        if(!d_)
-            throw std::bad_alloc();
-    }
-
-    void Free()
-    {
-        AGZ_ASSERT(d_ != nullptr);
-        size_t s = w_ * h_;
-        for(size_t i = 0; i < s; ++i)
-            (d_ + i)->~E();
-        AGZ_ALIGNED_FREE(d_);
-    }
-
     template<typename F = void(*)(E*)>
-    static Self New(size_t w, size_t h, F &&initer = &DefaultElemInitializer<E>)
+    static Self New(size_t w, size_t h, F &&initer = &DefaultElementInitializer<E>)
     {
         Self ret(w, h, initer);
         return std::move(ret);
@@ -79,6 +97,18 @@ public:
     {
         Self ret(FROM_FN, w, h, initer);
         return std::move(ret);
+    }
+
+    template<typename A, typename F = void(*)(const A*, E*)>
+    static Self FromConstOther(const Buffer2D<A> &transformFrom, F &&f = &DefaultConstElementTransformer)
+    {
+        return transformFrom.template Map<E, F>(std::forward<F>(f));
+    }
+
+    template<typename A, typename F = void(*)(A*, E*)>
+    static Self FromOther(Buffer2D<A> &transformFrom, F &&f = &DefaultElementTransformer)
+    {
+        return transformFrom.template Map<E, F>(std::forward<F>(f));
     }
 
     Buffer2D(Self &&moveFrom) noexcept
@@ -107,19 +137,94 @@ public:
         w_ = copyFrom.w_;
         h_ = copyFrom.h_;
 
+        if(!copyFrom.IsAvailable())
+        {
+            d_ = nullptr;
+            return *this;
+        }
+
         size_t s = w_ * h_;
         Alloc(s);
 
         for(size_t i = 0; i < s; ++i)
-            new(d_ + i) E(copyFrom.d_[i]);
+            new (d_ + i) E(copyFrom.d_[i]);
 
         return *this;
     }
 
     ~Buffer2D()
     {
-        if(d_)
+        if(IsAvailable())
             Free();
+    }
+
+    void Destroy()
+    {
+        AGZ_ASSERT(IsAvailable());
+        Free();
+        w_ = h_ = 0;
+        d_ = nullptr;
+    }
+
+    AGZ_FORCE_INLINE bool IsAvailable() const
+    {
+        return d_ != nullptr;
+    }
+
+    E &operator()(size_t x, size_t y)
+    {
+        AGZ_ASSERT(IsAvailable());
+        return d_[GetIdx(x, y)];
+    }
+
+    const E &operator()(size_t x, size_t y) const
+    {
+        AGZ_ASSERT(IsAvailable());
+        return d_[GetIdx(x, y)];
+    }
+
+    template<typename F>
+    void ForAll(F &&f)
+    {
+        AGZ_ASSERT(IsAvailable());
+        E *d = d_;
+        for(size_t y = 0; y < h_; ++y)
+        {
+            for(size_t x = 0; x < w_; ++x)
+                f(x, y, d++);
+        }
+    }
+
+    template<typename F>
+    void ForAll(F &&f) const
+    {
+        AGZ_ASSERT(IsAvailable());
+        const E *d = d_;
+        for(size_t y = 0; y < h_; ++y)
+        {
+            for(size_t x = 0; x < w_; ++x)
+                f(x, y, d++);
+        }
+    }
+
+    template<typename N, typename F = void(*)(E*, N*)>
+    Buffer2D<N> Map(F &&f = &DefaultElementTransformer<E, N>)
+    {
+        AGZ_ASSERT(IsAvailable());
+        return Buffer2D<N>::FromFn(w_, h_, [&](size_t x, size_t y, N *buf)
+        {
+            f(&(*this)(x, y), buf);
+        });
+    }
+
+    template<typename N, typename F = void(*)(const E*, N*)>
+    Buffer2D<N> Map(F &&f = &DefaultElementTransformer<E, N>) const
+    {
+        AGZ_ASSERT(IsAvailable());
+        return Buffer2D<N>::FromFn(w_, h_, [&](size_t x, size_t y, N *buf)
+        {
+            f(&(*this)(x, y), buf);
+        });
     }
 };
 

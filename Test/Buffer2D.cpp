@@ -1,12 +1,14 @@
 #include <algorithm>
 
 #include <Buffer/Prelude.h>
+#include <Math/Prelude.h>
 #include <Time/Prelude.h>
 
 #include "Catch.hpp"
 
 using namespace AGZ;
 using namespace Buffer;
+using namespace Math;
 using namespace std;
 
 TEST_CASE("Buffer")
@@ -21,6 +23,22 @@ TEST_CASE("Buffer")
             *buf = static_cast<int>(x * y);
         });
 
-        buf0 = buf1;
+        auto buf2 = Buffer2D<float>::FromConstOther(buf1,
+            [](const int *src, float *dst)
+        {
+            *dst = static_cast<float>(*src);
+        });
+
+        auto buf3 = buf2.Map<int>(
+            [](const float *src, int *dst)
+        {
+            *dst = static_cast<int>(*src);
+        });
+
+        buf0 = std::move(buf1);
+
+        REQUIRE(buf0(45, 46) == 45 * 46);
+        REQUIRE(buf0(212, 13) == 212 * 13);
+        REQUIRE(ApproxEq(buf2(212, 13), 212.0f * 13.0f, 1e-5f));
     }
 }
