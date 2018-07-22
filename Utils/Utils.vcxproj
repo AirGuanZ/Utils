@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Src\Buffer\Buffer.h" />
     <ClInclude Include="..\Src\Buffer\Buffer2D.h" />
     <ClInclude Include="..\Src\Buffer\Prelude.h" />
     <ClInclude Include="..\Src\Common.h" />
