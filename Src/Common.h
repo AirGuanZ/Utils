@@ -5,8 +5,8 @@
     #define AGZ_FORCE_INLINE __forceinline
 
     #include <cstdlib>
-    #define AGZ_ALIGNED_MALLOC _aligned_malloc
-    #define AGZ_ALIGNED_FREE   _aligned_free
+    #define AGZ_ALIGNED_MALLOC(S, A) _aligned_malloc((S), (A))
+    #define AGZ_ALIGNED_FREE(P)   _aligned_free((P))
 
 #elif defined __GNUC__
     #define AGZ_FORCE_INLINE __attribute__((always_inline))

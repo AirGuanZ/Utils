@@ -2,7 +2,7 @@
 
 #include "../Common.h"
 
-AGZ_NS_BEG(AGZ::Buffer)
+AGZ_NS_BEG(AGZ::Buf)
 
 template<typename E>
 void DefaultElementInitializer(E *buf)
@@ -50,6 +50,12 @@ public:
     using Elem = E;
     using Self = Buffer<E>;
 
+    Buffer()
+        : s_(0), d_(nullptr)
+    {
+        
+    }
+
     template<typename F = void(*)(E*)>
     explicit Buffer(size_t s, F &&initer = &DefaultElementInitializer)
         : s_(s)
@@ -69,7 +75,8 @@ public:
     }
 
     template<typename F = void(*)(E*)>
-    static AGZ_FORCE_INLINE Self New(size_t s, F &&initer = &DefaultElementInitializer)
+    static AGZ_FORCE_INLINE Self New(size_t s,
+                                     F &&initer = &DefaultElementInitializer)
     {
         Self ret(s, std::forward<F>(initer));
         return std::move(ret);
@@ -218,6 +225,15 @@ public:
             f(&(*this)(i), buf);
         });
     }
+
+    template<typename A, typename F>
+    AGZ_FORCE_INLINE A Foldl(const A &init, F &&f) const
+    {
+        A v = init;
+        for(size_t i = 0; i < s_; ++i)
+            v = f(v, d_[i]);
+        return std::move(v);
+    }
 };
 
-AGZ_NS_END(AGZ::Buffer)
+AGZ_NS_END(AGZ::Buf)

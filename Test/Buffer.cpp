@@ -7,12 +7,25 @@
 #include "Catch.hpp"
 
 using namespace AGZ;
-using namespace Buffer;
+using namespace Buf;
 using namespace Math;
 using namespace std;
 
 TEST_CASE("Buffer")
 {
+    SECTION("Buffer")
+    {
+        auto buf = Buffer<int>::FromFn(10, [](size_t i, int *v) { *v = static_cast<int>(i); });
+
+        REQUIRE(buf(0) == 0);
+        REQUIRE(buf(9) == 9);
+
+        int sum = buf
+            .Map<int>([](int *src, int *dst) { *dst = 2 * *src; })
+            .Foldl(0, [](int a, int v) { return a + v; });
+        REQUIRE(sum == (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9) * 2);
+    }
+
     SECTION("Buffer2D")
     {
         auto buf0 = Buffer2D<int>::New(640, 480);

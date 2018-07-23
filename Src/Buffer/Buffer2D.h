@@ -5,7 +5,7 @@
 #include "../Common.h"
 #include "Buffer.h"
 
-AGZ_NS_BEG(AGZ::Buffer)
+AGZ_NS_BEG(AGZ::Buf)
 
 template<typename E>
 class Buffer2D
@@ -42,6 +42,12 @@ public:
 
     using Elem = E;
     using Self = Buffer2D<E>;
+
+    Buffer2D()
+        : w_(0), h_(0), d_(nullptr)
+    {
+        
+    }
 
     template<typename F = void(*)(E*)>
     Buffer2D(size_t w, size_t h, F &&initer = &DefaultElementInitializer)
@@ -233,4 +239,4 @@ public:
     }
 };
 
-AGZ_NS_END(AGZ::Buffer)
+AGZ_NS_END(AGZ::Buf)
