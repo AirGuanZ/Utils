@@ -13,7 +13,7 @@ namespace Aux
 template<typename T, typename F>
 class alignas(alignof(T), alignof(F)) FixedResult
 {
-    static const size_t DATA_SIZE = Aux::StaticMax<size_t>(sizeof(T), sizeof(F));
+    static const size_t DATA_SIZE = sizeof(T) > sizeof(F) ? sizeof(T) : sizeof(F);
     
     struct OK_t  { };
     struct ERR_t { };
@@ -59,13 +59,24 @@ public:
     static Self Err(F &&v) { return Self(ERR_t(), std::move(v)); }
     
     FixedResult(const Self &copyFrom)
+        : isOk_(copyFrom.isOk_)
     {
-        isOk_ = copyFrom.isOk_;
         if(isOk_)
             new(data_) T(*static_cast<const T*>(copyFrom.data_));
         else
             new(data_) F(*static_cast<const F*>(copyFrom.data_));
     }
+    
+    FixedResult(Self &&copyFrom)
+        : isOk_(copyFrom.isOk_)
+    {
+        if(isOk_)
+            new(data_) T(std::move(*static_cast<T*>(copyFrom.data_)));
+        else
+            new(data_) F(std::move(*static_cast<F*>(copyFrom.data_)));
+    }
+    
+    
 };
 
 AGZ_NS_END(AGZ)
