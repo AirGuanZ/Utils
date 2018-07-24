@@ -25,50 +25,50 @@ public:
     explicit FixedOption(const T &copyFrom)
         : isSome_(true)
     {
-        new(data_) Data(copyFrom);
+        new(&data_[0]) Data(copyFrom);
     }
 
     explicit FixedOption(T &&moveFrom)
         : isSome_(true)
     {
-        new(data_) Data(std::move(moveFrom));
+        new(&data_[0]) Data(std::move(moveFrom));
     }
 
     FixedOption(const Self &copyFrom)
         : isSome_(copyFrom.isSome_)
     {
         if(isSome_)
-            new(data_) Data(*static_cast<const Data*>(copyFrom.data_));
+            new(&data_[0]) Data(*reinterpret_cast<const Data*>(&copyFrom.data_[0]));
     }
 
     FixedOption(Self &&moveFrom)
-        : isSome_(copyFrom.isSome_)
+        : isSome_(moveFrom.isSome_)
     {
         if(isSome_)
-            new(data_) Data(std::move(*static_cast<Data*>(copyFrom.data_)));
+            new(&data_[0]) Data(std::move(*reinterpret_cast<Data*>(&moveFrom.data_[0])));
     }
 
     ~FixedOption()
     {
         if(isSome_)
-            *static_cast<Data*>(data_).~T();
+            reinterpret_cast<Data*>(&data_[0])->~T();
     }
 
     Self &operator=(const Self &copyFrom)
     {
         if(isSome_)
-            *static_cast<Data*>(data_).~T();
+            reinterpret_cast<Data*>(&data_[0])->~T();
         if((isSome_ = copyFrom.isSome_))
-            new(data_) Data(*static_cast<const Data*>(copyFrom.data_));
+            new(&data_[0]) Data(*reinterpret_cast<const Data*>(&copyFrom.data_[0]));
         return *this;
     }
 
     Self &operator=(Self &&moveFrom)
     {
         if(isSome_)
-            *static_cast<Data*>(data_).~T();
+            reinterpret_cast<Data*>(&data_[0])->~T();
         if((isSome_ = moveFrom.isSome_))
-            new(data_) Data(std::move(*static_cast<Data*>(copyFrom.data_)));
+            new(&data_[0]) Data(std::move(*reinterpret_cast<Data*>(&moveFrom.data_[0])));
         return *this;
     }
 
@@ -80,14 +80,14 @@ public:
     {
         if(!isSome_)
             std::terminate();
-        return *static_cast<Data*>(data_);
+        return *reinterpret_cast<Data*>(&data_[0]);
     }
 
     const T &Unwrap() const
     {
         if(!isSome_)
             std::terminate();
-        return *static_cast<const Data*>(data_);
+        return *reinterpret_cast<const Data*>(&data_[0]);
     }
 };
 
@@ -111,7 +111,7 @@ public:
     
     explicit AllocOption(T &&moveFrom)
     {
-        data_ = new Data(std::move(copyFrom));
+        data_ = new Data(std::move(moveFrom));
     }
     
     AllocOption(const Self &copyFrom)
@@ -145,7 +145,7 @@ public:
         return *this;
     }
     
-    Self &operator=(Self &&moveFrom)
+    Self &operator=(Self &&moveFrom) noexcept(noexcept(~T()))
     {
         if(data_)
             delete data_;
@@ -165,7 +165,7 @@ public:
         return *data_;
     }
     
-    const T &Unwrap()
+    const T &Unwrap() const
     {
         if(!data_)
             std::terminate();
@@ -176,10 +176,10 @@ public:
 namespace Aux
 {
     template<typename T>
-    std::enable_if_t<sizeof(T) <= 8, FixedOption<T>> OptionSelector() { }
+    std::enable_if_t<sizeof(T) <= 8, FixedOption<T>> OptionSelector() { return FixedOption<T>(); }
     
     template<typename T>
-    std::enable_if_t<sizeof(T) > 8, AllocOption<T>> OptionSelector() { }
+    std::enable_if_t<(sizeof(T) > 8), AllocOption<T>> OptionSelector() { return AllocOption<T>(); }
 }
 
 template<typename T>

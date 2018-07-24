@@ -52,11 +52,11 @@ public:
     using ErrData = F;
     using Self    = FixedResult<T, F>;
     
-    static Self Ok(const T &v) { return Self(OK_t(), v); }
-    static Self Ok(T &&v) { return Self(OK_t(), std::move(v)); }
+    static Self MakeOk(const T &v) { return Self(OK_t(), v); }
+    static Self MakeOk(T &&v) { return Self(OK_t(), std::move(v)); }
     
-    static Self Err(const F &v) { return Self(ERR_t(), v); }
-    static Self Err(F &&v) { return Self(ERR_t(), std::move(v)); }
+    static Self MakeErr(const F &v) { return Self(ERR_t(), v); }
+    static Self MakeErr(F &&v) { return Self(ERR_t(), std::move(v)); }
     
     FixedResult(const Self &copyFrom)
         : isOk_(copyFrom.isOk_)

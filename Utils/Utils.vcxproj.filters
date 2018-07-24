@@ -10,6 +10,9 @@
     <Filter Include="Buffer">
       <UniqueIdentifier>{10d262d2-8012-4482-9276-80048e6714aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Result">
+      <UniqueIdentifier>{193a42c3-82ca-446c-b2ee-87f4d3e18213}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Common.h" />
@@ -60,6 +63,15 @@
     </ClInclude>
     <ClInclude Include="..\Src\Buffer\Buffer.h">
       <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Result\Option.h">
+      <Filter>Result</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Result\Result.h">
+      <Filter>Result</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Result\Prelude.h">
+      <Filter>Result</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
