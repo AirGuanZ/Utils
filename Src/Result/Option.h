@@ -176,13 +176,19 @@ public:
 namespace Aux
 {
     template<typename T>
-    std::enable_if_t<sizeof(T) <= 16, FixedOption<T>> OptionSelector() { }
+    std::enable_if_t<sizeof(T) <= 8, FixedOption<T>> OptionSelector() { }
     
     template<typename T>
-    std::enable_if_t<sizeof(T) <= 16, AllocOption<T>> OptionSelector() { }
+    std::enable_if_t<sizeof(T) > 8, AllocOption<T>> OptionSelector() { }
 }
 
 template<typename T>
 using Option = decltype(Aux::OptionSelector<T>());
+
+template<typename T>
+Option<T> Some(T &&v) { return Option<T>(std::forward<T>(v)); }
+
+template<typename T>
+Option<T> None() { return Option<T>(); }
 
 AGZ_NS_END(AGZ)
