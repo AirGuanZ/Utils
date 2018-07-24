@@ -28,6 +28,8 @@ inline Uninitialized_t UNINITIALIZED;
 struct CONS_FLAG_FROM_FN_t { };
 inline CONS_FLAG_FROM_FN_t FROM_FN;
 
+struct Void_t { };
+
 #define AGZ_USE_SSE2
 
 AGZ_NS_END(AGZ)
