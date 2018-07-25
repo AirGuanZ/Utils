@@ -43,10 +43,10 @@ public:
     using Elem = E;
     using Self = Buffer2D<E>;
 
-    Buffer2D()
+    AGZ_FORCE_INLINE Buffer2D()
         : w_(0), h_(0), d_(nullptr)
     {
-        
+
     }
 
     template<typename F = void(*)(E*)>
@@ -161,7 +161,7 @@ public:
         return *this;
     }
 
-    ~Buffer2D()
+    AGZ_FORCE_INLINE ~Buffer2D()
     {
         if(IsAvailable())
             Free();

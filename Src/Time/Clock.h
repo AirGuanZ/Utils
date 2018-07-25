@@ -21,9 +21,9 @@ public:
     Clock(const Clock&) = default;
     ~Clock() = default;
 
-    void Restart() { start_ = Self::Now(); }
+    AGZ_FORCE_INLINE void Restart() { start_ = Self::Now(); }
 
-    R ElaspedTime() { return Self::Now() - start_; }
+    AGZ_FORCE_INLINE R ElaspedTime() { return Self::Now() - start_; }
 
 private:
 

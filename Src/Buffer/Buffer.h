@@ -5,19 +5,19 @@
 AGZ_NS_BEG(AGZ::Buf)
 
 template<typename E>
-void DefaultElementInitializer(E *buf)
+AGZ_FORCE_INLINE void DefaultElementInitializer(E *buf)
 {
     new (buf) E();
 }
 
 template<typename E, typename N>
-void DefaultElementTransformer(E *src, N *dst)
+AGZ_FORCE_INLINE void DefaultElementTransformer(E *src, N *dst)
 {
     new (dst) N(*src);
 }
 
 template<typename E, typename N>
-void DefaultConstElementTransformer(const E *src, N *dst)
+AGZ_FORCE_INLINE void DefaultConstElementTransformer(const E *src, N *dst)
 {
     new (dst) N(*src);
 }
@@ -50,10 +50,10 @@ public:
     using Elem = E;
     using Self = Buffer<E>;
 
-    Buffer()
+    AGZ_FORCE_INLINE Buffer()
         : s_(0), d_(nullptr)
     {
-        
+
     }
 
     template<typename F = void(*)(E*)>
@@ -118,8 +118,8 @@ public:
             new (d_ + i) E(copyFrom.d_[i]);
     }
 
-    Buffer(Self &&moveFrom) noexcept
-        : s_(moveFrom.s_), d_(moveFrom.d_)
+    AGZ_FORCE_INLINE Buffer(Self &&moveFrom) noexcept
+         : s_(moveFrom.s_), d_(moveFrom.d_)
     {
         moveFrom.s_ = 0;
         moveFrom.d_ = nullptr;
@@ -155,7 +155,7 @@ public:
         return *this;
     }
 
-    ~Buffer()
+    AGZ_FORCE_INLINE ~Buffer()
     {
         if(IsAvailable())
             Free();

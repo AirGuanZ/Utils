@@ -30,6 +30,17 @@ inline CONS_FLAG_FROM_FN_t FROM_FN;
 
 struct Void_t { };
 
+[[noreturn]] void unreachable() noexcept
+{
+#ifdef _MSC_VER
+    __assume(0);
+#elif defined (__GNUC__)
+    __builtin_unreachable();
+#else
+    std::terminate();
+#endif
+}
+
 #define AGZ_USE_SSE2
 
 AGZ_NS_END(AGZ)

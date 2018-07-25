@@ -21,25 +21,25 @@ class alignas(alignof(T), alignof(F)) FixedResult
     unsigned char data_[DATA_SIZE];
     bool isOk_;
 
-    FixedResult(OK_t, const T &v)
+    AGZ_FORCE_INLINE FixedResult(OK_t, const T &v)
         : isOk_(true)
     {
         new(data_) T(v);
     }
 
-    FixedResult(OK_t, T &&v)
+    AGZ_FORCE_INLINE FixedResult(OK_t, T &&v)
         : isOk_(true)
     {
         new(data_) T(std::move(v));
     }
 
-    FixedResult(ERR_t, const F &v)
+    AGZ_FORCE_INLINE FixedResult(ERR_t, const F &v)
         : isOk_(false)
     {
         new(data_) F(v);
     }
 
-    FixedResult(ERR_t, F &&v)
+    AGZ_FORCE_INLINE FixedResult(ERR_t, F &&v)
         : isOk_(false)
     {
         new(data_) F(std::move(v));
@@ -53,13 +53,13 @@ public:
 
     using Self    = FixedResult<T, F>;
 
-    static Self MakeOk(const T &v) { return Self(OK_t(), v); }
-    static Self MakeOk(T &&v) { return Self(OK_t(), std::move(v)); }
+    static AGZ_FORCE_INLINE Self MakeOk(const T &v) { return Self(OK_t(), v); }
+    static AGZ_FORCE_INLINE Self MakeOk(T &&v) { return Self(OK_t(), std::move(v)); }
 
-    static Self MakeErr(const F &v) { return Self(ERR_t(), v); }
-    static Self MakeErr(F &&v) { return Self(ERR_t(), std::move(v)); }
+    static AGZ_FORCE_INLINE Self MakeErr(const F &v) { return Self(ERR_t(), v); }
+    static AGZ_FORCE_INLINE Self MakeErr(F &&v) { return Self(ERR_t(), std::move(v)); }
 
-    FixedResult(const Self &copyFrom)
+    AGZ_FORCE_INLINE FixedResult(const Self &copyFrom)
         : isOk_(copyFrom.isOk_)
     {
         if(isOk_)
@@ -68,7 +68,7 @@ public:
             new(&data_[0]) F(*reinterpret_cast<const F*>(&copyFrom.data_[0]));
     }
 
-    FixedResult(Self &&copyFrom)
+    AGZ_FORCE_INLINE FixedResult(Self &&copyFrom)
         : isOk_(copyFrom.isOk_)
     {
         if(isOk_)
@@ -79,7 +79,7 @@ public:
                                             &copyFrom.data_[0])));
     }
 
-    ~FixedResult()
+    AGZ_FORCE_INLINE ~FixedResult()
     {
         if(isOk_)
             reinterpret_cast<T*>(&data_[0])->~T();
@@ -109,35 +109,27 @@ public:
         return *this;
     }
 
-    Type GetType() const { return isOk_ ? RT_Ok : RT_Err; }
-    bool IsOk() const { return isOk_; }
-    bool IsErr() const { return !isOk_; }
+    AGZ_FORCE_INLINE Type GetType() const { return isOk_ ? RT_Ok : RT_Err; }
+    AGZ_FORCE_INLINE bool IsOk() const { return isOk_; }
+    AGZ_FORCE_INLINE bool IsErr() const { return !isOk_; }
 
-    T &UnwrapOk()
+    AGZ_FORCE_INLINE T &UnwrapOk()
     {
-        if(!isOk_)
-            std::terminate();
         return *reinterpret_cast<T*>(&data_[0]);
     }
 
-    const T &UnwrapOk() const
+    AGZ_FORCE_INLINE const T &UnwrapOk() const
     {
-        if(!isOk_)
-            std::terminate();
         return *reinterpret_cast<T*>(&data_[0]);
     }
 
-    F &UnwrapErr()
+    AGZ_FORCE_INLINE F &UnwrapErr()
     {
-        if(isOk_)
-            std::terminate();
         return *reinterpret_cast<F*>(&data_[0]);
     }
 
-    const F &UnwrapErr() const
+    AGZ_FORCE_INLINE const F &UnwrapErr() const
     {
-        if(isOk_)
-            std::terminate();
         return *reinterpret_cast<F*>(&data_[0]);
     }
 };
@@ -151,10 +143,10 @@ class AllocResult
     struct OK_t { };
     struct ERR_t { };
 
-    AllocResult(OK_t, const T &v) : ok_(Some(v)), err_() { }
-    AllocResult(OK_t, T &&v) : ok_(Some(std::move(v))), err_() { }
-    AllocResult(ERR_t, const T &v) : ok_(), err_(Some(v)) { }
-    AllocResult(ERR_t, T &&v) : ok_(), err_(Some(std::move(v))) { }
+    AGZ_FORCE_INLINE AllocResult(OK_t, const T &v) : ok_(Some(v)), err_() { }
+    AGZ_FORCE_INLINE AllocResult(OK_t, T &&v) : ok_(Some(std::move(v))), err_() { }
+    AGZ_FORCE_INLINE AllocResult(ERR_t, const T &v) : ok_(), err_(Some(v)) { }
+    AGZ_FORCE_INLINE AllocResult(ERR_t, T &&v) : ok_(), err_(Some(std::move(v))) { }
 
 public:
 
@@ -164,49 +156,49 @@ public:
 
     using Self = AllocResult<T, F>;
 
-    static Self MakeOk(const T &v) { return Self(OK_t(), v); }
-    static Self MakeOk(T &&v) { return Self(OK_t(), std::move(v)); }
+    static AGZ_FORCE_INLINE Self MakeOk(const T &v) { return Self(OK_t(), v); }
+    static AGZ_FORCE_INLINE Self MakeOk(T &&v) { return Self(OK_t(), std::move(v)); }
 
-    static Self MakeErr(const F &v) { return Self(ERR_t(), v); }
-    static Self MakeErr(F &&v) { return Self(ERR_t(), std::move(v)); }
+    static AGZ_FORCE_INLINE Self MakeErr(const F &v) { return Self(ERR_t(), v); }
+    static AGZ_FORCE_INLINE Self MakeErr(F &&v) { return Self(ERR_t(), std::move(v)); }
 
-    AllocResult(const Self &copyFrom)
+    AGZ_FORCE_INLINE AllocResult(const Self &copyFrom)
         : ok_(copyFrom.ok_), err_(copyFrom.err_)
     {
 
     }
 
-    AllocResult(Self &&moveFrom)
+    AGZ_FORCE_INLINE AllocResult(Self &&moveFrom)
         : ok_(std::move(moveFrom.ok_)), err_(std::move(moveFrom.err_))
     {
 
     }
 
-    ~AllocResult() { }
+    AGZ_FORCE_INLINE ~AllocResult() { }
 
-    Self &operator=(const Self &copyFrom)
+    AGZ_FORCE_INLINE Self &operator=(const Self &copyFrom)
     {
         ok_ = copyFrom.ok_;
         err_ = copyFrom.err_;
         return *this;
     }
 
-    Self &operator=(Self &&moveFrom)
+    AGZ_FORCE_INLINE Self &operator=(Self &&moveFrom)
     {
         ok_ = std::move(moveFrom.ok_);
         err_ = std::move(moveFrom.err_);
         return *this;
     }
 
-    Type GetType() const { return ok_.IsSome() ? RT_Ok : RT_Err; }
-    bool IsOk() const { return ok_.IsSome(); }
-    bool IsErr() const { return err_.IsSome(); }
+    AGZ_FORCE_INLINE Type GetType() const { return ok_.IsSome() ? RT_Ok : RT_Err; }
+    AGZ_FORCE_INLINE bool IsOk() const { return ok_.IsSome(); }
+    AGZ_FORCE_INLINE bool IsErr() const { return err_.IsSome(); }
 
-    T &UnwrapOk() { return ok_.Unwrap(); }
-    const T &UnwrapOk() const { return ok_.Unwrap(); }
+    AGZ_FORCE_INLINE T &UnwrapOk() { return ok_.Unwrap(); }
+    AGZ_FORCE_INLINE const T &UnwrapOk() const { return ok_.Unwrap(); }
 
-    F &UnwrapErr() { return err_.Unwrap(); }
-    const F &UnwrapErr() const { return err_.Unwrap(); }
+    AGZ_FORCE_INLINE F &UnwrapErr() { return err_.Unwrap(); }
+    AGZ_FORCE_INLINE const F &UnwrapErr() const { return err_.Unwrap(); }
 };
 
 namespace Aux
@@ -224,15 +216,15 @@ template<typename T, typename F>
 using Result = std::remove_pointer_t<decltype(ResultSelector<T, F>())>;
 
 template<typename T, typename F>
-Result<T, F> Ok(const T &v) { return Result<T, F>::MakeOk(v); }
+AGZ_FORCE_INLINE Result<T, F> Ok(const T &v) { return Result<T, F>::MakeOk(v); }
 
 template<typename T, typename F>
-Result<T, F> Ok(T &&v) { return Result<T, F>::MakeOk(std::move(v)); }
+AGZ_FORCE_INLINE Result<T, F> Ok(T &&v) { return Result<T, F>::MakeOk(std::move(v)); }
 
 template<typename T, typename F>
-Result<T, F> Err(const F &v) { return Result<T, F>::MakeErr(v); }
+AGZ_FORCE_INLINE Result<T, F> Err(const F &v) { return Result<T, F>::MakeErr(v); }
 
 template<typename T, typename F>
-Result<T, F> Err(F &&v) { return Result<T, F>::MakeErr(std::move(v)); }
+AGZ_FORCE_INLINE Result<T, F> Err(F &&v) { return Result<T, F>::MakeErr(std::move(v)); }
 
 AGZ_NS_END(AGZ)
