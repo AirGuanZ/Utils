@@ -44,6 +44,7 @@ public:
     enum Type { Ok, Err };
     using OkData  = T;
     using ErrData = F;
+
     using Self    = FixedResult<T, F>;
 
     static Self MakeOk(const T &v) { return Self(OK_t(), v); }
