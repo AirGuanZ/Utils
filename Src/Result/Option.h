@@ -101,19 +101,19 @@ public:
     enum Type { Some, None };
     using Data = T;
     using Self = AllocOption<T>;
-    
+
     AllocOption() : data_(nullptr) { }
-    
+
     explicit AllocOption(const T &copyFrom)
     {
         data_ = new Data(copyFrom);
     }
-    
+
     explicit AllocOption(T &&moveFrom)
     {
         data_ = new Data(std::move(moveFrom));
     }
-    
+
     AllocOption(const Self &copyFrom)
     {
         if(copyFrom.IsSome())
@@ -121,19 +121,19 @@ public:
         else
             data_ = nullptr;
     }
-    
+
     AllocOption(Self &&moveFrom)
         : data_(moveFrom.data_)
     {
         moveFrom.data_ = nullptr;
     }
-    
+
     ~AllocOption()
     {
         if(data_)
             delete data_;
     }
-    
+
     Self &operator=(const Self &copyFrom)
     {
         if(data_)
@@ -144,7 +144,7 @@ public:
             data_ = nullptr;
         return *this;
     }
-    
+
     Self &operator=(Self &&moveFrom) noexcept(noexcept(~T()))
     {
         if(data_)
@@ -153,18 +153,18 @@ public:
         moveFrom.data_ = nullptr;
         return *this;
     }
-    
+
     Type GetType() const { return data_ ? Some : None; }
     bool IsSome() const { return data_ != nullptr; }
     bool IsNone() const { return data_ == nullptr; }
-    
+
     T &Unwrap()
     {
         if(!data_)
             std::terminate();
         return *data_;
     }
-    
+
     const T &Unwrap() const
     {
         if(!data_)
@@ -177,13 +177,16 @@ namespace Aux
 {
     template<typename T>
     std::enable_if_t<sizeof(T) <= 8, FixedOption<T>> OptionSelector() { return FixedOption<T>(); }
-    
+
     template<typename T>
     std::enable_if_t<(sizeof(T) > 8), AllocOption<T>> OptionSelector() { return AllocOption<T>(); }
 }
 
 template<typename T>
 using Option = decltype(Aux::OptionSelector<T>());
+
+template<typename T>
+Option<T> Some(const T &v) { return Option<T>(std::forward<T>(v)); }
 
 template<typename T>
 Option<T> Some(T &&v) { return Option<T>(std::forward<T>(v)); }
