@@ -91,9 +91,9 @@ public:
     {
         isOk_ = copyFrom.isOk_;
         if(isOk_)
-            new(&data[0]) T(*reinterpret_cast<const T*>(&copyFrom.data[0]));
+            new(&data_[0]) T(*reinterpret_cast<const T*>(&copyFrom.data_[0]));
         else
-            new(&data[0]) F(*reinterpret_cast<const F*>(&copyFrom.data[0]));
+            new(&data_[0]) F(*reinterpret_cast<const F*>(&copyFrom.data_[0]));
         return *this;
     }
 
@@ -101,11 +101,11 @@ public:
     {
         isOk_ = moveFrom.isOk_;
         if(isOk_)
-            new(&data[0]) T(std::move(*reinterpret_cast<const T*>(
-                                            &moveFrom.data[0])));
+            new(&data_[0]) T(std::move(*reinterpret_cast<const T*>(
+                                            &moveFrom.data_[0])));
         else
-            new(&data[0]) F(std::move(*reinterpret_cast<const F*>(
-                                            &moveFrom.data[0])));
+            new(&data_[0]) F(std::move(*reinterpret_cast<const F*>(
+                                            &moveFrom.data_[0])));
         return *this;
     }
 

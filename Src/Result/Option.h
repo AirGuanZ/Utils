@@ -178,7 +178,7 @@ template<typename T>
 using Option = decltype(Aux::OptionSelector<T>());
 
 template<typename T>
-AGZ_FORCE_INLINE Option<T> Some(const T &v) { return Option<T>(std::forward<T>(v)); }
+AGZ_FORCE_INLINE Option<T> Some(const T &v) { return Option<T>(v); }
 
 template<typename T>
 AGZ_FORCE_INLINE Option<T> Some(T &&v) { return Option<T>(std::forward<T>(v)); }
