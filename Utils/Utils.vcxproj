@@ -39,6 +39,7 @@
     <ClInclude Include="..\Src\Result\Result.h" />
     <ClInclude Include="..\Src\Time\Bench.h" />
     <ClInclude Include="..\Src\Time\Prelude.h" />
+    <ClInclude Include="..\Src\Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec2.inl" />

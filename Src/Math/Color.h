@@ -33,7 +33,7 @@ using Color4d = Color4<double>;
 
 namespace COLOR
 {
-    COLOR_CONST(VOID,  0.0, 0.0, 0.0, 0.0);
+    COLOR_CONST(CVOID,  0.0, 0.0, 0.0, 0.0);
     COLOR_CONST(BLACK, 0.0, 0.0, 0.0, 1.0);
     COLOR_CONST(WHITE, 1.0, 1.0, 1.0, 1.0);
     COLOR_CONST(RED,   1.0, 0.0, 0.0, 1.0);

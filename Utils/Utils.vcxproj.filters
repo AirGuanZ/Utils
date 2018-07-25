@@ -73,6 +73,7 @@
     <ClInclude Include="..\Src\Result\Prelude.h">
       <Filter>Result</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">
