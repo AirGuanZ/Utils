@@ -35,7 +35,7 @@ Vec3f v5 = v3.xxy(); // Fiexible swizzling
 
 Mat4f identity  = Mat4f(1.f);                              // Identity
 Mat4f rotate_xy = Mat4f::Rotate({ 1.f, 2.f }, Degf(90.0)); // Rotation
-Mat4f inv_rotxy = Inverse(rotate_xy); 					   // Inverse matrix
+Mat4f inv_rotxy = Inverse(rotate_xy);                      // Inverse matrix
 //... Common graphics-used matrix
 ```
 
@@ -61,7 +61,7 @@ f32x4 c = Sqrt(a + b);
 Vec4f d = c.AsVec(); // d: (sqrt(3), sqrt(5), sqrt(7), sqrt(9))
 ```
 
-### Buffer
+## Buffer
 
 ```c++
 // Initialize buf with { 0, 1, 2, 3, ..., 7, 8, 9 }
@@ -85,7 +85,7 @@ auto buf21 = Buffer2D<int>::FromFn(100, 100,
 });
 ```
 
-### Result
+## Result
 
 Option & Result, just like Rust! 话虽如此，C++的类型推导太让人不爽了……
 
