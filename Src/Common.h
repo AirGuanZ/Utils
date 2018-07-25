@@ -1,17 +1,24 @@
 #pragma once
 
 #ifdef _MSC_VER
-
-    #define AGZ_FORCE_INLINE __forceinline
-
-    #include <cstdlib>
-    #define AGZ_ALIGNED_MALLOC(S, A) _aligned_malloc((S), (A))
-    #define AGZ_ALIGNED_FREE(P)   _aligned_free((P))
-
+#define AGZ_FORCE_INLINE __forceinline
 #elif defined __GNUC__
-    #define AGZ_FORCE_INLINE __attribute__((always_inline))
+#define AGZ_FORCE_INLINE __attribute__((always_inline))
 #else
-    #define AGZ_FORCE_INLINE inline
+#define AGZ_FORCE_INLINE inline
+#endif
+
+#ifdef _MSC_VER
+#include <malloc.h>
+#define AGZ_ALIGNED_MALLOC(S, A) _aligned_malloc((S), (A))
+#define AGZ_ALIGNED_FREE(P)   _aligned_free((P))
+#elif defined __GNUC__
+
+#else
+#include <cstdlib>
+#define AGZ_ALIGNED_MALLOC(S, A) std::malloc((S))
+#define AGZ_ALIGNED_FREE(P) std::free((P))
+#warning "Aligned malloc/free unimplemented, use "
 #endif
 
 #define AGZ_NS_BEG(N) namespace N {
