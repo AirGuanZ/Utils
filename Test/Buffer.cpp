@@ -1,8 +1,6 @@
 #include <algorithm>
 
-#include <Buffer/Prelude.h>
-#include <Math/Prelude.h>
-#include <Time/Prelude.h>
+#include <Utils.h>
 
 #include "Catch.hpp"
 

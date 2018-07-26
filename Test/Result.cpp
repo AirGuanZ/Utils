@@ -2,8 +2,7 @@
 
 #include <string>
 
-#include <Math/Prelude.h>
-#include <Result/Prelude.h>
+#include <Utils.h>
 
 using namespace AGZ;
 using namespace Math;
