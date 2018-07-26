@@ -22,12 +22,15 @@
 
 #elif defined __GNUC__
 
+#define AGZ_ALIGNED_MALLOC(S, A) _mm_malloc((A), (S))
+#define AGZ_ALIGNED_FREE(P) _mm_free((P))
+
 #else
 
 #include <cstdlib>
 #define AGZ_ALIGNED_MALLOC(S, A) std::malloc((S))
 #define AGZ_ALIGNED_FREE(P) std::free((P))
-#warning "Aligned malloc/free unimplemented, use "
+#warning "Aligned malloc/free unimplemented, use std::malloc/free instead"
 
 #endif
 
