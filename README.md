@@ -1,10 +1,6 @@
-# Utils
-
-自用C++类库，把一些常见操作封装成自己喜欢的风格。
-
 ## Math
 
-基本数学操作，主要服务于图形学编程。
+Basic mathematica operations. Mainly for graphics programming.
 
 ### Scalar
 
@@ -41,7 +37,7 @@ Mat4f inv_rotxy = Inverse(rotate_xy);                      // Inverse matrix
 
 ### Random
 
-我就是单纯地觉得标准库的`<random>`用起来太麻烦……
+Simplify using of random components in standard library.
 
 ```c++
 int x    = Uniform(1, 10);       // Sample an integer uniformly in [1, 10]
@@ -52,7 +48,7 @@ double z = Normal(1.0, 4.0);     // Sample a double with normal distribution
 
 ### SIMD
 
-简单地拿SSE/SSE2加速`Vec4f`的运算。
+Alternative to `Vec4f` with SSE/SSE2 acceleration.
 
 ```c++
 f32x4 a = f32x4(1.0f, 2.0f, 3.0f, 4.0f);        // From floats
@@ -87,7 +83,7 @@ auto buf21 = Buffer2D<int>::FromFn(100, 100,
 
 ## Result
 
-Option & Result, just like Rust! 话虽如此，C++的类型推导太让人不爽了……
+Option & Result, just like Rust!
 
 ```c++
 Option<int> foo()
@@ -115,3 +111,4 @@ int main()
         cout << rt.UnwrapErr() << endl;
 }
 ```
+
