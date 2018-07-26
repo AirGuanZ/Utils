@@ -89,8 +89,9 @@ public:
     }
 
     template<typename A, typename F = void(*)(const A*, E*)>
-    static AGZ_FORCE_INLINE Self FromConstOther(const Buffer2D<A> &transformFrom,
-                                                F &&f = &DefaultConstElementTransformer)
+    static AGZ_FORCE_INLINE Self FromConstOther(
+        const Buffer2D<A> &transformFrom,
+        F &&f = &DefaultConstElementTransformer)
     {
         return transformFrom.template Map<E, F>(std::forward<F>(f));
     }

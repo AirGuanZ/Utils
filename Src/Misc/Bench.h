@@ -41,7 +41,8 @@ public:
     }
 
     template<typename F>
-    AGZ_FORCE_INLINE const Bench_t &Run(const std::string &name, int repeat, F &&func) const
+    AGZ_FORCE_INLINE const Bench_t &Run(const std::string &name,
+                                        int repeat, F &&func) const
     {
         std::cout << "[Benchmark] " << name << " ";
         Bench_impl(repeat, std::forward<F>(func));

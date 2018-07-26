@@ -51,7 +51,7 @@ public:
     bool operator!=(const Self &other) const;
 
     Self operator*(const Self &rhs) const;
-    
+
     Vec4<T> operator*(const Vec4<T> &p);
 
     static Self Translate(const Vec3<T> &v);

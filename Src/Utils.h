@@ -6,8 +6,6 @@
 #include "Buffer/Buffer.h"
 #include "Buffer/Buffer2D.h"
 
-#include "File/File.h"
-
 #include "Math/Angle.h"
 #include "Math/Color.h"
 #include "Math/Mat4.h"
@@ -22,8 +20,7 @@
 #include "Result/Option.h"
 #include "Result/Result.h"
 
-#include "Time/Bench.h"
-
-#include "Type/TypeOpr.h"
-
-#include "Unicode/Unicode.h"
+#include "Misc/Bench.h"
+#include "Misc/Endian.h"
+#include "Misc/TypeOpr.h"
+#include "Misc/Unicode.h"
