@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Common.h"
+#include "../Misc/Common.h"
 #include "Default.h"
 
 AGZ_NS_BEG(AGZ::Alloc)

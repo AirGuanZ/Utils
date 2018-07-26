@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-#include "../Common.h"
+#include "../Misc/Common.h"
 
 AGZ_NS_BEG(AGZ::Alloc)
 

@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "../Common.h"
+#include "../Misc/Common.h"
 #include "Buffer.h"
 
 AGZ_NS_BEG(AGZ::Buf)

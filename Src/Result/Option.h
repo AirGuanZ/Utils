@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "../Common.h"
+#include "../Misc/Common.h"
 
 AGZ_NS_BEG(AGZ)
 

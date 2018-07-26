@@ -5,7 +5,7 @@
 #include <string>
 #include <utility>
 
-#include "../Common.h"
+#include "../Misc/Common.h"
 
 AGZ_NS_BEG(AGZ)
 AGZ_NS_BEG(Time)

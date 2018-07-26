@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Src\Alloc\Default.h" />
+    <ClInclude Include="..\Src\Alloc\Fast.h" />
     <ClInclude Include="..\Src\Buffer\Buffer.h" />
     <ClInclude Include="..\Src\Buffer\Buffer2D.h" />
     <ClInclude Include="..\Src\Common.h" />
@@ -38,6 +40,7 @@
     <ClInclude Include="..\Src\Misc\Unicode.h" />
     <ClInclude Include="..\Src\Result\Option.h" />
     <ClInclude Include="..\Src\Result\Result.h" />
+    <ClInclude Include="..\Src\String\Core.h" />
     <ClInclude Include="..\Src\Utils.h" />
   </ItemGroup>
   <ItemGroup>

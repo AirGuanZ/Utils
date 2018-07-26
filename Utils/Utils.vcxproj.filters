@@ -13,9 +13,14 @@
     <Filter Include="Misc">
       <UniqueIdentifier>{695ff70c-efc1-4c77-926e-ce7a2e1e46a1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="String">
+      <UniqueIdentifier>{20a9f90c-cbee-4c36-959c-827ce718850b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Alloc">
+      <UniqueIdentifier>{1a1bfc14-1cc5-41ef-bea4-539779d56e20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Src\Common.h" />
     <ClInclude Include="..\Src\Math\Scalar.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -70,6 +75,18 @@
     </ClInclude>
     <ClInclude Include="..\Src\Misc\Unicode.h">
       <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Core.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Common.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Alloc\Default.h">
+      <Filter>Alloc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Alloc\Fast.h">
+      <Filter>Alloc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../Common.h"
+#include "../Misc/Common.h"
 #include "../Result/Option.h"
 
 AGZ_NS_BEG(AGZ::Unicode)

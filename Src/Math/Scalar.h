@@ -3,7 +3,7 @@
 #include <cmath>
 #include <algorithm>
 
-#include "../Common.h"
+#include "../Misc/Common.h"
 #include "Angle.h"
 
 AGZ_NS_BEG(AGZ::Math)

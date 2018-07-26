@@ -3,7 +3,7 @@
 #include <cstring>
 #include <type_traits>
 
-#include "../Common.h"
+#include "../Misc/Common.h"
 #include "Scalar.h"
 #include "Vec2.h"
 #include "Vec3.h"
