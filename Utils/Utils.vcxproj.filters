@@ -7,9 +7,6 @@
     <Filter Include="Buffer">
       <UniqueIdentifier>{10d262d2-8012-4482-9276-80048e6714aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Result">
-      <UniqueIdentifier>{193a42c3-82ca-446c-b2ee-87f4d3e18213}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Misc">
       <UniqueIdentifier>{695ff70c-efc1-4c77-926e-ce7a2e1e46a1}</UniqueIdentifier>
     </Filter>
@@ -57,12 +54,6 @@
     <ClInclude Include="..\Src\Buffer\Buffer.h">
       <Filter>Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Result\Option.h">
-      <Filter>Result</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Result\Result.h">
-      <Filter>Result</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Utils.h" />
     <ClInclude Include="..\Src\Misc\Bench.h">
       <Filter>Misc</Filter>
@@ -79,14 +70,14 @@
     <ClInclude Include="..\Src\String\Core.h">
       <Filter>String</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Common.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Alloc\Default.h">
       <Filter>Alloc</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\Alloc\Fast.h">
       <Filter>Alloc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Misc\Common.h">
+      <Filter>Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

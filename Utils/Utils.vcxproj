@@ -23,7 +23,6 @@
     <ClInclude Include="..\Src\Alloc\Fast.h" />
     <ClInclude Include="..\Src\Buffer\Buffer.h" />
     <ClInclude Include="..\Src\Buffer\Buffer2D.h" />
-    <ClInclude Include="..\Src\Common.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />
     <ClInclude Include="..\Src\Math\Color.h" />
     <ClInclude Include="..\Src\Math\Mat4.h" />
@@ -35,11 +34,10 @@
     <ClInclude Include="..\Src\Math\Vec3.h" />
     <ClInclude Include="..\Src\Math\Vec4.h" />
     <ClInclude Include="..\Src\Misc\Bench.h" />
+    <ClInclude Include="..\Src\Misc\Common.h" />
     <ClInclude Include="..\Src\Misc\Endian.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
     <ClInclude Include="..\Src\Misc\Unicode.h" />
-    <ClInclude Include="..\Src\Result\Option.h" />
-    <ClInclude Include="..\Src\Result\Result.h" />
     <ClInclude Include="..\Src\String\Core.h" />
     <ClInclude Include="..\Src\Utils.h" />
   </ItemGroup>

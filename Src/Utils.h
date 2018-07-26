@@ -17,10 +17,9 @@
 #include "Math/Vec3.h"
 #include "Math/Vec4.h"
 
-#include "Result/Option.h"
-#include "Result/Result.h"
-
 #include "Misc/Bench.h"
 #include "Misc/Endian.h"
+#include "Misc/Option.h"
+#include "Misc/Result.h"
 #include "Misc/TypeOpr.h"
 #include "Misc/Unicode.h"
