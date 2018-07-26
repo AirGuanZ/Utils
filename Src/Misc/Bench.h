@@ -34,14 +34,14 @@ class Bench_t
 public:
 
     template<typename F>
-    AGZ_FORCE_INLINE const Bench_t &Run(int repeat, F &&func) const
+    const Bench_t &Run(int repeat, F &&func) const
     {
         Bench_impl(repeat, std::forward<F>(func));
         return *this;
     }
 
     template<typename F>
-    AGZ_FORCE_INLINE const Bench_t &Run(const std::string &name,
+    const Bench_t &Run(const std::string &name,
                                         int repeat, F &&func) const
     {
         std::cout << "[Benchmark] " << name << " ";
@@ -51,14 +51,14 @@ public:
 };
 
 template<typename F>
-AGZ_FORCE_INLINE Bench_t Run(int repeat, F &&func)
+Bench_t Run(int repeat, F &&func)
 {
     Bench_impl(repeat, std::forward<F>(func));
     return Bench_t();
 }
 
 template<typename F>
-AGZ_FORCE_INLINE Bench_t Run(const std::string &name, int repeat, F &&func)
+Bench_t Run(const std::string &name, int repeat, F &&func)
 {
     return Bench_t().Run(name, repeat, std::forward<F>(func));
 }

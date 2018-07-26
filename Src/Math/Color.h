@@ -23,14 +23,14 @@ using Color4d = Color4<double>;
     { \
         struct Color##N##_t \
         { \
-            AGZ_FORCE_INLINE operator Color3f() const \
+            AGZ_INLINE operator Color3f() const \
                 { return Color3f(float(R),  float(G),  float(B)); } \
-            AGZ_FORCE_INLINE operator Color3d() const \
+            AGZ_INLINE operator Color3d() const \
                 { return Color3d(double(R), double(G), double(B)); } \
-            AGZ_FORCE_INLINE operator Color4f() const \
+            AGZ_INLINE operator Color4f() const \
                 { return Color4f(float(R),  float(G), \
                                  float(B),  float(A)); } \
-            AGZ_FORCE_INLINE operator Color4d() const \
+            AGZ_INLINE operator Color4d() const \
                 { return Color4d(double(R), double(G), \
                                  double(B), double(A)); } \
         }; \

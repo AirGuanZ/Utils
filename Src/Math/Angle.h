@@ -21,33 +21,33 @@ template<typename T>
 using Deg = AngleTemplate<T, 1>;
 
 template<typename T, int I>
-AGZ_FORCE_INLINE auto operator+(AngleTemplate<T, I> lhs,
+auto operator+(AngleTemplate<T, I> lhs,
                                 AngleTemplate<T, I> rhs)
 {
     return AngleTemplate<T, I>{ lhs.value + rhs.value };
 }
 
 template<typename T, int I>
-AGZ_FORCE_INLINE auto operator-(AngleTemplate<T, I> lhs,
+auto operator-(AngleTemplate<T, I> lhs,
                                 AngleTemplate<T, I> rhs)
 {
     return AngleTemplate<T, I>{ lhs.value - rhs.value };
 }
 
 template<typename T, int I>
-AGZ_FORCE_INLINE auto operator*(AngleTemplate<T, I> lhs, T rhs)
+auto operator*(AngleTemplate<T, I> lhs, T rhs)
 {
     return AngleTemplate<T, I>{ lhs.value * rhs };
 }
 
 template<typename T, int I>
-AGZ_FORCE_INLINE auto operator*(T lhs, AngleTemplate<T, I> rhs)
+auto operator*(T lhs, AngleTemplate<T, I> rhs)
 {
     return rhs * lhs;
 }
 
 template<typename T, int I>
-AGZ_FORCE_INLINE auto operator/(AngleTemplate<T, I> lhs, T rhs)
+auto operator/(AngleTemplate<T, I> lhs, T rhs)
 {
     return AngleTemplate<T, I>{ lhs.value / rhs };
 }

@@ -11,13 +11,13 @@ using SharedEngine = std::default_random_engine;
 
 struct SharedRandomEngine_t
 {
-    AGZ_FORCE_INLINE auto &GetEng() { return eng; }
+    auto &GetEng() { return eng; }
     SharedEngine eng;
 };
 
 template<typename T, typename S> struct IntUniform_t
 {
-    static AGZ_FORCE_INLINE T Eval(T minv, T maxv, S &rng)
+    static T Eval(T minv, T maxv, S &rng)
     {
         return std::uniform_int_distribution<T>(minv, maxv)(rng.GetEng());
     }
@@ -25,7 +25,7 @@ template<typename T, typename S> struct IntUniform_t
 
 template<typename T, typename S> struct RealUniform_t
 {
-    static AGZ_FORCE_INLINE T Eval(T minv, T maxv, S &rng)
+    static T Eval(T minv, T maxv, S &rng)
     {
         return std::uniform_real_distribution<T>(minv, maxv)(rng.GetEng());
     }
@@ -33,7 +33,7 @@ template<typename T, typename S> struct RealUniform_t
 
 template<typename T, typename S> struct RealNormal_t
 {
-    static AGZ_FORCE_INLINE T Eval(T mean, T stddev, S &rng)
+    static T Eval(T mean, T stddev, S &rng)
     {
         return std::normal_distribution<T>(mean, stddev)(rng.GetEng());
     }
@@ -70,18 +70,18 @@ MAKE_REAL_NORMAL_T(double);
 inline thread_local SharedRandomEngine_t SHARED_RNG;
 
 template<typename T, typename S = SharedRandomEngine_t>
-AGZ_FORCE_INLINE T Uniform(T min, T max, S &rng = SHARED_RNG)
+T Uniform(T min, T max, S &rng = SHARED_RNG)
 {
     return Uniform_t<T, S>::Eval(min, max, rng);
 }
 
 template<typename T, typename S = SharedRandomEngine_t>
-AGZ_FORCE_INLINE T Normal(T mean, T stddev, S &rng = SHARED_RNG)
+T Normal(T mean, T stddev, S &rng = SHARED_RNG)
 {
     return Normal_t<T, S>::Eval(mean, stddev, rng);
 }
 
-AGZ_FORCE_INLINE void SetSharedSeed(SharedEngine::result_type seed)
+AGZ_INLINE void SetSharedSeed(SharedEngine::result_type seed)
 {
     SHARED_RNG.GetEng().seed(seed);
 }

@@ -42,8 +42,8 @@ public:
         if(size > nodeSize_)
         {
             NewNode(size);
-            cur->remainSize = 0;
-            return cur->top;
+            cur_->remainSize = 0;
+            return cur_->top;
         }
 
         if(!cur_ || size > cur_->remainSize)

@@ -77,22 +77,22 @@ public:
 };
 
 template<typename T>
-inline Vec4<T> ApplyToPoint(const Mat4<T> &m, const Vec4<T> &v);
+Vec4<T> ApplyToPoint(const Mat4<T> &m, const Vec4<T> &v);
 
 template<typename T>
-inline Vec3<T> ApplyToPoint(const Mat4<T> &m, const Vec3<T> &p);
+Vec3<T> ApplyToPoint(const Mat4<T> &m, const Vec3<T> &p);
 
 template<typename T>
-inline Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec4<T> &v);
+Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec4<T> &v);
 
 template<typename T>
-inline Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec3<T> &v);
+Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec3<T> &v);
 
 template<typename T>
-inline Mat4<T> Transpose(const Mat4<T> &m);
+Mat4<T> Transpose(const Mat4<T> &m);
 
 template<typename T>
-inline Mat4<T> Inverse(const Mat4<T> &m);
+Mat4<T> Inverse(const Mat4<T> &m);
 
 using Mat4f = Mat4<float>;
 using Mat4d = Mat4<double>;
@@ -100,7 +100,7 @@ using Mat4d = Mat4<double>;
 //===================================================== Implementations =====================================================
 
 template<typename T>
-inline Mat4<T>::Mat4(T v)
+Mat4<T>::Mat4(T v)
 {
     m[0][1] = m[0][2] = m[0][3] =
     m[1][0] = m[1][2] = m[1][3] =
@@ -110,14 +110,14 @@ inline Mat4<T>::Mat4(T v)
 }
 
 template<typename T>
-inline Mat4<T>::Mat4(const Data &_m)
+Mat4<T>::Mat4(const Data &_m)
 {
     static_assert(std::is_trivially_copyable<Component>::value);
     std::memcpy(m, _m, sizeof(m));
 }
 
 template<typename T>
-inline Mat4<T>::Mat4(T m00, T m01, T m02, T m03,
+Mat4<T>::Mat4(T m00, T m01, T m02, T m03,
     T m10, T m11, T m12, T m13,
     T m20, T m21, T m22, T m23,
     T m30, T m31, T m32, T m33)
@@ -129,7 +129,7 @@ inline Mat4<T>::Mat4(T m00, T m01, T m02, T m03,
 }
 
 template<typename T>
-inline Mat4<T> Mat4<T>::All(T v)
+Mat4<T> Mat4<T>::All(T v)
 {
     Self ret(UNINITIALIZED);
     ret.m[0][0] = ret.m[0][1] = ret.m[0][2] = ret.m[0][3] =
@@ -140,14 +140,14 @@ inline Mat4<T> Mat4<T>::All(T v)
 }
 
 template<typename T>
-inline const Mat4<T> &Mat4<T>::IDENTITY()
+const Mat4<T> &Mat4<T>::IDENTITY()
 {
     static const Self ret;
     return ret;
 }
 
 template<typename T>
-inline bool Mat4<T>::operator==(const Self &other) const
+bool Mat4<T>::operator==(const Self &other) const
 {
     for(int c = 0; c < 4; ++c)
     {
@@ -161,7 +161,7 @@ inline bool Mat4<T>::operator==(const Self &other) const
 }
 
 template<typename T>
-inline bool Mat4<T>::operator!=(const Self &other) const
+bool Mat4<T>::operator!=(const Self &other) const
 {
     for(int c = 0; c < 4; ++c)
     {
@@ -175,7 +175,7 @@ inline bool Mat4<T>::operator!=(const Self &other) const
 }
 
 template<typename T>
-inline typename Mat4<T>::Self Mat4<T>::operator*(const Self &rhs) const
+typename Mat4<T>::Self Mat4<T>::operator*(const Self &rhs) const
 {
     Self ret(UNINITIALIZED);
     for(int r = 0; r < 4; ++r)
@@ -192,7 +192,7 @@ inline typename Mat4<T>::Self Mat4<T>::operator*(const Self &rhs) const
 }
 
 template<typename T>
-inline Vec4<T> Mat4<T>::operator*(const Vec4<T> &p)
+Vec4<T> Mat4<T>::operator*(const Vec4<T> &p)
 {
     return Vec4<T>(m[0][0] * p.x + m[0][1] * p.y + m[0][2] * p.z + m[0][3] * p.w,
                    m[1][0] * p.x + m[1][1] * p.y + m[1][2] * p.z + m[1][3] * p.w,
@@ -201,7 +201,7 @@ inline Vec4<T> Mat4<T>::operator*(const Vec4<T> &p)
 }
 
 template<typename T>
-inline typename Mat4<T>::Self Mat4<T>::Translate(const Vec3<T> &v)
+typename Mat4<T>::Self Mat4<T>::Translate(const Vec3<T> &v)
 {
     constexpr T I = T(1), O = T(0);
     return Self(I, O, O, v.x,
@@ -212,7 +212,7 @@ inline typename Mat4<T>::Self Mat4<T>::Translate(const Vec3<T> &v)
 
 template<typename T>
 template<typename U>
-inline typename Mat4<T>::Self Mat4<T>::Rotate(const Vec3<T> &_axis, U angle)
+typename Mat4<T>::Self Mat4<T>::Rotate(const Vec3<T> &_axis, U angle)
 {
     T m[4][4];
     Vec3<T> axis = Normalize(_axis);
@@ -245,7 +245,7 @@ inline typename Mat4<T>::Self Mat4<T>::Rotate(const Vec3<T> &_axis, U angle)
 
 template<typename T>
 template<typename U>
-inline typename Mat4<T>::Self Mat4<T>::RotateX(U angle)
+typename Mat4<T>::Self Mat4<T>::RotateX(U angle)
 {
     constexpr T I = T(1), O = T(0);
     const auto S = Sin(angle), C = Cos(angle);
@@ -257,7 +257,7 @@ inline typename Mat4<T>::Self Mat4<T>::RotateX(U angle)
 
 template <typename T>
 template <typename U>
-inline typename Mat4<T>::Self Mat4<T>::RotateY(U angle)
+typename Mat4<T>::Self Mat4<T>::RotateY(U angle)
 {
     constexpr T I = T(1), O = T(0);
     const auto S = Sin(angle), C = Cos(angle);
@@ -269,7 +269,7 @@ inline typename Mat4<T>::Self Mat4<T>::RotateY(U angle)
 
 template <typename T>
 template <typename U>
-inline typename Mat4<T>::Self Mat4<T>::RotateZ(U angle)
+typename Mat4<T>::Self Mat4<T>::RotateZ(U angle)
 {
     constexpr T I = T(1), O = T(0);
     const auto S = Sin(angle), C = Cos(angle);
@@ -280,7 +280,7 @@ inline typename Mat4<T>::Self Mat4<T>::RotateZ(U angle)
 }
 
 template<typename T>
-inline typename Mat4<T>::Self Mat4<T>::Scale(const Vec3<T> &s)
+typename Mat4<T>::Self Mat4<T>::Scale(const Vec3<T> &s)
 {
     constexpr T I = T(1), O = T(0);
     return Self(s.x, O, O, O,
@@ -291,7 +291,7 @@ inline typename Mat4<T>::Self Mat4<T>::Scale(const Vec3<T> &s)
 
 template<typename T>
 template<typename U>
-inline typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T near, T far)
+typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T near, T far)
 {
     T invDis = T(1) / (far - near);
     constexpr T I = T(1), O = T(0);
@@ -303,7 +303,7 @@ inline typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T near, T fa
 }
 
 template<typename T>
-inline typename Mat4<T>::Self Mat4<T>::LookAt(const Vec3<T>& src, const Vec3<T>& dst, const Vec3<T>& up)
+typename Mat4<T>::Self Mat4<T>::LookAt(const Vec3<T>& src, const Vec3<T>& dst, const Vec3<T>& up)
 {
     constexpr T I = T(1), O = T(0);
     auto D = Normalize(dst - src);
@@ -316,13 +316,13 @@ inline typename Mat4<T>::Self Mat4<T>::LookAt(const Vec3<T>& src, const Vec3<T>&
 }
 
 template<typename T>
-inline Vec4<T> ApplyToPoint(const Mat4<T> &m, const Vec4<T> &v)
+Vec4<T> ApplyToPoint(const Mat4<T> &m, const Vec4<T> &v)
 {
     return m * v;
 }
 
 template<typename T>
-inline Vec3<T> ApplyToPoint(const Mat4<T> &m, const Vec3<T> &p)
+Vec3<T> ApplyToPoint(const Mat4<T> &m, const Vec3<T> &p)
 {
     Vec4<T> ret = m * Vec4<T>(p.x, p.y, p.z, 1.0);
     T dw = T(1) / ret.w;
@@ -330,13 +330,13 @@ inline Vec3<T> ApplyToPoint(const Mat4<T> &m, const Vec3<T> &p)
 }
 
 template<typename T>
-inline Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec4<T> &v)
+Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec4<T> &v)
 {
     return m * v;
 }
 
 template<typename T>
-inline Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec3<T> &v)
+Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec3<T> &v)
 {
     return Vec3<T>(m.m[0][0] * v.x + m.m[0][1] * v.y + m.m[0][2] * v.z,
                    m.m[1][0] * v.x + m.m[1][1] * v.y + m.m[1][2] * v.z,
@@ -344,7 +344,7 @@ inline Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec3<T> &v)
 }
 
 template<typename T>
-inline Mat4<T> Transpose(const Mat4<T> &m)
+Mat4<T> Transpose(const Mat4<T> &m)
 {
     return Mat4<T>(m[0][0], m[1][0], m[2][0], m[3][0],
                    m[0][1], m[1][1], m[2][1], m[3][1],
@@ -353,7 +353,7 @@ inline Mat4<T> Transpose(const Mat4<T> &m)
 }
 
 template<typename T>
-inline Mat4<T> InverseForFloat(const Mat4<T> &_m)
+Mat4<T> InverseForFloat(const Mat4<T> &_m)
 {
     int indxc[4], indxr[4], ipiv[4] = { 0 };
     T m[4][4];

@@ -1,12 +1,21 @@
 #pragma once
 
+
+
 #include "../Common.h"
 
 AGZ_NS_BEG(AGZ::Endian)
 
 enum class Endian { Big, Little };
 
+#ifdef __BYTE_ORDER__
 constexpr bool IS_LITTLE_ENDIAN = __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__;
+#elif defined(AGZ_BIG_ENDIAN)
+constexpr bool IS_LITTLE_ENDIAN = false;
+#else
+constexpr bool IS_LITTLE_ENDIAN = true;
+#endif
+
 constexpr bool IS_BIG_ENDIAN = !IS_LITTLE_ENDIAN;
 
 constexpr Endian ENDIAN = IS_BIG_ENDIAN ? Endian::Big : Endian::Little;
@@ -30,7 +39,9 @@ namespace Impl
     {
         static T Convert(T val)
         {
-            T ret; char *p = (char*)&ret, *q = (char*)&val;
+            T ret;
+            char *p = reinterpret_cast<char*>(&ret);
+            char *q = reinterpret_cast<char*>(&val);
             p[0] = q[1];
             p[1] = q[0];
             return ret;
@@ -42,7 +53,9 @@ namespace Impl
     {
         static T Convert(T val)
         {
-            T ret; char *p = (char*)&ret, *q = (char*)&val;
+            T ret;
+            char *p = reinterpret_cast<char*>(&ret);
+            char *q = reinterpret_cast<char*>(&val);
             p[0] = q[3];
             p[1] = q[2];
             p[2] = q[1];
@@ -56,7 +69,9 @@ namespace Impl
     {
         static T Convert(T val)
         {
-            T ret; char *p = (char*)&ret, *q = (char*)&val;
+            T ret;
+            char *p = reinterpret_cast<char*>(&ret);
+            char *q = reinterpret_cast<char*>(&val);
             p[0] = q[7];
             p[1] = q[6];
             p[2] = q[5];
@@ -76,7 +91,7 @@ namespace Impl
 template<typename T>
 inline T Big2Little(T val)
 {
-    return Impl::Bit2LittleImpl<T, sizeof(T)>::Convert(val);
+    return Impl::Big2LittleImpl<T, sizeof(T)>::Convert(val);
 }
 
 template<typename T>

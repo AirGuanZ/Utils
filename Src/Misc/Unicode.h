@@ -8,13 +8,13 @@
 AGZ_NS_BEG(AGZ::Unicode)
 
 // See https://en.wikipedia.org/wiki/UTF-8
-inline std::string CodePoint2UTF8(char32_t codepoint)
+AGZ_INLINE std::string CodePoint2UTF8(char32_t codePoint)
 {
     std::string ret;
     if(codePoint <= 0x7f)
     {
         ret.resize(1);
-        ret[0] = char(codepoint);
+        ret[0] = char(codePoint);
     }
     else if(codePoint <= 0x7ff)
     {
@@ -42,7 +42,7 @@ inline std::string CodePoint2UTF8(char32_t codepoint)
 
 // Return None when beg >= end or there is an decoding error
 // IMPROVE: ugly branches and repeated similar code segments
-inline Option<char32_t> NextCodePointInUTF8(const char *beg, const char *end,
+AGZ_INLINE Option<char32_t> NextCodePointInUTF8(const char *beg, const char *end,
                                             size_t *skipBytes)
 {
 #define SET_SKIP(N) \
@@ -59,7 +59,7 @@ inline Option<char32_t> NextCodePointInUTF8(const char *beg, const char *end,
     char fst = *beg++;
 
     // 1 bytes
-    if(fst & (1 << 7) == 0)
+    if((fst & (1 << 7)) == 0)
     {
         SET_SKIP(1);
         return Some(char32_t(fst));
@@ -67,7 +67,7 @@ inline Option<char32_t> NextCodePointInUTF8(const char *beg, const char *end,
 
     auto fetch6Bits = [](char ch) -> Option<std::uint32_t>
     {
-        if(ch & (3 << 6) != (1 << 7))
+        if((ch & (3 << 6)) != (1 << 7))
             return None<uint32_t>();
         return Some(uint32_t(ch & 0x3f));
     };

@@ -2,15 +2,15 @@
 
 #ifdef _MSC_VER
 
-#define AGZ_FORCE_INLINE __forceinline
+#define AGZ_INLINE inline //__forceinline
 
 #elif defined __GNUC__
 
-#define AGZ_FORCE_INLINE __attribute__((always_inline))
+#define AGZ_INLINE inline //__attribute__((always_inline))
 
 #else
 
-#define AGZ_FORCE_INLINE inline
+#define AGZ_INLINE inline
 
 #endif
 
@@ -41,6 +41,13 @@
 #define AGZ_ASSERT(X) assert(X)
 
 #define AGZ_USE_SSE2
+
+#ifndef __BYTE_ORDER__
+
+// #define AGZ_BIG_ENDIAN
+#define AGZ_LITTLE_ENDIAN
+
+#endif
 
 AGZ_NS_BEG(AGZ)
 
