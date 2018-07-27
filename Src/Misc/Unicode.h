@@ -50,12 +50,7 @@ AGZ_INLINE Option<char32_t> NextCodePointInUTF8(const char *beg, const char *end
         if(skipBytes) *skipBytes = (N); \
     } while(0)
 
-    if(beg >= end)
-    {
-        SET_SKIP(0);
-        return None<char32_t>();
-    }
-
+    AGZ_ASSERT(beg < end);
     char fst = *beg++;
 
     // 1 bytes
@@ -76,23 +71,10 @@ AGZ_INLINE Option<char32_t> NextCodePointInUTF8(const char *beg, const char *end
     if((fst & (0x1f << 3)) == (0x1e << 3))
     {
         auto oHigh6 = fetch6Bits(*beg++);
-        if(oHigh6.IsNone())
-        {
-            SET_SKIP(1);
-            return None<char32_t>();
-        }
         auto oMid6 = fetch6Bits(*beg++);
-        if(oMid6.IsNone())
-        {
-            SET_SKIP(1);
-            return None<char32_t>();
-        }
         auto oLow6 = fetch6Bits(*beg);
-        if(oLow6.IsNone())
-        {
-            SET_SKIP(1);
+        if(oHigh6.IsNone() || oMid6.IsNone() || oLow6.IsNone())
             return None<char32_t>();
-        }
         SET_SKIP(4);
         return Some(char32_t(((0x7 & fst) << 18) |
                              (oHigh6.Unwrap() << 12) |
@@ -104,17 +86,9 @@ AGZ_INLINE Option<char32_t> NextCodePointInUTF8(const char *beg, const char *end
     if((fst & (0xf << 4)) == (0xe << 3))
     {
         auto oHigh6 = fetch6Bits(*beg++);
-        if(oHigh6.IsNone())
-        {
-            SET_SKIP(1);
-            return None<char32_t>();
-        }
         auto oLow6 = fetch6Bits(*beg);
-        if(oLow6.IsNone())
-        {
-            SET_SKIP(1);
+        if(oHigh6.IsNone() || oLow6.IsNone())
             return None<char32_t>();
-        }
         SET_SKIP(3);
         return Some(char32_t(((0xf & fst) << 12) |
                              (oHigh6.Unwrap() << 6) |
@@ -126,17 +100,13 @@ AGZ_INLINE Option<char32_t> NextCodePointInUTF8(const char *beg, const char *end
     {
         auto snd6 = fetch6Bits(*beg);
         if(snd6.IsNone())
-        {
-            SET_SKIP(1);
             return None<char32_t>();
-        }
         SET_SKIP(2);
         return Some(char32_t(((0x1f & fst) << 6) |
                              (snd6.Unwrap())));
     }
 
     // Unknown prefix
-    SET_SKIP(1);
     return None<char32_t>();
 
 #undef SET_SKIP
