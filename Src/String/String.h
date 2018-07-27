@@ -1,36 +1,36 @@
-#pragma once
+﻿#pragma once
 
 #include <atomic>
 #include <cstring>
 #include <type_traits>
 
 #include "../Misc/Common.h"
-#include "../Misc/Option.h"
 
 /*
-撇开std::string的蛋疼不提，即使是在使用Rust的String的时候，我也无法感到称心如意。
-在网络上可以看到很多关于这种不快来源的言论，譬如可变/不可变、动态类型/静态类型（放屁）
-云云。
+    撇开std::string的蛋疼不提，即使是在使用Rust的String的时候，我也无法感到称心如意。
+    在网络上可以看到很多关于这种不快来源的言论，譬如可变/不可变、动态类型/静态类型（放屁）
+    云云。
 
-一种我比较认同的观点是：String不应该是Char的序列。的确，从存储机制上，
-认为String是Char序列是再自然不过的想法，但这样一来String就沦落为vector<Char>了
-（C++正是这么干的）。
+    一种我比较认同的观点是：String不应该是Char的序列。的确，从存储机制上，
+    认为String是Char序列是再自然不过的想法，但这样一来String就沦落为vector<Char>了
+    （C++正是这么干的）。
 
-这使得我们可以自由地操控String中的每个CodeUnit，却在涉及到CodePoint及更高的抽象层次
-的操作上心惊胆战，毕竟vector<Char>根本就没有提供“字符串”这一概念应有的抽象。
-因此，我打算试着彻底摈弃把String看作Char序列的做法，从AGZ::String类的接口中，将完全
-无法以Char的方式访问其内容，即使是for each这样的迭代操作，AGZ::String也只会提供
-immutable的、仅包含一个UTF8 CodePoint的字符串。
+    这使得我们可以自由地操控String中的每个CodeUnit，却在涉及到CodePoint及更高的抽象层次
+    的操作上心惊胆战，毕竟vector<Char>根本就没有提供“字符串”这一概念应有的抽象。
+    因此，我打算试着彻底摈弃把String看作Char序列的做法，从AGZ::String类的接口中，将完全
+    无法以Char的方式访问其内容，即使是for each这样的迭代操作，AGZ::String也只会提供
+    immutable的、仅包含一个UTF8 CodePoint的字符串。
 
-存储方面，对小型字符串，使用一块固定buffer直接拷贝；对稍微大些的字符串，用引用计数
-进行共享。
+    存储方面，对小型字符串，使用一块固定buffer直接拷贝；对稍微大些的字符串，用引用计数
+    进行共享。
 
-small_.len记录small string的长度。若超过INT_BUF_SIZE，则为large。
-换言之，这里的存储并不是0-ended的。
+    small_.len记录small string的长度。若超过INT_BUF_SIZE，则为large。
+    换言之，这里的存储并不是0-ended的。
 
-另外，因为是Immutable的，所以线程安全不成问题。唯一需要注意的是引用计数的跨线程操作，
-这一点由本实现自行保证。
+    另外，因为是Immutable的，所以线程安全不成问题。唯一需要注意的是引用计数的跨线程操作，
+    这一点由本实现自行保证。
 */
+
 AGZ_NS_BEG(AGZ)
 
 template<typename CU, typename CP, typename TP> class TString;
@@ -38,14 +38,14 @@ template<typename CU, typename CP, typename TP> class TString;
 namespace StringAux
 {
     template<typename T, std::enable_if_t<
-        std::is_trivially_copiable_v<T>, int> = 0>
+        std::is_trivially_copyable_v<T>, int> = 0>
     void Construct(T *dst, const T *src, size_t n)
     {
         std::memcpy(dst, src, n * sizeof(T));
     }
 
     template<typename T, std::enable_if_t<
-        !std::is_trivially_copiable_v<T>, int> = 0>
+        !std::is_trivially_copyable_v<T>, int> = 0>
     void Construct(T *dst, const T *src, size_t n)
     {
         for(size_t i = 0; i < n; ++i)
@@ -102,11 +102,11 @@ namespace StringAux
     // 只能由TString创建，保证一定指向一个合法CodePoint的开头
     // 用户可以通过这种location来标定String中的位置，譬如创建子串等
     template<typename CU, typename CP, typename TP>
-    class TStrLoc
+    class StrLoc
     {
         const CU *pos;
 
-        TStrLoc(const CU *pos) : pos(pos) { }
+        explicit StrLoc(const CU *pos) : pos(pos) { }
 
     public:
 
@@ -121,9 +121,9 @@ template<typename CU, typename CP,
          typename TP = StringAux::SingleThreaded>
 class TString
 {
-    static constexpr INT_BUF_SIZE = 31;
+    static constexpr size_t INT_BUF_SIZE = 31;
 
-    using LargeBuf = RefCountedBuf<CU, TP>;
+    using LargeBuf = StringAux::RefCountedBuf<CU, TP>;
 
     union
     {
@@ -152,7 +152,7 @@ public:
 
     using CodeUnit  = CU;
     using CodePoint = CP;
-    using Self      = TString<CU, CT>;
+    using Self      = TString<CU, CP, TP>;
 
     // Construct from existed buffer. Will copy all data to owned storage.
     TString(const CU *beg, const CU *end);
@@ -166,39 +166,39 @@ public:
 };
 
 template<typename CU, typename CP, typename TP>
-inline bool TString<CU, CP, TP>::IsSmallStorage() const
+bool TString<CU, CP, TP>::IsSmallStorage() const
 {
     return small_.len <= INT_BUF_SIZE;
 }
 
 template<typename CU, typename CP, typename TP>
-inline bool TString<CU, CP, TP>::IsLargeStorage() const
+bool TString<CU, CP, TP>::IsLargeStorage() const
 {
     return small_.len > INT_BUF_SIZE;
 }
 
 template<typename CU, typename CP, typename TP>
-inline size_t TString<CU, CP, TP>::GetSmallLen() const
+size_t TString<CU, CP, TP>::GetSmallLen() const
 {
     AGZ_ASSERT(IsSmallStorage());
     return small_.len;
 }
 
 template<typename CU, typename CP, typename TP>
-inline size_t TString<CU, CP, TP>::GetLargeLen() const
+size_t TString<CU, CP, TP>::GetLargeLen() const
 {
     AGZ_ASSERT(IsLargeStorage() && large_.beg < large_.end);
     return large_.end - large_.beg;
 }
 
 template<typename CU, typename CP, typename TP>
-inline size_t TString<CU, CP, TP>::GetLen() const
+size_t TString<CU, CP, TP>::GetLen() const
 {
     return IsSmallStorage() ? GetSmallLen() : GetLargeLen();
 }
 
 template<typename CU, typename CP, typename TP>
-inline TString<CU, CP, TP>::TString(const CU *beg, const CU *end)
+TString<CU, CP, TP>::TString(const CU *beg, const CU *end)
 {
     AGZ_ASSERT(beg <= end);
     size_t len = end - beg;
@@ -213,12 +213,12 @@ inline TString<CU, CP, TP>::TString(const CU *beg, const CU *end)
         large_.buf = LargeBuf::New(len);
         large_.beg = large_.buf.GetData();
         large_.end = large_.beg + len;
-        StringAux::Cnostruct<CU>(large_.buf.GetData(), beg, len);
+        StringAux::Construct<CU>(large_.buf.GetData(), beg, len);
     }
 }
 
 template<typename CU, typename CP, typename TP>
-inline TString<CU, CP, TP>::TString(const Self &copyFrom)
+TString<CU, CP, TP>::TString(const Self &copyFrom)
 {
     if(copyFrom.IsSmallStorage())
     {
@@ -237,20 +237,20 @@ inline TString<CU, CP, TP>::TString(const Self &copyFrom)
 }
 
 template<typename CU, typename CP, typename TP>
-inline TString<CU, CP, TP>::~TString()
+TString<CU, CP, TP>::~TString()
 {
     if(IsLargeStorage())
         large_.buf->DecRef();
 }
 
 template<typename CU, typename CP, typename TP>
-inline const CU *TString<CU, CP, TP>::RawCodeUnits() const
+const CU *TString<CU, CP, TP>::RawCodeUnits() const
 {
     return IsSmallStorage() ? &small_.buf[0] : large_.beg;
 }
 
 template<typename CU, typename CP, typename TP>
-inline size_t TString<CU, CP, TP>::CodeUnitCount() const
+size_t TString<CU, CP, TP>::CodeUnitCount() const
 {
     return GetLen();
 }

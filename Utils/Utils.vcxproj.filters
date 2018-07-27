@@ -64,12 +64,6 @@
     <ClInclude Include="..\Src\Misc\TypeOpr.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Misc\Unicode.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Core.h">
-      <Filter>String</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Alloc\Default.h">
       <Filter>Alloc</Filter>
     </ClInclude>
@@ -78,6 +72,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\Misc\Common.h">
       <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\String.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\UTF8.h">
+      <Filter>String</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -44,8 +44,16 @@
 
 #ifndef __BYTE_ORDER__
 
+#ifdef _MSC_VER
+
+#define AGZ_LITTLE_ENDIAN
+
+#else
+
 // #define AGZ_BIG_ENDIAN
 #define AGZ_LITTLE_ENDIAN
+
+#endif
 
 #endif
 
