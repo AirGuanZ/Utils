@@ -83,15 +83,9 @@ auto buf21 = Buffer2D<int>::FromFn(100, 100,
 
 ## Result
 
-Option & Result, just like Rust!
+Result, just like Rust!
 
 ```c++
-Option<int> foo()
-{
-    if(...) return Some(5);
-    return None<int>();
-}
-
 Result<int, string> bar()
 {
     if(...) return Ok<int, string>(5);
@@ -100,10 +94,6 @@ Result<int, string> bar()
 
 int main()
 {
-    auto rt = foo();
-    if(rt.IsSome())
-        cout << rt.Unwrap() << endl;
-
     auto rt2 = bar();
     if(rt.IsOk())
         cout << rt.UnwrapOk() << endl;
