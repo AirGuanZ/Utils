@@ -10,6 +10,8 @@ class UTF32Core
 {
 public:
 
+    static_assert(sizeof(T) >= 4);
+
     using CodePoint = char32_t;
     using CodeUnit  = T;
 
