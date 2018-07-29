@@ -120,7 +120,7 @@ public:
     } while(0)
 
         // 2 bytes
-        if((fst & 0b11100000) == 0b1100000)
+        if((fst & 0b11100000) == 0b11000000)
         {
             CodePoint low;
             if(cu_num < 2) return 0;

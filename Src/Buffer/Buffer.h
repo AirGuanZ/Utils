@@ -35,7 +35,7 @@ class Buffer
     void Alloc(size_t s)
     {
         AGZ_ASSERT(s > 0);
-        d_ = static_cast<E*>(std::aligned_alloc(alignof(E), s * sizeof(E)));
+        d_ = static_cast<E*>(AGZ_ALIGNED_ALLOC(alignof(E), s * sizeof(E)));
         if(!d_)
             throw std::bad_alloc();
     }
@@ -45,7 +45,7 @@ class Buffer
         AGZ_ASSERT(d_ != nullptr);
         for(size_t i = 0; i < s_; ++i)
             (d_ + i)->~E();
-        std::free(d_);
+        AGZ_ALIGNED_FREE(d_);
     }
 
 public:
