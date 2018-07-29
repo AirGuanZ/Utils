@@ -53,7 +53,7 @@ public:
     static std::string Name() { return "UTF-8"; }
 
     // Maximum count of code units to encode a code point
-    static size_t MaxCUInCP() { return 4; }
+    static constexpr size_t MaxCUInCP = 4;
 
     // Convert a code point to code units
     // Return count of code units obtained (shall <= MaxCUInCP())

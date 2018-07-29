@@ -1,8 +1,11 @@
 #include <Utils.h>
 
+#include <string>
+
 #include "Catch.hpp"
 
 using namespace AGZ;
+using namespace std;
 
 TEST_CASE("String")
 {
@@ -22,5 +25,9 @@ TEST_CASE("String")
         REQUIRE(Str(u8"ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA"
                       "ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA", 104)[4] == u8'E');
         REQUIRE(Str(u8"今", 3).Length() == 3);
+
+        string s = u8"今天minecraft天°气dark soul不错the witcher啊";
+        auto sd = s.data();
+        REQUIRE(Str(sd, sd + s.length()).Length() == s.length());
     }
 }

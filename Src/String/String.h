@@ -171,6 +171,7 @@ public:
     ~String();
 
     const CodeUnit *Data() const;
+    
     size_t Length() const;
 
     CodeUnit operator[](size_t idx) const;
