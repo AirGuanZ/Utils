@@ -38,6 +38,8 @@
     <ClInclude Include="..\Src\Misc\Common.h" />
     <ClInclude Include="..\Src\Misc\Endian.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
+    <ClInclude Include="..\Src\String\CharSet.h" />
+    <ClInclude Include="..\Src\String\UTF32.h" />
     <ClInclude Include="..\Src\String\UTF8.h" />
     <ClInclude Include="..\Src\String\String.h" />
     <ClInclude Include="..\Src\Utils.h" />

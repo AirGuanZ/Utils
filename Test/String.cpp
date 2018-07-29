@@ -19,15 +19,19 @@ TEST_CASE("String")
 
     SECTION("Constructor")
     {
-        REQUIRE(Str(u8"minecraft", 9).Length() == 9);
-        REQUIRE(Str(u8"ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA"
+        REQUIRE(Str8(u8"minecraft", 9).Length() == 9);
+        REQUIRE(Str8(u8"ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA"
                       "ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA", 104).Length() == 104);
-        REQUIRE(Str(u8"ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA"
+        REQUIRE(Str8(u8"ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA"
                       "ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA", 104)[4] == u8'E');
-        REQUIRE(Str(u8"今", 3).Length() == 3);
+        REQUIRE(Str8(u8"今", 3).Length() == 3);
 
         string s = u8"今天minecraft天°气dark soul不错the witcher啊";
         auto sd = s.data();
-        REQUIRE(Str(sd, sd + s.length()).Length() == s.length());
+        REQUIRE(Str8(sd, sd + s.length()).Length() == s.length());
+
+        REQUIRE(Str8(String<UTF8<uint32_t>>(
+            Str32(Str8(sd, sd + s.length())))).Length() == s.length());
+        REQUIRE(Str32(Str8(sd, sd + s.length())).Length() == 37);
     }
 }

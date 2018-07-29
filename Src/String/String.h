@@ -5,32 +5,9 @@
 #include <vector>
 
 #include "../Misc/Common.h"
+
 #include "UTF8.h"
-
-/*
-    撇开std::string的蛋疼不提，即使是在使用Rust的String的时候，我也无法感到称心如意。
-    在网络上可以看到很多关于这种不快来源的言论，譬如可变/不可变、动态类型/静态类型（放屁）
-    云云。
-
-    一种我比较认同的观点是：String不应该是Char的序列。的确，从存储机制上，
-    认为String是Char序列是再自然不过的想法，但这样一来String就沦落为vector<Char>了
-    （C++正是这么干的）。
-
-    这使得我们可以自由地操控String中的每个CodeUnit，却在涉及到CodePoint及更高的抽象层次
-    的操作上心惊胆战，毕竟vector<Char>根本就没有提供“字符串”这一概念应有的抽象。
-    因此，我打算试着彻底摈弃把String看作Char序列的做法，从AGZ::String类的接口中，将完全
-    无法以Char的方式访问其内容，即使是for each这样的迭代操作，AGZ::String也只会提供
-    immutable的、仅包含一个UTF8 CodePoint的字符串。
-
-    存储方面，对小型字符串，使用一块固定buffer直接拷贝；对稍微大些的字符串，用引用计数
-    进行共享。
-
-    small_.len记录small string的长度。若超过INT_BUF_SIZE，则为large。
-    换言之，这里的存储并不是0-ended的。
-
-    另外，因为是Immutable的，所以线程安全不成问题。唯一需要注意的是引用计数的跨线程操作，
-    这一点由本实现自行保证。
-*/
+#include "UTF32.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -132,6 +109,8 @@ class String
     size_t GetLargeLen() const;
     size_t GetLen() const;
 
+    void Init(const typename CS::CodeUnit *beg, const typename CS::CodeUnit *end);
+
 public:
 
     using CharSet   = CS;
@@ -143,7 +122,7 @@ public:
 
     // Construct from existed buffer
     // Will copy all data to owned storage
-    // Doesn't check the correctness of given code units. UB when [beg, end) is invalid
+    // Faster than with-checking edition. UB when [beg, end) is invalid
     String(CONS_FLAG_NOCHECK_t, const CodeUnit *beg, const CodeUnit *end);
 
     // Construct from existed buffer
@@ -210,13 +189,8 @@ size_t String<CS, TP>::GetLen() const
 }
 
 template<typename CS, typename TP>
-String<CS, TP>::String()
-{
-    small_.len = 0;
-}
-
-template<typename CS, typename TP>
-String<CS, TP>::String(CONS_FLAG_NOCHECK_t, const CodeUnit *beg, const CodeUnit *end)
+void String<CS, TP>::Init(const typename CS::CodeUnit *beg,
+                          const typename CS::CodeUnit *end)
 {
     AGZ_ASSERT(beg <= end);
     size_t len = end - beg;
@@ -235,6 +209,19 @@ String<CS, TP>::String(CONS_FLAG_NOCHECK_t, const CodeUnit *beg, const CodeUnit 
     }
 }
 
+template<typename CS, typename TP>
+String<CS, TP>::String()
+{
+    small_.len = 0;
+}
+
+template<typename CS, typename TP>
+String<CS, TP>::String(CONS_FLAG_NOCHECK_t, const CodeUnit *beg,
+                                            const CodeUnit *end)
+{
+    Init(beg, end);
+}
+
 template <typename CS, typename TP>
 String<CS, TP>::String(const CodeUnit* beg, const CodeUnit* end)
     : String(NOCHECK, beg, end)
@@ -244,6 +231,7 @@ String<CS, TP>::String(const CodeUnit* beg, const CodeUnit* end)
         throw EncodingException("Input [beg, end) is not a valid "
                               + CS::Name() + " sequence");
     }
+    Init(beg, end);
 }
 
 template<typename CS, typename TP>
@@ -252,7 +240,8 @@ String<CS, TP>::String(const Self &copyFrom)
     if(copyFrom.IsSmallStorage())
     {
         small_.len = static_cast<uint8_t>(copyFrom.GetSmallLen());
-        StringAux::CopyConstruct(&small_.buf[0], &copyFrom.small_.buf[0], copyFrom.small_.len);
+        StringAux::CopyConstruct(&small_.buf[0], &copyFrom.small_.buf[0],
+                                                 copyFrom.small_.len);
     }
     else
     {
@@ -274,8 +263,43 @@ String<CS, TP>::String(CONS_FLAG_FROM_t<OCS>, const typename OCS::CodeUnit *beg,
     else
     {
         std::vector<CodeUnit> cus;
+        CodeUnit sgl[CS::MaxCUInCP];
+        while(beg < end)
+        {
+            typename OCS::CodePoint ocp;
+            size_t skip = OCS::CU2CP(beg, &ocp, end - beg);
+            if(!skip)
+            {
+                throw EncodingException("Input [beg, end) is not a valid "
+                                      + OCS::Name() + " sequence");
+            }
+            beg += skip;
 
+            size_t sgls = CS::CP2CU(CS::template From<OCS>(ocp), sgl);
+            AGZ_ASSERT(sgls);
+            for(size_t i = 0; i < sgls; ++i)
+                cus.push_back(sgl[i]);
+        }
+
+        Init(cus.data(), cus.data() + cus.size());
     }
+}
+
+template<typename CS, typename TP>
+template<typename OCS>
+String<CS, TP>::String(CONS_FLAG_FROM_t<OCS>, const typename OCS::CodeUnit *beg,
+                                              size_t n)
+    : String(FROM<OCS>, beg, beg + n)
+{
+
+}
+
+template<typename CS, typename TP>
+template<typename OCS, typename OTP>
+String<CS, TP>::String(const String<OCS, OTP>& copyFrom)
+    : String(FROM<OCS>, copyFrom.Data(), copyFrom.Length())
+{
+
 }
 
 template<typename CS, typename TP>
@@ -304,6 +328,7 @@ typename String<CS, TP>::CodeUnit String<CS, TP>::operator[](size_t idx) const
     return Data()[idx];
 }
 
-using Str = String<UTF8<char>>;
+using Str8  = String<UTF8<>>;
+using Str32 = String<UTF32<>>;
 
 AGZ_NS_END(AGZ)

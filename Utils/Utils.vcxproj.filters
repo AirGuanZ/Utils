@@ -85,6 +85,12 @@
     <ClInclude Include="..\Src\Iterable\Iterable.h">
       <Filter>Iterable</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\String\CharSet.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\UTF32.h">
+      <Filter>String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">
