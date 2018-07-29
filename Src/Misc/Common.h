@@ -65,6 +65,14 @@ inline Uninitialized_t UNINITIALIZED;
 struct CONS_FLAG_FROM_FN_t { };
 inline CONS_FLAG_FROM_FN_t FROM_FN;
 
+template<typename T>
+struct CONS_FLAG_FROM_t { };
+template<typename T>
+inline CONS_FLAG_FROM_t<T> FROM;
+
+struct CONS_FLAG_NOCHECK_t { };
+inline CONS_FLAG_NOCHECK_t NOCHECK;
+
 struct Void_t { };
 
 AGZ_NS_END(AGZ)

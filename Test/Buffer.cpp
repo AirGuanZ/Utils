@@ -13,7 +13,8 @@ TEST_CASE("Buffer")
 {
     SECTION("Buffer")
     {
-        auto buf = Buffer<int>::FromFn(10, [](size_t i, int *v) { *v = static_cast<int>(i); });
+        auto buf = Buffer<int>::FromFn(10, [](size_t i, int *v)
+            { *v = static_cast<int>(i); });
 
         REQUIRE(buf(0) == 0);
         REQUIRE(buf(9) == 9);

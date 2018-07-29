@@ -1,17 +1,56 @@
 #pragma once
 
+#include <optional>
+
 #include "../Misc/Common.h"
 
 AGZ_NS_BEG(AGZ)
 
+template<typename Core>
+class CharSet : public Core
+{
+public:
+
+    using CodePoint = typename Core::CodePoint;
+    using CodeUnit  = typename Core::CodeUnit;
+
+    static bool Check(const CodeUnit *beg, size_t n)
+    {
+        CodePoint cp;
+        while(n)
+        {
+            size_t s = Core::CU2CP(beg, &cp, n);
+            if(!s)
+                return false;
+            n -= s;
+            beg += s;
+        }
+        return true;
+    }
+
+    template<typename OCS>
+    static CodePoint From(typename OCS::CodePoint ocp)
+    {
+        return Core::FromUnicode(OCS::ToUnicode(ocp));
+    }
+
+    template<typename OCS>
+    static typename OCS::CodePoint To(CodePoint cp)
+    {
+        return OCS::FromUnicode(Core::ToUnicode(cp));
+    }
+};
+
 // En/decoding rules: see https://en.wikipedia.org/wiki/UTF-8
-template<typename T = char>
-class UTF8
+template<typename T>
+class UTF8Core
 {
 public:
 
     using CodePoint = char32_t;
     using CodeUnit  = T;
+
+    static std::string Name() { return "UTF-8"; }
 
     // Maximum count of code units to encode a code point
     static size_t MaxCUInCP() { return 4; }
@@ -59,9 +98,9 @@ public:
     // Recognize the first code point in a code unit sequence
     // Return count of code units consumed
     // Return 0 when the code uni seq is invalid
-    static size_t CU2CP(const CodeUnit *cu, CodePoint *cp)
+    static size_t CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num)
     {
-        AGZ_ASSERT(cu && cp);
+        AGZ_ASSERT(cu && cp && cu_num);
 
         CodeUnit fst = *cu++;
 
@@ -84,6 +123,7 @@ public:
         if((fst & 0b11100000) == 0b1100000)
         {
             CodePoint low;
+            if(cu_num < 2) return 0;
             NEXT(*cu, low);
             *cp = ((fst & 0b00011111) << 6) | low;
             return 2;
@@ -93,6 +133,7 @@ public:
         if((fst & 0b11110000) == 0b11100000)
         {
             CodePoint high, low;
+            if(cu_num < 3) return 0;
             NEXT(*cu++, high); NEXT(*cu, low);
             *cp = ((fst & 0b00001111) << 12) | (high << 6) | low;
             return 3;
@@ -102,6 +143,7 @@ public:
         if((fst & 0b11111000) == 0b11110000)
         {
             CodePoint high, medi, low;
+            if(cu_num < 4) return 0;
             NEXT(*cu++, high); NEXT(*cu++, medi); NEXT(*cu, low);
             *cp = ((fst & 0b00000111) << 18) | (high << 12) | (medi << 6) | low;
             return 4;
@@ -111,6 +153,19 @@ public:
 
         return 0;
     }
+
+    static char32_t ToUnicode(CodePoint cp)
+    {
+        return cp;
+    }
+
+    static CodePoint FromUnicode(char32_t cp)
+    {
+        return cp;
+    }
 };
+
+template<typename T = char>
+using UTF8 = CharSet<UTF8Core<T>>;
 
 AGZ_NS_END(AGZ)

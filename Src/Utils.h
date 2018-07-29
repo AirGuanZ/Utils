@@ -19,7 +19,7 @@
 
 #include "Misc/Bench.h"
 #include "Misc/Endian.h"
-#include "Misc/Result.h"
 #include "Misc/TypeOpr.h"
 
 #include "String/String.h"
+#include "String/UTF8.h"
