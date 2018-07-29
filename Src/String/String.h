@@ -132,8 +132,6 @@ class String
     size_t GetLargeLen() const;
     size_t GetLen() const;
 
-    typename CS::CodeUnit *GetRawBuf();
-
 public:
 
     using CharSet   = CS;
@@ -175,7 +173,6 @@ public:
     const CodeUnit *Data() const;
     size_t Length() const;
 
-    CodeUnit &operator[](size_t idx);
     CodeUnit operator[](size_t idx) const;
 };
 
@@ -209,12 +206,6 @@ template<typename CS, typename TP>
 size_t String<CS, TP>::GetLen() const
 {
     return IsSmallStorage() ? GetSmallLen() : GetLargeLen();
-}
-
-template <typename CS, typename TP>
-typename CS::CodeUnit* String<CS, TP>::GetRawBuf()
-{
-    return IsSmallStorage() ? &small_.buf[0] : large_.beg;
 }
 
 template<typename CS, typename TP>
@@ -303,13 +294,6 @@ template<typename CS, typename TP>
 size_t String<CS, TP>::Length() const
 {
     return GetLen();
-}
-
-template <typename CS, typename TP>
-typename String<CS, TP>::CodeUnit& String<CS, TP>::operator[](size_t idx)
-{
-    AGZ_ASSERT(idx < GetLen());
-    return GetRawBuf()[idx];
 }
 
 template <typename CS, typename TP>
