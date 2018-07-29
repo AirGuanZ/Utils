@@ -22,8 +22,9 @@
 
 #elif defined __GNUC__
 
-#define AGZ_ALIGNED_MALLOC(S, A) _mm_malloc((A), (S))
-#define AGZ_ALIGNED_FREE(P) _mm_free((P))
+#include <cstdlib>
+#define AGZ_ALIGNED_MALLOC(S, A) (std::aligned_alloc)((A), (S))
+#define AGZ_ALIGNED_FREE(P) (std::free)((P))
 
 #else
 

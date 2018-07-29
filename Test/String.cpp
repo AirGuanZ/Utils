@@ -18,6 +18,6 @@ TEST_CASE("String")
     {
         REQUIRE(Str(u8"minecraft", 9).Length() == 9);
         REQUIRE(Str(u8"ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA", 52).Length() == 52);
-        REQUIRE(Str(u8"½ñ", 3).Length() == 3);
+        REQUIRE(Str(u8"ä»Š", 3).Length() == 3);
     }
 }

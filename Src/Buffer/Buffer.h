@@ -1,5 +1,8 @@
 #pragma once
 
+#include <new>
+#include <utility>
+
 #include "../Misc/Common.h"
 
 AGZ_NS_BEG(AGZ::Buf)

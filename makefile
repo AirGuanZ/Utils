@@ -34,10 +34,5 @@ run :
 clean :
 	rm -f $(TARGET)
 	rm -f $(OPP_FILES) $(DPP_FILES)
-	rm -f $(shell find ./src/ -name "*.dtmp")
-
-.PHONY : cleanall
-cleanall :
-	rm -f $(TARGET)
-	rm -f $(OPP_FILES) $(DPP_FILES)
-	rm -f $(shell find ./src/ -name "*.dtmp")
+	rm -f $(shell find ./Src/ -name "*.dtmp")
+	rm -f $(shell find ./Test/ -name "*.dtmp")
