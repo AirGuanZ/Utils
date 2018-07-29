@@ -14,27 +14,6 @@
 
 #endif
 
-#ifdef _MSC_VER
-
-#include <malloc.h>
-#define AGZ_ALIGNED_MALLOC(S, A) _aligned_malloc((S), (A))
-#define AGZ_ALIGNED_FREE(P)   _aligned_free((P))
-
-#elif defined __GNUC__
-
-#include <cstdlib>
-#define AGZ_ALIGNED_MALLOC(S, A) (std::aligned_alloc)((A), (S))
-#define AGZ_ALIGNED_FREE(P) (std::free)((P))
-
-#else
-
-#include <cstdlib>
-#define AGZ_ALIGNED_MALLOC(S, A) std::malloc((S))
-#define AGZ_ALIGNED_FREE(P) std::free((P))
-#warning "Aligned malloc/free unimplemented, use std::malloc/free instead"
-
-#endif
-
 #define AGZ_NS_BEG(N) namespace N {
 #define AGZ_NS_END(N) }
 
