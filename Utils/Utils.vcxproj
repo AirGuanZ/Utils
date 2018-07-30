@@ -23,7 +23,6 @@
     <ClInclude Include="..\Src\Alloc\Fast.h" />
     <ClInclude Include="..\Src\Buffer\Buffer.h" />
     <ClInclude Include="..\Src\Buffer\Buffer2D.h" />
-    <ClInclude Include="..\Src\Iterable\Iterable.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />
     <ClInclude Include="..\Src\Math\Color.h" />
     <ClInclude Include="..\Src\Math\Mat4.h" />
@@ -38,6 +37,8 @@
     <ClInclude Include="..\Src\Misc\Common.h" />
     <ClInclude Include="..\Src\Misc\Endian.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
+    <ClInclude Include="..\Src\Range\NumSeq.h" />
+    <ClInclude Include="..\Src\Range\Take.h" />
     <ClInclude Include="..\Src\String\CharSet.h" />
     <ClInclude Include="..\Src\String\UTF32.h" />
     <ClInclude Include="..\Src\String\UTF8.h" />

@@ -1,5 +1,6 @@
 #include <cstring>
 #include <string>
+#include <vector>
 
 AGZ_NS_BEG(AGZ)
 
@@ -81,7 +82,7 @@ void String<CS, TP>::Init2(const typename CS::CodeUnit *beg1,
     }
 }
 
-template<typename CS, typeame TP>
+template<typename CS, typename TP>
 String<CS, TP> &String<CS, TP>::CopyFromSelf(const Self &copyFrom)
 {
     if(IsLargeStorage())
@@ -278,12 +279,11 @@ String<CS, TP>::String(const char *cStr, CharEncoding encoding)
     case CharEncoding::UTF8:
         new(this) Self(FROM<UTF8<char>>, cStr, std::strlen(cStr));
         break;
-    case CharEncoding::UTF32:
-        new(this) Self(FROM<UTF32<char>>, cStr, std::strlen(cStr));
-        break;
     default:
         throw EncodingException("Unknown encoding: "
-                              + std::to_string(encoding));
+                              + std::to_string(
+                                  static_cast<std::underlying_type_t<CharEncoding>>
+                                  (encoding)));
     }
 }
 
@@ -406,7 +406,7 @@ String<CS, TP> operator*(size_t n, const String<CS, TP> &s)
     return s * n;
 }
 
-template<typename CS, typaname TP>
+template<typename CS, typename TP>
 std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s)
 {
     return out << s.ToStdString();

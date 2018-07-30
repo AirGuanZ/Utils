@@ -20,7 +20,7 @@ namespace RangeAux
 
         using It = typename R::Iterator;
 
-        Take(R range, typename It::difference_type num)
+        TakeImpl(R range, typename It::difference_type num)
             : range_(std::move(range)), num_(num)
         {
             AGZ_ASSERT(num >= 0);
@@ -52,7 +52,7 @@ namespace RangeAux
         }
     };
 
-    class TakeRHS { size_t n; };
+    struct TakeRHS { size_t n; };
 }
 
 inline RangeAux::TakeRHS Take(size_t n) { return RangeAux::TakeRHS { n }; }

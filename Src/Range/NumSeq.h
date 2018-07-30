@@ -1,6 +1,6 @@
 #pragma once
 
-#include <numeric_limits>
+#include <limits>
 #include <type_traits>
 
 #include "../Misc/Common.h"
@@ -8,7 +8,7 @@
 AGZ_NS_BEG(AGZ)
 
 template<typename T,
-    std::enable_if_t<std:Lis_integral_v<T>, int> = 0>
+    std::enable_if_t<std::is_integral_v<T>, int> = 0>
 class NumSeq
 {
     T start_, step_;

@@ -16,8 +16,8 @@
     <Filter Include="Alloc">
       <UniqueIdentifier>{1a1bfc14-1cc5-41ef-bea4-539779d56e20}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Iterable">
-      <UniqueIdentifier>{97ed4527-1b97-4611-beb6-40933ba19ec3}</UniqueIdentifier>
+    <Filter Include="Range">
+      <UniqueIdentifier>{c15bab53-935c-406b-9cb1-0e6e06a56b40}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -82,14 +82,17 @@
     <ClInclude Include="..\Src\String\UTF8.h">
       <Filter>String</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Iterable\Iterable.h">
-      <Filter>Iterable</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\String\CharSet.h">
       <Filter>String</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\String\UTF32.h">
       <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\NumSeq.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Take.h">
+      <Filter>Range</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -27,11 +27,8 @@ TEST_CASE("String")
         REQUIRE(Str8(u8"今", 3).Length() == 3);
 
         string s = u8"今天minecraft天°气dark soul不错the witcher啊";
-        auto sd = s.data();
-        REQUIRE(Str8(sd, sd + s.length()).Length() == s.length());
-
-        REQUIRE(Str8(String<UTF8<uint32_t>>(
-            Str32(Str8(sd, sd + s.length())))).Length() == s.length());
-        REQUIRE(Str32(Str8(sd, sd + s.length())).Length() == 37);
+        REQUIRE(Str8(s).Length() == s.length());
+        REQUIRE(Str8(String<UTF8<uint32_t>>(Str32(Str8(s)))).Length() == s.length());
+        REQUIRE(Str32(Str8(s)).Length() == 37);
     }
 }

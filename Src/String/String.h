@@ -4,7 +4,6 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
-#include <vector>
 
 #include "../Misc/Common.h"
 
@@ -16,7 +15,7 @@ AGZ_NS_BEG(AGZ)
 template<typename CS, typename TP> class String;
 
 // Possible encoding used by a c-style string
-enum class CharEncoding { UTF8, UTF32 };
+enum class CharEncoding { UTF8 };
 
 namespace StringAux
 {
@@ -133,7 +132,7 @@ class String
                const typename CS::CodeUnit *beg2,
                const typename CS::CodeUnit *end2);
 
-    Self &CopyFromSelf(const Self &copyFrom);
+    String<CS, TP> &CopyFromSelf(const String<CS, TP> &copyFrom);
 
 public:
 
@@ -190,14 +189,14 @@ public:
     String(const std::string &cppStr,
            CharEncoding encoding = CharEncoding::UTF8);
 
-    template<typename OCS, typeame OTP>
+    template<typename OCS, typename OTP>
     Self &operator=(const String<OCS, OTP> &copyFrom);
 
     Self &operator=(Self &&moveFrom);
 
     ~String();
 
-    void &Swap(Self &other);
+    void Swap(Self &other);
 
     // Set with a new value and return the old one
     Self &Exchange(const Self &value);
@@ -222,7 +221,7 @@ public:
 template<typename CS, typename TP>
 String<CS, TP> operator*(size_t n, const String<CS, TP> &s);
 
-template<typename CS, typaname TP>
+template<typename CS, typename TP>
 std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s);
 
 using Str8  = String<UTF8<>>;

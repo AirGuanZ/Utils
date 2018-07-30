@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <optional>
 
 #include "../Misc/Common.h"
@@ -23,7 +24,7 @@ namespace UTF8Aux
 
         using iterator_category = std::bidirectional_iterator_tag;
         using value_type        = char32_t;
-        using difference_type   = ssize_t;
+        using difference_type   = std::make_signed_t<size_t>;
         using pointer           = char32_t*;
         using reference         = char32_t&;
 
@@ -33,7 +34,7 @@ namespace UTF8Aux
 
         const char32_t *operator->() const;
 
-        Self &operatpr++();
+        Self &operator++();
 
         Self operator++(int);
 
