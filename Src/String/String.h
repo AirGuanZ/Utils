@@ -107,11 +107,12 @@ class CharRange
 public:
 
     using Iterator = typename CS::Iterator;
+    using CodeUnit = typename CS::CodeUnit;
+
+    using Self = CharRange<CS, TP>;
 
     // For large storage
-    CharRange(LargeBuf *buf,
-              const typename CS::CodeUnit *beg,
-              const typename CS::CodeUnit *end)
+    CharRange(LargeBuf *buf, const CodeUnit *beg, const CodeUnit *end)
         : largeBuf_(buf), small_(false), beg_(beg), end_(end)
     {
         AGZ_ASSERT(beg <= end && buf);
@@ -119,8 +120,7 @@ public:
     }
 
     // For small storage
-    CharRange(const typename CS::CodeUnit *beg,
-              const typename CS::CodeUnit *end)
+    CharRange(const CodeUnit *beg, const CodeUnit *end)
         : small_(false)
     {
         AGZ_ASSERT(beg <= end && end - beg <= SMALL_BUF_SIZE);
@@ -128,6 +128,9 @@ public:
         beg_ = &smallBuf_[0];
         end_ = beg_ + (end - beg);
     }
+
+    CharRange(const Self &)       = delete;
+    Self &operator=(const Self &) = delete;
 
     ~CharRange()
     {
