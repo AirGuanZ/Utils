@@ -1,7 +1,9 @@
 ﻿#pragma once
 
 #include <atomic>
+#include <ostream>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 #include "../Misc/Common.h"
@@ -12,6 +14,9 @@
 AGZ_NS_BEG(AGZ)
 
 template<typename CS, typename TP> class String;
+
+// Possible encoding used by a c-style string
+enum class CharEncoding { UTF8, UTF32 };
 
 namespace StringAux
 {
@@ -34,6 +39,7 @@ namespace StringAux
         static constexpr bool IsThreadSafe = false;
     };
 
+    // Reference counted buffer for large string storage
     template<typename CU, typename TP>
     class RefCountedBuf
     {
@@ -50,7 +56,7 @@ namespace StringAux
         RefCountedBuf()               = delete;
         RefCountedBuf(const Self &)   = delete;
         ~RefCountedBuf()              = delete;
-        
+
         Self &operator=(const Self &) = delete;
 
         void IncRef() const { ++refs; }
@@ -67,12 +73,23 @@ namespace StringAux
             return ret;
         }
     };
+
+    // Valid location in string
+    // Can never locate at the medium of any code point
+    template<typename CU>
+    struct Loc
+    {
+        const CU *pos;
+
+        Loc() : pos(nullptr) { }
+        Loc(const CU *pos) : pos(pos) { }
+        bool IsNull() const { return pos == nullptr; }
+    };
 }
 
 class EncodingException : public std::invalid_argument
 {
 public:
-
     EncodingException(const std::string &err) : invalid_argument(err) { }
 };
 
@@ -109,7 +126,14 @@ class String
     size_t GetLargeLen() const;
     size_t GetLen() const;
 
-    void Init(const typename CS::CodeUnit *beg, const typename CS::CodeUnit *end);
+    void Init(const typename CS::CodeUnit *beg,
+              const typename CS::CodeUnit *end);
+    void Init2(const typename CS::CodeUnit *beg1,
+               const typename CS::CodeUnit *end1,
+               const typename CS::CodeUnit *beg2,
+               const typename CS::CodeUnit *end2);
+
+    Self &CopyFromSelf(const Self &copyFrom);
 
 public:
 
@@ -118,26 +142,37 @@ public:
     using CodePoint = typename CS::CodePoint;
     using Self      = String<CS, TP>;
 
+    using Loc = StringAux::Loc<CodeUnit>;
+
     String();
 
     // Construct from existed buffer
     // Will copy all data to owned storage
-    // Faster than with-checking edition. UB when [beg, end) is invalid
+    // Faster than the checking version bellow. UB when [beg, end) is invalid
     String(CONS_FLAG_NOCHECK_t, const CodeUnit *beg, const CodeUnit *end);
 
     // Construct from existed buffer
     // Will copy all data to owned storage
     String(const CodeUnit *beg, const CodeUnit *end);
 
+    // Construct with concat([beg1, end1), [beg2, end2))
+    String(CONS_FLAG_NOCHECK_t, const CodeUnit *beg1, const CodeUnit *end1,
+                                const CodeUnit *beg2, const CodeUnit *end2);
+
+    // Construct with concat([beg1, end1), [beg2, end2))
+    String(const CodeUnit *beg1, const CodeUnit *end1,
+           const CodeUnit *beg2, const CodeUnit *end2);
+
     // Construct from existed buffer
     // Will copy all data to owned storage
     String(const CodeUnit *beg, size_t n) : String(beg, beg + n) { }
 
+    // Construct from existed buffer using another CharSet
     template<typename OCS>
     String(CONS_FLAG_FROM_t<OCS>, const typename OCS::CodeUnit *beg,
                                   const typename OCS::CodeUnit *end);
 
-
+    // Construct from existed buffer using another CharSet
     template<typename OCS>
     String(CONS_FLAG_FROM_t<OCS>, const typename OCS::CodeUnit *beg,
                                   size_t n);
@@ -145,190 +180,54 @@ public:
     template<typename OCS, typename OTP>
     String(const String<OCS, OTP> &copyFrom);
 
-    String(const Self &copyFrom);
+    String(Self &&moveFrom);
+
+    String(const CodeUnit *beg, const CodeUnit *end, size_t repeat);
+
+    String(const char *cStr,
+           CharEncoding encoding = CharEncoding::UTF8);
+
+    String(const std::string &cppStr,
+           CharEncoding encoding = CharEncoding::UTF8);
+
+    template<typename OCS, typeame OTP>
+    Self &operator=(const String<OCS, OTP> &copyFrom);
+
+    Self &operator=(Self &&moveFrom);
 
     ~String();
 
+    void &Swap(Self &other);
+
+    // Set with a new value and return the old one
+    Self &Exchange(const Self &value);
+
     const CodeUnit *Data() const;
-    
+
     size_t Length() const;
 
+    bool IsEmpty() const;
+
     CodeUnit operator[](size_t idx) const;
+
+    std::string ToStdString() const;
+
+    Self operator+(const Self &rhs);
+
+    Self operator*(size_t n);
+
+    Loc FindSubstr(const Self &dst) const;
 };
 
 template<typename CS, typename TP>
-bool String<CS, TP>::IsSmallStorage() const
-{
-    return small_.len <= SMALL_BUF_SIZE;
-}
+String<CS, TP> operator*(size_t n, const String<CS, TP> &s);
 
-template<typename CS, typename TP>
-bool String<CS, TP>::IsLargeStorage() const
-{
-    return small_.len > SMALL_BUF_SIZE;
-}
-
-template<typename CS, typename TP>
-size_t String<CS, TP>::GetSmallLen() const
-{
-    AGZ_ASSERT(IsSmallStorage());
-    return small_.len;
-}
-
-template<typename CS, typename TP>
-size_t String<CS, TP>::GetLargeLen() const
-{
-    AGZ_ASSERT(IsLargeStorage() && large_.beg < large_.end);
-    return large_.end - large_.beg;
-}
-
-template<typename CS, typename TP>
-size_t String<CS, TP>::GetLen() const
-{
-    return IsSmallStorage() ? GetSmallLen() : GetLargeLen();
-}
-
-template<typename CS, typename TP>
-void String<CS, TP>::Init(const typename CS::CodeUnit *beg,
-                          const typename CS::CodeUnit *end)
-{
-    AGZ_ASSERT(beg <= end);
-    size_t len = end - beg;
-    if(len <= SMALL_BUF_SIZE) // Small storage
-    {
-        StringAux::CopyConstruct(&small_.buf[0], beg, len);
-        small_.len = static_cast<uint8_t>(len);
-    }
-    else // Large storage
-    {
-        small_.len = SMALL_BUF_SIZE + 1;
-        large_.buf = LargeBuf::New(len);
-        large_.beg = large_.buf->GetData();
-        large_.end = large_.beg + len;
-        StringAux::CopyConstruct(large_.buf->GetData(), beg, len);
-    }
-}
-
-template<typename CS, typename TP>
-String<CS, TP>::String()
-{
-    small_.len = 0;
-}
-
-template<typename CS, typename TP>
-String<CS, TP>::String(CONS_FLAG_NOCHECK_t, const CodeUnit *beg,
-                                            const CodeUnit *end)
-{
-    Init(beg, end);
-}
-
-template <typename CS, typename TP>
-String<CS, TP>::String(const CodeUnit* beg, const CodeUnit* end)
-    : String(NOCHECK, beg, end)
-{
-    if(!CS::Check(beg, end - beg))
-    {
-        throw EncodingException("Input [beg, end) is not a valid "
-                              + CS::Name() + " sequence");
-    }
-    Init(beg, end);
-}
-
-template<typename CS, typename TP>
-String<CS, TP>::String(const Self &copyFrom)
-{
-    if(copyFrom.IsSmallStorage())
-    {
-        small_.len = static_cast<uint8_t>(copyFrom.GetSmallLen());
-        StringAux::CopyConstruct(&small_.buf[0], &copyFrom.small_.buf[0],
-                                                 copyFrom.small_.len);
-    }
-    else
-    {
-        small_.len = SMALL_BUF_SIZE + 1;
-        large_.buf = copyFrom.large_.buf;
-        large_.beg = copyFrom.large_.beg;
-        large_.end = copyFrom.large_.end;
-        large_.buf->IncRef();
-    }
-}
-
-template<typename CS, typename TP>
-template<typename OCS>
-String<CS, TP>::String(CONS_FLAG_FROM_t<OCS>, const typename OCS::CodeUnit *beg,
-                                              const typename OCS::CodeUnit *end)
-{
-    if constexpr (std::is_same_v<CS, OCS>)
-        new(this) Self(beg, end);
-    else
-    {
-        std::vector<CodeUnit> cus;
-        CodeUnit sgl[CS::MaxCUInCP];
-        while(beg < end)
-        {
-            typename OCS::CodePoint ocp;
-            size_t skip = OCS::CU2CP(beg, &ocp, end - beg);
-            if(!skip)
-            {
-                throw EncodingException("Input [beg, end) is not a valid "
-                                      + OCS::Name() + " sequence");
-            }
-            beg += skip;
-
-            size_t sgls = CS::CP2CU(CS::template From<OCS>(ocp), sgl);
-            AGZ_ASSERT(sgls);
-            for(size_t i = 0; i < sgls; ++i)
-                cus.push_back(sgl[i]);
-        }
-
-        Init(cus.data(), cus.data() + cus.size());
-    }
-}
-
-template<typename CS, typename TP>
-template<typename OCS>
-String<CS, TP>::String(CONS_FLAG_FROM_t<OCS>, const typename OCS::CodeUnit *beg,
-                                              size_t n)
-    : String(FROM<OCS>, beg, beg + n)
-{
-
-}
-
-template<typename CS, typename TP>
-template<typename OCS, typename OTP>
-String<CS, TP>::String(const String<OCS, OTP>& copyFrom)
-    : String(FROM<OCS>, copyFrom.Data(), copyFrom.Length())
-{
-
-}
-
-template<typename CS, typename TP>
-String<CS, TP>::~String()
-{
-    if(IsLargeStorage())
-        large_.buf->DecRef();
-}
-
-template<typename CS, typename TP>
-const typename String<CS, TP>::CodeUnit *String<CS, TP>::Data() const
-{
-    return IsSmallStorage() ? &small_.buf[0] : large_.beg;
-}
-
-template<typename CS, typename TP>
-size_t String<CS, TP>::Length() const
-{
-    return GetLen();
-}
-
-template <typename CS, typename TP>
-typename String<CS, TP>::CodeUnit String<CS, TP>::operator[](size_t idx) const
-{
-    AGZ_ASSERT(idx < GetLen());
-    return Data()[idx];
-}
+template<typename CS, typaname TP>
+std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s);
 
 using Str8  = String<UTF8<>>;
 using Str32 = String<UTF32<>>;
 
 AGZ_NS_END(AGZ)
+
+#include "String.inl"
