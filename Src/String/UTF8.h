@@ -1,16 +1,58 @@
 #pragma once
 
+#include <optional>
+
 #include "../Misc/Common.h"
 #include "CharSet.h"
 
 AGZ_NS_BEG(AGZ)
+
+namespace UTF8Aux
+{
+    template<typename T>
+    class UTF8Iterator
+    {
+        T *cur;
+        std::optional<char32_t> ch;
+
+        void UpdateCh();
+
+    public:
+
+        using Self = UTF8Iterator<T>;
+
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type        = char32_t;
+        using difference_type   = ssize_t;
+        using pointer           = char32_t*;
+        using reference         = char32_t&;
+
+        UTF8Iterator(T *cur);
+
+        char32_t operator*() const;
+
+        const char32_t *operator->() const;
+
+        Self &operatpr++();
+
+        Self operator++(int);
+
+        Self &operator--();
+
+        Self &operator--(int);
+
+        friend bool operator==(const Self &a, const Self &b);
+
+        friend bool operator!=(const Self &a, const Self &b);
+    };
+}
 
 // En/decoding rules: see https://en.wikipedia.org/wiki/UTF-8
 template<typename T>
 class UTF8Core
 {
 public:
-
+    using Iterator  = UTF8Aux::UTF8Iterator<T>;
     using CodePoint = char32_t;
     using CodeUnit  = T;
 
@@ -18,6 +60,8 @@ public:
 
     // Maximum count of code units to encode a code point
     static constexpr size_t MaxCUInCP = 4;
+
+    static size_t CUInCP(CodePoint cp);
 
     // Convert a code point to code units
     // Return count of code units obtained (shall <= MaxCUInCP())
@@ -36,6 +80,16 @@ public:
 
 template<typename T = char>
 using UTF8 = CharSet<UTF8Core<T>>;
+
+template<typename T>
+size_t UTF8Core<T>::CUInCP(CodePoint cp)
+{
+    if(cp <= 0x7f)     return 1;
+    if(cp <= 0x7ff)    return 2;
+    if(cp <= 0xffff)   return 3;
+    if(cp <= 0x10ffff) return 4;
+    return 0;
+}
 
 template<typename T>
 size_t UTF8Core<T>::CP2CU(CodePoint cp, CodeUnit *cu)

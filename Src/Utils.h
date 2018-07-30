@@ -21,5 +21,8 @@
 #include "Misc/Endian.h"
 #include "Misc/TypeOpr.h"
 
+#include "Range/NumSeq.h"
+#include "Range/Take.h"
+
 #include "String/String.h"
 #include "String/UTF8.h"

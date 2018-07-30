@@ -145,6 +145,7 @@ public:
                 return false;
             if(b.IsEnd())
                 return true;
+            AGZ_ASSERT(a.step == b.step);
             return (a.step < 0) ^ (a.cur < b.cur);
         }
 
