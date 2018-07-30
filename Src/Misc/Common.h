@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdexcept>
+
 #ifdef _MSC_VER
 
 #define AGZ_INLINE inline //__forceinline
@@ -71,5 +73,11 @@ struct CONS_FLAG_UNSPECIFIED_t { };
 inline CONS_FLAG_UNSPECIFIED_t UNSPECIFIED;
 
 struct Void_t { };
+
+class EncodingException : public std::invalid_argument
+{
+public:
+    EncodingException(const std::string &err) : invalid_argument(err) { }
+};
 
 AGZ_NS_END(AGZ)

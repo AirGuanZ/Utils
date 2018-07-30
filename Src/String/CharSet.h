@@ -9,8 +9,9 @@ class CharSet : public Core
 {
 public:
 
+    using Iterator  = typename Core::Iterator;
     using CodePoint = typename Core::CodePoint;
-    using CodeUnit = typename Core::CodeUnit;
+    using CodeUnit  = typename Core::CodeUnit;
 
     static bool Check(const CodeUnit *beg, size_t n)
     {

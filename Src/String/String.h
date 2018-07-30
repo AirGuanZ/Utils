@@ -2,7 +2,6 @@
 
 #include <atomic>
 #include <ostream>
-#include <stdexcept>
 #include <string>
 
 #include "../Misc/Common.h"
@@ -81,15 +80,63 @@ namespace StringAux
         const CU *pos;
 
         Loc() : pos(nullptr) { }
-        Loc(const CU *pos) : pos(pos) { }
+        explicit Loc(const CU *pos) : pos(pos) { }
         bool IsNull() const { return pos == nullptr; }
     };
+
+    static constexpr size_t SMALL_BUF_SIZE = 31;
 }
 
-class EncodingException : public std::invalid_argument
+template<typename CS, typename TP>
+class CharRange
 {
+    static constexpr size_t SMALL_BUF_SIZE = StringAux::SMALL_BUF_SIZE;
+
+    using LargeBuf = StringAux::RefCountedBuf<typename CS::CodeUnit, TP>;
+
+    union
+    {
+        typename CS::CodeUnit smallBuf_[SMALL_BUF_SIZE];
+        LargeBuf *largeBuf_;
+    };
+    bool small_;
+
+    const typename CS::CodeUnit *beg_;
+    const typename CS::CodeUnit *end_;
+
 public:
-    EncodingException(const std::string &err) : invalid_argument(err) { }
+
+    using Iterator = typename CS::Iterator;
+
+    // For large storage
+    CharRange(LargeBuf *buf,
+              const typename CS::CodeUnit *beg,
+              const typename CS::CodeUnit *end)
+        : largeBuf_(buf), small_(false), beg_(beg), end_(end)
+    {
+        AGZ_ASSERT(beg <= end && buf);
+        buf->IncRef();
+    }
+
+    // For small storage
+    CharRange(const typename CS::CodeUnit *beg,
+              const typename CS::CodeUnit *end)
+        : small_(false)
+    {
+        AGZ_ASSERT(beg <= end && end - beg <= SMALL_BUF_SIZE);
+        StringAux::CopyConstruct(&smallBuf_[0], beg, end - beg);
+        beg_ = &smallBuf_[0];
+        end_ = beg_ + (end - beg);
+    }
+
+    ~CharRange()
+    {
+        if(!small_)
+            largeBuf_->DecRef();
+    }
+
+    Iterator begin() const { return Iterator(beg_, end_); }
+    Iterator end() const { return Iterator(end_, end_); }
 };
 
 // CU: Code Unit
@@ -98,7 +145,7 @@ public:
 template<typename CS = UTF8<char>, typename TP = StringAux::MultiThreaded>
 class String
 {
-    static constexpr size_t SMALL_BUF_SIZE = 31;
+    static constexpr size_t SMALL_BUF_SIZE = StringAux::SMALL_BUF_SIZE;
 
     using LargeBuf = StringAux::RefCountedBuf<typename CS::CodeUnit, TP>;
 
@@ -133,6 +180,7 @@ class String
                const typename CS::CodeUnit *end2);
 
     String<CS, TP> &CopyFromSelf(const String<CS, TP> &copyFrom);
+    void ConstructFromSelf(const String<CS, TP> &copyFrom);
 
 public:
 
@@ -141,7 +189,8 @@ public:
     using CodePoint = typename CS::CodePoint;
     using Self      = String<CS, TP>;
 
-    using Loc = StringAux::Loc<CodeUnit>;
+    using Iterator = typename CS::Iterator;
+    using Loc      = StringAux::Loc<CodeUnit>;
 
     String();
 
@@ -177,7 +226,9 @@ public:
                                   size_t n);
 
     template<typename OCS, typename OTP>
-    String(const String<OCS, OTP> &copyFrom);
+    explicit String(const String<OCS, OTP> &copyFrom);
+
+    String(const Self &copyFrom);
 
     String(Self &&moveFrom);
 
@@ -191,6 +242,8 @@ public:
 
     template<typename OCS, typename OTP>
     Self &operator=(const String<OCS, OTP> &copyFrom);
+
+    Self &operator=(const Self &copyFrom);
 
     Self &operator=(Self &&moveFrom);
 
@@ -216,6 +269,8 @@ public:
     Self operator*(size_t n);
 
     Loc FindSubstr(const Self &dst) const;
+
+    CharRange<CS, TP> Chars() const;
 };
 
 template<typename CS, typename TP>

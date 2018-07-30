@@ -63,8 +63,8 @@ void String<CS, TP>::Init2(const typename CS::CodeUnit *beg1,
                            const typename CS::CodeUnit *beg2,
                            const typename CS::CodeUnit *end2)
 {
-    AGZ_ASSERT(beg <= end);
-    size_t len1 = end1 - beg1 len2 = end2 - beg2, len = len1 + len2;
+    AGZ_ASSERT(beg1 <= end1 && beg2 <= end2);
+    size_t len1 = end1 - beg1, len2 = end2 - beg2, len = len1 + len2;
     if(len <= SMALL_BUF_SIZE) // Small storage
     {
         StringAux::CopyConstruct(&small_.buf[0], beg1, len1);
@@ -87,10 +87,17 @@ String<CS, TP> &String<CS, TP>::CopyFromSelf(const Self &copyFrom)
 {
     if(IsLargeStorage())
         large_.buf->DecRef();
+    ConstructFromSelf(copyFrom);
+    return *this;
+}
+
+template<typename CS, typename TP>
+void String<CS, TP>::ConstructFromSelf(const Self &copyFrom)
+{
     if(copyFrom.IsSmallStorage())
     {
         static_assert(std::is_trivially_copyable_v<CodeUnit>);
-        std::memcpy(&small_, &moveFrom.small_, sizeof(small_));
+        std::memcpy(&small_, &copyFrom.small_, sizeof(small_));
     }
     else
     {
@@ -98,7 +105,6 @@ String<CS, TP> &String<CS, TP>::CopyFromSelf(const Self &copyFrom)
         large_ = copyFrom.large_;
         large_.buf->IncRef();
     }
-    return *this;
 }
 
 template<typename CS, typename TP>
@@ -195,6 +201,12 @@ String<CS, TP>::String(const String<OCS, OTP>& copyFrom)
 }
 
 template<typename CS, typename TP>
+String<CS, TP>::String(const Self &copyFrom)
+{
+    ConstructFromSelf(copyFrom);
+}
+
+template<typename CS, typename TP>
 String<CS, TP>::String(Self &&moveFrom)
 {
     if(moveFrom.IsSmallStorage())
@@ -204,8 +216,8 @@ String<CS, TP>::String(Self &&moveFrom)
     }
     else
     {
-        small_.len = moveFrom.small_.len;
         large_ = moveFrom.large_;
+        small_.len = SMALL_BUF_SIZE + 1;
         moveFrom.small_.len = 0;
     }
 }
@@ -237,6 +249,13 @@ typename String<CS, TP>::Self &String<CS, TP>::operator=(Self &&moveFrom)
         large_ = moveFrom.large_;
         moveFrom.small_.len = 0;
     }
+    return *this;
+}
+
+template<typename CS, typename TP>
+String<CS, TP> &String<CS, TP>::operator=(const Self &copyFrom)
+{
+    CopyFromSelf(copyFrom);
     return *this;
 }
 
@@ -359,8 +378,8 @@ std::string String<CS, TP>::ToStdString() const
 template<typename CS, typename TP>
 typename String<CS, TP>::Self String<CS, TP>::operator+(const Self &rhs)
 {
-    return Self(NOCHECK, Data(), Data() + Len(),
-                         rhs.Data(), rhs.Data() + Len());
+    return Self(NOCHECK, Data(), Data() + Length(),
+                         rhs.Data(), rhs.Data() + Length());
 }
 
 template<typename CS, typename TP>
@@ -373,15 +392,17 @@ template<typename CS, typename TP>
 typename String<CS, TP>::Loc String<CS, TP>::FindSubstr(const Self &dst) const
 {
     // IMPROVE: too slow
+
     size_t dstLen = dst.Length();
     size_t len = Length();
+    const CodeUnit *d = Data(), *dd = dst.Data();
+
     if(!dstLen)
         return Loc(d);
     if(len < dstLen)
-        return Loc(nullptr)
+        return Loc(nullptr);
     size_t end = len - dstLen;
 
-    const CodeUnit *d = Data(), *dd = dst.Data();
     for(size_t i = 0; i < end; ++i, ++d)
     {
         bool matched = true;
@@ -410,6 +431,14 @@ template<typename CS, typename TP>
 std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s)
 {
     return out << s.ToStdString();
+}
+
+template<typename CS, typename TP>
+CharRange<CS, TP> String<CS, TP>::Chars() const
+{
+    if(IsSmallStorage())
+        return CharRange<CS, TP>(Data(), Data() + Length());
+    return CharRange<CS, TP>(large_.buf, Data(), Data() + Length());
 }
 
 AGZ_NS_END(AGZ)

@@ -6,6 +6,7 @@
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Endian.cpp" />
     <ClCompile Include="String.cpp" />
+    <ClCompile Include="Range.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Catch.hpp" />

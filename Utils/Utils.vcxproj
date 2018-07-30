@@ -37,7 +37,7 @@
     <ClInclude Include="..\Src\Misc\Common.h" />
     <ClInclude Include="..\Src\Misc\Endian.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
-    <ClInclude Include="..\Src\Range\NumSeq.h" />
+    <ClInclude Include="..\Src\Range\Seq.h" />
     <ClInclude Include="..\Src\Range\Take.h" />
     <ClInclude Include="..\Src\String\CharSet.h" />
     <ClInclude Include="..\Src\String\UTF32.h" />
@@ -49,6 +49,7 @@
     <None Include="..\Src\Math\SwizzleVec2.inl" />
     <None Include="..\Src\Math\SwizzleVec3.inl" />
     <None Include="..\Src\Math\SwizzleVec4.inl" />
+    <None Include="..\Src\String\String.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

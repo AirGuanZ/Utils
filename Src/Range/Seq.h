@@ -7,9 +7,8 @@
 
 AGZ_NS_BEG(AGZ)
 
-template<typename T,
-    std::enable_if_t<std::is_integral_v<T>, int> = 0>
-class NumSeq
+template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
+class Seq
 {
     T start_, step_;
 
@@ -25,7 +24,7 @@ public:
 
         }
 
-        constexpr T EndVal() const
+        static constexpr T EndVal()
         {
             return std::numeric_limits<T>::lowest();
         }
@@ -37,7 +36,7 @@ public:
 
     public:
 
-        friend class NumSeq;
+        friend class Seq;
 
         using iterator_category = std::random_access_iterator_tag;
         using value_type = T;
@@ -165,10 +164,10 @@ public:
         }
     };
 
-    NumSeq(T start, T step = T(1))
+    explicit Seq(T start, T step = T(1))
         : start_(start), step_(step)
     {
-
+        AGZ_ASSERT(step != 0);
     }
 
     Iterator begin() const

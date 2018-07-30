@@ -21,14 +21,17 @@ TEST_CASE("String")
     {
         REQUIRE(Str8(u8"minecraft", 9).Length() == 9);
         REQUIRE(Str8(u8"ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA"
-                      "ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA", 104).Length() == 104);
+                       "ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA", 104).Length() == 104);
         REQUIRE(Str8(u8"ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA"
-                      "ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA", 104)[4] == u8'E');
-        REQUIRE(Str8(u8"今", 3).Length() == 3);
+                       "ABCDEFGHIJKLMNOPQRSTUWVZYAABCDEFGHIJKLMNOPQRSTUWVZYA", 104)[4] == u8'E');
+        REQUIRE(Str8(Str8(u8"今", 3)).Length() == 3);
 
-        string s = u8"今天minecraft天°气dark soul不错the witcher啊";
+        string s = u8"今天minecraft天°气dark souls不错the witcher啊";
         REQUIRE(Str8(s).Length() == s.length());
         REQUIRE(Str8(String<UTF8<uint32_t>>(Str32(Str8(s)))).Length() == s.length());
-        REQUIRE(Str32(Str8(s)).Length() == 37);
+        REQUIRE(Str8(Str32(Str8(s))).Length() == s.length());
+
+        REQUIRE(Str32(s).ToStdString() == s);
+        REQUIRE(Str8(s).ToStdString() == s);
     }
 }

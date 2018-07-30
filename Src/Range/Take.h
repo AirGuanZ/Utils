@@ -18,24 +18,24 @@ namespace RangeAux
 
     public:
 
-        using It = typename R::Iterator;
+        using Iterator = typename R::Iterator;
 
-        TakeImpl(R range, typename It::difference_type num)
+        TakeImpl(R range, typename Iterator::difference_type num)
             : range_(std::move(range)), num_(num)
         {
             AGZ_ASSERT(num >= 0);
         }
 
-        It begin() const
+        Iterator begin() const
         {
             return std::begin(range_);
         }
 
-        It end() const
+        Iterator end() const
         {
             if constexpr(std::is_base_of_v<
                 std::random_access_iterator_tag,
-                typename It::iterator_category>)
+                typename Iterator::iterator_category>)
             {
                 return std::begin(range_)
                      + std::min(std::end(range_) - std::begin(range_),
@@ -44,7 +44,7 @@ namespace RangeAux
             else
             {
                 decltype(num_) n = 0;
-                It ret = std::begin(range_);
+                Iterator ret = std::begin(range_);
                 while(n < num_ && ret != std::end(range_))
                     ++ret, ++n;
                 return ret;
@@ -60,8 +60,10 @@ inline RangeAux::TakeRHS Take(size_t n) { return RangeAux::TakeRHS { n }; }
 template<typename R>
 auto operator|(R &&range, RangeAux::TakeRHS rhs)
 {
-    return RangeAux::TakeImpl<std::remove_cv_t<
-                std::remove_reference_t<R>>>(std::forward<R>(range), rhs.n);
+    using RT = RangeAux::TakeImpl<std::remove_cv_t<
+                            std::remove_reference_t<R>>>;
+    return RT(std::forward<R>(range),
+        static_cast<typename RT::Iterator::difference_type>(rhs.n));
 }
 
 AGZ_NS_END(AGZ)
