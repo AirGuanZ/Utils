@@ -86,12 +86,12 @@ public:
             return *this;
         }
 
-        friend Iterator operator+(Iterator i, difference_type n)
+        friend Iterator operator+(const Iterator &i, difference_type n)
         {
             return Iterator(i.cur + n * i.step, i.step);
         }
 
-        friend Iterator operator+(difference_type n, Iterator i)
+        friend Iterator operator+(difference_type n, const Iterator &i)
         {
             return i + n;
         }
@@ -102,12 +102,12 @@ public:
             return *this;
         }
 
-        friend Iterator operator-(Iterator i, difference_type n)
+        friend Iterator operator-(const Iterator &i, difference_type n)
         {
             return Iterator(i.cur - n * i.step, i.step);
         }
 
-        friend difference_type operator-(Iterator b, Iterator a)
+        friend difference_type operator-(const Iterator &b, const Iterator &a)
         {
             if(b.IsEnd())
             {
@@ -125,7 +125,7 @@ public:
             return cur + n * step;
         }
 
-        friend bool operator==(Iterator a, Iterator b)
+        friend bool operator==(const Iterator &a, const Iterator &b)
         {
             if(a.IsEnd() || b.IsEnd())
                 return false;
@@ -133,12 +133,12 @@ public:
             return a.cur == b.cur;
         }
 
-        friend bool operator!=(Iterator a, Iterator b)
+        friend bool operator!=(const Iterator &a, const Iterator &b)
         {
             return !(a == b);
         }
 
-        friend bool operator<(Iterator a, Iterator b)
+        friend bool operator<(const Iterator &a, const Iterator &b)
         {
             if(a.IsEnd())
                 return false;
@@ -148,17 +148,17 @@ public:
             return (a.step < 0) ^ (a.cur < b.cur);
         }
 
-        friend bool operator>(Iterator a, Iterator b)
+        friend bool operator>(const Iterator &a, const Iterator &b)
         {
             return b < a;
         }
 
-        friend bool operator<=(Iterator a, Iterator b)
+        friend bool operator<=(const Iterator &a, const Iterator &b)
         {
             return !(a > b);
         }
 
-        friend bool operator>=(Iterator a, Iterator b)
+        friend bool operator>=(const Iterator &a, const Iterator &b)
         {
             return !(a < b);
         }
