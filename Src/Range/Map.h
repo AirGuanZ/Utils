@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iterator>
+
 #include "../Misc/Common.h"
 
 AGZ_NS_BEG(AGZ)
@@ -178,7 +180,7 @@ namespace RangeAux
             }
         };
 
-        MapImpl(R range, F *f)
+        MapImpl(R range, F f)
             : range_(std::move(range)), func_(std::move(f))
         {
 
