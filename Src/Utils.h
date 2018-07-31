@@ -21,6 +21,11 @@
 #include "Misc/Endian.h"
 #include "Misc/TypeOpr.h"
 
+#include "Range/Between.h"
+#include "Range/Filter.h"
+#include "Range/Map.h"
+#include "Range/Range.h"
+#include "Range/Reduce.h"
 #include "Range/Seq.h"
 #include "Range/Take.h"
 
