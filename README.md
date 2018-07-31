@@ -81,24 +81,66 @@ auto buf21 = Buffer2D<int>::FromFn(100, 100,
 });
 ```
 
-## Result
-
-Result, just like Rust!
+## Endian
 
 ```c++
-Result<int, string> bar()
-{
-    if(...) return Ok<int, string>(5);
-    return Err<int, string>("fatal error!");
-}
+if constexpr(IS_LITTLE_ENDIAN)
+    ...
+else
+    ...
 
-int main()
-{
-    auto rt2 = bar();
-    if(rt.IsOk())
-        cout << rt.UnwrapOk() << endl;
-    else
-        cout << rt.UnwrapErr() << endl;
-}
+// Assuming native endian is little
+uint32_t v1 = Native2Big((uint32_t)0x12345678);
+assert(v1 == 0x78563412);
+assert(v1 == Native2Little(v1));
+assert(Big2Little(v1) == 0x12345678);
 ```
 
+## Range
+
+```cpp
+// Print "3 4 5 6 7 "
+for(auto i : Seq(3) | Take(5))
+    cout << i << " ";
+
+// Print "9 4 1 0 1 "
+for(auto i : Between(-3, 2) | Map([](int v){ return v * v; }))
+    cout << i << " ";
+
+// Print "2 4 6 8 10 "
+for(auto i : Between(1, 20)
+           | Take(10)
+           | Filter([](int v){ return v % 2 == 0; }))
+    cout << i << " ";
+
+// Print "9 7 5 3 1 "
+for(auto i : Seq(1, 2) | Take(5) | Reverse())
+    cout << i << " ";
+
+// Sum all integers between [1, 10)
+int i = Between(1, 10) | Reduce(0, [](int a, int b){ return a + b });
+assert(i == 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9);
+```
+
+## String
+
+A non-null-terminated immutable string class...Just for fun.
+
+1. Uses small string optimization & reference counting
+2. Supports various char encoding
+
+```cpp
+// using Str8 = String<UTF8<char>>; using Str32 = String<UTF32<uint32_t>>;
+
+Str8 a("今天天气不错。Hello, world!");
+Str32 b = a;
+std::string c = b.ToStdString();
+
+// Traverse UTF-8 code units
+for(auto codeUnit : a)
+    ...
+
+// Traverse Unicode code points
+for(auto codePoint : a.Chars())
+    ...
+```
