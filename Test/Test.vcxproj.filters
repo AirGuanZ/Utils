@@ -7,6 +7,7 @@
     <ClCompile Include="Endian.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="Range.cpp" />
+    <ClCompile Include="Misc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Catch.hpp" />

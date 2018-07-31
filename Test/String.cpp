@@ -28,11 +28,17 @@ TEST_CASE("String")
 
         string s = u8"今天minecraft天°气dark souls不错the witcher啊";
         REQUIRE(Str8(s).Length() == s.length());
-        REQUIRE(Str8(String<UTF8<uint32_t>>(Str32(Str8(s)))).Length() == s.length());
+        REQUIRE(Str8(String<UTF8<uint32_t>>(Str32(Str32(s)))).Length() == s.length());
         REQUIRE(Str8(Str32(Str8(s))).Length() == s.length());
 
         Str8 a = s;
         REQUIRE(a.ToStdString() == s);
         REQUIRE(Str32(s).ToStdString() == s);
+
+        REQUIRE(Str8(std::move(a)).ToStdString() == s);
+        Str8 b = std::move(a);
+        REQUIRE(b.IsEmpty());
+
+        REQUIRE(Str8(s.data(), s.data() + s.length(), 5).ToStdString() == s + s + s + s + s);
     }
 }

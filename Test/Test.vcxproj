@@ -23,6 +23,7 @@
     <ClCompile Include="Endian.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="Misc.cpp" />
     <ClCompile Include="Range.cpp" />
     <ClCompile Include="String.cpp" />
   </ItemGroup>

@@ -1,18 +1,17 @@
 #pragma once
 
+#include <utility>
+
 #include "../Misc/Common.h"
 
 AGZ_NS_BEG(AGZ::TypeOpr)
 
-/* Dummy variable */
-#define DV(T) (*((T*)nullptr))
-
 #define BINARY_OPR(Name, Opr) \
     template<typename L, typename R> \
-    using Name = decltype(DV(L) Opr DV(R))
+    using Name = decltype(std::declval<L>() Opr std::declval<R>())
 #define UNARY_OPR(Name, Opr) \
     template<typename T> \
-    using Name = decltype(Opr DV(T))
+    using Name = decltype(Opr std::declval<T>())
 
 BINARY_OPR(Add, +);
 BINARY_OPR(Sub, -);

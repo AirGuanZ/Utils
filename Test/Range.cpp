@@ -59,5 +59,9 @@ TEST_CASE("Range")
 
         REQUIRE((Between(0, 100) | Count()) == 100);
         REQUIRE((Between(0, 100) | CountIf(IsEven)) == 50);
+
+        v.clear();
+        Seq(1) | Take(10) | Each([&](int i) { v.push_back(i); });
+        REQUIRE(v == vector<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
     }
 }

@@ -282,16 +282,16 @@ String<CS, TP>::String(const CodeUnit *beg, const CodeUnit *end, size_t repeat)
         CodeUnit *buf = &small_.buf[0];
         for(size_t i = 0; i < repeat; ++i, buf += ulen)
             StringAux::CopyConstruct(buf, beg, ulen);
-        small_.len = tlen;
+        small_.len = static_cast<uint8_t>(tlen);
     }
     else
     {
         small_.len = SMALL_BUF_SIZE + 1;
         large_.buf = LargeBuf::New(tlen);
-        large_.beg = large_.buf->Data();
+        large_.beg = large_.buf->GetData();
         large_.end = large_.beg + tlen;
 
-        CodeUnit *buf = &small_.buf[0];
+        CodeUnit *buf = large_.buf->GetData();
         for(size_t i = 0; i < repeat; ++i, buf += ulen)
             StringAux::CopyConstruct(buf, beg, ulen);
     }
