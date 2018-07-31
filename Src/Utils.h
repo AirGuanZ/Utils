@@ -1,8 +1,5 @@
 #pragma once
 
-#include "Alloc/Default.h"
-#include "Alloc/Fast.h"
-
 #include "Buffer/Buffer.h"
 #include "Buffer/Buffer2D.h"
 
