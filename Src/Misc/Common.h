@@ -42,6 +42,7 @@
 
 #ifdef _MSC_VER
 
+// Platform supporting MSVC must use little endian
 #define AGZ_LITTLE_ENDIAN
 
 #else

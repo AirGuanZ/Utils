@@ -12,7 +12,7 @@ namespace UTF8Aux
     template<typename T>
     class UTF8Iterator
     {
-        const T *cur, *end;
+        const T *cur;
         mutable std::optional<char32_t> ch;
 
         void UpdateCh() const;
@@ -27,7 +27,7 @@ namespace UTF8Aux
         using pointer           = char32_t*;
         using reference         = char32_t&;
 
-        UTF8Iterator(const T *cur, const T *end);
+        UTF8Iterator(const T *cur);
 
         char32_t operator*() const;
 
@@ -201,12 +201,10 @@ const typename UTF8Core<T>::CodeUnit *UTF8Core<T>::LastCodePoint(const CodeUnit 
 template<typename T>
 void UTF8Aux::UTF8Iterator<T>::UpdateCh() const
 {
-    if(cur >= end)
-        throw EncodingException("Dereferencing out-of-range UTF-8 iterator");
     if(!ch.has_value())
     {
         char32_t cp;
-        if(!UTF8Core<T>::CU2CP(cur, &cp, end - cur))
+        if(!UTF8Core<T>::CU2CP(cur, &cp, UTF8Core<T>::MaxCUInCP))
             throw EncodingException("Invalid UTF-8 sequence");
         ch = cp;
     }
@@ -214,10 +212,10 @@ void UTF8Aux::UTF8Iterator<T>::UpdateCh() const
 }
 
 template<typename T>
-UTF8Aux::UTF8Iterator<T>::UTF8Iterator(const T *cur, const T *end)
-    : cur(cur), end(end)
+UTF8Aux::UTF8Iterator<T>::UTF8Iterator(const T *cur)
+    : cur(cur)
 {
-    AGZ_ASSERT(cur && cur <= end);
+    AGZ_ASSERT(cur);
 }
 
 template<typename T>
@@ -271,7 +269,7 @@ UTF8Aux::UTF8Iterator<T> UTF8Aux::UTF8Iterator<T>::operator--(int)
 template<typename T>
 bool UTF8Aux::UTF8Iterator<T>::operator==(const Self &rhs) const
 {
-    return cur == rhs.cur && end == rhs.end;
+    return cur == rhs.cur;
 }
 
 AGZ_NS_END(AGZ)

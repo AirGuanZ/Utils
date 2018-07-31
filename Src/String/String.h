@@ -128,8 +128,8 @@ public:
             largeBuf_->DecRef();
     }
 
-    Iterator begin() const { return Iterator(beg_, end_); }
-    Iterator end() const { return Iterator(end_, end_); }
+    Iterator begin() const { return Iterator(beg_); }
+    Iterator end() const { return Iterator(end_); }
 
     ReverseIterator rbegin() const { return ReverseIterator(end()); }
     ReverseIterator rend() const { return ReverseIterator(begin()); }

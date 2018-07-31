@@ -8,39 +8,7 @@ AGZ_NS_BEG(AGZ)
 namespace UTF32Aux
 {
     template<typename T>
-    class UTF32Iterator
-    {
-        const T *cur;
-
-    public:
-
-        using Self = UTF32Iterator<T>;
-
-        // IMPROVE: can be random_access_iterator
-        using iterator_category = std::bidirectional_iterator_tag;
-        using value_type        = char32_t;
-        using difference_type   = std::make_signed_t<size_t>;
-        using pointer           = char32_t*;
-        using reference         = char32_t&;
-
-        UTF32Iterator(const T *cur, const T *end) : cur(cur) { }
-
-        char32_t operator*() const { return *cur; }
-
-        const char32_t *operator->() const { return cur; }
-
-        Self &operator++() { ++cur; return *this; }
-
-        Self operator++(int) { auto ret = *this; ++cur; return ret; }
-
-        Self &operator--() { --cur; return *this; }
-
-        Self operator--(int) { auto ret = *this; --cur; return ret; }
-
-        bool operator==(const Self &rhs) const { return cur == rhs.cur; }
-
-        bool operator!=(const Self &rhs) const { return !(*this == rhs); }
-    };
+    using UTF32Iterator = const T*;
 }
 
 template<typename T>
