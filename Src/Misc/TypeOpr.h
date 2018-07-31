@@ -37,8 +37,6 @@ UNARY_OPR(Pos, +);
 UNARY_OPR(Neg, -);
 UNARY_OPR(BoolNot, !);
 UNARY_OPR(BitNot, ~);
-UNARY_OPR(Deref, *);
-UNARY_OPR(Addr, &);
 
 #undef DV
 #undef BINARY_OPR

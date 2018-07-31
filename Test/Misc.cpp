@@ -15,5 +15,6 @@ TEST_CASE("Misc")
         static_assert(std::is_same_v<Add<int, float>, float>);
         static_assert(std::is_same_v<Div<float, double>, double>);
         static_assert(std::is_same_v<Equal<int, float>, bool>);
+        static_assert(std::is_same_v<BitNot<int>, int>);
     }
 }
