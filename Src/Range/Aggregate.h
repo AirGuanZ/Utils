@@ -33,7 +33,8 @@ namespace RangeAux
     struct ReduceRHS
     {
         template<typename R, typename I, typename F>
-        auto Eval(R &&range, I &&init, F &&func)
+        std::remove_cv_t<std::remove_reference_t<I>>
+        Eval(R &&range, I &&init, F &&func)
         {
             auto ret = init;
             for(auto &val : range)
@@ -89,7 +90,7 @@ auto operator|(R &&range, const RangeAux::AggregateWrapper<RHS> &opr)
 }
 
 template<typename I, typename F>
-auto Reduce(I &init, F &&func)
+auto Reduce(I &&init, F &&func)
 {
     return RangeAux::AggregateWrapper<RangeAux::ReduceRHS<I, F>>(
         std::forward<I>(init), std::forward<F>(func));

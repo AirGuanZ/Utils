@@ -5,6 +5,7 @@
 #include <string>
 
 #include "../Misc/Common.h"
+#include "../Range/Reverse.h"
 
 #include "UTF8.h"
 #include "UTF32.h"
@@ -72,18 +73,6 @@ namespace StringAux
         }
     };
 
-    // Valid location in string
-    // Can never locate at the medium of any code point
-    template<typename CU>
-    struct Loc
-    {
-        const CU *pos;
-
-        Loc() : pos(nullptr) { }
-        explicit Loc(const CU *pos) : pos(pos) { }
-        bool IsNull() const { return pos == nullptr; }
-    };
-
     static constexpr size_t SMALL_BUF_SIZE = 31;
 }
 
@@ -106,8 +95,9 @@ class CharRange
 
 public:
 
-    using Iterator = typename CS::Iterator;
-    using CodeUnit = typename CS::CodeUnit;
+    using Iterator        = typename CS::Iterator;
+    using ReverseIterator = ::AGZ::ReverseIterator<Iterator>;
+    using CodeUnit        = typename CS::CodeUnit;
 
     using Self = CharRange<CS, TP>;
 
@@ -140,6 +130,9 @@ public:
 
     Iterator begin() const { return Iterator(beg_, end_); }
     Iterator end() const { return Iterator(end_, end_); }
+
+    ReverseIterator rbegin() const { return ReverseIterator(end()); }
+    ReverseIterator rend() const { return ReverseIterator(begin()); }
 };
 
 // CU: Code Unit
@@ -175,6 +168,8 @@ class String
     size_t GetLargeLen() const;
     size_t GetLen() const;
 
+    const CodeUnit *End() const;
+
     void Init(const typename CS::CodeUnit *beg,
               const typename CS::CodeUnit *end);
     void Init2(const typename CS::CodeUnit *beg1,
@@ -192,8 +187,8 @@ public:
     using CodePoint = typename CS::CodePoint;
     using Self      = String<CS, TP>;
 
-    using Iterator = typename CS::Iterator;
-    using Loc      = StringAux::Loc<CodeUnit>;
+    using Iterator        = const CodeUnit*;
+    using ReverseIterator = ReverseIterator<Iterator>;
 
     String();
 
@@ -263,17 +258,33 @@ public:
 
     bool IsEmpty() const;
 
-    CodeUnit operator[](size_t idx) const;
-
     std::string ToStdString() const;
 
+    CodeUnit operator[](size_t idx) const;
     Self operator+(const Self &rhs);
-
     Self operator*(size_t n);
 
-    Loc FindSubstr(const Self &dst) const;
+    bool operator==(const Self &rhs) const;
+    bool operator!=(const Self &rhs) const;
+    bool operator<(const Self &rhs) const;
+    bool operator<=(const Self &rhs) const;
+    bool operator>=(const Self &rhs) const;
+    bool operator>(const Self &rhs) const;
 
     CharRange<CS, TP> Chars() const;
+
+    Iterator begin() const;
+    Iterator end() const;
+
+    ReverseIterator rbegin() const;
+    ReverseIterator rend() const;
+
+    bool StartsWith(const Self &prefix) const;
+    bool EndsWith(const Self &suffix) const;
+
+    Self Substr(size_t beg, size_t end) const;
+    Self Prefix(size_t len) const;
+    Self Suffix(size_t beg) const;
 };
 
 template<typename CS, typename TP>

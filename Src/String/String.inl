@@ -37,6 +37,13 @@ size_t String<CS, TP>::GetLen() const
 }
 
 template<typename CS, typename TP>
+const typename CS::CodeUnit *String<CS, TP>::End() const
+{
+    return IsSmallStorage() ? &small_.buf[0] + GetSmallLen() :
+                              large_.buf->GetData() + GetLargeLen();
+}
+
+template<typename CS, typename TP>
 void String<CS, TP>::Init(const typename CS::CodeUnit *beg,
                           const typename CS::CodeUnit *end)
 {
@@ -389,39 +396,6 @@ typename String<CS, TP>::Self String<CS, TP>::operator*(size_t n)
 }
 
 template<typename CS, typename TP>
-typename String<CS, TP>::Loc String<CS, TP>::FindSubstr(const Self &dst) const
-{
-    // IMPROVE: too slow
-
-    size_t dstLen = dst.Length();
-    size_t len = Length();
-    const CodeUnit *d = Data(), *dd = dst.Data();
-
-    if(!dstLen)
-        return Loc(d);
-    if(len < dstLen)
-        return Loc(nullptr);
-    size_t end = len - dstLen;
-
-    for(size_t i = 0; i < end; ++i, ++d)
-    {
-        bool matched = true;
-        for(size_t j = 0; j < dstLen; ++j)
-        {
-            if(d[j] != dd[j])
-            {
-                matched = false;
-                break;
-            }
-        }
-        if(matched)
-            return Loc(d);
-    }
-
-    return Loc(nullptr);
-}
-
-template<typename CS, typename TP>
 String<CS, TP> operator*(size_t n, const String<CS, TP> &s)
 {
     return s * n;
@@ -437,8 +411,20 @@ template<typename CS, typename TP>
 CharRange<CS, TP> String<CS, TP>::Chars() const
 {
     if(IsSmallStorage())
-        return CharRange<CS, TP>(Data(), Data() + Length());
-    return CharRange<CS, TP>(large_.buf, Data(), Data() + Length());
+        return CharRange<CS, TP>(Data(), End());
+    return CharRange<CS, TP>(large_.buf, Data(), End());
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::Iterator String<CS, TP>::begin() const
+{
+    return Data();
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::Iterator String<CS, TP>::end() const
+{
+    return End();
 }
 
 AGZ_NS_END(AGZ)

@@ -111,7 +111,7 @@ namespace RangeAux
                 return cur + n * step;
             }
 
-            friend bool operator==(const Iterator &lhs, const Iterator &rhs)
+            friend bool operator==(const Iterator &a, const Iterator &b)
             {
                 AGZ_ASSERT(a.step == b.step);
                 return a.cur == b.cur;
