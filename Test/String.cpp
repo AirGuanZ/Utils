@@ -31,7 +31,8 @@ TEST_CASE("String")
         REQUIRE(Str8(String<UTF8<uint32_t>>(Str32(Str8(s)))).Length() == s.length());
         REQUIRE(Str8(Str32(Str8(s))).Length() == s.length());
 
+        Str8 a = s;
+        REQUIRE(a.ToStdString() == s);
         REQUIRE(Str32(s).ToStdString() == s);
-        REQUIRE(Str8(s).ToStdString() == s);
     }
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <type_traits>
 
 #include "../Misc/Common.h"
@@ -41,7 +40,7 @@ namespace RangeAux
                 return cur;
             }
 
-            cnost T *operator->() const
+            const T *operator->() const
             {
                 return &cur;
             }
@@ -61,7 +60,7 @@ namespace RangeAux
 
             Iterator &operator--()
             {
-                cur = -= step;
+                cur -= step;
                 return *this;
             }
 
@@ -74,7 +73,7 @@ namespace RangeAux
 
             Iterator &operator+=(difference_type n)
             {
-                cur = += n * step;
+                cur += n * step;
                 return *this;
             }
 
@@ -90,7 +89,7 @@ namespace RangeAux
 
             Iterator &operator-=(difference_type n)
             {
-                cur = -= n * step;
+                cur -= n * step;
                 return *this;
             }
 
@@ -143,7 +142,7 @@ namespace RangeAux
             }
         };
 
-        BetweenImpl(T start, T step, T end)
+        BetweenImpl(T start, T end, T step)
             : start_(start), step_(step)
         {
             // IMPROVE

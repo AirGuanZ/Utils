@@ -10,12 +10,12 @@ AGZ_NS_BEG(AGZ)
 
 namespace RangeAux
 {
-    template<template<typename...Args> class RHS>
+    template<typename RHS, typename...Args>
     struct AggregateWrapper
     {
         std::tuple<Args...> args;
 
-        AggregateWrapper(Args&&...args)
+        explicit AggregateWrapper(Args&&...args)
             : args(std::forward<Args>(args)...)
         {
 
@@ -24,21 +24,22 @@ namespace RangeAux
         template<typename R>
         auto Eval(R &&range)
         {
-            return std::apply(&RHS::Eval<R>, std::tuple_cat(
+            return std::apply(&RHS::template Eval<R>, std::tuple_cat(
                         std::tuple<R>(std::forward<R>(range)),
                         args));
         }
     };
 
+    template<typename I, typename F>
     struct ReduceRHS
     {
-        template<typename R, typename I, typename F>
-        std::remove_cv_t<std::remove_reference_t<I>>
+        template<typename R>
+        static std::remove_cv_t<std::remove_reference_t<I>>
         Eval(R &&range, I &&init, F &&func)
         {
-            auto ret = init;
-            for(auto &val : range)
-                ret = func(ret, init);
+            std::remove_cv_t<std::remove_reference_t<I>> ret = init;
+            for(auto &&val : range)
+                ret = func(ret, val);
             return ret;
         }
     };
@@ -46,7 +47,7 @@ namespace RangeAux
     struct CountRHS
     {
         template<typename R>
-        auto Eval(R &&range)
+        static auto Eval(R &&range)
         {
             if constexpr(std::is_base_of_v<
                                 std::random_access_iterator_tag,
@@ -69,7 +70,7 @@ namespace RangeAux
     struct CountIfRHS
     {
         template<typename R>
-        auto Eval(R &&range, F &&func)
+        static auto Eval(R &&range, F &&func)
         {
             typename R::Iterator::difference_type ret = 0;
             auto it = std::begin(range), end = std::end(range);
@@ -86,7 +87,7 @@ namespace RangeAux
     struct EachRHS
     {
         template<typename R>
-        auto Eval(R &&range, F &&func)
+        static auto Eval(R &&range, F &&func)
         {
             for(auto &&v : range)
                 func(std::forward<decltype(v)>(v));
@@ -95,8 +96,8 @@ namespace RangeAux
     };
 }
 
-template<typename R, typename RHS>
-auto operator|(R &&range, const RangeAux::AggregateWrapper<RHS> &opr)
+template<typename R, typename RHS, typename...Args>
+auto operator|(R &&range, RangeAux::AggregateWrapper<RHS, Args...> &&opr)
 {
     return opr.Eval(std::forward<R>(range));
 }
@@ -104,11 +105,11 @@ auto operator|(R &&range, const RangeAux::AggregateWrapper<RHS> &opr)
 template<typename I, typename F>
 auto Reduce(I &&init, F &&func)
 {
-    return RangeAux::AggregateWrapper<RangeAux::ReduceRHS<I, F>>(
+    return RangeAux::AggregateWrapper<RangeAux::ReduceRHS<I, F>, I, F>(
         std::forward<I>(init), std::forward<F>(func));
 }
 
-auto Count()
+inline auto Count()
 {
     return RangeAux::AggregateWrapper<RangeAux::CountRHS>();
 }
@@ -116,14 +117,14 @@ auto Count()
 template<typename F>
 auto CountIf(F &&func)
 {
-    return RangeAux::AggregateWrapper<RangeAux::CountIfRHS<F>>(
+    return RangeAux::AggregateWrapper<RangeAux::CountIfRHS<F>, F>(
         std::forward<F>(func));
 }
 
 template<typename F>
 auto Each(F &&func)
 {
-    return RangeAux::AggregateWrapper<RangeAux::EachRHS<F>>(
+    return RangeAux::AggregateWrapper<RangeAux::EachRHS<F>, F>(
         std::forward<F>(func));
 }
 

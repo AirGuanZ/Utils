@@ -18,7 +18,7 @@ namespace RangeAux
     class FilterImpl
     {
         R range_;
-        F func_;
+        mutable F func_;
 
     public:
 
@@ -38,15 +38,17 @@ namespace RangeAux
                                       typename InIt::iterator_category>,
                     std::bidirectional_iterator_tag,
                     typename InIt::iterator_category>;
+
             using value_type        = typename InIt::value_type;
             using difference_type   = typename InIt::difference_type;
             using pointer           = typename InIt::pointer;
             using reference         = typename InIt::reference;
 
-            Iterator(InIt it, InIt end, F *f)
-                : it(std::move(it)), end(end), f(f)
+            Iterator(InIt _it, InIt _end, F *f)
+                : it(std::move(_it)), end(_end), f(f)
             {
-
+                while(it != end && !(*f)(*it))
+                    ++it;
             }
 
             value_type operator*() const

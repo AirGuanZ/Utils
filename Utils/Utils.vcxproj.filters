@@ -13,9 +13,6 @@
     <Filter Include="String">
       <UniqueIdentifier>{20a9f90c-cbee-4c36-959c-827ce718850b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Alloc">
-      <UniqueIdentifier>{1a1bfc14-1cc5-41ef-bea4-539779d56e20}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Range">
       <UniqueIdentifier>{c15bab53-935c-406b-9cb1-0e6e06a56b40}</UniqueIdentifier>
     </Filter>
@@ -67,12 +64,6 @@
     <ClInclude Include="..\Src\Misc\TypeOpr.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Alloc\Default.h">
-      <Filter>Alloc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Alloc\Fast.h">
-      <Filter>Alloc</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Misc\Common.h">
       <Filter>Misc</Filter>
     </ClInclude>
@@ -92,6 +83,21 @@
       <Filter>Range</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\Range\Seq.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Aggregate.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Between.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Filter.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Map.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Reverse.h">
       <Filter>Range</Filter>
     </ClInclude>
   </ItemGroup>

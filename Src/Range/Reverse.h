@@ -28,7 +28,7 @@ public:
         return *--It(it);
     }
 
-    const T *operator->() const
+    const pointer operator->() const
     {
         return (--It(it)).operator->();
     }
@@ -36,7 +36,7 @@ public:
     ReverseIterator &operator++()
     {
         --it;
-        return *thisl
+        return *this;
     }
 
     ReverseIterator operator++(int)
@@ -70,7 +70,7 @@ public:
         return ReverseIterator(i.it - n);
     }
 
-    friend ReverseIterator operator+(difference_type, const ReverseIterator &i)
+    friend ReverseIterator operator+(difference_type n, const ReverseIterator &i)
     {
         return i - n;
     }
@@ -96,32 +96,32 @@ public:
         return *(*this + n);
     }
 
-    friend bool operator==(const Iterator &a, const Iterator &b)
+    friend bool operator==(const ReverseIterator &a, const ReverseIterator &b)
     {
         return a.it == b.it;
     }
 
-    friend bool operator!=(const Iterator &a, const Iterator &b)
+    friend bool operator!=(const ReverseIterator &a, const ReverseIterator &b)
     {
         return !(a == b);
     }
 
-    friend bool operator<(const Iterator &a, const Iterator &b)
+    friend bool operator<(const ReverseIterator &a, const ReverseIterator &b)
     {
         return b.it < a.it;
     }
 
-    friend bool operator>(const Iterator &a, const Iterator &b)
+    friend bool operator>(const ReverseIterator &a, const ReverseIterator &b)
     {
         return b < a;
     }
 
-    friend bool operator<=(const Iterator &a, const Iterator &b)
+    friend bool operator<=(const ReverseIterator &a, const ReverseIterator &b)
     {
         return !(a > b);
     }
 
-    friend bool operator>=(const Iterator &a, const Iterator &b)
+    friend bool operator>=(const ReverseIterator &a, const ReverseIterator &b)
     {
         return !(a < b);
     }
@@ -160,7 +160,7 @@ namespace RangeAux
 
 inline RangeAux::ReverseRHS Reverse()
 {
-    return ReverseRHS { };
+    return RangeAux::ReverseRHS { };
 }
 
 template<typename R>

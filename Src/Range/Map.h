@@ -12,7 +12,7 @@ namespace RangeAux
     class MapImpl
     {
         R range_;
-        F func_;
+        mutable F func_;
 
         using InIt = typename R::Iterator;
 
@@ -20,8 +20,9 @@ namespace RangeAux
 
         class Iterator
         {
-            using _value_type = decltype(declval<F>()(
-                        declval<typename InIt::value_type>)());
+            using _value_type =
+                decltype(std::declval<F>()(
+                    std::declval<typename InIt::value_type>()));
 
             InIt it;
             F *f;
@@ -32,7 +33,7 @@ namespace RangeAux
 
             public:
 
-                ptr_t(_value_type val)
+                explicit ptr_t(_value_type val)
                     : val(std::move(val))
                 {
 
@@ -43,7 +44,7 @@ namespace RangeAux
                     return val;
                 }
 
-                _value_type &operatpr*() const
+                _value_type &operator*()
                 {
                     return val;
                 }
@@ -53,7 +54,7 @@ namespace RangeAux
                     return &val;
                 }
 
-                _value_type *operator->() const
+                _value_type *operator->()
                 {
                     return &val;
                 }
@@ -193,7 +194,7 @@ namespace RangeAux
 
         Iterator end() const
         {
-            return Iterator(std::end(range_), &func);
+            return Iterator(std::end(range_), &func_);
         }
     };
 
@@ -202,10 +203,10 @@ namespace RangeAux
 }
 
 template<typename F>
-RangeAux::MapRHS<F> Map(F f) { return RangeAux::MapRHS{ std::move(f) }; }
+RangeAux::MapRHS<F> Map(F f) { return RangeAux::MapRHS<F>{ std::move(f) }; }
 
 template<typename R, typename F>
-auto operator|(R &&range, RangeAux::MapRHS<F> &&rhs)
+auto operator|(R &&range, RangeAux::MapRHS<F> rhs)
 {
     using RT = RangeAux::MapImpl<std::remove_cv_t<
         std::remove_reference_t<R>>, std::remove_reference_t<F>>;

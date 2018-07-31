@@ -168,7 +168,7 @@ class String
     size_t GetLargeLen() const;
     size_t GetLen() const;
 
-    const CodeUnit *End() const;
+    const typename CS::CodeUnit *End() const;
 
     void Init(const typename CS::CodeUnit *beg,
               const typename CS::CodeUnit *end);

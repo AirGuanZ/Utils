@@ -27,7 +27,7 @@ namespace UTF8Aux
         using pointer           = char32_t*;
         using reference         = char32_t&;
 
-        UTF8Iterator(const T *cur);
+        explicit UTF8Iterator(const T *cur);
 
         char32_t operator*() const;
 

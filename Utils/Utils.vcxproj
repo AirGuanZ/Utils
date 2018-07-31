@@ -19,8 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Src\Alloc\Default.h" />
-    <ClInclude Include="..\Src\Alloc\Fast.h" />
     <ClInclude Include="..\Src\Buffer\Buffer.h" />
     <ClInclude Include="..\Src\Buffer\Buffer2D.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />
@@ -37,6 +35,11 @@
     <ClInclude Include="..\Src\Misc\Common.h" />
     <ClInclude Include="..\Src\Misc\Endian.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
+    <ClInclude Include="..\Src\Range\Aggregate.h" />
+    <ClInclude Include="..\Src\Range\Between.h" />
+    <ClInclude Include="..\Src\Range\Filter.h" />
+    <ClInclude Include="..\Src\Range\Map.h" />
+    <ClInclude Include="..\Src\Range\Reverse.h" />
     <ClInclude Include="..\Src\Range\Seq.h" />
     <ClInclude Include="..\Src\Range\Take.h" />
     <ClInclude Include="..\Src\String\CharSet.h" />

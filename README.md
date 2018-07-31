@@ -99,27 +99,33 @@ assert(Big2Little(v1) == 0x12345678);
 ## Range
 
 ```cpp
-// Print "3 4 5 6 7 "
-for(auto i : Seq(3) | Take(5))
-    cout << i << " ";
+vector<int> v;
+for(auto i : Seq<int>(1) | Take(5))
+    v.push_back(i);
+REQUIRE(v == vector<int>{ 1, 2, 3, 4, 5 });
 
-// Print "9 4 1 0 1 "
-for(auto i : Between(-3, 2) | Map([](int v){ return v * v; }))
-    cout << i << " ";
+v.clear();
+for(auto i : Between(1, 6))
+    v.push_back(i);
+REQUIRE(v == vector<int>{ 1, 2, 3, 4, 5 });
 
-// Print "2 4 6 8 10 "
-for(auto i : Between(1, 20)
-           | Take(10)
-           | Filter([](int v){ return v % 2 == 0; }))
-    cout << i << " ";
+v.clear();
+auto Square = [](int v) { return v * v; };
+for(auto i : Between(1, 6) | Map(Square))
+    v.push_back(i);
+REQUIRE(v == vector<int>{ 1, 4, 9, 16, 25 });
 
-// Print "9 7 5 3 1 "
-for(auto i : Seq(1, 2) | Take(5) | Reverse())
-    cout << i << " ";
+auto addInt = [](int a, int b) { return a + b; };
+REQUIRE((Between(1, 4) | Reduce(0, addInt)) == 1 + 2 + 3);
 
-// Sum all integers between [1, 10)
-int i = Between(1, 10) | Reduce(0, [](int a, int b){ return a + b });
-assert(i == 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9);
+v.clear();
+auto IsEven = [](int v) { return v % 2 == 0; };
+for(auto i : Between(1, 7) | Filter(IsEven))
+    v.push_back(i);
+REQUIRE(v == vector<int>{ 2, 4, 6 });
+
+REQUIRE((Between(0, 100) | Count()) == 100);
+REQUIRE((Between(0, 100) | CountIf(IsEven)) == 50);
 ```
 
 ## String
@@ -132,7 +138,7 @@ A non-null-terminated immutable string class...Just for fun.
 ```cpp
 // using Str8 = String<UTF8<char>>; using Str32 = String<UTF32<uint32_t>>;
 
-Str8 a("今天天气不错。Hello, world!");
+Str8 a = "今天天气不错。Hello, world!";
 Str32 b = a;
 std::string c = b.ToStdString();
 
@@ -144,3 +150,4 @@ for(auto codeUnit : a)
 for(auto codePoint : a.Chars())
     ...
 ```
+
