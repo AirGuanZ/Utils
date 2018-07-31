@@ -9,8 +9,12 @@ AGZ_NS_BEG(AGZ)
 namespace RangeAux
 {
     template<typename R, typename F,
-        std::enable_if_t<std::is_save_v<decltype(std::declval<F>()(
-            *std::declval<typename R::Iterator>())), bool>, int> = 0>
+            std::enable_if_t<
+                std::is_same_v<
+                    decltype(std::declval<F>()(
+                        *std::declval<typename R::Iterator>())),
+                    bool>,
+                int> = 0>
     class FilterImpl
     {
         R range_;
@@ -117,13 +121,17 @@ namespace RangeAux
 }
 
 template<typename F>
-RangeAux::FilterRHS<F> Filter(F f) { return RangeAux::FilterRHS<F>{ std::move(f) }; }
+RangeAux::FilterRHS<F> Filter(F f)
+{
+    return RangeAux::FilterRHS<F>{ std::move(f) };
+}
 
 template<typename R, typename F>
 auto operator|(R &&range, RangeAux::FilterRHS<F> &&rhs)
 {
-    using RT = RangeAux::FilterImpl<std::remove_cv_t<
-        std::remove_reference_t<R>>, std::remove_reference_t<F>>;
+    using RT = RangeAux::FilterImpl<
+                    std::remove_cv_t<std::remove_reference_t<R>>,
+                    std::remove_reference_t<F>>;
     return RT(std::forward<R>(range), std::move(rhs.f));
 }
 
