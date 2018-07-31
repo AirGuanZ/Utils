@@ -46,7 +46,7 @@ namespace RangeAux
     struct CountRHS
     {
         template<typename R>
-        auto Eval(const R &range)
+        auto Eval(R &&range)
         {
             if constexpr(std::is_base_of_v<
                                 std::random_access_iterator_tag,
@@ -69,7 +69,7 @@ namespace RangeAux
     struct CountIfRHS
     {
         template<typename R>
-        auto Eval(const R &range, F &&func)
+        auto Eval(R &&range, F &&func)
         {
             typename R::Iterator::difference_type ret = 0;
             auto it = std::begin(range), end = std::end(range);
@@ -79,6 +79,18 @@ namespace RangeAux
                     ++ret;
             }
             return ret;
+        }
+    };
+
+    template<typename F>
+    struct EachRHS
+    {
+        template<typename R>
+        auto Eval(R &&range, F &&func)
+        {
+            for(auto &&v : range)
+                func(std::forward<decltype(v)>(v));
+            return range;
         }
     };
 }
@@ -105,6 +117,13 @@ template<typename F>
 auto CountIf(F &&func)
 {
     return RangeAux::AggregateWrapper<RangeAux::CountIfRHS<F>>(
+        std::forward<F>(func));
+}
+
+template<typename F>
+auto Each(F &&func)
+{
+    return RangeAux::AggregateWrapper<RangeAux::EachRHS<F>>(
         std::forward<F>(func));
 }
 
