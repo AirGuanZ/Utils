@@ -1,6 +1,6 @@
 #pragma once
 
-#include <limits>
+#include <algorithm>
 #include <type_traits>
 
 #include "../Misc/Common.h"
@@ -10,9 +10,9 @@ AGZ_NS_BEG(AGZ)
 namespace RangeAux
 {
     template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
-    class SeqImpl
+    class BetweenImpl
     {
-        T start_, step_;
+        T start_, step_, end_;
 
     public:
 
@@ -26,32 +26,22 @@ namespace RangeAux
 
             }
 
-            static constexpr T EndVal()
-            {
-                return std::numeric_limits<T>::lowest();
-            }
-
-            bool IsEnd() const
-            {
-                return step == EndVal();
-            }
-
         public:
 
-            friend class SeqImpl;
+            friend class BetweenImpl;
 
             using iterator_category = std::random_access_iterator_tag;
-            using value_type = T;
-            using difference_type = std::make_signed_t<T>;
-            using pointer = T*;
-            using reference = T&;
+            using value_type        = T;
+            using difference_type   = std::make_signed_t<T>;
+            using pointer           = T*;
+            using reference         = T&;
 
             T operator*() const
             {
                 return cur;
             }
 
-            const T *operator->() const
+            cnost T *operator->() const
             {
                 return &cur;
             }
@@ -64,60 +54,54 @@ namespace RangeAux
 
             Iterator operator++(int)
             {
-                Iterator ret = *this;
-                cur += step;
+                auto ret = *this;
+                ++*this;
                 return ret;
             }
 
             Iterator &operator--()
             {
-                cur -= step;
+                cur = -= step;
                 return *this;
             }
 
             Iterator operator--(int)
             {
-                Iterator ret = *this;
-                cur -= step;
+                auto ret = *this;
+                --*this;
                 return ret;
             }
 
             Iterator &operator+=(difference_type n)
             {
-                cur += n * step;
+                cur = += n * step;
                 return *this;
             }
 
-            friend Iterator operator+(const Iterator &i, difference_type n)
+            friend Iterator operator+(Iterator i, difference_type n)
             {
-                return Iterator(i.cur + n * i.step, i.step);
+                return i += n;
             }
 
-            friend Iterator operator+(difference_type n, const Iterator &i)
+            friend Iterator operator+(difference_type n, Iterator i)
             {
                 return i + n;
             }
 
             Iterator &operator-=(difference_type n)
             {
-                cur -= n * step;
+                cur = -= n * step;
                 return *this;
             }
 
-            friend Iterator operator-(const Iterator &i, difference_type n)
+            friend Iterator operator-(Iterator i, difference_type n)
             {
-                return Iterator(i.cur - n * i.step, i.step);
+                return i -= n;
             }
 
-            friend difference_type operator-(const Iterator &b, const Iterator &a)
+            friend difference_type operator-(const Iterator &b,
+                                             const Iterator &a)
             {
-                if(b.IsEnd())
-                {
-                    if(a.IsEnd()) return difference_type(0);
-                    return std::numeric_limits<difference_type>::max();
-                }
-                if(a.IsEnd())
-                    return std::numeric_limits<difference_type>::lowest();
                 AGZ_ASSERT(b.step == a.step);
                 return (b.cur - a.cur) / b.step;
             }
@@ -127,10 +111,8 @@ namespace RangeAux
                 return cur + n * step;
             }
 
-            friend bool operator==(const Iterator &a, const Iterator &b)
+            friend bool operator==(const Iterator &lhs, const Iterator &rhs)
             {
-                if(a.IsEnd() || b.IsEnd())
-                    return false;
                 AGZ_ASSERT(a.step == b.step);
                 return a.cur == b.cur;
             }
@@ -142,11 +124,6 @@ namespace RangeAux
 
             friend bool operator<(const Iterator &a, const Iterator &b)
             {
-                if(a.IsEnd())
-                    return false;
-                if(b.IsEnd())
-                    return true;
-                AGZ_ASSERT(a.step == b.step);
                 return (a.step < 0) ^ (a.cur < b.cur);
             }
 
@@ -166,10 +143,23 @@ namespace RangeAux
             }
         };
 
-        SeqImpl(T start, T step)
+        BetweenImpl(T start, T step, T end)
             : start_(start), step_(step)
         {
-            AGZ_ASSERT(step != 0);
+            // IMPROVE
+            if(step > 0)
+            {
+                AGZ_ASSERT(start <= end);
+                while((end - start) % step)
+                    ++end;
+            }
+            else
+            {
+                AGZ_ASSERT(start >= end);
+                while((end - start) % step)
+                    --end;
+            }
+            end_ = end;
         }
 
         Iterator begin() const
@@ -179,15 +169,23 @@ namespace RangeAux
 
         Iterator end() const
         {
-            return Iterator(T(0), Iterator::EndVal());
+            return Iterator(end_, step_);
         }
     };
 }
 
 template<typename T>
-RangeAux::SeqImpl<T> Seq(T start, T step = T(1))
+RangeAux::BetweenImpl<T> Between(T start, T end)
 {
-    return RangeAux::SeqImpl<T>(start, step);
+    if(start <= end)
+        return RangeAux::BetweenImpl<T>(start, end, 1);
+    return RangeAux::BetweenImpl<T>(start, end, -1);
+}
+
+template<typename T>
+RangeAux::BetweenImpl<T> Between(T start, T end, T step)
+{
+    return RangeAux::BetweenImpl<T>(start, end, step);
 }
 
 AGZ_NS_END(AGZ)
