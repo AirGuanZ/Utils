@@ -40,4 +40,38 @@ I AdvanceTo(const I &cur, const I &end, typename I::difference_type n)
     return ret;
 }
 
+template<typename T>
+class ValuePointer
+{
+    T val_;
+
+public:
+
+    ValuePointer(T val)
+        : val_(std::move(val))
+    {
+
+    }
+
+    const T &operator*() const
+    {
+        return val_;
+    }
+
+    T &operator()
+    {
+        return val_;
+    }
+
+    const T *operator->() const
+    {
+        return &val_;
+    }
+
+    T *operator->()
+    {
+        return &val_;
+    }
+};
+
 AGZ_NS_END(AGZ)

@@ -52,6 +52,7 @@ template<typename T>
 class UTF8Core
 {
 public:
+
     using Iterator  = UTF8Aux::UTF8Iterator<T>;
     using CodePoint = char32_t;
     using CodeUnit  = T;
@@ -191,7 +192,8 @@ size_t UTF8Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num)
 }
 
 template<typename T>
-const typename UTF8Core<T>::CodeUnit *UTF8Core<T>::LastCodePoint(const CodeUnit *cur)
+const typename UTF8Core<T>::CodeUnit *
+UTF8Core<T>::LastCodePoint(const CodeUnit *cur)
 {
     while((*--cur) & 0b11000000 == 0b10000000)
         ;

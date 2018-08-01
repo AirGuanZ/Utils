@@ -5,12 +5,6 @@
 
 AGZ_NS_BEG(AGZ)
 
-namespace UTF32Aux
-{
-    template<typename T>
-    using UTF32Iterator = const T*;
-}
-
 template<typename T>
 class UTF32Core
 {
@@ -18,7 +12,7 @@ public:
 
     static_assert(sizeof(T) >= 4);
 
-    using Iterator  = UTF32Aux::UTF32Iterator<T>;
+    using Iterator  = const T*;
     using CodePoint = char32_t;
     using CodeUnit  = T;
 

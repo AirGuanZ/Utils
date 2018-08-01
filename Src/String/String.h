@@ -9,6 +9,7 @@
 #include "../Range/Reverse.h"
 
 #include "UTF8.h"
+#include "UTF16.h"
 #include "UTF32.h"
 
 AGZ_NS_BEG(AGZ)
@@ -297,6 +298,7 @@ template<typename CS, typename TP>
 std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s);
 
 using Str8  = String<UTF8<>>;
+using Str16 = String<UTF16<>>;
 using Str32 = String<UTF32<>>;
 
 AGZ_NS_END(AGZ)

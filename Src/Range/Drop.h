@@ -52,10 +52,16 @@ namespace RangeAux
     };
 
     struct DropTrait
-    { template<typename R> using Impl = DropImpl<R>; };
+    {
+        template<typename R>
+        using Impl = DropImpl<R>;
+    };
 
     struct DropWhileTrait
-    { template<typename R> using Impl = DropWhileImpl<R>; }
+    {
+        template<typename R>
+        using Impl = DropWhileImpl<R>;
+    };
 }
 
 inline Drop(size_t n)

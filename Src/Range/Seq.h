@@ -41,10 +41,10 @@ namespace RangeAux
             friend class SeqImpl;
 
             using iterator_category = std::random_access_iterator_tag;
-            using value_type = T;
-            using difference_type = std::make_signed_t<T>;
-            using pointer = T*;
-            using reference = T&;
+            using value_type        = T;
+            using difference_type   = std::make_signed_t<T>;
+            using pointer           = T*;
+            using reference         = T&;
 
             T operator*() const
             {
@@ -109,7 +109,8 @@ namespace RangeAux
                 return Iterator(i.cur - n * i.step, i.step);
             }
 
-            friend difference_type operator-(const Iterator &b, const Iterator &a)
+            friend difference_type operator-(const Iterator &b,
+                                             const Iterator &a)
             {
                 if(b.IsEnd())
                 {
