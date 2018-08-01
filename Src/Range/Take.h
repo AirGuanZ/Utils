@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "../Misc/Common.h"
+#include "Transform.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -37,17 +38,52 @@ namespace RangeAux
         }
     };
 
-    struct TakeRHS { size_t n; };
+    template<typename R, typename F>
+    class TakeWhileImpl
+    {
+        R range_;
+        typename R::Iterator end_;
+
+    public:
+
+        using Iterator = typename R::Iterator;
+
+        TakeWhileImpl(R range, F &&func)
+            : range_(std::move(range))
+        {
+            Iterator beg = std::begin(range_), end = std::end(range_);
+            while(beg != end && func(*beg))
+                ++beg;
+            end_ = beg;
+        }
+    };
+
+    struct TakeTrait
+    {
+        template<typename R>
+        using Impl = TakeImpl<R>;
+    };
+
+    struct TakeWhileTrait
+    {
+        template<typename R>
+        using Impl = TakeWhileImpl<R>;
+    };
 }
 
-inline RangeAux::TakeRHS Take(size_t n) { return RangeAux::TakeRHS { n }; }
-
-template<typename R>
-auto operator|(R &&range, RangeAux::TakeRHS rhs)
+template<typename F>
+inline Take(size_t n)
 {
-    using RT = RangeAux::TakeImpl<remove_rcv_t<R>>;
-    return RT(std::forward<R>(range),
-        static_cast<typename RT::Iterator::difference_type>(rhs.n));
+    return RangeAux::TransformWrapper<
+            RangeAux::TakeTrait, size_t>(n);
+}
+
+template<typename F>
+inline TakeWhile(F &&func)
+{
+    return RangeAux::TransformWrapper<
+            RangeAux::TakeWhileTrait, remove_rcv_t<F>>(
+                std::forward<F>(func));
 }
 
 AGZ_NS_END(AGZ)
