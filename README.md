@@ -98,14 +98,11 @@ assert(Big2Little(v1) == 0x12345678);
 
 ## Range
 
+Between, Collect, Drop, DropWhile, Filter, Map, PartialFoldl, Reverse, Seq(uence), Take, TakeWhile...
+
 ```cpp
 vector<int> v;
 for(auto i : Seq<int>(1) | Take(5))
-    v.push_back(i);
-REQUIRE(v == vector<int>{ 1, 2, 3, 4, 5 });
-
-v.clear();
-for(auto i : Between(1, 6))
     v.push_back(i);
 REQUIRE(v == vector<int>{ 1, 2, 3, 4, 5 });
 
@@ -126,6 +123,25 @@ REQUIRE(v == vector<int>{ 2, 4, 6 });
 
 REQUIRE((Between(0, 100) | Count()) == 100);
 REQUIRE((Between(0, 100) | CountIf(IsEven)) == 50);
+
+v.clear();
+Seq(1) | Take(10) | Each([&](int i) { v.push_back(i); });
+REQUIRE(v == vector<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
+
+auto isLessThan10 = [](int v) { return v < 10; };
+REQUIRE((Seq(1) | Drop(2) | Take(5) | Collect<vector<int>>())
+     == vector<int>{ 3, 4, 5, 6, 7 });
+REQUIRE((Seq(1) | DropWhile(isLessThan10) | Take(5) | Collect<vector<int>>())
+     == vector<int>{ 10, 11, 12, 13, 14 });
+
+REQUIRE((Between(1, 6) | PartialFoldl(0, addInt) | Collect<vector<int>>())
+     == vector<int>{ 1, 3, 6, 10, 15 });
+
+REQUIRE((Between(1, 6) | Reverse() | Collect<vector<int>>())
+     == vector<int>{ 5, 4, 3, 2, 1 });
+
+REQUIRE((Seq(1) | TakeWhile(isLessThan10) | Collect<vector<int>>())
+     == vector<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 ```
 
 ## String
