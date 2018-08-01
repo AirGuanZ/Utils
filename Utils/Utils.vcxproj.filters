@@ -124,6 +124,18 @@
     <ClInclude Include="..\Src\String\Charset.h">
       <Filter>String</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Range\Reduce.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Count.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Each.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\AllAny.h">
+      <Filter>Range</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">
