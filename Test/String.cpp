@@ -1,6 +1,7 @@
 ﻿#include <Utils.h>
 
 #include <string>
+#include <vector>
 
 #include "Catch.hpp"
 
@@ -47,15 +48,15 @@ TEST_CASE("String")
 
         {
             const char *s1 = u8"Minecraft", *s2 = u8" is a good game";
-            REQUIRE(Str8(NOCHECK, s1, s1 + std::strlen(s1), s2, s2 + std::strlen(s2))
+            REQUIRE(Str8(NOCHECK, s1, s1 + strlen(s1), s2, s2 + strlen(s2))
                 == u8"Minecraft is a good game");
-            REQUIRE(Str8(s1, s1 + std::strlen(s1), s2, s2 + std::strlen(s2))
+            REQUIRE(Str8(s1, s1 + strlen(s1), s2, s2 + strlen(s2))
                 == u8"Minecraft is a good game");
         }
 
         {
             REQUIRE(Str32(u8"Minecraft is a good game") == u8"Minecraft is a good game");
-            REQUIRE(Str16(u8"Minecraft") == u8"Minecraft");
+            REQUIRE(Str8(u8"今天天气真不错") == u8"今天天气真不错");
             REQUIRE(Str16(u8"今天天气真不错") == u8"今天天气真不错");
             REQUIRE(Str32(u8"今天天气真不错") == u8"今天天气真不错");
             REQUIRE(Str32(u8"今天天气真不错。") != u8"今天天气真不错");
@@ -76,13 +77,13 @@ TEST_CASE("String")
 
     SECTION("Chars")
     {
-        (Str8(u8"今天天气不错").Chars() | Collect<std::vector<char32_t>>()) ==
-        (Str16(u8"今天天气不错").Chars() | Collect<std::vector<char32_t>>());
+        (Str8(u8"今天天气不错").Chars() | Collect<vector<char32_t>>()) ==
+        (Str16(u8"今天天气不错").Chars() | Collect<vector<char32_t>>());
 
 
         (Str8(u8"今天天气不错，今天天气不错，今天天气不错。").Chars() |
-            Collect<std::vector<char32_t>>()) ==
+            Collect<vector<char32_t>>()) ==
         (Str32(u8"今天天气不错，今天天气不错，今天天气不错。").Chars() |
-            Collect<std::vector<char32_t>>());
+            Collect<vector<char32_t>>());
     }
 }
