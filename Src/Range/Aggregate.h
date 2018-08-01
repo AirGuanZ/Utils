@@ -94,6 +94,36 @@ namespace RangeAux
             return range;
         }
     };
+
+    template<typename F>
+    struct AllRHS
+    {
+        template<typename R>
+        static bool Eval(R &&range, F &&func)
+        {
+            for(auto &&v : range)
+            {
+                if(!func(std::forward<decltype(v)>(v)))
+                    return false;
+            }
+            return true;
+        }
+    };
+
+    template<typename F>
+    struct AnyRHS
+    {
+        template<typename R>
+        static bool Eval(R &&range, F &&func)
+        {
+            for(auto &&v : range)
+            {
+                if(func(std::forward<decltype(v)>(v)))
+                    return true;
+            }
+            return false;
+        }
+    };
 }
 
 template<typename R, typename RHS, typename...Args>
@@ -125,6 +155,20 @@ template<typename F>
 auto Each(F &&func)
 {
     return RangeAux::AggregateWrapper<RangeAux::EachRHS<F>, F>(
+        std::forward<F>(func));
+}
+
+template<typename F>
+bool All(F &&func)
+{
+    return RangeAux::AggregateWrapper<RangeAux::AllRHS<F>, F>(
+        std::forward<F>(func));
+}
+
+template<typename F>
+bool Any(F &&func)
+{
+    return RangeAux::AggregateWrapper<RangeAux::AnyRHS<F>, F>(
         std::forward<F>(func));
 }
 

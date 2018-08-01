@@ -465,7 +465,7 @@ typename String<CS, TP>::ReverseIterator String<CS, TP>::rend() const
 template<typename CS, typename TP>
 bool String<CS, TP>::StartsWith(const Self &prefix) const
 {
-    auto [data, len] = DataAndLength();
+    auto [data, len]   = DataAndLength();
     auto [pData, pLen] = prefix.DataAndLength();
     if(len < prefix.Length())
         return false;
@@ -480,13 +480,13 @@ bool String<CS, TP>::StartsWith(const Self &prefix) const
 template<typename CS, typename TP>
 bool String<CS, TP>::EndsWith(const Self &suffix) const
 {
-    auto [D, L] = DataAndLength();
+    auto [D, L]   = DataAndLength();
     auto [pD, pL] = suffix.DataAndLength();
     if(L < pL)
         return false;
     for(size_t i = 0, j = L - pL; i < pL; ++i, ++j)
     {
-        if(pL[i] != L[j])
+        if(pD[i] != D[j])
             return false;
     }
     return true;
