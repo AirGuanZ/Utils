@@ -24,9 +24,10 @@ namespace RangeAux
         template<typename R>
         auto Eval(R &&range)
         {
-            return std::apply(&RHS::template Eval<R>, std::tuple_cat(
-                        std::tuple<R>(std::forward<R>(range)),
-                        args));
+            return std::apply(&RHS::template Eval<R>,
+                              std::tuple_cat(
+                                std::tuple<R>(std::forward<R>(range)),
+                                args));
         }
     };
 
@@ -34,10 +35,9 @@ namespace RangeAux
     struct ReduceRHS
     {
         template<typename R>
-        static std::remove_cv_t<std::remove_reference_t<I>>
-        Eval(R &&range, I &&init, F &&func)
+        static remove_rcv_t<I> Eval(R &&range, I &&init, F &&func)
         {
-            std::remove_cv_t<std::remove_reference_t<I>> ret = init;
+            remove_rcv_t<I> ret = init;
             for(auto &&val : range)
                 ret = func(ret, val);
             return ret;
@@ -49,9 +49,7 @@ namespace RangeAux
         template<typename R>
         static auto Eval(R &&range)
         {
-            if constexpr(std::is_base_of_v<
-                                std::random_access_iterator_tag,
-                                typename R::Iterator::iterator_category>)
+            if constexpr(IsRandomAccessIterator<typename R::Iterator>)
             {
                 return std::end(range) - std::begin(range);
             }

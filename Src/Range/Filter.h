@@ -34,8 +34,7 @@ namespace RangeAux
             // Doesn't support RandomAccessIterator
             using iterator_category =
                 std::conditional_t<
-                    std::is_base_of_v<std::bidirectional_iterator_tag,
-                                      typename InIt::iterator_category>,
+                    IsBidirectionalIterator<InIt>,
                     std::bidirectional_iterator_tag,
                     typename InIt::iterator_category>;
 
@@ -131,9 +130,8 @@ RangeAux::FilterRHS<F> Filter(F f)
 template<typename R, typename F>
 auto operator|(R &&range, RangeAux::FilterRHS<F> &&rhs)
 {
-    using RT = RangeAux::FilterImpl<
-                    std::remove_cv_t<std::remove_reference_t<R>>,
-                    std::remove_reference_t<F>>;
+    using RT = RangeAux::FilterImpl<remove_rcv_t<R>,
+                                    std::remove_reference_t<F>>;
     return RT(std::forward<R>(range), std::move(rhs.f));
 }
 

@@ -145,15 +145,14 @@ namespace RangeAux
         BetweenImpl(T start, T end, T step)
             : start_(start), step_(step)
         {
-            // IMPROVE
             if(step > 0)
             {
                 AGZ_ASSERT(start <= end);
-                while((end - start) % step)
-                    ++end;
+                end += (end - start) % step;
             }
             else
             {
+                // IMPROVE
                 AGZ_ASSERT(start >= end);
                 while((end - start) % step)
                     --end;

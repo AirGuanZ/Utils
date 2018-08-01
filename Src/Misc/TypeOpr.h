@@ -26,8 +26,8 @@ BINARY_OPR(NotEqual, !=);
 BINARY_OPR(LessEqual, <=);
 BINARY_OPR(Less, <);
 
-BINARY_OPR(BoolAnd, &&);
-BINARY_OPR(BoolOr, ||);
+BINARY_OPR(LogicAnd, &&);
+BINARY_OPR(LogicOr, ||);
 
 BINARY_OPR(BitAnd, &);
 BINARY_OPR(BitOr, |);
@@ -35,8 +35,17 @@ BINARY_OPR(BitXor, ^);
 
 UNARY_OPR(Pos, +);
 UNARY_OPR(Neg, -);
-UNARY_OPR(BoolNot, !);
+UNARY_OPR(LogicNot, !);
 UNARY_OPR(BitNot, ~);
+
+template<typename T>
+using Deref = decltype(*std::declval<T>());
+
+template<typename T>
+using Addr = T*;
+
+template<typename F, typename...Args>
+using Apply = decltype(std::declval<F>()(std::declval<Args>()...));
 
 #undef DV
 #undef BINARY_OPR

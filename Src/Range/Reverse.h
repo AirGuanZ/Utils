@@ -65,12 +65,14 @@ public:
         return *this;
     }
 
-    friend ReverseIterator operator+(const ReverseIterator &i, difference_type n)
+    friend ReverseIterator operator+(const ReverseIterator &i,
+                                     difference_type n)
     {
         return ReverseIterator(i.it - n);
     }
 
-    friend ReverseIterator operator+(difference_type n, const ReverseIterator &i)
+    friend ReverseIterator operator+(difference_type n,
+                                     const ReverseIterator &i)
     {
         return i - n;
     }
@@ -81,12 +83,14 @@ public:
         return *this;
     }
 
-    friend ReverseIterator operator-(ReverseIterator i, difference_type n)
+    friend ReverseIterator operator-(const ReverseIterator &i,
+                                     difference_type n)
     {
         return ReverseIterator(i.it + n);
     }
 
-    friend difference_type operator-(const ReverseIterator &b, const ReverseIterator &a)
+    friend difference_type operator-(const ReverseIterator &b,
+                                     const ReverseIterator &a)
     {
         return a - b;
     }
@@ -166,8 +170,7 @@ inline RangeAux::ReverseRHS Reverse()
 template<typename R>
 auto operator|(R &&range, RangeAux::ReverseRHS rhs)
 {
-    using RT = RangeAux::ReverseImpl<
-        std::remove_cv_t<std::remove_reference_t<R>>>;
+    using RT = RangeAux::ReverseImpl<remove_rcv_t<R>>;
     return RT(std::forward<R>(range));
 }
 

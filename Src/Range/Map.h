@@ -208,8 +208,8 @@ RangeAux::MapRHS<F> Map(F f) { return RangeAux::MapRHS<F>{ std::move(f) }; }
 template<typename R, typename F>
 auto operator|(R &&range, RangeAux::MapRHS<F> rhs)
 {
-    using RT = RangeAux::MapImpl<std::remove_cv_t<
-        std::remove_reference_t<R>>, std::remove_reference_t<F>>;
+    using RT = RangeAux::MapImpl<remove_rcv_t<R>,
+                                 std::remove_reference_t<F>>;
     return RT(std::forward<R>(range), std::move(rhs.f));
 }
 

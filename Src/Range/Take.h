@@ -33,9 +33,7 @@ namespace RangeAux
 
         Iterator end() const
         {
-            if constexpr(std::is_base_of_v<
-                std::random_access_iterator_tag,
-                typename Iterator::iterator_category>)
+            if constexpr(IsRandomAccessIterator<Iterator>)
             {
                 return std::begin(range_)
                      + std::min(std::end(range_) - std::begin(range_),
@@ -60,8 +58,7 @@ inline RangeAux::TakeRHS Take(size_t n) { return RangeAux::TakeRHS { n }; }
 template<typename R>
 auto operator|(R &&range, RangeAux::TakeRHS rhs)
 {
-    using RT = RangeAux::TakeImpl<std::remove_cv_t<
-                            std::remove_reference_t<R>>>;
+    using RT = RangeAux::TakeImpl<remove_rcv_t<R>>;
     return RT(std::forward<R>(range),
         static_cast<typename RT::Iterator::difference_type>(rhs.n));
 }
