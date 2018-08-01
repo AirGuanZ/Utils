@@ -4,6 +4,45 @@
 
 AGZ_NS_BEG(AGZ)
 
+namespace StringAux
+{
+    template<typename T>
+    void CopyConstruct(T *dst, const T *src, size_t n)
+    {
+        for(size_t i = 0; i < n; ++i)
+            new(dst++) T(*src++);
+    }
+
+    template<typename CU, typename TP>
+    typename RefCountedBuf<CU, TP>::Self *RefCountedBuf<CU, TP>::New(size_t n)
+    {
+        AGZ_ASSERT(n >= 1);
+        size_t bytes = sizeof(Self) + (n-1) * sizeof(CU);
+        Self *ret = reinterpret_cast<Self*>(std::malloc(bytes));
+        ret->refs = 1;
+        return ret;
+    }
+}
+
+template<typename CS, typename TP>
+CharRange<CS, TP>::CharRange(LargeBuf *buf, const CodeUnit *beg,
+                                            const CodeUnit *end)
+    : largeBuf_(buf), small_(false), beg_(beg), end_(end)
+{
+    AGZ_ASSERT(beg <= end && buf);
+    buf->IncRef();
+}
+
+template<typename CS, typename TP>
+CharRange<CS, TP>::CharRange(const CodeUnit *beg, const CodeUnit *end)
+    : small_(false)
+{
+    AGZ_ASSERT(beg <= end && end - beg <= SMALL_BUF_SIZE);
+    StringAux::CopyConstruct(&smallBuf_[0], beg, end - beg);
+    beg_ = &smallBuf_[0];
+    end_ = beg_ + (end - beg);
+}
+
 template<typename CS, typename TP>
 bool String<CS, TP>::IsSmallStorage() const
 {
@@ -419,6 +458,66 @@ typename String<CS, TP>::Self String<CS, TP>::operator*(size_t n)
 }
 
 template<typename CS, typename TP>
+CharRange<CS, TP> String<CS, TP>::Chars() const
+{
+    if(IsSmallStorage())
+        return CharRange<CS, TP>(Data(), End());
+    return CharRange<CS, TP>(large_.buf, Data(), End());
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::Iterator String<CS, TP>::begin() const
+{
+    return Data();
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::Iterator String<CS, TP>::end() const
+{
+    return End();
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::ReverseIterator String<CS, TP>::rbegin() const
+{
+    return ReverseIterator(end());
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::ReverseIterator String<CS, TP>::rend() const
+{
+    return ReverseIterator(begin());
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::StartsWith(const Self &prefix) const
+{
+    return StringAlgo::StartsWith(begin(), end(),
+                                  std::begin(prefix), std::end(prefix));
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::EndsWith(const Self &suffix) const
+{
+    return StringAlgo::EndsWith(begin(), end(),
+                                std::begin(prefix), std::end(prefix));
+}
+
+template<typename CS, typename TP>
+size_t String<CS, TP>::Find(const Self &dst) const
+{
+    return StringAlgo::Find(begin(), end(),
+                            std::begin(prefix), std::end(prefix));
+}
+
+template<typename CS, typename TP>
+size_t String<CS, TP>::RFind(const Self &dst) const
+{
+    return StringAlgo::RFind(begin(), end(),
+                             std::begin(prefix), std::end(prefix));
+}
+
+template<typename CS, typename TP>
 bool String<CS, TP>::operator==(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
@@ -545,78 +644,6 @@ bool String<CS, TP>::operator>(const const char *rhs) const
 }
 
 template<typename CS, typename TP>
-CharRange<CS, TP> String<CS, TP>::Chars() const
-{
-    if(IsSmallStorage())
-        return CharRange<CS, TP>(Data(), End());
-    return CharRange<CS, TP>(large_.buf, Data(), End());
-}
-
-template<typename CS, typename TP>
-typename String<CS, TP>::Iterator String<CS, TP>::begin() const
-{
-    return Data();
-}
-
-template<typename CS, typename TP>
-typename String<CS, TP>::Iterator String<CS, TP>::end() const
-{
-    return End();
-}
-
-template<typename CS, typename TP>
-typename String<CS, TP>::ReverseIterator String<CS, TP>::rbegin() const
-{
-    return ReverseIterator(end());
-}
-
-template<typename CS, typename TP>
-typename String<CS, TP>::ReverseIterator String<CS, TP>::rend() const
-{
-    return ReverseIterator(begin());
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::StartsWith(const Self &prefix) const
-{
-    return StringAlgo::StartsWith(begin(), end(),
-                                  std::begin(prefix), std::end(prefix));
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::EndsWith(const Self &suffix) const
-{
-    return StringAlgo::EndsWith(begin(), end(),
-                                std::begin(prefix), std::end(prefix));
-}
-
-template<typename CS, typename TP>
-size_t String<CS, TP>::Find(const Self &dst) const
-{
-    return StringAlgo::Find(begin(), end(),
-                            std::begin(prefix), std::end(prefix));
-}
-
-template<typename CS, typename TP>
-size_t String<CS, TP>::RFind(const Self &dst) const
-{
-    return StringAlgo::RFind(begin(), end(),
-                             std::begin(prefix), std::end(prefix));
-}
-
-template<typename CS, typename TP>
-String<CS, TP> operator*(size_t n, const String<CS, TP> &s)
-{
-    return s * n;
-}
-
-template<typename CS, typename TP>
-std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s)
-{
-    return out << s.ToStdString();
-}
-
-template<typename CS, typename TP>
 bool operator==(const std::string &lhs, const String<CS, TP> &rhs)
 {
     return lhs == rhs.ToStdString();
@@ -686,6 +713,18 @@ template<typename CS, typename TP>
 bool operator>(const const char *lhs, const String<CS, TP> &rhs)
 {
     return lhs > rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+String<CS, TP> operator*(size_t n, const String<CS, TP> &s)
+{
+    return s * n;
+}
+
+template<typename CS, typename TP>
+std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s)
+{
+    return out << s.ToStdString();
 }
 
 AGZ_NS_END(AGZ)

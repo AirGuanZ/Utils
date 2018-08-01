@@ -19,13 +19,6 @@ enum class CharEncoding { UTF8 };
 
 namespace StringAux
 {
-    template<typename T>
-    void CopyConstruct(T *dst, const T *src, size_t n)
-    {
-        for(size_t i = 0; i < n; ++i)
-            new(dst++) T(*src++);
-    }
-
     struct MultiThreaded
     {
         using RefCounter = std::atomic<size_t>;
@@ -63,14 +56,7 @@ namespace StringAux
 
         CU *GetData() { return &data[0]; }
 
-        static Self *New(size_t n)
-        {
-            AGZ_ASSERT(n >= 1);
-            size_t bytes = sizeof(Self) + (n-1) * sizeof(CU);
-            Self *ret = reinterpret_cast<Self*>(std::malloc(bytes));
-            ret->refs = 1;
-            return ret;
-        }
+        static Self *New(size_t n);
     };
 
     static constexpr size_t SMALL_BUF_SIZE = 31;
@@ -103,31 +89,14 @@ public:
     using Self = CharRange<CS, TP>;
 
     // For large storage
-    CharRange(LargeBuf *buf, const CodeUnit *beg, const CodeUnit *end)
-        : largeBuf_(buf), small_(false), beg_(beg), end_(end)
-    {
-        AGZ_ASSERT(beg <= end && buf);
-        buf->IncRef();
-    }
-
+    CharRange(LargeBuf *buf, const CodeUnit *beg, const CodeUnit *end);
     // For small storage
-    CharRange(const CodeUnit *beg, const CodeUnit *end)
-        : small_(false)
-    {
-        AGZ_ASSERT(beg <= end && end - beg <= SMALL_BUF_SIZE);
-        StringAux::CopyConstruct(&smallBuf_[0], beg, end - beg);
-        beg_ = &smallBuf_[0];
-        end_ = beg_ + (end - beg);
-    }
+    CharRange(const CodeUnit *beg, const CodeUnit *end);
 
     CharRange(const Self &)       = delete;
     Self &operator=(const Self &) = delete;
 
-    ~CharRange()
-    {
-        if(!small_)
-            largeBuf_->DecRef();
-    }
+    ~CharRange() { if(!small_) largeBuf_->DecRef(); }
 
     Iterator begin() const { return Iterator(beg_); }
     Iterator end() const { return Iterator(end_); }
@@ -268,6 +237,22 @@ public:
     Self operator+(const Self &rhs);
     Self operator*(size_t n);
 
+    CharRange<CS, TP> Chars() const;
+
+    Iterator begin() const;
+    Iterator end() const;
+
+    ReverseIterator rbegin() const;
+    ReverseIterator rend() const;
+
+    bool StartsWith(const Self &prefix) const;
+    bool EndsWith(const Self &suffix) const;
+
+    constexpr static size_t NPOS = StringAlgo::NPOS;
+
+    size_t Find(const Self &dst) const;
+    size_t RFind(const Self &dst) const;
+
     bool operator==(const Self &rhs) const;
     bool operator!=(const Self &rhs) const;
     bool operator<(const Self &rhs) const;
@@ -288,29 +273,7 @@ public:
     bool operator<=(const const char *rhs) const;
     bool operator>=(const const char *rhs) const;
     bool operator>(const const char *rhs) const;
-
-    CharRange<CS, TP> Chars() const;
-
-    Iterator begin() const;
-    Iterator end() const;
-
-    ReverseIterator rbegin() const;
-    ReverseIterator rend() const;
-
-    bool StartsWith(const Self &prefix) const;
-    bool EndsWith(const Self &suffix) const;
-
-    constexpr static size_t NPOS = StringAlgo::NPOS;
-
-    size_t Find(const Self &dst) const;
-    size_t RFind(const Self &dst) const;
 };
-
-template<typename CS, typename TP>
-String<CS, TP> operator*(size_t n, const String<CS, TP> &s)
-
-template<typename CS, typename TP>
-std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s);
 
 template<typename CS, typename TP>
 bool operator==(const std::string &lhs, const String<CS, TP> &rhs);
@@ -337,6 +300,12 @@ template<typename CS, typename TP>
 bool operator>=(const const char *lhs, const String<CS, TP> &rhs);
 template<typename CS, typename TP>
 bool operator>(const const char *lhs, const String<CS, TP> &rhs);
+
+template<typename CS, typename TP>
+String<CS, TP> operator*(size_t n, const String<CS, TP> &s)
+
+template<typename CS, typename TP>
+std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s);
 
 using Str8  = String<UTF8<>>;
 using Str16 = String<UTF16<>>;
