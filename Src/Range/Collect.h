@@ -16,11 +16,11 @@ namespace RangeAux
     struct CollectAsPushBackableRHS
     {
         template<typename R>
-        C Eval(R &&range)
+        static C Eval(R &&range)
         {
              C ret;
-             for(auto &&v : range)
-                ret.push_back(std::forward<decltype(v)>(v));
+             for(auto &&val : range)
+                ret.push_back(std::forward<decltype(val)>(val));
             return std::move(ret);
         }
     };
@@ -29,7 +29,7 @@ namespace RangeAux
     struct CollectAsInsertableRHS
     {
         template<typename R>
-        C Eval(R &&range)
+        static C Eval(R &&range)
         {
              C ret;
              for(auto &&v : range)
@@ -59,7 +59,7 @@ namespace RangeAux
     };
 
     template<typename T>
-    struct CollectSelector<std::unordered_set<T>>
+    struct CollectorSelector<std::unordered_set<T>>
     {
         using RHS = CollectAsInsertableRHS<std::unordered_set<T>>;
     };

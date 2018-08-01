@@ -25,16 +25,6 @@ template<typename It>
 std::enable_if_t<IsRandomAccessIterator<It>, size_t>
 RFind(It beg1, It end1, It beg2, It end2);
 
-template<typename It, typename CS>
-std::enable_if_t<IsRandomAccessIterator<It>, size_t>
-FindFirstIn(It beg1, It end1, typename CS::Iterator beg2,
-                              typename CS::Iterator end2);
-
-template<typname It, typeame CS>
-std::enable_if_t<IsRandomAccessIterator<It>, size_t>
-FindLastIn(It beg1, It end1, typename CS::Iterator beg2,
-                             typename CS::Iterator end2);
-
 enum class CompareResult { Less, Equal, Greater };
 
 template<typename It>
@@ -150,7 +140,7 @@ Comp(It beg1, It end1, It beg2, It end2)
 
     return beg1 == end1 ? (beg2 == end2 ? CompareResult::Equal
                                         : CompareResult::Less)
-                        : Greater;
+                        : CompareResult::Greater;
 }
 
 AGZ_NS_END(AGZ::StrAlgo)

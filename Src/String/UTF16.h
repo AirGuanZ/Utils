@@ -29,7 +29,7 @@ public:
 
         value_type operator*() const;
 
-        pointer *operator->() const;
+        pointer operator->() const;
 
         Self &operator++();
 
@@ -41,7 +41,7 @@ public:
 
         bool operator==(const Self &rhs) const;
 
-        bool operator!=(const Self &rhs) const { return !(*this == rhs);
+        bool operator!=(const Self &rhs) const { return !(*this == rhs); }
     };
 
     static_assert(sizeof(T) >= 2);
@@ -130,14 +130,14 @@ UTF16Core<T>::LastCodePoint(const CodeUnit *cur)
 }
 
 template<typename T>
-UTF16Iterator<T>::UTF16Iterator(const T *cur)
+UTF16Core<T>::Iterator::Iterator(const T *cur)
     : cur(cur)
 {
     AGZ_ASSERT(cur);
 }
 
 template<typename T>
-char32_t UTF16Iterator<T>::operator*() const
+char32_t UTF16Core<T>::Iterator::operator*() const
 {
     char32_t ret;
     if(!UTF16Core<T>::CU2CP(cur, &ret, UTF16Core<T>::MaxCUInCP))
@@ -145,21 +145,21 @@ char32_t UTF16Iterator<T>::operator*() const
     return ret;
 }
 
-template<typename T>
-const char32_t *UTF16Iterator<T>::operator->() const
+template <typename T>
+typename UTF16Core<T>::Iterator::pointer UTF16Core<T>::Iterator::operator->() const
 {
     return pointer(**this);
 }
 
 template<typename T>
-UTF16Iterator<T> &UTF16Iterator<T>::operator++()
+typename UTF16Core<T>::Iterator &UTF16Core<T>::Iterator::operator++()
 {
     cur += UTF16Core<T>::CUInCP(**this);
     return *this;
 }
 
 template<typename T>
-UTF16Iterator<T> UTF16Iterator<T>::operator++(int)
+typename UTF16Core<T>::Iterator UTF16Core<T>::Iterator::operator++(int)
 {
     auto ret = *this;
     ++*this;
@@ -167,14 +167,14 @@ UTF16Iterator<T> UTF16Iterator<T>::operator++(int)
 }
 
 template<typename T>
-UTF16Iterator<T> &UTF16Iterator<T>::operator--()
+typename UTF16Core<T>::Iterator &UTF16Core<T>::Iterator::operator--()
 {
     cur = UTF16Core<T>::LastCodePoint(cur);
     return *this;
 }
 
 template<typename T>
-UTF16Iterator<T> UTF16Iterator<T>::operator--(int)
+typename UTF16Core<T>::Iterator UTF16Core<T>::Iterator::operator--(int)
 {
     auto ret = *this;
     --*this;
@@ -182,7 +182,7 @@ UTF16Iterator<T> UTF16Iterator<T>::operator--(int)
 }
 
 template<typename T>
-bool UTF16Iterator<T>::operator==(const Self &rhs) const
+bool UTF16Core<T>::Iterator::operator==(const Self &rhs) const
 {
     return cur == rhs.cur;
 }

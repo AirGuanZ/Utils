@@ -23,7 +23,7 @@ namespace RangeAux
 
             It it;
             I lastVal;
-            mutable F *f;
+            F *f;
 
         public:
 
@@ -41,7 +41,7 @@ namespace RangeAux
 
             value_type operator*() const
             {
-                return f(lastVal, *it);
+                return (*f)(lastVal, *it);
             }
 
             pointer operator->() const
@@ -94,22 +94,20 @@ namespace RangeAux
         }
     };
 
+    template<typename I, typename F>
     struct PartialFoldlTrait
     {
         template<typename R>
-        using Impl = PartialFoldlImpl<R>;
+        using Impl = PartialFoldlImpl<R, I, F>;
     };
 }
 
 template<typename I, typename F>
-auto PartialFoldl(I &&init, F &&func)
+auto PartialFoldl(I init, F func)
 {
     return RangeAux::TransformWrapper<
-            RangeAux::PartialFoldlTrait,
-            remove_rcv_t<I>,
-            remove_rcv_t<F>>(
-                std::forward<I>(init),
-                std::forward<F>(func));
+            RangeAux::PartialFoldlTrait<I, F>, I, F>(
+                std::move(init), std::move(func));
 }
 
 AGZ_NS_END(AGZ)

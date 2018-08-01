@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "../Misc/Common.h"
+#include "Iterator.h"
 
 AGZ_NS_BEG(AGZ)
 

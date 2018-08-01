@@ -17,7 +17,7 @@ public:
     using pointer           = typename It::pointer;
     using reference         = typename It::reference;
 
-    ReverseIterator(It it)
+    explicit ReverseIterator(It it)
         : it(std::move(it))
     {
 
@@ -28,7 +28,7 @@ public:
         return *--It(it);
     }
 
-    const pointer operator->() const
+    pointer operator->() const
     {
         return (--It(it)).operator->();
     }
@@ -142,7 +142,7 @@ namespace RangeAux
 
         using Iterator = ReverseIterator<typename R::Iterator>;
 
-        ReverseImpl(R range)
+        explicit ReverseImpl(R range)
             : range_(std::move(range))
         {
 

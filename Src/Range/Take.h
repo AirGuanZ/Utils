@@ -56,6 +56,16 @@ namespace RangeAux
                 ++beg;
             end_ = beg;
         }
+
+        Iterator begin() const
+        {
+            return std::begin(range_);
+        }
+
+        Iterator end() const
+        {
+            return end_;
+        }
     };
 
     struct TakeTrait
@@ -64,26 +74,27 @@ namespace RangeAux
         using Impl = TakeImpl<R>;
     };
 
+    template<typename F>
     struct TakeWhileTrait
     {
         template<typename R>
-        using Impl = TakeWhileImpl<R>;
+        using Impl = TakeWhileImpl<R, F>;
     };
 }
 
-template<typename F>
-inline Take(size_t n)
+inline auto Take(size_t n)
 {
     return RangeAux::TransformWrapper<
-            RangeAux::TakeTrait, size_t>(n);
+        RangeAux::TakeTrait, size_t>(std::move(n));
 }
 
 template<typename F>
-inline TakeWhile(F &&func)
+auto TakeWhile(F func)
 {
     return RangeAux::TransformWrapper<
-            RangeAux::TakeWhileTrait, remove_rcv_t<F>>(
-                std::forward<F>(func));
+            RangeAux::TakeWhileTrait<remove_rcv_t<F>>,
+            remove_rcv_t<F>>(
+                std::move(func));
 }
 
 AGZ_NS_END(AGZ)

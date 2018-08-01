@@ -1,5 +1,8 @@
+#pragma once
+
 #include <cstring>
 #include <string>
+#include <tuple>
 #include <vector>
 
 AGZ_NS_BEG(AGZ)
@@ -253,7 +256,7 @@ String<CS, TP>::String(const Self &copyFrom)
 }
 
 template<typename CS, typename TP>
-String<CS, TP>::String(Self &&moveFrom)
+String<CS, TP>::String(Self &&moveFrom) noexcept
 {
     if(moveFrom.IsSmallStorage())
     {
@@ -280,7 +283,7 @@ String<CS, TP> &String<CS, TP>::operator=(const String<OCS, OTP> &copyFrom)
 }
 
 template<typename CS, typename TP>
-typename String<CS, TP>::Self &String<CS, TP>::operator=(Self &&moveFrom)
+typename String<CS, TP>::Self &String<CS, TP>::operator=(Self &&moveFrom) noexcept
 {
     if(IsLargeStorage())
         large_.buf->DecRef();
@@ -403,14 +406,12 @@ bool String<CS, TP>::IsEmpty() const
 }
 
 template<typename CS, typename TP>
-std::pair<const typename String<CS, TP>::CodeUnit, size_t>
+std::pair<const typename String<CS, TP>::CodeUnit*, size_t>
 String<CS, TP>::DataAndLength() const
 {
     if(IsSmallStorage())
-        return std::make_pair<const CodeUnit*, size_t>(
-                    &small_[0], small_.len);
-    return std::make_pair<const CodeUnit*, size_t>(
-                large_.beg, large_.end - large_.beg);
+        return { &small_.buf[0], static_cast<size_t>(small_.len) };
+    return { large_.beg, large_.end - large_.beg };
 }
 
 template<typename CS, typename TP>
@@ -419,10 +420,8 @@ std::pair<const typename String<CS, TP>::CodeUnit*,
 String<CS, TP>::BeginAndEnd() const
 {
     if(IsSmallStorage())
-        return std::make_pair<const CodeUnit*, const CodeUnit*>(
-                    &small_[0], &small_[0] + small_.len);
-    return std::make_pair<const CodeUnit*, const CodeUnit*>(
-                large_.beg, large_.end);
+        return { &small_.buf[0], &small_.buf[0] + small_.len };
+    return { large_.beg, large_.end };
 }
 
 template <typename CS, typename TP>
@@ -492,29 +491,29 @@ typename String<CS, TP>::ReverseIterator String<CS, TP>::rend() const
 template<typename CS, typename TP>
 bool String<CS, TP>::StartsWith(const Self &prefix) const
 {
-    return StringAlgo::StartsWith(begin(), end(),
-                                  std::begin(prefix), std::end(prefix));
+    return StrAlgo::StartsWith(begin(), end(),
+                               std::begin(prefix), std::end(prefix));
 }
 
 template<typename CS, typename TP>
 bool String<CS, TP>::EndsWith(const Self &suffix) const
 {
-    return StringAlgo::EndsWith(begin(), end(),
-                                std::begin(prefix), std::end(prefix));
+    return StrAlgo::EndsWith(begin(), end(),
+                                std::begin(suffix), std::end(suffix));
 }
 
 template<typename CS, typename TP>
 size_t String<CS, TP>::Find(const Self &dst) const
 {
-    return StringAlgo::Find(begin(), end(),
-                            std::begin(prefix), std::end(prefix));
+    return StrAlgo::Find(begin(), end(),
+                            std::begin(dst), std::end(dst));
 }
 
 template<typename CS, typename TP>
 size_t String<CS, TP>::RFind(const Self &dst) const
 {
-    return StringAlgo::RFind(begin(), end(),
-                             std::begin(prefix), std::end(prefix));
+    return StrAlgo::RFind(begin(), end(),
+                             std::begin(dst), std::end(dst));
 }
 
 template<typename CS, typename TP>
@@ -522,8 +521,8 @@ bool String<CS, TP>::operator==(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StringAlgo::Comp(b1, e1, b2, e2)
-        == StringAlgo::CompareResult::Equal;
+    return StrAlgo::Comp(b1, e1, b2, e2)
+        == StrAlgo::CompareResult::Equal;
 }
 
 template<typename CS, typename TP>
@@ -531,8 +530,8 @@ bool String<CS, TP>::operator!=(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StringAlgo::Comp(b1, e1, b2, e2)
-        != StringAlgo::CompareResult::Equal;
+    return StrAlgo::Comp(b1, e1, b2, e2)
+        != StrAlgo::CompareResult::Equal;
 }
 
 template<typename CS, typename TP>
@@ -540,8 +539,8 @@ bool String<CS, TP>::operator<(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StringAlgo::Comp(b1, e1, b2, e2)
-        == StringAlgo::CompareResult::Less;
+    return StrAlgo::Comp(b1, e1, b2, e2)
+        == StrAlgo::CompareResult::Less;
 }
 
 template<typename CS, typename TP>
@@ -549,8 +548,8 @@ bool String<CS, TP>::operator<=(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StringAlgo::Comp(b1, e1, b2, e2)
-        != StringAlgo::CompareResult::Greater;
+    return StrAlgo::Comp(b1, e1, b2, e2)
+        != StrAlgo::CompareResult::Greater;
 }
 
 template<typename CS, typename TP>
@@ -558,8 +557,8 @@ bool String<CS, TP>::operator>=(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StringAlgo::Comp(b1, e1, b2, e2)
-        != StringAlgo::CompareResult::Less;
+    return StrAlgo::Comp(b1, e1, b2, e2)
+        != StrAlgo::CompareResult::Less;
 }
 
 template<typename CS, typename TP>
@@ -567,8 +566,8 @@ bool String<CS, TP>::operator>(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StringAlgo::Comp(b1, e1, b2, e2)
-        == StringAlgo::CompareResult::Greater;
+    return StrAlgo::Comp(b1, e1, b2, e2)
+        == StrAlgo::CompareResult::Greater;
 }
 
 template<typename CS, typename TP>
@@ -608,37 +607,37 @@ bool String<CS, TP>::operator>(const std::string &rhs) const
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::operator==(const const char *rhs) const
+bool String<CS, TP>::operator==(const char *rhs) const
 {
     return ToStdString() == rhs;
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::operator!=(const const char *rhs) const
+bool String<CS, TP>::operator!=(const char *rhs) const
 {
     return ToStdString() != rhs;
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::operator<(const const char *rhs) const
+bool String<CS, TP>::operator<(const char *rhs) const
 {
     return ToStdString() < rhs;
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::operator<=(const const char *rhs) const
+bool String<CS, TP>::operator<=(const char *rhs) const
 {
     return ToStdString() <= rhs;
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::operator>=(const const char *rhs) const
+bool String<CS, TP>::operator>=(const char *rhs) const
 {
     return ToStdString() >= rhs;
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::operator>(const const char *rhs) const
+bool String<CS, TP>::operator>(const char *rhs) const
 {
     return ToStdString() > rhs;
 }
@@ -680,37 +679,37 @@ bool operator>(const std::string &lhs, const String<CS, TP> &rhs)
 }
 
 template<typename CS, typename TP>
-bool operator==(const const char *lhs, const String<CS, TP> &rhs)
+bool operator==(const char *lhs, const String<CS, TP> &rhs)
 {
     return lhs == rhs.ToStdString();
 }
 
 template<typename CS, typename TP>
-bool operator!=(const const char *lhs, const String<CS, TP> &rhs)
+bool operator!=(const char *lhs, const String<CS, TP> &rhs)
 {
     return lhs != rhs.ToStdString();
 }
 
 template<typename CS, typename TP>
-bool operator<(const const char *lhs, const String<CS, TP> &rhs)
+bool operator<(const char *lhs, const String<CS, TP> &rhs)
 {
     return lhs < rhs.ToStdString();
 }
 
 template<typename CS, typename TP>
-bool operator<=(const const char *lhs, const String<CS, TP> &rhs)
+bool operator<=(const char *lhs, const String<CS, TP> &rhs)
 {
     return lhs <= rhs.ToStdString();
 }
 
 template<typename CS, typename TP>
-bool operator>=(const const char *lhs, const String<CS, TP> &rhs)
+bool operator>=(const char *lhs, const String<CS, TP> &rhs)
 {
     return lhs >= rhs.ToStdString();
 }
 
 template<typename CS, typename TP>
-bool operator>(const const char *lhs, const String<CS, TP> &rhs)
+bool operator>(const char *lhs, const String<CS, TP> &rhs)
 {
     return lhs > rhs.ToStdString();
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <tuple>
 #include <utility>
@@ -14,8 +14,8 @@ namespace RangeAux
     {
         std::tuple<Args...> args;
 
-        explicit TransformWrapper(Args&&...args)
-            : args(std::forward<Args>(args)...)
+        explicit TransformWrapper(Args&&..._args)
+            : args(std::forward<Args>(_args)...)
         {
 
         }
@@ -24,7 +24,7 @@ namespace RangeAux
         auto Eval(R &&range)
         {
             return std::make_from_tuple<
-                        typename ImplTrait::Impl<R>>(
+                        typename ImplTrait::template Impl<R>>(
                             std::tuple_cat(
                                 std::tuple<remove_rcv_t<R>>(
                                     std::forward<R>(range)),

@@ -3,7 +3,6 @@
 #include <atomic>
 #include <ostream>
 #include <string>
-#include <tuple>
 
 #include "../Misc/Common.h"
 #include "../Range/Reverse.h"
@@ -198,7 +197,7 @@ public:
 
     String(const Self &copyFrom);
 
-    String(Self &&moveFrom);
+    String(Self &&moveFrom) noexcept;
 
     String(const CodeUnit *beg, const CodeUnit *end, size_t repeat);
 
@@ -213,7 +212,7 @@ public:
 
     Self &operator=(const Self &copyFrom);
 
-    Self &operator=(Self &&moveFrom);
+    Self &operator=(Self &&moveFrom) noexcept;
 
     ~String();
 
@@ -229,7 +228,7 @@ public:
     bool IsEmpty() const;
 
     std::pair<const CodeUnit*, size_t> DataAndLength() const;
-    std::pair<const CodeUnit* const CodeUnit*> BeginAndEnd() const;
+    std::pair<const CodeUnit*, const CodeUnit*> BeginAndEnd() const;
 
     std::string ToStdString() const;
 
@@ -248,7 +247,7 @@ public:
     bool StartsWith(const Self &prefix) const;
     bool EndsWith(const Self &suffix) const;
 
-    constexpr static size_t NPOS = StringAlgo::NPOS;
+    constexpr static size_t NPOS = StrAlgo::NPOS;
 
     size_t Find(const Self &dst) const;
     size_t RFind(const Self &dst) const;
@@ -267,12 +266,12 @@ public:
     bool operator>=(const std::string &rhs) const;
     bool operator>(const std::string &rhs) const;
 
-    bool operator==(const const char *rhs) const;
-    bool operator!=(const const char *rhs) const;
-    bool operator<(const const char *rhs) const;
-    bool operator<=(const const char *rhs) const;
-    bool operator>=(const const char *rhs) const;
-    bool operator>(const const char *rhs) const;
+    bool operator==(const char *rhs) const;
+    bool operator!=(const char *rhs) const;
+    bool operator<(const char *rhs) const;
+    bool operator<=(const char *rhs) const;
+    bool operator>=(const char *rhs) const;
+    bool operator>(const char *rhs) const;
 };
 
 template<typename CS, typename TP>
@@ -289,20 +288,20 @@ template<typename CS, typename TP>
 bool operator>(const std::string &lhs, const String<CS, TP> &rhs);
 
 template<typename CS, typename TP>
-bool operator==(const const char *lhs, const String<CS, TP> &rhs);
+bool operator==(const char *lhs, const String<CS, TP> &rhs);
 template<typename CS, typename TP>
-bool operator!=(const const char *lhs, const String<CS, TP> &rhs);
+bool operator!=(const char *lhs, const String<CS, TP> &rhs);
 template<typename CS, typename TP>
-bool operator<(const const char *lhs, const String<CS, TP> &rhs);
+bool operator<(const char *lhs, const String<CS, TP> &rhs);
 template<typename CS, typename TP>
-bool operator<=(const const char *lhs, const String<CS, TP> &rhs);
+bool operator<=(const char *lhs, const String<CS, TP> &rhs);
 template<typename CS, typename TP>
-bool operator>=(const const char *lhs, const String<CS, TP> &rhs);
+bool operator>=(const char *lhs, const String<CS, TP> &rhs);
 template<typename CS, typename TP>
-bool operator>(const const char *lhs, const String<CS, TP> &rhs);
+bool operator>(const char *lhs, const String<CS, TP> &rhs);
 
 template<typename CS, typename TP>
-String<CS, TP> operator*(size_t n, const String<CS, TP> &s)
+String<CS, TP> operator*(size_t n, const String<CS, TP> &s);
 
 template<typename CS, typename TP>
 std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s);

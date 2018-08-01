@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../Misc/Common.h"
-#include "Range/Iterator.h"
+#include "Iterator.h"
+#include "Transform.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -57,24 +58,25 @@ namespace RangeAux
         using Impl = DropImpl<R>;
     };
 
+    template<typename F>
     struct DropWhileTrait
     {
         template<typename R>
-        using Impl = DropWhileImpl<R>;
+        using Impl = DropWhileImpl<R, F>;
     };
 }
 
 inline auto Drop(size_t n)
 {
     return RangeAux::TransformWrapper<
-            RangeAux::DropTrait, size_t>(n);
+            RangeAux::DropTrait, size_t>(std::move(n));
 }
 
 template<typename F>
 auto DropWhile(F &&func)
 {
     return RangeAux::TransformWrapper<
-            RangeAux::DropWhileTrait, remove_rcv_t<F>>(
+            RangeAux::DropWhileTrait<F>, F>(
                 std::forward<F>(func));
 }
 

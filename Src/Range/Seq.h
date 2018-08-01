@@ -38,6 +38,8 @@ namespace RangeAux
 
         public:
 
+            Iterator() = default;
+
             friend class SeqImpl;
 
             using iterator_category = std::random_access_iterator_tag;

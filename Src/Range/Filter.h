@@ -3,6 +3,7 @@
 #include <iterator>
 
 #include "../Misc/Common.h"
+#include "Iterator.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -130,9 +131,9 @@ RangeAux::FilterRHS<F> Filter(F f)
 template<typename R, typename F>
 auto operator|(R &&range, RangeAux::FilterRHS<F> &&rhs)
 {
-    using RT = RangeAux::FilterImpl<remove_rcv_t<R>,
-                                    std::remove_reference_t<F>>;
-    return RT(std::forward<R>(range), std::move(rhs.f));
+    return RangeAux::FilterImpl<remove_rcv_t<R>,
+                                    std::remove_reference_t<F>>
+            (std::forward<R>(range), std::move(rhs.f));
 }
 
 AGZ_NS_END(AGZ)

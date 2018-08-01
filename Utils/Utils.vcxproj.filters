@@ -73,9 +73,6 @@
     <ClInclude Include="..\Src\String\UTF8.h">
       <Filter>String</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\String\CharSet.h">
-      <Filter>String</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\String\UTF32.h">
       <Filter>String</Filter>
     </ClInclude>
@@ -99,6 +96,33 @@
     </ClInclude>
     <ClInclude Include="..\Src\Range\Reverse.h">
       <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Collect.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Drop.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Iterator.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\PartialFoldl.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Transform.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Algorithm.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\UTF.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\UTF16.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Charset.h">
+      <Filter>String</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

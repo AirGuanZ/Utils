@@ -18,7 +18,7 @@ constexpr bool IsBidirectionalIterator =
                       typename T::iterator_category>;
 
 template<typename T>
-consexpr bool IsForwardIterator =
+constexpr bool IsForwardIterator =
     std::is_base_of_v<std::forward_iterator_tag,
                       typename T::iterator_category>;
 
@@ -47,7 +47,7 @@ class ValuePointer
 
 public:
 
-    ValuePointer(T val)
+    explicit ValuePointer(T val)
         : val_(std::move(val))
     {
 
@@ -58,7 +58,7 @@ public:
         return val_;
     }
 
-    T &operator()
+    T &operator*()
     {
         return val_;
     }
