@@ -64,14 +64,14 @@ namespace RangeAux
     };
 }
 
-inline Drop(size_t n)
+inline auto Drop(size_t n)
 {
     return RangeAux::TransformWrapper<
             RangeAux::DropTrait, size_t>(n);
 }
 
 template<typename F>
-inline DropWhile(F &&func)
+auto DropWhile(F &&func)
 {
     return RangeAux::TransformWrapper<
             RangeAux::DropWhileTrait, remove_rcv_t<F>>(
