@@ -35,6 +35,12 @@ std::enable_if_t<IsRandomAccessIterator<It>, size_t>
 FindLastIn(It beg1, It end1, typename CS::Iterator beg2,
                              typename CS::Iterator end2);
 
+enum class CompareResult { Less, Equal, Greater };
+
+template<typename It>
+std::enable_if_t<IsRandomAccessIterator<It>, CompareResult>
+Comp(It beg1, It end1, It beg2, It end2);
+
 AGZ_NS_END(AGZ::StrAlgo)
 
 AGZ_NS_BEG(AGZ::StrAlgo)
@@ -113,13 +119,38 @@ std::enable_if_t<IsRandomAccessIterator<It>, size_t>
 RFind(It beg1, It end1, It beg2, It end2)
 {
     AGZ_ASSERT(beg1 <= end1 && beg2 <= end2);
-    
+
     using RI = ReverseIterator<It>;
     size_t rev_rt = Find(RI(end1), RI(beg1), RI(end2), RI(beg2));
     if(rev_rt == NPOS)
         return NPOS;
     return static_cast<size_t>(end1 - beg1) - rev_rt
          - static_cast<size_t>(end2 - beg2);
+}
+
+template<typename It>
+std::enable_if_t<IsRandomAccessIterator<It>, CompareResult>
+Comp(It beg1, It end1, It beg2, It end2)
+{
+    AGZ_ASSERT(beg1 <= end1 && beg2 <= end2);
+
+    while(beg1 < end1 && beg2 < end2)
+    {
+        auto c1 = *beg1++, c2 = *beg2++;
+        if(c1 < c2) return CompareResult::Less;
+        if(c1 > c2) return CompareResult::Greater;
+    }
+
+    if(beg1 == end1)
+    {
+        if(beg2 == end2)
+            return CompareResult::Equal;
+        return CompareResult::Less;
+    }
+
+    return beg1 == end1 ? (beg2 == end2 ? CompareResult::Equal
+                                        : CompareResult::Less)
+                        : Greater;
 }
 
 AGZ_NS_END(AGZ::StrAlgo)

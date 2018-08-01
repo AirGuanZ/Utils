@@ -419,15 +419,129 @@ typename String<CS, TP>::Self String<CS, TP>::operator*(size_t n)
 }
 
 template<typename CS, typename TP>
-String<CS, TP> operator*(size_t n, const String<CS, TP> &s)
+bool String<CS, TP>::operator==(const Self &rhs) const
 {
-    return s * n;
+    auto [b1, e1] = BeginAndEnd();
+    auto [b2, e2] = rhs.BeginAndEnd();
+    return StringAlgo::Comp(b1, e1, b2, e2)
+        == StringAlgo::CompareResult::Equal;
 }
 
 template<typename CS, typename TP>
-std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s)
+bool String<CS, TP>::operator!=(const Self &rhs) const
 {
-    return out << s.ToStdString();
+    auto [b1, e1] = BeginAndEnd();
+    auto [b2, e2] = rhs.BeginAndEnd();
+    return StringAlgo::Comp(b1, e1, b2, e2)
+        != StringAlgo::CompareResult::Equal;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator<(const Self &rhs) const
+{
+    auto [b1, e1] = BeginAndEnd();
+    auto [b2, e2] = rhs.BeginAndEnd();
+    return StringAlgo::Comp(b1, e1, b2, e2)
+        == StringAlgo::CompareResult::Less;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator<=(const Self &rhs) const
+{
+    auto [b1, e1] = BeginAndEnd();
+    auto [b2, e2] = rhs.BeginAndEnd();
+    return StringAlgo::Comp(b1, e1, b2, e2)
+        != StringAlgo::CompareResult::Greater;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator>=(const Self &rhs) const
+{
+    auto [b1, e1] = BeginAndEnd();
+    auto [b2, e2] = rhs.BeginAndEnd();
+    return StringAlgo::Comp(b1, e1, b2, e2)
+        != StringAlgo::CompareResult::Less;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator>(const Self &rhs) const
+{
+    auto [b1, e1] = BeginAndEnd();
+    auto [b2, e2] = rhs.BeginAndEnd();
+    return StringAlgo::Comp(b1, e1, b2, e2)
+        == StringAlgo::CompareResult::Greater;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator==(const std::string &rhs) const
+{
+    return ToStdString() == rhs;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator!=(const std::string &rhs) const
+{
+    return ToStdString() != rhs;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator<(const std::string &rhs) const
+{
+    return ToStdString() < rhs;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator<=(const std::string &rhs) const
+{
+    return ToStdString() <= rhs;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator>=(const std::string &rhs) const
+{
+    return ToStdString() >= rhs;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator>(const std::string &rhs) const
+{
+    return ToStdString() > rhs;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator==(const const char *rhs) const
+{
+    return ToStdString() == rhs;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator!=(const const char *rhs) const
+{
+    return ToStdString() != rhs;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator<(const const char *rhs) const
+{
+    return ToStdString() < rhs;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator<=(const const char *rhs) const
+{
+    return ToStdString() <= rhs;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator>=(const const char *rhs) const
+{
+    return ToStdString() >= rhs;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::operator>(const const char *rhs) const
+{
+    return ToStdString() > rhs;
 }
 
 template<typename CS, typename TP>
@@ -488,6 +602,90 @@ size_t String<CS, TP>::RFind(const Self &dst) const
 {
     return StringAlgo::RFind(begin(), end(),
                              std::begin(prefix), std::end(prefix));
+}
+
+template<typename CS, typename TP>
+String<CS, TP> operator*(size_t n, const String<CS, TP> &s)
+{
+    return s * n;
+}
+
+template<typename CS, typename TP>
+std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s)
+{
+    return out << s.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator==(const std::string &lhs, const String<CS, TP> &rhs)
+{
+    return lhs == rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator!=(const std::string &lhs, const String<CS, TP> &rhs)
+{
+    return lhs != rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator<(const std::string &lhs, const String<CS, TP> &rhs)
+{
+    return lhs < rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator<=(const std::string &lhs, const String<CS, TP> &rhs)
+{
+    return lhs <= rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator>=(const std::string &lhs, const String<CS, TP> &rhs)
+{
+    return lhs >= rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator>(const std::string &lhs, const String<CS, TP> &rhs)
+{
+    return lhs > rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator==(const const char *lhs, const String<CS, TP> &rhs)
+{
+    return lhs == rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator!=(const const char *lhs, const String<CS, TP> &rhs)
+{
+    return lhs != rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator<(const const char *lhs, const String<CS, TP> &rhs)
+{
+    return lhs < rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator<=(const const char *lhs, const String<CS, TP> &rhs)
+{
+    return lhs <= rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator>=(const const char *lhs, const String<CS, TP> &rhs)
+{
+    return lhs >= rhs.ToStdString();
+}
+
+template<typename CS, typename TP>
+bool operator>(const const char *lhs, const String<CS, TP> &rhs)
+{
+    return lhs > rhs.ToStdString();
 }
 
 AGZ_NS_END(AGZ)

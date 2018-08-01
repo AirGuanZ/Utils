@@ -275,6 +275,20 @@ public:
     bool operator>=(const Self &rhs) const;
     bool operator>(const Self &rhs) const;
 
+    bool operator==(const std::string &rhs) const;
+    bool operator!=(const std::string &rhs) const;
+    bool operator<(const std::string &rhs) const;
+    bool operator<=(const std::string &rhs) const;
+    bool operator>=(const std::string &rhs) const;
+    bool operator>(const std::string &rhs) const;
+
+    bool operator==(const const char *rhs) const;
+    bool operator!=(const const char *rhs) const;
+    bool operator<(const const char *rhs) const;
+    bool operator<=(const const char *rhs) const;
+    bool operator>=(const const char *rhs) const;
+    bool operator>(const const char *rhs) const;
+
     CharRange<CS, TP> Chars() const;
 
     Iterator begin() const;
@@ -293,10 +307,36 @@ public:
 };
 
 template<typename CS, typename TP>
-String<CS, TP> operator*(size_t n, const String<CS, TP> &s);
+String<CS, TP> operator*(size_t n, const String<CS, TP> &s)
 
 template<typename CS, typename TP>
 std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s);
+
+template<typename CS, typename TP>
+bool operator==(const std::string &lhs, const String<CS, TP> &rhs);
+template<typename CS, typename TP>
+bool operator!=(const std::string &lhs, const String<CS, TP> &rhs);
+template<typename CS, typename TP>
+bool operator<(const std::string &lhs, const String<CS, TP> &rhs);
+template<typename CS, typename TP>
+bool operator<=(const std::string &lhs, const String<CS, TP> &rhs);
+template<typename CS, typename TP>
+bool operator>=(const std::string &lhs, const String<CS, TP> &rhs);
+template<typename CS, typename TP>
+bool operator>(const std::string &lhs, const String<CS, TP> &rhs);
+
+template<typename CS, typename TP>
+bool operator==(const const char *lhs, const String<CS, TP> &rhs);
+template<typename CS, typename TP>
+bool operator!=(const const char *lhs, const String<CS, TP> &rhs);
+template<typename CS, typename TP>
+bool operator<(const const char *lhs, const String<CS, TP> &rhs);
+template<typename CS, typename TP>
+bool operator<=(const const char *lhs, const String<CS, TP> &rhs);
+template<typename CS, typename TP>
+bool operator>=(const const char *lhs, const String<CS, TP> &rhs);
+template<typename CS, typename TP>
+bool operator>(const const char *lhs, const String<CS, TP> &rhs);
 
 using Str8  = String<UTF8<>>;
 using Str16 = String<UTF16<>>;
