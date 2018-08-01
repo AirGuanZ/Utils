@@ -18,7 +18,7 @@ namespace RangeAux
 
         using Iterator = typename R::Iterator;
 
-        DropImpl(R range, size_t n)
+        DropImpl(R &&range, size_t n)
             : range_(std::move(range))
         {
             beg_ = AdvanceTo(std::begin(range_), std::end(range_),
@@ -39,7 +39,7 @@ namespace RangeAux
 
         using Iterator = typename R::Iterator;
 
-        DropWhileImpl(R range, F &&func)
+        DropWhileImpl(R &&range, F &&func)
             : range_(std::move(range))
         {
             Iterator end = std::end(range_);

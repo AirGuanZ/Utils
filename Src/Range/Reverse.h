@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Misc/Common.h"
+#include "Transform.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -142,7 +143,7 @@ namespace RangeAux
 
         using Iterator = ReverseIterator<typename R::Iterator>;
 
-        explicit ReverseImpl(R range)
+        explicit ReverseImpl(R &&range)
             : range_(std::move(range))
         {
 
@@ -159,19 +160,16 @@ namespace RangeAux
         }
     };
 
-    struct ReverseRHS { };
+    struct ReverseTrait
+    {
+        template<typename R>
+        using Impl = ReverseImpl<R>;
+    };
 }
 
-inline RangeAux::ReverseRHS Reverse()
+inline auto Reverse()
 {
-    return RangeAux::ReverseRHS { };
-}
-
-template<typename R>
-auto operator|(R &&range, RangeAux::ReverseRHS rhs)
-{
-    using RT = RangeAux::ReverseImpl<remove_rcv_t<R>>;
-    return RT(std::forward<R>(range));
+    return RangeAux::TransformWrapper<RangeAux::ReverseTrait>();
 }
 
 AGZ_NS_END(AGZ)

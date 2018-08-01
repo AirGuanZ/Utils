@@ -27,8 +27,8 @@ namespace RangeAux
         {
             return std::apply(&RHS::template Eval<R>,
                               std::tuple_cat(
-                                std::tuple<R>(std::forward<R>(range)),
-                                args));
+                                  std::make_tuple<R>(std::forward<R>(range)),
+                                  args));
         }
     };
 

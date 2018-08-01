@@ -3,6 +3,7 @@
 #include <iterator>
 
 #include "../Misc/Common.h"
+#include "Transform.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -181,7 +182,7 @@ namespace RangeAux
             }
         };
 
-        MapImpl(R range, F f)
+        MapImpl(R &&range, F &&f)
             : range_(std::move(range)), func_(std::move(f))
         {
 
@@ -200,9 +201,16 @@ namespace RangeAux
 
     template<typename F>
     struct MapRHS { F f; };
+
+    template<typename F>
+    struct MapTrait
+    {
+        template<typename R>
+        using Impl = MapImpl<R, F>;
+    };
 }
 
-template<typename F>
+/*template<typename F>
 RangeAux::MapRHS<F> Map(F f) { return RangeAux::MapRHS<F>{ std::move(f) }; }
 
 template<typename R, typename F>
@@ -211,6 +219,13 @@ auto operator|(R &&range, RangeAux::MapRHS<F> rhs)
     using RT = RangeAux::MapImpl<remove_rcv_t<R>,
                                  std::remove_reference_t<F>>;
     return RT(std::forward<R>(range), std::move(rhs.f));
+}*/
+
+template<typename F>
+auto Map(F f)
+{
+    return RangeAux::TransformWrapper<
+            RangeAux::MapTrait<F>, F>(std::move(f));
 }
 
 AGZ_NS_END(AGZ)

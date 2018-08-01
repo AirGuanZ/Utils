@@ -48,7 +48,7 @@ namespace RangeAux
 
         using Iterator = typename R::Iterator;
 
-        TakeWhileImpl(R range, F &&func)
+        TakeWhileImpl(R &&range, F &&func)
             : range_(std::move(range))
         {
             Iterator beg = std::begin(range_), end = std::end(range_);
@@ -92,9 +92,7 @@ template<typename F>
 auto TakeWhile(F func)
 {
     return RangeAux::TransformWrapper<
-            RangeAux::TakeWhileTrait<remove_rcv_t<F>>,
-            remove_rcv_t<F>>(
-                std::move(func));
+            RangeAux::TakeWhileTrait<F>,F>(std::move(func));
 }
 
 AGZ_NS_END(AGZ)

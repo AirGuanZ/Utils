@@ -33,8 +33,6 @@ namespace RangeAux
     };
 }
 
-// TODO: 把所有range的transformer都改写成TransformWrapper的形式
-
 template<typename R, typename Impl, typename...Args>
 auto operator|(R &&range, RangeAux::TransformWrapper<Impl, Args...> &&opr)
 {

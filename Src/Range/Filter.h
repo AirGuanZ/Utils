@@ -4,18 +4,13 @@
 
 #include "../Misc/Common.h"
 #include "Iterator.h"
+#include "Transform.h"
 
 AGZ_NS_BEG(AGZ)
 
 namespace RangeAux
 {
-    template<typename R, typename F,
-            std::enable_if_t<
-                std::is_same_v<
-                    decltype(std::declval<F>()(
-                        *std::declval<typename R::Iterator>())),
-                    bool>,
-                int> = 0>
+    template<typename R, typename F>
     class FilterImpl
     {
         R range_;
@@ -101,7 +96,7 @@ namespace RangeAux
             }
         };
 
-        FilterImpl(R range, F f)
+        FilterImpl(R &&range, F &&f)
             : range_(std::move(range)), func_(std::move(f))
         {
 
@@ -119,21 +114,18 @@ namespace RangeAux
     };
 
     template<typename F>
-    struct FilterRHS { F f; };
+    struct FilterTrait
+    {
+        template<typename R>
+        using Impl = FilterImpl<R, F>;
+    };
 }
 
 template<typename F>
-RangeAux::FilterRHS<F> Filter(F f)
+auto Filter(F f)
 {
-    return RangeAux::FilterRHS<F>{ std::move(f) };
-}
-
-template<typename R, typename F>
-auto operator|(R &&range, RangeAux::FilterRHS<F> &&rhs)
-{
-    return RangeAux::FilterImpl<remove_rcv_t<R>,
-                                    std::remove_reference_t<F>>
-            (std::forward<R>(range), std::move(rhs.f));
+    return RangeAux::TransformWrapper<
+            RangeAux::FilterTrait<F>, F>(std::move(f));
 }
 
 AGZ_NS_END(AGZ)

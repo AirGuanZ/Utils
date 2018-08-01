@@ -38,12 +38,31 @@ CharRange<CS, TP>::CharRange(LargeBuf *buf, const CodeUnit *beg,
 
 template<typename CS, typename TP>
 CharRange<CS, TP>::CharRange(const CodeUnit *beg, const CodeUnit *end)
-    : small_(false)
+    : small_(true)
 {
     AGZ_ASSERT(beg <= end && end - beg <= SMALL_BUF_SIZE);
     StringAux::CopyConstruct(&smallBuf_[0], beg, end - beg);
     beg_ = &smallBuf_[0];
     end_ = beg_ + (end - beg);
+}
+
+template<typename CS, typename TP>
+CharRange<CS, TP>::CharRange(const Self &copyFrom)
+    : small_(copyFrom.small_)
+{
+    if(small_)
+    {
+        StringAux::CopyConstruct(smallBuf_, copyFrom.smallBuf_, SMALL_BUF_SIZE);
+        beg_ = &smallBuf_[0];
+        end_ = beg_ + (copyFrom.end_ - copyFrom.beg_);
+    }
+    else
+    {
+        largeBuf_ = copyFrom.largeBuf_;
+        largeBuf_->IncRef();
+        beg_ = copyFrom.beg_;
+        end_ = copyFrom.end_;
+    }
 }
 
 template<typename CS, typename TP>
@@ -379,7 +398,7 @@ void String<CS, TP>::Swap(Self &other)
 }
 
 template<typename CS, typename TP>
-typename String<CS, TP>::Self &String<CS, TP>::Exchange(const Self &value)
+typename String<CS, TP>::Self String<CS, TP>::Exchange(const Self &value)
 {
     // IMPROVE
     Self ret = *this;

@@ -92,7 +92,8 @@ public:
     // For small storage
     CharRange(const CodeUnit *beg, const CodeUnit *end);
 
-    CharRange(const Self &)       = delete;
+    CharRange(const Self &copyFrom);
+
     Self &operator=(const Self &) = delete;
 
     ~CharRange() { if(!small_) largeBuf_->DecRef(); }
@@ -219,7 +220,7 @@ public:
     void Swap(Self &other);
 
     // Set with a new value and return the old one
-    Self &Exchange(const Self &value);
+    Self Exchange(const Self &value);
 
     const CodeUnit *Data() const;
 
