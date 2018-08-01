@@ -3,6 +3,7 @@
 #include <atomic>
 #include <ostream>
 #include <string>
+#include <tuple>
 
 #include "../Misc/Common.h"
 #include "../Range/Reverse.h"
@@ -258,6 +259,9 @@ public:
 
     bool IsEmpty() const;
 
+    std::pair<const CodeUnit*, size_t> DataAndLength() const;
+    std::pair<const CodeUnit* const CodeUnit*> BeginAndEnd() const;
+
     std::string ToStdString() const;
 
     CodeUnit operator[](size_t idx) const;
@@ -282,7 +286,6 @@ public:
     bool StartsWith(const Self &prefix) const;
     bool EndsWith(const Self &suffix) const;
 
-    Self Substr(size_t beg, size_t end) const;
     Self Prefix(size_t len) const;
     Self Suffix(size_t beg) const;
 };

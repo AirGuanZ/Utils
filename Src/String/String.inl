@@ -363,6 +363,29 @@ bool String<CS, TP>::IsEmpty() const
     return Length() == 0;
 }
 
+template<typename CS, typename TP>
+std::pair<const typename String<CS, TP>::CodeUnit, size_t>
+String<CS, TP>::DataAndLength() const
+{
+    if(IsSmallStorage())
+        return std::make_pair<const CodeUnit*, size_t>(
+                    &small_[0], small_.len);
+    return std::make_pair<const CodeUnit*, size_t>(
+                large_.beg, large_.end - large_.beg);
+}
+
+template<typename CS, typename TP>
+std::pair<const typename String<CS, TP>::CodeUnit*,
+          const typename String<CS, TP>::CodeUnit*>
+String<CS, TP>::BeginAndEnd() const
+{
+    if(IsSmallStorage())
+        return std::make_pair<const CodeUnit*, const CodeUnit*>(
+                    &small_[0], &small_[0] + small_.len);
+    return std::make_pair<const CodeUnit*, const CodeUnit*>(
+                large_.beg, large_.end);
+}
+
 template <typename CS, typename TP>
 typename String<CS, TP>::CodeUnit String<CS, TP>::operator[](size_t idx) const
 {
@@ -374,7 +397,7 @@ template<typename CS, typename TP>
 std::string String<CS, TP>::ToStdString() const
 {
     if constexpr (std::is_same_v<CodeUnit, char>)
-        return std::string(Data(), Length());
+        return std::make_from_tuple<std::string>(DataAndLength());
     else
     {
         String<UTF8<char>, TP> t(*this);
@@ -385,8 +408,8 @@ std::string String<CS, TP>::ToStdString() const
 template<typename CS, typename TP>
 typename String<CS, TP>::Self String<CS, TP>::operator+(const Self &rhs)
 {
-    return Self(NOCHECK, Data(), Data() + Length(),
-                         rhs.Data(), rhs.Data() + Length());
+    auto args = std::tuple_cat(NOCHECK, BeginAndEnd(), rhs.BeginAndEnd());
+    return std::make_from_tuple<Self>(args);
 }
 
 template<typename CS, typename TP>
@@ -425,6 +448,48 @@ template<typename CS, typename TP>
 typename String<CS, TP>::Iterator String<CS, TP>::end() const
 {
     return End();
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::ReverseIterator String<CS, TP>::rbegin() const
+{
+    return ReverseIterator(begin());
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::ReverseIterator String<CS, TP>::rend() const
+{
+    return ReverseIterator(end());
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::StartsWith(const Self &prefix) const
+{
+    auto [data, len] = DataAndLength();
+    auto [pData, pLen] = prefix.DataAndLength();
+    if(len < prefix.Length())
+        return false;
+    for(size_t i = 0; i != len; ++i)
+    {
+        if(data[i] != pData[i])
+            return false;
+    }
+    return true;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::EndsWith(const Self &suffix) const
+{
+    auto [D, L] = DataAndLength();
+    auto [pD, pL] = suffix.DataAndLength();
+    if(L < pL)
+        return false;
+    for(size_t i = 0, j = L - pL; i < pL; ++i, ++j)
+    {
+        if(pL[i] != L[j])
+            return false;
+    }
+    return true;
 }
 
 AGZ_NS_END(AGZ)
