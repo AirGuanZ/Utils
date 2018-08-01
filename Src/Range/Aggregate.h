@@ -40,7 +40,7 @@ namespace RangeAux
             remove_rcv_t<I> ret = init;
             for(auto &&val : range)
                 ret = func(ret, val);
-            return ret;
+            return std::move(ret);
         }
     };
 
@@ -85,11 +85,24 @@ namespace RangeAux
     struct EachRHS
     {
         template<typename R>
-        static auto Eval(R &&range, F &&func)
+        static auto &&Eval(R &&range, F &&func)
         {
             for(auto &&v : range)
                 func(std::forward<decltype(v)>(v));
-            return range;
+            return std::forward<R>(range);
+        }
+    };
+
+    template<typename F>
+    struct EachIndexRHS
+    {
+        template<typename R>
+        static auto &&Eval(R &&range, F &&func)
+        {
+            size_t i = 0;
+            for(auto &&v : range)
+                func(std::forward<decltype(v)>(v), i++);
+            return std::forward<R>(range);
         }
     };
 
@@ -153,6 +166,13 @@ template<typename F>
 auto Each(F &&func)
 {
     return RangeAux::AggregateWrapper<RangeAux::EachRHS<F>, F>(
+        std::forward<F>(func));
+}
+
+template<typename F>
+auto EachIndex(F &&func)
+{
+    return RangeAux::AggregateWrapper<RangeAux::EachIndexRHS<F>, F>(
         std::forward<F>(func));
 }
 

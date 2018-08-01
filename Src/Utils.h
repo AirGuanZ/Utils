@@ -20,6 +20,7 @@
 
 #include "Range/Aggregate.h"
 #include "Range/Between.h"
+#include "Range/Collect.h"
 #include "Range/Filter.h"
 #include "Range/Map.h"
 #include "Range/Reverse.h"

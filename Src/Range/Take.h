@@ -14,16 +14,16 @@ namespace RangeAux
     class TakeImpl
     {
         R range_;
-        typename R::Iterator::difference_type num_;
+        typename R::Iterator end_;
 
     public:
 
         using Iterator = typename R::Iterator;
 
         TakeImpl(R range, typename Iterator::difference_type num)
-            : range_(std::move(range)), num_(num)
+            : range_(std::move(range))
         {
-            AGZ_ASSERT(num >= 0);
+            end_ = AdvanceTo(std::begin(range_), std::end(range_), num);
         }
 
         Iterator begin() const
@@ -33,20 +33,7 @@ namespace RangeAux
 
         Iterator end() const
         {
-            if constexpr(IsRandomAccessIterator<Iterator>)
-            {
-                return std::begin(range_)
-                     + std::min(std::end(range_) - std::begin(range_),
-                                num_);
-            }
-            else
-            {
-                decltype(num_) n = 0;
-                Iterator ret = std::begin(range_);
-                while(n < num_ && ret != std::end(range_))
-                    ++ret, ++n;
-                return ret;
-            }
+            return end_;
         }
     };
 

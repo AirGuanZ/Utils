@@ -86,14 +86,4 @@ public:
 template<typename T>
 using remove_rcv_t = std::remove_cv_t<std::remove_reference_t<T>>;
 
-template<typename T>
-constexpr bool IsRandomAccessIterator =
-    std::is_base_of_v<std::random_access_iterator_tag,
-                      typename T::iterator_category>;
-
-template<typename T>
-constexpr bool IsBidirectionalIterator =
-    std::is_base_of_v<std::bidirectional_iterator_tag,
-                      typename T::iterator_category>;
-
 AGZ_NS_END(AGZ)
