@@ -2,7 +2,7 @@
 
 #include "../Misc/Common.h"
 #include "../Range/Iterator.h"
-#include "CharSet.h"
+#include "Charset.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -67,7 +67,7 @@ public:
 };
 
 template<typename T = char16_t>
-using UTF16 = CharSet<UTF16Core<T>>;
+using UTF16 = Charset<UTF16Core<T>>;
 
 template<typename T>
 size_t UTF16Core<T>::CUInCP(CodePoint cp)

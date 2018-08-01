@@ -5,7 +5,7 @@
 AGZ_NS_BEG(AGZ)
 
 template<typename Core>
-class CharSet : public Core
+class Charset : public Core
 {
 public:
 

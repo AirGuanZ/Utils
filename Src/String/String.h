@@ -7,10 +7,8 @@
 
 #include "../Misc/Common.h"
 #include "../Range/Reverse.h"
-
-#include "UTF8.h"
-#include "UTF16.h"
-#include "UTF32.h"
+#include "Algorithm.h"
+#include "UTF.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -90,6 +88,7 @@ class CharRange
         typename CS::CodeUnit smallBuf_[SMALL_BUF_SIZE];
         LargeBuf *largeBuf_;
     };
+
     bool small_;
 
     const typename CS::CodeUnit *beg_;
@@ -287,8 +286,10 @@ public:
     bool StartsWith(const Self &prefix) const;
     bool EndsWith(const Self &suffix) const;
 
-    Self Prefix(size_t len) const;
-    Self Suffix(size_t beg) const;
+    constexpr static size_t NPOS = StringAlgo::NPOS;
+
+    size_t Find(const Self &dst) const;
+    size_t RFind(const Self &dst) const;
 };
 
 template<typename CS, typename TP>
@@ -300,6 +301,7 @@ std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s);
 using Str8  = String<UTF8<>>;
 using Str16 = String<UTF16<>>;
 using Str32 = String<UTF32<>>;
+using WStr  = String<WUTF>;
 
 AGZ_NS_END(AGZ)
 

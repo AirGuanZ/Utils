@@ -307,9 +307,9 @@ String<CS, TP>::String(const char *cStr, CharEncoding encoding)
         break;
     default:
         throw EncodingException("Unknown encoding: "
-                              + std::to_string(
-                                  static_cast<std::underlying_type_t<CharEncoding>>
-                                  (encoding)));
+                + std::to_string(
+                    static_cast<std::underlying_type_t<CharEncoding>>
+                    (encoding)));
     }
 }
 
@@ -453,43 +453,41 @@ typename String<CS, TP>::Iterator String<CS, TP>::end() const
 template<typename CS, typename TP>
 typename String<CS, TP>::ReverseIterator String<CS, TP>::rbegin() const
 {
-    return ReverseIterator(begin());
+    return ReverseIterator(end());
 }
 
 template<typename CS, typename TP>
 typename String<CS, TP>::ReverseIterator String<CS, TP>::rend() const
 {
-    return ReverseIterator(end());
+    return ReverseIterator(begin());
 }
 
 template<typename CS, typename TP>
 bool String<CS, TP>::StartsWith(const Self &prefix) const
 {
-    auto [data, len]   = DataAndLength();
-    auto [pData, pLen] = prefix.DataAndLength();
-    if(len < prefix.Length())
-        return false;
-    for(size_t i = 0; i != len; ++i)
-    {
-        if(data[i] != pData[i])
-            return false;
-    }
-    return true;
+    return StringAlgo::StartsWith(begin(), end(),
+                                  std::begin(prefix), std::end(prefix));
 }
 
 template<typename CS, typename TP>
 bool String<CS, TP>::EndsWith(const Self &suffix) const
 {
-    auto [D, L]   = DataAndLength();
-    auto [pD, pL] = suffix.DataAndLength();
-    if(L < pL)
-        return false;
-    for(size_t i = 0, j = L - pL; i < pL; ++i, ++j)
-    {
-        if(pD[i] != D[j])
-            return false;
-    }
-    return true;
+    return StringAlgo::EndsWith(begin(), end(),
+                                std::begin(prefix), std::end(prefix));
+}
+
+template<typename CS, typename TP>
+size_t String<CS, TP>::Find(const Self &dst) const
+{
+    return StringAlgo::Find(begin(), end(),
+                            std::begin(prefix), std::end(prefix));
+}
+
+template<typename CS, typename TP>
+size_t String<CS, TP>::RFind(const Self &dst) const
+{
+    return StringAlgo::RFind(begin(), end(),
+                             std::begin(prefix), std::end(prefix));
 }
 
 AGZ_NS_END(AGZ)

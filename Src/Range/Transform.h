@@ -23,10 +23,12 @@ namespace RangeAux
         template<typename R>
         auto Eval(R &&range)
         {
-            return std::make_from_tuple<typename ImplTrait::Impl<R>>(
-                std::tuple_cat(
-                    std::tuple<remove_rcv_t<R>>(std::forward<R>(range)),
-                    args));
+            return std::make_from_tuple<
+                        typename ImplTrait::Impl<R>>(
+                            std::tuple_cat(
+                                std::tuple<remove_rcv_t<R>>(
+                                    std::forward<R>(range)),
+                                args));
         }
     };
 }

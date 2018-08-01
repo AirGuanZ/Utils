@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Misc/Common.h"
-#include "CharSet.h"
+#include "Charset.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -39,6 +39,6 @@ public:
 };
 
 template<typename T = char32_t>
-using UTF32 = CharSet<UTF32Core<T>>;
+using UTF32 = Charset<UTF32Core<T>>;
 
 AGZ_NS_END(AGZ)

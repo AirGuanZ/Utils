@@ -3,7 +3,7 @@
 #include <optional>
 
 #include "../Misc/Common.h"
-#include "CharSet.h"
+#include "Charset.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -84,7 +84,7 @@ public:
 };
 
 template<typename T = char>
-using UTF8 = CharSet<UTF8Core<T>>;
+using UTF8 = Charset<UTF8Core<T>>;
 
 template<typename T>
 size_t UTF8Core<T>::CUInCP(CodePoint cp)
