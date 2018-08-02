@@ -302,7 +302,8 @@ String<CS, TP> &String<CS, TP>::operator=(const String<OCS, OTP> &copyFrom)
 }
 
 template<typename CS, typename TP>
-typename String<CS, TP>::Self &String<CS, TP>::operator=(Self &&moveFrom) noexcept
+typename String<CS, TP>::Self &
+String<CS, TP>::operator=(Self &&moveFrom) noexcept
 {
     if(IsLargeStorage())
         large_.buf->DecRef();
@@ -359,6 +360,20 @@ String<CS, TP>::String(const CodeUnit *beg, const CodeUnit *end, size_t repeat)
 }
 
 template<typename CS, typename TP>
+String<CS, TP>::String(const char *cStr)
+    : String(cStr, CharEncoding::UTF8)
+{
+
+}
+
+template<typename CS, typename TP>
+String<CS, TP>::String(const std::string &cppStr)
+    : String(cppStr, CharEncoding::UTF8)
+{
+
+}
+
+template<typename CS, typename TP>
 String<CS, TP>::String(const char *cStr, CharEncoding encoding)
 {
     switch(encoding)
@@ -376,9 +391,18 @@ String<CS, TP>::String(const char *cStr, CharEncoding encoding)
 
 template<typename CS, typename TP>
 String<CS, TP>::String(const std::string &cppStr, CharEncoding encoding)
-    : String(cppStr.c_str(), encoding)
 {
-
+    switch(encoding)
+    {
+    case CharEncoding::UTF8:
+        new(this) Self(FROM<UTF8<char>>, cppStr.c_str(), cppStr.length());
+        break;
+    default:
+        throw EncodingException("Unknown encoding: "
+                + std::to_string(
+                    static_cast<std::underlying_type_t<CharEncoding>>
+                    (encoding)));
+    }
 }
 
 template<typename CS, typename TP>

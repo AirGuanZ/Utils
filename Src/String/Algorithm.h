@@ -9,32 +9,6 @@
 
 AGZ_NS_BEG(AGZ::StrAlgo)
 
-template<typename It>
-std::enable_if_t<IsRandomAccessIterator<It>, bool>
-StartsWith(It beg1, It end1, It beg2, It end2);
-
-template<typename It>
-std::enable_if_t<IsRandomAccessIterator<It>, bool>
-EndsWith(It beg1, It end1, It beg2, It end2);
-
-template<typename It>
-std::enable_if_t<IsRandomAccessIterator<It>, size_t>
-Find(It beg1, It end1, It beg2, It end2);
-
-template<typename It>
-std::enable_if_t<IsRandomAccessIterator<It>, size_t>
-RFind(It beg1, It end1, It beg2, It end2);
-
-enum class CompareResult { Less, Equal, Greater };
-
-template<typename It>
-std::enable_if_t<IsRandomAccessIterator<It>, CompareResult>
-Comp(It beg1, It end1, It beg2, It end2);
-
-AGZ_NS_END(AGZ::StrAlgo)
-
-AGZ_NS_BEG(AGZ::StrAlgo)
-
 constexpr size_t NPOS = std::numeric_limits<size_t>::max();
 
 template<typename It>
@@ -144,3 +118,28 @@ Comp(It beg1, It end1, It beg2, It end2)
 }
 
 AGZ_NS_END(AGZ::StrAlgo)
+
+AGZ_NS_BEG(AGZ)
+
+class StringJoinRHS { Str8 mid, empty; };
+
+inline StringJoinRHS Join(const Str8 &mid = Str8(" "),
+                          const Str8 &empty = Str8(""))
+{
+    return StringJoinRHS { mid, empty };
+}
+
+template<template<typename...> class C, typename CS, typename TP>
+auto operator|(const C<String<CS, TP>> &strs, const StringJoinRHS &rhs)
+{
+    using RT = typename C<String<CS, TP>>::value_type;
+    if(strs.empty())
+        return RT(rhs.empty);
+    RT ret = strs[0];
+    auto cur = std::begin(strs), end = std::end(strs);
+    while(++cur != end)
+        ret += rhs.mid + *cur;
+    return std::move(ret);
+}
+
+AGZ_NS_END(AGZ)

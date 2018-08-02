@@ -202,11 +202,10 @@ public:
 
     String(const CodeUnit *beg, const CodeUnit *end, size_t repeat);
 
-    String(const char *cStr,
-           CharEncoding encoding = CharEncoding::UTF8);
-
-    String(const std::string &cppStr,
-           CharEncoding encoding = CharEncoding::UTF8);
+    String(const char *cStr);
+    String(const std::string &cppStr);
+    String(const char *cStr, CharEncoding encoding);
+    String(const std::string &cppStr, CharEncoding encoding);
 
     template<typename OCS, typename OTP>
     Self &operator=(const String<OCS, OTP> &copyFrom);

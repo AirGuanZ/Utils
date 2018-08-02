@@ -154,16 +154,14 @@ A non-null-terminated immutable string class...Just for fun.
 ```cpp
 // using Str8 = String<UTF8<char>>; using Str32 = String<UTF32<uint32_t>>;
 
-Str8 a = "今天天气不错。Hello, world!";
+Str8 a = u8"今天天气不错。Hello, world!";
 Str32 b = a;
 std::string c = b.ToStdString();
+REQUIRE(c == u8"今天天气不错。Hello, world!");
 
-// Traverse UTF-8 code units
-for(auto codeUnit : a)
-    ...
+REQUIRE(Str8(u8"0") * 5 == u8"00000");
 
 // Traverse Unicode code points
 for(auto codePoint : a.Chars())
     ...
 ```
-
