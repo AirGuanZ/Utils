@@ -13,14 +13,14 @@ TEST_CASE("Buffer")
 {
     SECTION("Buffer")
     {
-        auto buf = Buffer<int>::FromFn(10, [](size_t i, int *v)
-            { *v = static_cast<int>(i); });
+        auto buf = Buffer<int>::FromFn(10, [](size_t i)
+            { return static_cast<int>(i); });
 
         REQUIRE(buf(0) == 0);
         REQUIRE(buf(9) == 9);
 
         int sum = buf
-            .Map<int>([](int *src, int *dst) { *dst = 2 * *src; })
+            .Map<int>([](int src) { return 2 * src; })
             .Foldl(0, [](int a, int v) { return a + v; });
         REQUIRE(sum == (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9) * 2);
     }
@@ -30,21 +30,21 @@ TEST_CASE("Buffer")
         auto buf0 = Buffer2D<int>::New(640, 480);
 
         auto buf1 = Buffer2D<int>::FromFn(640, 480,
-            [](size_t x, size_t y, int *buf)
+            [](size_t x, size_t y)
         {
-            *buf = static_cast<int>(x * y);
+            return static_cast<int>(x * y);
         });
 
         auto buf2 = Buffer2D<float>::FromConstOther(buf1,
-            [](const int *src, float *dst)
+            [](int src)
         {
-            *dst = static_cast<float>(*src);
+            return static_cast<float>(*src);
         });
 
         auto buf3 = buf2.Map<int>(
-            [](const float *src, int *dst)
+            [](float src)
         {
-            *dst = static_cast<int>(*src);
+            return static_cast<int>(*src);
         });
 
         buf0 = std::move(buf1);

@@ -9,21 +9,21 @@
 AGZ_NS_BEG(AGZ::Buf)
 
 template<typename E>
-void DefaultElementInitializer(E *buf)
+E DefaultElementInitializer()
 {
-    new (buf) E();
+    return E();
 }
 
 template<typename E, typename N>
-void DefaultElementTransformer(E *src, N *dst)
+void DefaultElementTransformer(E &src)
 {
-    new (dst) N(*src);
+    return N(src);
 }
 
 template<typename E, typename N>
-void DefaultConstElementTransformer(const E *src, N *dst)
+void DefaultConstElementTransformer(const E &src)
 {
-    new (dst) N(*src);
+    return N(src);
 }
 
 template<typename E>
@@ -59,13 +59,13 @@ public:
 
     }
 
-    template<typename F = void(*)(E*)>
+    template<typename F = void(*)()>
     explicit Buffer(size_t s, F &&initer = &DefaultElementInitializer)
         : s_(s)
     {
         Alloc(s);
         for(size_t i = 0; i < s; ++i)
-            initer(d_ + i);
+            new(d_ + i) E(initer());
     }
 
     template<typename F>
@@ -74,12 +74,11 @@ public:
     {
         Alloc(s);
         for(size_t i = 0; i < s; ++i)
-            initer(i, d_ + i);
+            new(d_ + i) E(initer(i));
     }
 
-    template<typename F = void(*)(E*)>
-    static Self New(size_t s,
-                                     F &&initer = &DefaultElementInitializer)
+    template<typename F = void(*)()>
+    static Self New(size_t s, F &&initer = &DefaultElementInitializer)
     {
         Self ret(s, std::forward<F>(initer));
         return std::move(ret);
@@ -92,7 +91,7 @@ public:
         return std::move(ret);
     }
 
-    template<typename A, typename F = void(*)(const A*, E*)>
+    template<typename A, typename F = void(*)(const A&)>
     static Self FromConstOther(
         const Buffer<A> &transformFrom,
         F &&f = &DefaultConstElementTransformer)
@@ -100,9 +99,9 @@ public:
         return transformFrom.template Map<E, F>(std::forward<F>(f));
     }
 
-    template<typename A, typename F = void(*)(A*, E*)>
+    template<typename A, typename F = void(*)(A&)>
     static Self FromOther(Buffer<A> &transformFrom,
-                                           F &&f = &DefaultElementTransformer)
+                          F &&f = &DefaultElementTransformer)
     {
         return transformFrom.template Map<E, F>(std::forward<F>(f));
     }
@@ -191,42 +190,58 @@ public:
     }
 
     template<typename F>
-    void ForAll(F &&f)
+    void Each(F &&f)
     {
         AGZ_ASSERT(IsAvailable());
         E *d = d_;
         for(size_t i = 0; i < s_; ++i)
-            f(i, d++);
+            f(*d++);
     }
 
     template<typename F>
-    void ForAll(F &&f) const
+    void Each(F &&f) const
     {
         AGZ_ASSERT(IsAvailable());
         const E *d = d_;
         for(size_t i = 0; i < s_; ++i)
-            f(i, d++);
+            f(*d++);
     }
 
-    template<typename N, typename F = void(*)(E*, N*)>
+    template<typename F>
+    void EachIndex(F &&f)
+    {
+        AGZ_ASSERT(IsAvailable());
+        E *d = d_;
+        for(size_t i = 0; i < s_; ++i)
+            f(i, *d++);
+    }
+
+    template<typename F>
+    void EachIndex(F &&f) const
+    {
+        AGZ_ASSERT(IsAvailable());
+        const E *d = d_;
+        for(size_t i = 0; i < s_; ++i)
+            f(i, *d++);
+    }
+
+    template<typename N, typename F = void(*)(E&)>
     Buffer<N> Map(F &&f = &DefaultElementTransformer<E, N>)
     {
         AGZ_ASSERT(IsAvailable());
-        return Buffer<N>::FromFn(s_,
-            [&](size_t i, N *buf)
+        return Buffer<N>::FromFn(s_, [&](size_t i)
         {
-            f(&(*this)(i), buf);
+            return f((*this)(i));
         });
     }
 
-    template<typename N, typename F = void(*)(const E*, N*)>
+    template<typename N, typename F = void(*)(const E&)>
     Buffer<N> Map(F &&f = &DefaultElementTransformer<E, N>) const
     {
         AGZ_ASSERT(IsAvailable());
-        return Buffer<N>::FromFn(s_,
-            [&](size_t i, N *buf)
+        return Buffer<N>::FromFn(s_, [&](size_t i)
         {
-            f(&(*this)(i), buf);
+            return f((*this)(i), buf);
         });
     }
 

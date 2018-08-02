@@ -50,7 +50,7 @@ public:
 
     }
 
-    template<typename F = void(*)(E*)>
+    template<typename F = void(*)()>
     Buffer2D(size_t w, size_t h, F &&initer = &DefaultElementInitializer)
         : w_(w), h_(h)
     {
@@ -58,7 +58,7 @@ public:
         Alloc(s);
 
         for(size_t i = 0; i < s; ++i)
-            initer(d_ + i);
+            new (d_ + i) E(initer());
     }
 
     template<typename F>
@@ -70,11 +70,11 @@ public:
         for(size_t y = 0; y < h; ++y)
         {
             for(size_t x = 0; x < w; ++x)
-                initer(x, y, d++);
+                new (d++) E(initer(x, y));
         }
     }
 
-    template<typename F = void(*)(E*)>
+    template<typename F = void(*)()>
     static Self New(size_t w, size_t h,
                     F &&initer = &DefaultElementInitializer<E>)
     {
@@ -89,17 +89,16 @@ public:
         return std::move(ret);
     }
 
-    template<typename A, typename F = void(*)(const A*, E*)>
-    static Self FromConstOther(
-        const Buffer2D<A> &transformFrom,
-        F &&f = &DefaultConstElementTransformer)
+    template<typename A, typename F = void(*)(const A&)>
+    static Self FromConstOther(const Buffer2D<A> &transformFrom,
+                               F &&f = &DefaultConstElementTransformer)
     {
         return transformFrom.template Map<E, F>(std::forward<F>(f));
     }
 
-    template<typename A, typename F = void(*)(A*, E*)>
+    template<typename A, typename F = void(*)(A&)>
     static Self FromOther(Buffer2D<A> &transformFrom,
-                                           F &&f = &DefaultElementTransformer)
+                          F &&f = &DefaultElementTransformer)
     {
         return transformFrom.template Map<E, F>(std::forward<F>(f));
     }
@@ -195,48 +194,72 @@ public:
     }
 
     template<typename F>
-    void ForAll(F &&f)
+    void Each(F &&f)
     {
         AGZ_ASSERT(IsAvailable());
         E *d = d_;
         for(size_t y = 0; y < h_; ++y)
         {
             for(size_t x = 0; x < w_; ++x)
-                f(x, y, d++);
+                f(*d++);
         }
     }
 
     template<typename F>
-    void ForAll(F &&f) const
+    void Each(F &&f) const
     {
         AGZ_ASSERT(IsAvailable());
         const E *d = d_;
         for(size_t y = 0; y < h_; ++y)
         {
             for(size_t x = 0; x < w_; ++x)
-                f(x, y, d++);
+                f(*d++);
         }
     }
 
-    template<typename N, typename F = void(*)(E*, N*)>
+    template<typename F>
+    void EachIndex(F &&f)
+    {
+        AGZ_ASSERT(IsAvailable());
+        E *d = d_;
+        for(size_t y = 0; y < h_; ++y)
+        {
+            for(size_t x = 0; x < w_; ++x)
+                f(*d++);
+        }
+    }
+
+    template<typename F>
+    void EachIndex(F &&f) const
+    {
+        AGZ_ASSERT(IsAvailable());
+        const E *d = d_;
+        for(size_t y = 0; y < h_; ++y)
+        {
+            for(size_t x = 0; x < w_; ++x)
+                f(*d++);
+        }
+    }
+
+    template<typename N, typename F = void(*)(E&)>
     Buffer2D<N> Map(F &&f = &DefaultElementTransformer<E, N>)
     {
         AGZ_ASSERT(IsAvailable());
         return Buffer2D<N>::FromFn(w_, h_,
             [&](size_t x, size_t y, N *buf)
         {
-            f(&(*this)(x, y), buf);
+            return f((*this)(x, y));
         });
     }
 
-    template<typename N, typename F = void(*)(const E*, N*)>
+    template<typename N, typename F = void(*)(const E&)>
     Buffer2D<N> Map(F &&f = &DefaultElementTransformer<E, N>) const
     {
         AGZ_ASSERT(IsAvailable());
         return Buffer2D<N>::FromFn(w_, h_,
             [&](size_t x, size_t y, N *buf)
         {
-            f(&(*this)(x, y), buf);
+            f((*this)(x, y));
         });
     }
 };
