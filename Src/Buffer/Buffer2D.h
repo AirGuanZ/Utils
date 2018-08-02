@@ -50,7 +50,7 @@ public:
 
     }
 
-    template<typename F = void(*)()>
+    template<typename F = E(*)()>
     Buffer2D(size_t w, size_t h, F &&initer = &DefaultElementInitializer)
         : w_(w), h_(h)
     {
@@ -74,7 +74,7 @@ public:
         }
     }
 
-    template<typename F = void(*)()>
+    template<typename F = E(*)()>
     static Self New(size_t w, size_t h,
                     F &&initer = &DefaultElementInitializer<E>)
     {
@@ -89,14 +89,14 @@ public:
         return std::move(ret);
     }
 
-    template<typename A, typename F = void(*)(const A&)>
+    template<typename A, typename F = E(*)(const A&)>
     static Self FromConstOther(const Buffer2D<A> &transformFrom,
                                F &&f = &DefaultConstElementTransformer)
     {
         return transformFrom.template Map<E, F>(std::forward<F>(f));
     }
 
-    template<typename A, typename F = void(*)(A&)>
+    template<typename A, typename F = E(*)(A&)>
     static Self FromOther(Buffer2D<A> &transformFrom,
                           F &&f = &DefaultElementTransformer)
     {
@@ -241,25 +241,25 @@ public:
         }
     }
 
-    template<typename N, typename F = void(*)(E&)>
+    template<typename N, typename F = N(*)(E&)>
     Buffer2D<N> Map(F &&f = &DefaultElementTransformer<E, N>)
     {
         AGZ_ASSERT(IsAvailable());
         return Buffer2D<N>::FromFn(w_, h_,
-            [&](size_t x, size_t y, N *buf)
+            [&](size_t x, size_t y)
         {
             return f((*this)(x, y));
         });
     }
 
-    template<typename N, typename F = void(*)(const E&)>
+    template<typename N, typename F = N(*)(const E&)>
     Buffer2D<N> Map(F &&f = &DefaultElementTransformer<E, N>) const
     {
         AGZ_ASSERT(IsAvailable());
         return Buffer2D<N>::FromFn(w_, h_,
-            [&](size_t x, size_t y, N *buf)
+            [&](size_t x, size_t y)
         {
-            f((*this)(x, y));
+            return f((*this)(x, y));
         });
     }
 };

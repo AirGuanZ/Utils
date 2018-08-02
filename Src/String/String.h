@@ -274,6 +274,9 @@ public:
     bool operator>(const char *rhs) const;
 };
 
+template<typename CS, typename TP, typename R>
+String<CS, TP> &operator+=(String<CS, TP> &lhs, R &&rhs);
+
 template<typename CS, typename TP>
 bool operator==(const std::string &lhs, const String<CS, TP> &rhs);
 template<typename CS, typename TP>
@@ -310,6 +313,14 @@ using Str8  = String<UTF8<>>;
 using Str16 = String<UTF16<>>;
 using Str32 = String<UTF32<>>;
 using WStr  = String<WUTF>;
+
+struct StringJoinRHS { Str8 mid, empty; };
+
+inline StringJoinRHS Join(const Str8 &mid = Str8(" "),
+                          const Str8 &empty = Str8(""));
+
+template<typename R>
+auto operator|(const R &strs, StringJoinRHS rhs);
 
 AGZ_NS_END(AGZ)
 

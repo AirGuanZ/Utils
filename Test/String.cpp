@@ -86,4 +86,11 @@ TEST_CASE("String")
         (Str32(u8"今天天气不错，今天天气不错，今天天气不错。").Chars() |
             Collect<vector<char32_t>>());
     }
+
+    SECTION("Join")
+    {
+        REQUIRE((vector<Str8>{ u8"mine", u8"craft" } | Join(u8"HM")) == u8"mineHMcraft");
+        REQUIRE((vector<Str8>{ u8"a", u8"b", u8"c" } | Join(u8" + ")) == u8"a + b + c");
+        REQUIRE((vector<Str8>{ } | Join(u8" + ", u8"Nothing!")) == u8"Nothing!");
+    }
 }

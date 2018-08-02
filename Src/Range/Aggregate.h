@@ -1,11 +1,9 @@
 #pragma once
 
-#include <iterator>
 #include <tuple>
 #include <utility>
 
 #include "../Misc/Common.h"
-#include "Iterator.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -16,7 +14,6 @@ namespace RangeAux
     {
         std::tuple<Args...> args;
 
-        // TODO: move?
         explicit AggregateWrapper(Args&&...args)
             : args(std::forward<Args>(args)...)
         {

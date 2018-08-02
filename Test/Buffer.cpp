@@ -27,8 +27,6 @@ TEST_CASE("Buffer")
 
     SECTION("Buffer2D")
     {
-        auto buf0 = Buffer2D<int>::New(640, 480);
-
         auto buf1 = Buffer2D<int>::FromFn(640, 480,
             [](size_t x, size_t y)
         {
@@ -38,16 +36,16 @@ TEST_CASE("Buffer")
         auto buf2 = Buffer2D<float>::FromConstOther(buf1,
             [](int src)
         {
-            return static_cast<float>(*src);
+            return static_cast<float>(src);
         });
 
         auto buf3 = buf2.Map<int>(
             [](float src)
         {
-            return static_cast<int>(*src);
+            return static_cast<int>(src);
         });
 
-        buf0 = std::move(buf1);
+        auto buf0 = std::move(buf1);
 
         REQUIRE(buf0(45, 46) == 45 * 46);
         REQUIRE(buf0(212, 13) == 212 * 13);

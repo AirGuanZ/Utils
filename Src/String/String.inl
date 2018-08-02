@@ -489,7 +489,7 @@ std::string String<CS, TP>::ToStdString() const
 template<typename CS, typename TP>
 typename String<CS, TP>::Self String<CS, TP>::operator+(const Self &rhs)
 {
-    auto args = std::tuple_cat(NOCHECK, BeginAndEnd(), rhs.BeginAndEnd());
+    auto args = std::tuple_cat(std::make_tuple(NOCHECK), BeginAndEnd(), rhs.BeginAndEnd());
     return std::make_from_tuple<Self>(args);
 }
 
@@ -685,6 +685,13 @@ bool String<CS, TP>::operator>(const char *rhs) const
     return ToStdString() > rhs;
 }
 
+
+template<typename CS, typename TP, typename R>
+String<CS, TP> &operator+=(String<CS, TP> &lhs, R &&rhs)
+{
+    return lhs = lhs + std::forward<R>(rhs);
+}
+
 template<typename CS, typename TP>
 bool operator==(const std::string &lhs, const String<CS, TP> &rhs)
 {
@@ -767,6 +774,26 @@ template<typename CS, typename TP>
 std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s)
 {
     return out << s.ToStdString();
+}
+
+inline StringJoinRHS Join(const Str8 &mid, const Str8 &empty)
+{
+    return StringJoinRHS{ mid, empty };
+}
+
+template<typename R>
+auto operator|(const R &strs, StringJoinRHS rhs)
+{
+    // IMPROVE
+
+    using RT = typename R::value_type;
+    if(strs.empty())
+        return RT(rhs.empty);
+    RT ret = strs[0];
+    auto cur = std::begin(strs), end = std::end(strs);
+    while(++cur != end)
+        ret += rhs.mid + *cur;
+    return std::move(ret);
 }
 
 AGZ_NS_END(AGZ)

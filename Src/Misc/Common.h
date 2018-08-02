@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iterator>
 #include <stdexcept>
-#include <type_traits>
 
 #ifdef _MSC_VER
 
@@ -80,7 +78,7 @@ struct Void_t { };
 class EncodingException : public std::invalid_argument
 {
 public:
-    EncodingException(const std::string &err) : invalid_argument(err) { }
+    explicit EncodingException(const std::string &err) : invalid_argument(err) { }
 };
 
 template<typename T>

@@ -15,13 +15,13 @@ E DefaultElementInitializer()
 }
 
 template<typename E, typename N>
-void DefaultElementTransformer(E &src)
+E DefaultElementTransformer(E &src)
 {
     return N(src);
 }
 
 template<typename E, typename N>
-void DefaultConstElementTransformer(const E &src)
+E DefaultConstElementTransformer(const E &src)
 {
     return N(src);
 }
@@ -59,7 +59,7 @@ public:
 
     }
 
-    template<typename F = void(*)()>
+    template<typename F = E(*)()>
     explicit Buffer(size_t s, F &&initer = &DefaultElementInitializer)
         : s_(s)
     {
@@ -77,7 +77,7 @@ public:
             new(d_ + i) E(initer(i));
     }
 
-    template<typename F = void(*)()>
+    template<typename F = E(*)()>
     static Self New(size_t s, F &&initer = &DefaultElementInitializer)
     {
         Self ret(s, std::forward<F>(initer));
@@ -91,7 +91,7 @@ public:
         return std::move(ret);
     }
 
-    template<typename A, typename F = void(*)(const A&)>
+    template<typename A, typename F = E(*)(const A&)>
     static Self FromConstOther(
         const Buffer<A> &transformFrom,
         F &&f = &DefaultConstElementTransformer)
@@ -99,7 +99,7 @@ public:
         return transformFrom.template Map<E, F>(std::forward<F>(f));
     }
 
-    template<typename A, typename F = void(*)(A&)>
+    template<typename A, typename F = E(*)(A&)>
     static Self FromOther(Buffer<A> &transformFrom,
                           F &&f = &DefaultElementTransformer)
     {
@@ -225,7 +225,7 @@ public:
             f(i, *d++);
     }
 
-    template<typename N, typename F = void(*)(E&)>
+    template<typename N, typename F = N(*)(E&)>
     Buffer<N> Map(F &&f = &DefaultElementTransformer<E, N>)
     {
         AGZ_ASSERT(IsAvailable());
@@ -235,7 +235,7 @@ public:
         });
     }
 
-    template<typename N, typename F = void(*)(const E&)>
+    template<typename N, typename F = N(*)(const E&)>
     Buffer<N> Map(F &&f = &DefaultElementTransformer<E, N>) const
     {
         AGZ_ASSERT(IsAvailable());
