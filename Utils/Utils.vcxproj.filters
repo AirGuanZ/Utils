@@ -133,7 +133,10 @@
     <ClInclude Include="..\Src\Range\Each.h">
       <Filter>Range</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Range\AllAny.h">
+    <ClInclude Include="..\Src\Range\All.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Range\Any.h">
       <Filter>Range</Filter>
     </ClInclude>
   </ItemGroup>

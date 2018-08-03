@@ -19,7 +19,8 @@
 #include "Misc/TypeOpr.h"
 
 #include "Range/Aggregate.h"
-#include "Range/AllAny.h"
+#include "Range/All.h"
+#include "Range/Any.h"
 #include "Range/Between.h"
 #include "Range/Collect.h"
 #include "Range/Count.h"

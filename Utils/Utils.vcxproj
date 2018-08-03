@@ -36,7 +36,8 @@
     <ClInclude Include="..\Src\Misc\Endian.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
     <ClInclude Include="..\Src\Range\Aggregate.h" />
-    <ClInclude Include="..\Src\Range\AllAny.h" />
+    <ClInclude Include="..\Src\Range\All.h" />
+    <ClInclude Include="..\Src\Range\Any.h" />
     <ClInclude Include="..\Src\Range\Between.h" />
     <ClInclude Include="..\Src\Range\Collect.h" />
     <ClInclude Include="..\Src\Range\Count.h" />
