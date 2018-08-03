@@ -1,7 +1,5 @@
 #pragma once
 
-#include <type_traits>
-
 #include "../Misc/Common.h"
 #include "UTF8.h"
 #include "UTF16.h"

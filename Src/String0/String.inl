@@ -406,6 +406,25 @@ String<CS, TP>::String(const std::string &cppStr, CharEncoding encoding)
 }
 
 template<typename CS, typename TP>
+String<CS, TP>::String(const Self &copyFrom, size_t beg, size_t end)
+{
+    AGZ_ASSERT(beg <= end);
+    if(copyFrom.IsSmallStorage())
+    {
+        auto d = copyFrom.Data()
+        Init(d + beg, d + end);
+    }
+    else
+    {
+        small_.len = copyFrom.small_.len;
+        large_.buf = copyFrom.large_.buf;
+        large_.buf->IncRef();
+        large_.beg = large_.buf->GetData() + beg;
+        large_.beg = large_.buf->GetData() + end;
+    }
+}
+
+template<typename CS, typename TP>
 String<CS, TP>::~String()
 {
     if(IsLargeStorage())
@@ -549,7 +568,7 @@ template<typename CS, typename TP>
 size_t String<CS, TP>::Find(const Self &dst) const
 {
     return StrAlgo::Find(begin(), end(),
-                            std::begin(dst), std::end(dst));
+                         std::begin(dst), std::end(dst));
 }
 
 template<typename CS, typename TP>
@@ -557,6 +576,19 @@ size_t String<CS, TP>::RFind(const Self &dst) const
 {
     return StrAlgo::RFind(begin(), end(),
                              std::begin(dst), std::end(dst));
+}
+
+template<typename CS, typename TP>
+String<CS, TP> String<CS, TP>::Substr(size_t beg, size_t end) const
+{
+    AGZ_ASSERT(beg <= end);
+    return Self(*this, beg, end);
+}
+
+template<typename CS, typename TP>
+String<CS, TP> String<CS, TP>::Substr(size_t beg) const
+{
+    return Substr(beg, Length());
 }
 
 template<typename CS, typename TP>

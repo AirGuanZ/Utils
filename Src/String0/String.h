@@ -207,6 +207,8 @@ public:
     String(const char *cStr, CharEncoding encoding);
     String(const std::string &cppStr, CharEncoding encoding);
 
+    String(const Self &copyFrom, size_t beg, size_t end);
+
     template<typename OCS, typename OTP>
     Self &operator=(const String<OCS, OTP> &copyFrom);
 
@@ -251,6 +253,9 @@ public:
 
     size_t Find(const Self &dst) const;
     size_t RFind(const Self &dst) const;
+
+    Self Substr(size_t beg, size_t end) const;
+    Self Substr(size_t beg) const;
 
     bool operator==(const Self &rhs) const;
     bool operator!=(const Self &rhs) const;

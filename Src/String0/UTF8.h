@@ -1,63 +1,85 @@
 #pragma once
 
-#include <type_traits>
+#include <optional>
 
 #include "../Misc/Common.h"
-#include "../Range/Iterator.h"
 #include "Charset.h"
 
 AGZ_NS_BEG(AGZ)
 
-template<typename T>
-class UTF8Iterator
+namespace UTF8Aux
 {
-    const T *cur;
+    template<typename T>
+    class UTF8Iterator
+    {
+        const T *cur;
+        mutable std::optional<char32_t> ch;
 
-    using Self = UTF8Iterator<T>;
+        void UpdateCh() const;
 
-public:
+    public:
 
-    using iterator_category = std::bidirectional_iterator_tag;
-    using value_type        = char32_t;
-    using difference_type   = std::make_signed_t<size_t>;
-    using pointer           = ValuePointer<char32_t>;
-    using reference         = char32_t&;
+        using Self = UTF8Iterator<T>;
 
-    explicit UTF8Iterator(const T *cur);
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type        = char32_t;
+        using difference_type   = std::make_signed_t<size_t>;
+        using pointer           = char32_t*;
+        using reference         = char32_t&;
 
-    char32_t operator*() const;
-    pointer operator->() const;
+        explicit UTF8Iterator(const T *cur);
 
-    UTF8Iterator &operator++();
-    UTF8Iterator operator++(int);
-    UTF8Iterator &operator--();
-    UTF8Iterator operator--(int);
+        char32_t operator*() const;
 
-    bool operator==(const Self &rhs) const;
-    bool operator!=(const Self &rhs) const;
-};
+        const char32_t *operator->() const;
 
+        Self &operator++();
+
+        Self operator++(int);
+
+        Self &operator--();
+
+        Self operator--(int);
+
+        bool operator==(const Self &rhs) const;
+
+        bool operator!=(const Self &rhs) const { return !(*this == rhs); }
+    };
+}
+
+// En/decoding rules: see https://en.wikipedia.org/wiki/UTF-8
 template<typename T>
 class UTF8Core
 {
 public:
 
-    using Iterator  = UTF8Iterator<T>;
+    using Iterator  = UTF8Aux::UTF8Iterator<T>;
     using CodePoint = char32_t;
     using CodeUnit  = T;
 
     static std::string Name() { return "UTF-8"; }
 
+    // Maximum count of code units to encode a code point
     static constexpr size_t MaxCUInCP = 4;
 
+    // How many code units cp will occupied
     static size_t CUInCP(CodePoint cp);
 
-    static size_t CP2CU(const CodeUnit *cu, CodePoint *cp);
+    // Convert a code point to code units
+    // Return count of code units obtained (shall <= MaxCUInCP())
+    // Return 0 when cp is invalid
+    static size_t CP2CU(CodePoint cp, CodeUnit *cu);
+
+    // Recognize the first code point in a code unit sequence
+    // Return count of code units consumed
+    // Return 0 when the code uni seq is invalid
+    static size_t CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num);
 
     static char32_t ToUnicode(CodePoint cp) { return cp; }
+
     static CodePoint FromUnicode(char32_t cp) { return cp; }
 
-    static const CodePoint *NextCodePoint(const CodeUnit *cur);
+    // Bidirectional only
     static const CodeUnit *LastCodePoint(const CodeUnit *cur);
 };
 
@@ -171,37 +193,6 @@ size_t UTF8Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num)
 
 template<typename T>
 const typename UTF8Core<T>::CodeUnit *
-UTF8Core<T>::NextCodePoint(const CodeUnit *cur)
-{
-    T fst = *cur;
-    if(!(fst & 0b10000000))
-        return cur + 1;
-    if((fst & 0b11100000) == 0b11000000)
-    {
-        if((++*cur & 0b11000000) != 0b10000000)
-            throw EncodingException("Advancing in invalid UTF-8 sequence");
-        return cur + 1;
-    }
-    if((fst & 0b11110000) == 0b11100000)
-    {
-        if((++*cur & 0b11000000) != 0b10000000 ||
-           (++*cur & 0b11000000) != 0b10000000)
-            throw EncodingException("Advancing in invalid UTF-8 sequence");
-        return cur + 1;
-    }
-    if((fst & 0b11111000) == 0b11110000)
-    {
-        if((++*cur & 0b11000000) != 0b10000000 ||
-           (++*cur & 0b11000000) != 0b10000000 ||
-           (++*cur & 0b11000000) != 0b10000000))
-           throw EncodingException("Advancing in invalid UTF-8 sequence");
-        return cur + 1;
-    }
-    throw EncodingException("Advancing in invalid UTF-8 sequence");
-}
-
-template<typename T>
-const typename UTF8Core<T>::CodeUnit *
 UTF8Core<T>::LastCodePoint(const CodeUnit *cur)
 {
     while((*--cur) & 0b11000000 == 0b10000000)
@@ -210,67 +201,77 @@ UTF8Core<T>::LastCodePoint(const CodeUnit *cur)
 }
 
 template<typename T>
-UTF8Iterator<T>::UTF8Iterator(const T *cur)
-    : cur(cur)
+void UTF8Aux::UTF8Iterator<T>::UpdateCh() const
 {
-
+    if(!ch.has_value())
+    {
+        char32_t cp;
+        if(!UTF8Core<T>::CU2CP(cur, &cp, UTF8Core<T>::MaxCUInCP))
+            throw EncodingException("Invalid UTF-8 sequence");
+        ch = cp;
+    }
+    AGZ_ASSERT(ch.has_value());
 }
 
 template<typename T>
-char32_t UTF8Iterator<T>::operator*() const
+UTF8Aux::UTF8Iterator<T>::UTF8Iterator(const T *cur)
+    : cur(cur)
 {
-    char32_t ret;
-    if(!UTF8Core<T>::CU2CP(cur, &ret))
-        throw EncodingException("Dereferencing invalid UTF-8 iterator");
+    AGZ_ASSERT(cur);
+}
+
+template<typename T>
+char32_t UTF8Aux::UTF8Iterator<T>::operator*() const
+{
+    UpdateCh();
+    return ch.value();
+}
+
+template<typename T>
+const char32_t *UTF8Aux::UTF8Iterator<T>::operator->() const
+{
+    UpdateCh();
+    return &ch.value();
+}
+
+template<typename T>
+UTF8Aux::UTF8Iterator<T> &UTF8Aux::UTF8Iterator<T>::operator++()
+{
+    cur += UTF8Core<T>::CUInCP(*(*this));
+    ch.reset();
+    return *this;
+}
+
+template<typename T>
+UTF8Aux::UTF8Iterator<T> UTF8Aux::UTF8Iterator<T>::operator++(int)
+{
+    auto ret = *this;
+    cur += UTF8Core<T>::CUInCP(*(*this));
+    ch.reset();
     return ret;
 }
 
 template<typename T>
-typename UTF8Iterator<T>::pointer UTF8Iterator<T>::operator->() const
-{
-    return pointer(**this);
-}
-
-template<typename T>
-UTF8Iterator<T> &UTFIterator<T>::operator++()
-{
-    cur = UTF8Core<T>::NextCodePoint(cur);
-    return *this;
-}
-
-template<typename T>
-UTF8Iterator<T> UTF8Iterator<T>::operator++(int)
-{
-    auto ret = *this;
-    ++*this;
-    return *this;
-}
-
-template<typename T>
-UTF8Iterator<T> &UTF8Iterator<T>::operator--()
+UTF8Aux::UTF8Iterator<T> &UTF8Aux::UTF8Iterator<T>::operator--()
 {
     cur = UTF8Core<T>::LastCodePoint(cur);
+    ch.reset();
     return *this;
 }
 
 template<typename T>
-UTF8Iterator<T> UTF8Iterator<T>::operator--(int)
+UTF8Aux::UTF8Iterator<T> UTF8Aux::UTF8Iterator<T>::operator--(int)
 {
     auto ret = *this;
-    --*this;
-    return *this;
+    cur = UTF8Core<T>::LastCodePoint(cur);
+    ch.reset();
+    return ret;
 }
 
 template<typename T>
-bool UTF8Iterator<T>::operator==(const UTF8Iterator<T> &rhs) const
+bool UTF8Aux::UTF8Iterator<T>::operator==(const Self &rhs) const
 {
     return cur == rhs.cur;
-}
-
-template<typename T>
-bool UTF8Iterator<T>::operator!=(const UTF8Iterator<T> &rhs) const
-{
-    return !(*this == rhs);
 }
 
 AGZ_NS_END(AGZ)

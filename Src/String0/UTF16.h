@@ -1,7 +1,5 @@
 #pragma once
 
-#include <type_traits>
-
 #include "../Misc/Common.h"
 #include "../Range/Iterator.h"
 #include "Charset.h"
@@ -62,9 +60,9 @@ public:
     static size_t CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num);
 
     static char32_t ToUnicode(CodePoint cp) { return cp; }
+
     static CodePoint FromUnicode(char32_t cp) { return cp; }
 
-    static const CodeUnit *NextCodePoint(const CodeUnit *cur);
     static const CodeUnit *LastCodePoint(const CodeUnit *cur);
 };
 
@@ -85,6 +83,7 @@ size_t UTF16Core<T>::CP2CU(CodePoint cp, CodeUnit *cu)
         *cu = static_cast<CodeUnit>(cp);
         return 1;
     }
+
     if(0x10000 <= cp && cp <= 0x10ffff)
     {
         cp -= 0x10000;
@@ -92,6 +91,7 @@ size_t UTF16Core<T>::CP2CU(CodePoint cp, CodeUnit *cu)
         *cu = static_cast<CodeUnit>(0xdc00 | (cp & 0x3ff));
         return 2;
     }
+
     return 0;
 }
 
@@ -118,23 +118,6 @@ size_t UTF16Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num)
     }
 
     return 0;
-}
-
-template<typename T>
-const typename UTF16Core<T>::CodeUnit *
-UTF16Core<T>::NextCodePoint(const CodeUnit *cur)
-{
-    char32_t high = static_cast<char32_t>(*cur);
-    if(high <= 0xd7ff || (0xe000 <= high && high <= 0xffff))
-        return cur + 1;
-    if(0xd800 <= high && high <= 0xdbff)
-    {
-        char32_t low = static_cast<char32_t>(*++cu);
-        if(low <= 0xdfff)
-            return cur + 1;
-        throw EncodingException("Advancing in invalid UTF-16 sequence");
-    }
-    throw EncodingException("Advancing in invalid UTF-16 sequence");
 }
 
 template<typename T>
@@ -171,7 +154,7 @@ typename UTF16Core<T>::Iterator::pointer UTF16Core<T>::Iterator::operator->() co
 template<typename T>
 typename UTF16Core<T>::Iterator &UTF16Core<T>::Iterator::operator++()
 {
-    cur = UTF16Core<T>::NextCodePoint(cur);
+    cur += UTF16Core<T>::CUInCP(**this);
     return *this;
 }
 
