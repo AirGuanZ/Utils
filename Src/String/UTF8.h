@@ -53,6 +53,7 @@ public:
     static size_t CUInCP(CodePoint cp);
 
     static size_t CP2CU(const CodeUnit *cu, CodePoint *cp);
+    static size_t CU2CP(const CodeUnit *cu, CodePoint *cp);
 
     static char32_t ToUnicode(CodePoint cp) { return cp; }
     static CodePoint FromUnicode(char32_t cp) { return cp; }
@@ -113,9 +114,9 @@ size_t UTF8Core<T>::CP2CU(CodePoint cp, CodeUnit *cu)
 }
 
 template<typename T>
-size_t UTF8Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num)
+size_t UTF8Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp)
 {
-    AGZ_ASSERT(cu && cp && cu_num);
+    AGZ_ASSERT(cu && cp);
 
     CodeUnit fst = *cu++;
 
@@ -138,7 +139,6 @@ size_t UTF8Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num)
     if((fst & 0b11100000) == 0b11000000)
     {
         CodePoint low;
-        if(cu_num < 2) return 0;
         NEXT(*cu, low);
         *cp = ((fst & 0b00011111) << 6) | low;
         return 2;
@@ -148,7 +148,6 @@ size_t UTF8Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num)
     if((fst & 0b11110000) == 0b11100000)
     {
         CodePoint high, low;
-        if(cu_num < 3) return 0;
         NEXT(*cu++, high); NEXT(*cu, low);
         *cp = ((fst & 0b00001111) << 12) | (high << 6) | low;
         return 3;
@@ -158,7 +157,6 @@ size_t UTF8Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num)
     if((fst & 0b11111000) == 0b11110000)
     {
         CodePoint high, medi, low;
-        if(cu_num < 4) return 0;
         NEXT(*cu++, high); NEXT(*cu++, medi); NEXT(*cu, low);
         *cp = ((fst & 0b00000111) << 18) | (high << 12) | (medi << 6) | low;
         return 4;

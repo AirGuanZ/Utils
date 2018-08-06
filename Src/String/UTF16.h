@@ -59,7 +59,7 @@ public:
 
     static size_t CP2CU(CodePoint cp, CodeUnit *cu);
 
-    static size_t CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num);
+    static size_t CU2CP(const CodeUnit *cu, CodePoint *cp);
 
     static char32_t ToUnicode(CodePoint cp) { return cp; }
     static CodePoint FromUnicode(char32_t cp) { return cp; }
@@ -96,9 +96,9 @@ size_t UTF16Core<T>::CP2CU(CodePoint cp, CodeUnit *cu)
 }
 
 template<typename T>
-size_t UTF16Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num)
+size_t UTF16Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp)
 {
-    AGZ_ASSERT(cu && cp && cu_num);
+    AGZ_ASSERT(cu && cp);
     char32_t high = static_cast<char32_t>(*cu);
 
     // 1 code unit

@@ -28,6 +28,30 @@ public:
     }
 
     template<typename OCS>
+    static size_t TranslateTo(const CodeUnit *beg, const CodeUnit *end,
+                              typename OCS::CodeUnit *dst, size_t buf_size)
+    {
+        typename OCS::CodeUnit tBuf[OCS::MaxCUInCP];
+        size_t ret = 0;
+        while(beg < end && buf_size)
+        {
+            CodePoint cp;
+            adv = CU2CP(beg, &cp);
+            if(!adv)
+                return 0;
+            size_t tsize = OCS::CP2CU(To<OCS>(cp), tBuf);
+            if(tsize > buf_size)
+                return ret;
+            ret += tsize;
+            beg += adv;
+            for(size_t i = 0; i < tsize; ++i)
+                dst[i] = tBuf[i];
+            dst += tsize;
+        }
+        return ret;
+    }
+
+    template<typename OCS>
     static CodePoint From(typename OCS::CodePoint ocp)
     {
         return Core::FromUnicode(OCS::ToUnicode(ocp));
