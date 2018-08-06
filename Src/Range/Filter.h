@@ -32,7 +32,7 @@ namespace RangeAux
                 std::conditional_t<
                     IsBidirectionalIterator<InIt>,
                     std::bidirectional_iterator_tag,
-                    typename InIt::iterator_category>;
+                    typename std::iterator_traits<InIt>::iterator_category>;
 
             using value_type        = typename InIt::value_type;
             using difference_type   = typename InIt::difference_type;

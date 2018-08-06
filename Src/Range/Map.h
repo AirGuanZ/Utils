@@ -63,7 +63,8 @@ namespace RangeAux
 
         public:
 
-            using iterator_category = typename InIt::iterator_category;
+            using iterator_category =
+                typename std::iterator_traits<InIt>::iterator_category;
             using value_type        = _value_type;
             using difference_type   = typename InIt::difference_type;
             using pointer           = ptr_t;
