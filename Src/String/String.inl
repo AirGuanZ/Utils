@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cctype>
 #include <cstring>
 #include <string>
 #include <tuple>
@@ -409,7 +410,11 @@ template<typename CS, typename TP>
 String<CS, TP>::String(const Self &copyFrom, size_t beg, size_t end)
 {
     AGZ_ASSERT(beg <= end);
-    if(copyFrom.IsSmallStorage())
+    if(beg == end)
+    {
+        small_.len = 0;
+    }
+    else if(copyFrom.IsSmallStorage())
     {
         auto d = copyFrom.Data()
         Init(d + beg, d + end);
@@ -539,18 +544,6 @@ typename String<CS, TP>::Iterator String<CS, TP>::end() const
 }
 
 template<typename CS, typename TP>
-typename String<CS, TP>::ReverseIterator String<CS, TP>::rbegin() const
-{
-    return ReverseIterator(end());
-}
-
-template<typename CS, typename TP>
-typename String<CS, TP>::ReverseIterator String<CS, TP>::rend() const
-{
-    return ReverseIterator(begin());
-}
-
-template<typename CS, typename TP>
 bool String<CS, TP>::StartsWith(const Self &prefix) const
 {
     return StrAlgo::StartsWith(begin(), end(),
@@ -565,30 +558,107 @@ bool String<CS, TP>::EndsWith(const Self &suffix) const
 }
 
 template<typename CS, typename TP>
-size_t String<CS, TP>::Find(const Self &dst) const
+size_t String<CS, TP>::Find(const Self &dst, size_t beg) const
 {
-    return StrAlgo::Find(begin(), end(),
+    if(beg >= Length())
+        return NPOS;
+    return StrAlgo::Find(begin() + beg, end(),
                          std::begin(dst), std::end(dst));
 }
 
 template<typename CS, typename TP>
-size_t String<CS, TP>::RFind(const Self &dst) const
+size_t String<CS, TP>::RFind(const Self &dst, size_t rbeg) const
 {
-    return StrAlgo::RFind(begin(), end(),
-                             std::begin(dst), std::end(dst));
+    if(rbeg >= Length())
+        return NPOS;
+    return StrAlgo::RFind(begin(), end() - rbeg,
+                          std::begin(dst), std::end(dst));
 }
 
 template<typename CS, typename TP>
-String<CS, TP> String<CS, TP>::Substr(size_t beg, size_t end) const
+String<CS, TP> String<CS, TP>::Slice(size_t beg, size_t end) const
 {
-    AGZ_ASSERT(beg <= end);
+    AGZ_ASSERT(beg <= end && end <= Length());
     return Self(*this, beg, end);
 }
 
 template<typename CS, typename TP>
-String<CS, TP> String<CS, TP>::Substr(size_t beg) const
+String<CS, TP> String<CS, TP>::Slice(size_t beg) const
 {
-    return Substr(beg, Length());
+    return Slice(beg, Length());
+}
+
+template<typename CS, typename TP>
+String<CS, TP> String<CS, TP>::LeftStrip() const
+{
+    size_t idx = 0;
+    auto [data, len] = DataAndLength();
+    while(idx < len && std::isspace(data[idx]))
+        ++idx;
+    return Slice(idx);
+}
+
+template<typename CS, typename TP>
+String<CS, TP> String<CS, TP>::RightStrip() const
+{
+    auto [data, end] = DataAndLength();
+    while(end > 0 && std::isspace(data[idx]))
+        --end;
+    return Slice(0, end);
+}
+
+template<typename CS, typename TP>
+String<CS, TP> String<CS, TP>::Strip() const
+{
+    return LeftStrip().RightStrip();
+}
+
+template<typename CS, typename TP>
+std::vector<String<CS, TP>> String<CS, TP>::Split(
+                    const std::vector<Self> &spliters)
+{
+    std::vector<Self> ret; Self s = *this;
+
+    while(!s.IsEmpty())
+    {
+        size_t splitBeg = NPOS, splitLen = 0;
+        for(auto &spliter : rhs.spliters)
+        {
+            AGZ_ASSERT(!spliter.IsEmpty());
+            size_t beg = s.Find(spliter);
+            if(beg < splitBeg)
+            {
+                splitBeg = beg;
+                splitLen = spliter.Length();
+            }
+        }
+
+        if(splitBeg == NPOS)
+        {
+            ret.push_back(std::move(s));
+            return std::move(ret);
+        }
+
+        if(splitBeg != 0)
+            ret.push_back(s.Slice(0, splitBeg));
+
+        s = s.Slice(splitBeg + splitLen);
+    }
+
+    return std::move(ret);
+}
+
+template<typename CS, typename TP>
+std::vector<String<CS, TP>> String<CS, TP>::Lines()
+{
+    return Split({ u8"\n", u8"\r\n" });
+}
+
+template<typename CS, typename TP>
+template<typename R>
+String<CS, TP> String<CS, TP>::Join(const R &strs) const
+{
+    return strs | Join(*this);
 }
 
 template<typename CS, typename TP>
@@ -596,7 +666,7 @@ bool String<CS, TP>::operator==(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Comp(b1, e1, b2, e2)
+    return StrAlgo::Compare(b1, e1, b2, e2)
         == StrAlgo::CompareResult::Equal;
 }
 
@@ -605,7 +675,7 @@ bool String<CS, TP>::operator!=(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Comp(b1, e1, b2, e2)
+    return StrAlgo::Compare(b1, e1, b2, e2)
         != StrAlgo::CompareResult::Equal;
 }
 
@@ -614,7 +684,7 @@ bool String<CS, TP>::operator<(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Comp(b1, e1, b2, e2)
+    return StrAlgo::Compare(b1, e1, b2, e2)
         == StrAlgo::CompareResult::Less;
 }
 
@@ -623,7 +693,7 @@ bool String<CS, TP>::operator<=(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Comp(b1, e1, b2, e2)
+    return StrAlgo::Compare(b1, e1, b2, e2)
         != StrAlgo::CompareResult::Greater;
 }
 
@@ -632,7 +702,7 @@ bool String<CS, TP>::operator>=(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Comp(b1, e1, b2, e2)
+    return StrAlgo::Compare(b1, e1, b2, e2)
         != StrAlgo::CompareResult::Less;
 }
 
@@ -641,7 +711,7 @@ bool String<CS, TP>::operator>(const Self &rhs) const
 {
     auto [b1, e1] = BeginAndEnd();
     auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Comp(b1, e1, b2, e2)
+    return StrAlgo::Compare(b1, e1, b2, e2)
         == StrAlgo::CompareResult::Greater;
 }
 
@@ -716,7 +786,6 @@ bool String<CS, TP>::operator>(const char *rhs) const
 {
     return ToStdString() > rhs;
 }
-
 
 template<typename CS, typename TP, typename R>
 String<CS, TP> &operator+=(String<CS, TP> &lhs, R &&rhs)
@@ -814,7 +883,7 @@ inline StringJoinRHS Join(const Str8 &mid, const Str8 &empty)
 }
 
 template<typename R>
-auto operator|(const R &strs, StringJoinRHS rhs)
+auto operator|(const R &strs, const StringJoinRHS &rhs)
 {
     // IMPROVE
 
@@ -826,6 +895,12 @@ auto operator|(const R &strs, StringJoinRHS rhs)
     while(++cur != end)
         ret += rhs.mid + *cur;
     return std::move(ret);
+}
+
+inline StringSplitRHS Split(const std::vector<Str8> &spliters =
+                            { u8" ", u8"\t", u8"\n", u8"\r\n" })
+{
+    return StringSplitRHS { spliters };
 }
 
 AGZ_NS_END(AGZ)

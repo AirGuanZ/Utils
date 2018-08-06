@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <atomic>
+#include <limits>
 #include <ostream>
 #include <string>
 
@@ -140,14 +141,18 @@ class String
 
     const typename CS::CodeUnit *End() const;
 
+    // Assume *this uninitialized
     void Init(const typename CS::CodeUnit *beg,
               const typename CS::CodeUnit *end);
+
+    // Assume *this uninitialized
     void Init2(const typename CS::CodeUnit *beg1,
                const typename CS::CodeUnit *end1,
                const typename CS::CodeUnit *beg2,
                const typename CS::CodeUnit *end2);
 
     String<CS, TP> &CopyFromSelf(const String<CS, TP> &copyFrom);
+
     void ConstructFromSelf(const String<CS, TP> &copyFrom);
 
 public:
@@ -158,13 +163,15 @@ public:
     using Self      = String<CS, TP>;
 
     using Iterator        = const CodeUnit*;
-    using ReverseIterator = ReverseIterator<Iterator>;
+
+    constexpr static size_t NPOS = StrAlgo::NPOS;
 
     String();
 
     // Construct from existed buffer
     // Will copy all data to owned storage
-    // Faster than the checking version bellow. UB when [beg, end) is invalid
+    // Faster than the with-checking version bellow
+    // UB when [beg, end) is invalid
     String(CONS_FLAG_NOCHECK_t, const CodeUnit *beg, const CodeUnit *end);
 
     // Construct from existed buffer
@@ -243,19 +250,25 @@ public:
     Iterator begin() const;
     Iterator end() const;
 
-    ReverseIterator rbegin() const;
-    ReverseIterator rend() const;
-
     bool StartsWith(const Self &prefix) const;
     bool EndsWith(const Self &suffix) const;
 
-    constexpr static size_t NPOS = StrAlgo::NPOS;
+    size_t Find(const Self &dst, size_t beg = 0) const;
+    size_t RFind(const Self &dst, size_t rbeg = 0) const;
 
-    size_t Find(const Self &dst) const;
-    size_t RFind(const Self &dst) const;
+    Self Slice(size_t beg, size_t end) const;
+    Self Slice(size_t beg) const;
 
-    Self Substr(size_t beg, size_t end) const;
-    Self Substr(size_t beg) const;
+    Self LeftStrip() const;
+    Self RightStrip() const;
+    Self Strip() const;
+
+    std::vector<Self> Split(const std::vector<Self> &spliters =
+                            { u8" ", u8"\t", u8"\n", u8"\r\n" });
+    std::vector<Self> Lines() const;
+
+    template<typename R>
+    Self Join(const R &strs) const;
 
     bool operator==(const Self &rhs) const;
     bool operator!=(const Self &rhs) const;
@@ -279,7 +292,7 @@ public:
     bool operator>(const char *rhs) const;
 };
 
-template<typename CS, typename TP, typename R>
+template<typename CS, typename TP>
 String<CS, TP> &operator+=(String<CS, TP> &lhs, R &&rhs);
 
 template<typename CS, typename TP>
@@ -321,11 +334,11 @@ using WStr  = String<WUTF>;
 
 struct StringJoinRHS { Str8 mid, empty; };
 
-inline StringJoinRHS Join(const Str8 &mid = Str8(" "),
-                          const Str8 &empty = Str8(""));
+inline StringJoinRHS Join(const Str8 &mid = u8" ",
+                          const Str8 &empty = u8"");
 
 template<typename R>
-auto operator|(const R &strs, StringJoinRHS rhs);
+auto operator|(R &&strs, const StringJoinRHS &rhs);
 
 AGZ_NS_END(AGZ)
 

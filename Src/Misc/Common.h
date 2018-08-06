@@ -5,28 +5,17 @@
 #ifdef _MSC_VER
 
 #define AGZ_INLINE inline //__forceinline
+#define AGZ_FORCEINLINE __forceinline
 
 #elif defined __GNUC__
 
 #define AGZ_INLINE inline //__attribute__((always_inline))
+#define AZG_FORCEINLINE __attribute__((always_inline))
 
 #else
 
 #define AGZ_INLINE inline
-
-#endif
-
-#ifdef _MSC_VER
-
-#include <malloc.h>
-#define AGZ_ALIGNED_ALLOC(align, size) _aligned_malloc((size), (align))
-#define AGZ_ALIGNED_FREE(ptr) _aligned_free((ptr))
-
-#else
-
-#include <cstdlib>
-#define AGZ_ALIGNED_ALLOC(align, size) (std::aligned_alloc)((align), (size))
-#define AGZ_ALIGNED_FREE(ptr) (std::free)((ptr))
+#define AGZ_FORCEINLINE inline
 
 #endif
 

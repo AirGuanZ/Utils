@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-#include "../Misc/Common.h"
+#include "../../Misc/Common.h"
 #include "Charset.h"
 
 AGZ_NS_BEG(AGZ)

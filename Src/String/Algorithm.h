@@ -96,7 +96,7 @@ RFind(It beg1, It end1, It beg2, It end2)
 
 template<typename It>
 std::enable_if_t<IsRandomAccessIterator<It>, CompareResult>
-Comp(It beg1, It end1, It beg2, It end2)
+Compare(It beg1, It end1, It beg2, It end2)
 {
     AGZ_ASSERT(beg1 <= end1 && beg2 <= end2);
 

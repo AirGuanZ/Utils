@@ -2,8 +2,8 @@
 
 #include <type_traits>
 
-#include "../Misc/Common.h"
-#include "../Range/Iterator.h"
+#include "../../Misc/Common.h"
+#include "../../Range/Iterator.h"
 #include "Charset.h"
 
 AGZ_NS_BEG(AGZ)

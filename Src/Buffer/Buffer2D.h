@@ -19,9 +19,8 @@ class Buffer2D
     void Alloc(size_t num)
     {
         AGZ_ASSERT(num > 0);
-        d_ = static_cast<E*>(AGZ_ALIGNED_ALLOC(alignof(E), num * sizeof(E)));
-        if(!d_)
-            throw std::bad_alloc();
+        d_ = static_cast<E*>(alloc_throw(::AGZ::aligned_alloc,
+                                         alignof(E), num * sizeof(E)));
     }
 
     void Free()
@@ -30,7 +29,7 @@ class Buffer2D
         size_t s = w_ * h_;
         for(size_t i = 0; i < s; ++i)
             (d_ + i)->~E();
-        AGZ_ALIGNED_FREE(d_);
+        ::AGZ::aligned_free(d_);
     }
 
     size_t GetIdx(size_t x, size_t y) const

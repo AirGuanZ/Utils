@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Misc/Common.h"
+#include "../../Misc/Common.h"
 
 AGZ_NS_BEG(AGZ)
 
@@ -12,6 +12,14 @@ public:
     using Iterator  = typename Core::Iterator;
     using CodePoint = typename Core::CodePoint;
     using CodeUnit  = typename Core::CodeUnit;
+
+    static size_t Length(const CodeUnit *cu)
+    {
+        size_t ret = 0;
+        while(*cu++)
+            ++ret;
+        return ret;
+    }
 
     static bool Check(const CodeUnit *beg, size_t n)
     {
