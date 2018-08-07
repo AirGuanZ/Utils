@@ -8,6 +8,15 @@
 using namespace AGZ;
 using namespace std;
 
+TEST_CASE("UTF")
+{
+    SECTION("UTF-8")
+    {
+        
+    }
+}
+
+/*
 TEST_CASE("String")
 {
     SECTION("UTF-8")
@@ -94,3 +103,4 @@ TEST_CASE("String")
         REQUIRE((vector<Str8>{ } | Join(u8" + ", u8"Nothing!")) == u8"Nothing!");
     }
 }
+*/

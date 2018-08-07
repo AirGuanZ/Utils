@@ -52,20 +52,17 @@
     <ClInclude Include="..\Src\Range\Take.h" />
     <ClInclude Include="..\Src\Range\Transform.h" />
     <ClInclude Include="..\Src\Range\Each.h" />
-    <ClInclude Include="..\Src\String\Algorithm.h" />
     <ClInclude Include="..\Src\String\Charset.h" />
     <ClInclude Include="..\Src\String\UTF.h" />
     <ClInclude Include="..\Src\String\UTF16.h" />
     <ClInclude Include="..\Src\String\UTF32.h" />
     <ClInclude Include="..\Src\String\UTF8.h" />
-    <ClInclude Include="..\Src\String\String.h" />
     <ClInclude Include="..\Src\Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec2.inl" />
     <None Include="..\Src\Math\SwizzleVec3.inl" />
     <None Include="..\Src\Math\SwizzleVec4.inl" />
-    <None Include="..\Src\String\String.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

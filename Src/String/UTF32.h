@@ -20,15 +20,20 @@ public:
 
     static constexpr size_t MaxCUInCP = 1;
 
+    static size_t CUInCP(CodePoint cp)
+    {
+        return 1;
+    }
+
     static size_t CP2CU(CodePoint cp, CodeUnit *cu)
     {
         cu[0] = cp;
         return 1;
     }
 
-    static size_t CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num)
+    static size_t CU2CP(const CodeUnit *cu, CodePoint *cp)
     {
-        AGZ_ASSERT(cu && cp && cu_num > 0);
+        AGZ_ASSERT(cu && cp);
         *cp = cu[0];
         return 1;
     }

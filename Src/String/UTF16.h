@@ -59,7 +59,7 @@ public:
 
     static size_t CP2CU(CodePoint cp, CodeUnit *cu);
 
-    static size_t CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num);
+    static size_t CU2CP(const CodeUnit *cu, CodePoint *cp);
 
     static char32_t ToUnicode(CodePoint cp) { return cp; }
     static CodePoint FromUnicode(char32_t cp) { return cp; }
@@ -96,7 +96,7 @@ size_t UTF16Core<T>::CP2CU(CodePoint cp, CodeUnit *cu)
 }
 
 template<typename T>
-size_t UTF16Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp, size_t cu_num)
+size_t UTF16Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp)
 {
     AGZ_ASSERT(cu && cp && cu_num);
     char32_t high = static_cast<char32_t>(*cu);
@@ -129,7 +129,7 @@ UTF16Core<T>::NextCodePoint(const CodeUnit *cur)
         return cur + 1;
     if(0xd800 <= high && high <= 0xdbff)
     {
-        char32_t low = static_cast<char32_t>(*++cu);
+        char32_t low = static_cast<char32_t>(*++cur);
         if(low <= 0xdfff)
             return cur + 1;
         throw EncodingException("Advancing in invalid UTF-16 sequence");
