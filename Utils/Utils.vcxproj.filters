@@ -133,6 +133,15 @@
     <ClInclude Include="..\Src\Range\Any.h">
       <Filter>Range</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\String\ASCII.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\StrAlgo.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\String.h">
+      <Filter>String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">
@@ -143,6 +152,9 @@
     </None>
     <None Include="..\Src\Math\SwizzleVec2.inl">
       <Filter>Math</Filter>
+    </None>
+    <None Include="..\Src\String\String.inl">
+      <Filter>String</Filter>
     </None>
   </ItemGroup>
 </Project>

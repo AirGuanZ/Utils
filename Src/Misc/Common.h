@@ -64,10 +64,10 @@ inline CONS_FLAG_UNSPECIFIED_t UNSPECIFIED;
 
 struct Void_t { };
 
-class EncodingException : public std::invalid_argument
+class CharsetException : public std::invalid_argument
 {
 public:
-    explicit EncodingException(const std::string &err) : invalid_argument(err) { }
+    explicit CharsetException(const std::string &err) : invalid_argument(err) { }
 };
 
 template<typename T>

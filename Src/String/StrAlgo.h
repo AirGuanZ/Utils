@@ -6,21 +6,21 @@
 #include <type_traits>
 
 #include "../Misc/Common.h"
-#include "../Misc/Iterator.h"
+#include "../Range/Iterator.h"
 
 AGZ_NS_BEG(AGZ::StrAlgo)
 
 // Boyer–Moore–Horspool algorithm.
 // See https://en.wikipedia.org/wiki/Boyer–Moore–Horspool_algorithm
 template<size_t AlignBytes>
-size_t BoyerMooreHorspool(const unsigned char *beg, const unsigned char *end,
+const unsigned char *BoyerMooreHorspool(const unsigned char *beg, const unsigned char *end,
                           const unsigned char *pbeg, const unsigned char *pend)
 {
     AGZ_ASSERT(beg <= end && pbeg <= pend);
 
     // Align to AlignByte + alignOffset:
     //     ALIGN_TO(p - alignOffset, AlignByte) + alignOffset
-    size_t alignOffset = beg & (AlignBytes - 1);
+    size_t alignOffset = reinterpret_cast<size_t>(beg) & (AlignBytes - 1);
     size_t alignFactor = AlignBytes - alignOffset;
     size_t len = end - beg, pLen = pend - pbeg;
     if(len < pLen)
@@ -43,7 +43,7 @@ size_t BoyerMooreHorspool(const unsigned char *beg, const unsigned char *end,
     size_t skip = 0, skipEnd = len - pLenM1;
     while(skip < skipEnd)
     {
-        auto i = static_cast<std::make_signe_t<size_t>>(pLenM1);
+        auto i = static_cast<std::make_signed_t<size_t>>(pLenM1);
         auto j = skip + i;
         while(beg[j--] == pbeg[i])
         {
@@ -51,7 +51,7 @@ size_t BoyerMooreHorspool(const unsigned char *beg, const unsigned char *end,
                 return beg + skip;
         }
         skip = ((skip + T[beg[skip + pLenM1]] + alignFactor)
-                & ~(AlignBytes - 1)) + alignOffset
+                & ~(AlignBytes - 1)) + alignOffset;
     }
 
     return end;

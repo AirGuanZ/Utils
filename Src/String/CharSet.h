@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Misc/Common.h"
+#include "../Misc/Common.h"
 
 AGZ_NS_BEG(AGZ)
 

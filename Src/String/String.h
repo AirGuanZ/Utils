@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "../Misc/Common.h"
-#includ "UTF.h"
 
 AGZ_NS_BEG(AGZ::StrImpl)
 
@@ -75,8 +74,6 @@ public:
 template<typename CU>
 class Storage
 {
-    friend class StringBuilder;
-
     static constexpr size_t SMALL_BUF_SIZE =
         SmallBufSizeSelector<sizeof(CU)>::Value;
 
@@ -92,7 +89,7 @@ class Storage
 
         struct
         {
-            largeBuf_ *buf;
+            LargeBuf *buf;
             const CU *beg;
             const CU *end;
         } large_;
@@ -112,18 +109,18 @@ public:
 
     static_assert(std::is_trivially_copyable_v<CU>);
 
-    Storage(size_t len);
+    explicit Storage(size_t len);
     Storage(const CU *data, size_t len);
     Storage(const CU *beg, const CU *end);
 
     Storage(const Self &copyFrom);
     Storage(const Self &copyFrom, size_t begIdx, size_t endIdx);
-    Storage(Self &&moveFrom);
+    Storage(Self &&moveFrom) noexcept;
 
     ~Storage();
 
     Self &operator=(const Self &copyFrom);
-    Self &operator=(Self &&moveFrom);
+    Self &operator=(Self &&moveFrom) noexcept;
 
     bool IsSmallStorage() const;
     bool IsLargeStorage() const;
@@ -140,9 +137,12 @@ public:
 };
 
 template<typename CS>
+class StringBuilder;
+
+template<typename CS>
 class String
 {
-    friend class StringBuilder;
+    friend class StringBuilder<CS>;
 
     Storage<typename CS::CodeUnit> storage_;
 
@@ -265,14 +265,14 @@ public:
     String(const Self &copyFrom, size_t begIdx, size_t endIdx);
 
     String(const Self &copyFrom);
-    String(Self &&moveFrom);
+    String(Self &&moveFrom) noexcept;
 
     ~String() = default;
 
     operator View() const;
 
     Self &operator=(const Self &copyFrom);
-    Self &operator=(Self &&moveFrom);
+    Self &operator=(Self &&moveFrom) noexcept;
 
     // Construct a view for the whole string
     View AsView() const;
@@ -300,7 +300,7 @@ public:
     std::vector<View> Split(const View &spliter) const;
 
     template<typename R>
-    Str Join(R &&strRange) const;
+    Self Join(R &&strRange) const;
 
     size_t Find(const View &dst, size_t begIdx = 0)   const;
     size_t FindR(const View &dst, size_t rbegIdx = 0) const;
@@ -334,7 +334,7 @@ class StringConvertor
 public:
 
     template<typename DCS, typename SCS>
-    static String<DCS> Convert(const String<SCS>::View &src);
+    static String<DCS> Convert(const typename String<SCS>::View &src);
 };
 
 AGZ_NS_END(AGZ::StrImpl)

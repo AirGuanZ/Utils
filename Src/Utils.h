@@ -35,4 +35,5 @@
 #include "Range/Seq.h"
 #include "Range/Take.h"
 
+#include "String/String.h"
 #include "String/UTF.h"

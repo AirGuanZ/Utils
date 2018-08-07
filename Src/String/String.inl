@@ -1,17 +1,13 @@
+#pragma once
+
 #include <algorithm>
 
 #include "../Misc/Malloc.h"
 #include "../Range/Reverse.h"
 #include "StrAlgo.h"
+#include "UTF.h"
 
 AGZ_NS_BEG(AGZ::StrImpl)
-
-template<typename CU>
-void Storage<CU>::AllocSmall(size_t len)
-{
-    AGZ_ASSERT(len <= SMALL_BUF_SIZE);
-    small_.len = len;
-}
 
 template<typename E>
 RefCountedBuf<E> *RefCountedBuf<E>::New(size_t n)
@@ -88,9 +84,9 @@ template<typename CU>
 Storage<CU>::Storage(size_t len)
 {
     if(len <= SMALL_BUF_SIZE)
-        AllocSmall();
+        AllocSmall(len);
     else
-        AllocLarge();
+        AllocLarge(len);
 }
 
 template<typename CU>
@@ -98,12 +94,12 @@ Storage<CU>::Storage(const CU *data, size_t len)
 {
     if(len <= SMALL_BUF_SIZE)
     {
-        AllocSmall();
+        AllocSmall(len);
         std::copy_n(data, len, GetSmallMutableData());
     }
     else
     {
-        AllocLarge();
+        AllocLarge(len);
         std::copy_n(data, len, GetLargeMutableData());
     }
 }
@@ -129,7 +125,7 @@ Storage<CU>::Storage(const Self &copyFrom, size_t beg, size_t end)
     size_t len = end - beg;
     if(len <= SMALL_BUF_SIZE)
     {
-        AllocSmall();
+        AllocSmall(len);
         std::copy_n(&copyFrom.Begin()[beg], len, GetSmallMutableData());
     }
     else
@@ -142,17 +138,17 @@ Storage<CU>::Storage(const Self &copyFrom, size_t beg, size_t end)
 }
 
 template<typename CU>
-Storage<CU>::Storage(Self &&moveFrom)
+Storage<CU>::Storage(Self &&moveFrom) noexcept
 {
     if(moveFrom.IsLargeStorage())
     {
-        small_.len = moveFrom.small_.len;
         large_ = moveFrom.large_;
+        small_.len = moveFrom.small_.len;
         moveFrom.small_.len = 0;
     }
     else
     {
-        auto [data, len] = moveFrom.DataAndLength();
+        auto [data, len] = moveFrom.BeginAndLength();
         AllocSmall(len);
         std::copy_n(data, len, GetSmallMutableData());
     }
@@ -175,7 +171,7 @@ Storage<CU> &Storage<CU>::operator=(const Self &copyFrom)
 }
 
 template<typename CU>
-Storage<CU> &Storage<CU>::operator=(Self &&moveFrom)
+Storage<CU> &Storage<CU>::operator=(Self &&moveFrom) noexcept
 {
     if(IsLargeStorage())
         large_.buf->DecRef();
@@ -206,7 +202,7 @@ template<typename CU>
 size_t Storage<CU>::GetLargeLength() const
 {
     AGZ_ASSERT(IsLargeStorage() && large_.beg <= large_.end);
-    return return large_.end - large_.beg;
+    return large_.end - large_.beg;
 }
 
 template<typename CU>
@@ -231,23 +227,23 @@ template<typename CU>
 std::pair<const CU*, size_t> Storage<CU>::BeginAndLength() const
 {
     return IsSmallStorage() ?
-                { &small_.buf[0], small_.len } :
-                { large_.beg, large_.end - large_.beg };
+        std::pair<const CU*, size_t> { &small_.buf[0], small_.len } :
+        std::pair<const CU*, size_t> { large_.beg, large_.end - large_.beg };
 }
 
 template<typename CU>
-std::pair<const CU*, size_t> Storage<CU>::BeginAndEnd() const
+std::pair<const CU*, const CU*> Storage<CU>::BeginAndEnd() const
 {
     return IsSmallStorage() ?
-                { &small_.buf[0], &small_.buf[small_.len] } :
-                { large_.beg, large_.end };
+        std::pair<const CU*, const CU*> { &small_.buf[0], &small_.buf[small_.len] } :
+        std::pair<const CU*, const CU*> { large_.beg, large_.end };
 }
 
 template<typename CS>
 String<CS>::View::View(const Str &str)
-    : str_(&str)
+    : str_(&str), beg_(str.Data()), len_(str.Length())
 {
-    std::tie(beg_, len_) = str.DataAndLength();
+
 }
 
 template<typename CS>
@@ -269,7 +265,7 @@ String<CS>::View::View(const Str &str, const CodeUnit* beg, size_t len)
 }
 
 template<typename CS>
-const String<CS> String<CS>::View::AsString() const
+String<CS> String<CS>::View::AsString() const
 {
     if(beg_ == str_->Data() && len_ == str_->Length())
         return *str_;
@@ -415,7 +411,7 @@ String<CS>::View::Split(const Self &spliter) const
 
 template<typename CS>
 template<typename R>
-String<CS> String<CS>::Join(R &&strRange) const
+String<CS> String<CS>::View::Join(R &&strRange) const
 {
     if(strRange.empty())
         return Str();
@@ -432,7 +428,7 @@ size_t String<CS>::View::Find(const Self &dst, size_t begIdx) const
 {
     AGZ_ASSERT(begIdx <= len_);
     auto rt = FindSubPattern(begin() + begIdx, end(), dst.begin(), dst.end());
-    return rt == end() ? NPOS : (rt - beg_)
+    return rt == end() ? NPOS : (rt - beg_);
 }
 
 template<typename CS>
@@ -473,7 +469,6 @@ std::string String<CS>::View::ToStdString(NativeCharset cs) const
             return StringConvertor::Convert<UTF8<>>(*this)
                         .ToStdString(NativeCharset::UTF8);
         }
-        break;
     }
     throw CharsetException("Unknown charset " +
             std::to_string(static_cast<
@@ -494,7 +489,7 @@ bool String<CS>::View::operator==(const Self &rhs) const
 }
 
 template<typename CS>
-bool String<CS>::View::operator==(const Self &rhs) const
+bool String<CS>::View::operator!=(const Self &rhs) const
 {
     return !(*this == rhs);
 }
@@ -528,8 +523,28 @@ bool String<CS>::View::operator>=(const Self &rhs) const
 }
 
 template<typename CS>
+typename CS::CodeUnit *String<CS>::GetMutableData()
+{
+    return storage_.GetMutableData();
+}
+
+template<typename CS>
+String<CS>::String(size_t len)
+    : storage_(len)
+{
+    
+}
+
+template<typename CS>
 String<CS>::String()
     : storage_(0)
+{
+
+}
+
+template<typename CS>
+String<CS>::String(const View &view)
+    : String(view.AsString())
 {
 
 }
@@ -563,7 +578,7 @@ String<CS>::String(const Self &copyFrom)
 }
 
 template<typename CS>
-String<CS>::String(Self &&moveFrom)
+String<CS>::String(Self &&moveFrom) noexcept
     : storage_(std::move(moveFrom.storage_))
 {
 
@@ -583,7 +598,7 @@ String<CS> &String<CS>::operator=(const Self &copyFrom)
 }
 
 template<typename CS>
-String<CS> &String<CS>::operator=(Self &&moveFrom)
+String<CS> &String<CS>::operator=(Self &&moveFrom) noexcept
 {
     storage_ = std::move(moveFrom.storage_);
     return *this;
@@ -691,7 +706,7 @@ template<typename CS>
 template<typename R>
 String<CS> String<CS>::Join(R &&strRange) const
 {
-    return AsView().Join(std::forward<R>(strRange))
+    return AsView().Join(std::forward<R>(strRange));
 }
 
 template<typename CS>
@@ -719,9 +734,9 @@ typename String<CS>::Iterator String<CS>::end() const
 }
 
 template<typename CS>
-std::string String<CS>::ToStdString() const
+std::string String<CS>::ToStdString(NativeCharset cs) const
 {
-    return AsView().ToStdString();
+    return AsView().ToStdString(cs);
 }
 
 template<typename CS>
@@ -762,14 +777,14 @@ void StringBuilder<CS>::Clear()
 }
 
 template<typename DCS, typename SCS>
-String<DCS> StringConvertor::Convert(const String<SCS>::View &src)
+String<DCS> StringConvertor::Convert(const typename String<SCS>::View &src)
 {
     if constexpr(std::is_same_v<DCS, SCS>)
         return String<SCS>(src.AsString());
     else
     {
         std::vector<typename DCS::CodeUnit> cus;
-        CodeUnit sgl[DCS::MaxCUInCP];
+        typename DCS::CodeUnit sgl[DCS::MaxCUInCP];
 
         auto beg = src.begin(), end = src.end();
         while(beg < end)
