@@ -1,345 +1,308 @@
-﻿#pragma once
+#pragma once
 
 #include <atomic>
+#include <cstdint>
 #include <limits>
-#include <ostream>
+#include <list>
 #include <string>
+#include <vector>
 
 #include "../Misc/Common.h"
-#include "../Range/Reverse.h"
-#include "Algorithm.h"
-#include "UTF.h"
+#includ "UTF.h"
 
-AGZ_NS_BEG(AGZ)
+AGZ_NS_BEG(AGZ::StrImpl)
 
-template<typename CS, typename TP> class String;
-
-// Possible encoding used by a c-style string
-enum class CharEncoding { UTF8 };
-
-namespace StringAux
+struct SingleThreaded
 {
-    struct MultiThreaded
-    {
-        using RefCounter = std::atomic<size_t>;
-        static constexpr bool IsThreadSafe = true;
-    };
+    using RefCounter = std::size_t;
+    static constexpr bool IsThreadSafe = false;
+};
 
-    struct SingleThreaded
-    {
-        using RefCounter = size_t;
-        static constexpr bool IsThreadSafe = false;
-    };
-
-    // Reference counted buffer for large string storage
-    template<typename CU, typename TP>
-    class RefCountedBuf
-    {
-        mutable typename TP::RefCounter refs;
-        CU data[1];
-
-    public:
-
-        using RefCounter = typename TP::RefCounter;
-        using Self = RefCountedBuf<CU, TP>;
-
-        static constexpr bool IsThreadSafe = TP::IsThreadSafe;
-
-        RefCountedBuf()               = delete;
-        RefCountedBuf(const Self &)   = delete;
-        ~RefCountedBuf()              = delete;
-
-        Self &operator=(const Self &) = delete;
-
-        void IncRef() const { ++refs; }
-        void DecRef() { if(!--refs) std::free(this); }
-
-        CU *GetData() { return &data[0]; }
-
-        static Self *New(size_t n);
-    };
-
-    static constexpr size_t SMALL_BUF_SIZE = 31;
-}
-
-template<typename CS, typename TP>
-class CharRange
+struct MultiThreaded
 {
-    static constexpr size_t SMALL_BUF_SIZE = StringAux::SMALL_BUF_SIZE;
+    using RefCounter = std::atomic<size_t>;
+    static constexpr bool IsThreadSafe = true;
+};
 
-    using LargeBuf = StringAux::RefCountedBuf<typename CS::CodeUnit, TP>;
+template<size_t>
+struct SmallBufSizeSelector;
 
-    union
-    {
-        typename CS::CodeUnit smallBuf_[SMALL_BUF_SIZE];
-        LargeBuf *largeBuf_;
-    };
+template<>
+struct SmallBufSizeSelector<1>
+{
+    static constexpr size_t Value = 31;
+};
 
-    bool small_;
+template<>
+struct SmallBufSizeSelector<2>
+{
+    static constexpr size_t Value = 15;
+};
 
-    const typename CS::CodeUnit *beg_;
-    const typename CS::CodeUnit *end_;
+template<>
+struct SmallBufSizeSelector<4>
+{
+    static constexpr size_t Value = 7;
+};
+
+template<typename E, typename TP>
+class RefCountedBuf
+{
+    mutable typename TP::RefCounter refs_;
+    E data_[1];
 
 public:
 
-    using Iterator        = typename CS::Iterator;
-    using ReverseIterator = ::AGZ::ReverseIterator<Iterator>;
-    using CodeUnit        = typename CS::CodeUnit;
+    using Self = RefCountedBuf<E, TP>;
 
-    using Self = CharRange<CS, TP>;
+    static constexpr bool IsThreadSafe = TP::IsThreadSafe;
 
-    // For large storage
-    CharRange(LargeBuf *buf, const CodeUnit *beg, const CodeUnit *end);
-    // For small storage
-    CharRange(const CodeUnit *beg, const CodeUnit *end);
+    static Self *New(size_t n);
 
-    CharRange(const Self &copyFrom);
+    RefCountedBuf()              = delete;
+    RefCountedBuf(const Self&)   = delete;
+    ~RefCountedBuf()             = delete;
+    Self &operator=(const Self&) = delete;
 
-    Self &operator=(const Self &) = delete;
+    void IncRef() const;
+    void DecRef() const;
 
-    ~CharRange() { if(!small_) largeBuf_->DecRef(); }
-
-    Iterator begin() const { return Iterator(beg_); }
-    Iterator end() const { return Iterator(end_); }
-
-    ReverseIterator rbegin() const { return ReverseIterator(end()); }
-    ReverseIterator rend() const { return ReverseIterator(begin()); }
+    E *GetData();
+    const E *GetData() const;
 };
 
-// CU: Code Unit
-// CP: Code Point
-// TP: Thread Policy
-template<typename CS = UTF8<char>, typename TP = StringAux::MultiThreaded>
-class String
+template<typename CU, typename TP>
+class Storage
 {
-    static constexpr size_t SMALL_BUF_SIZE = StringAux::SMALL_BUF_SIZE;
+    friend class StringBuilder;
 
-    using LargeBuf = StringAux::RefCountedBuf<typename CS::CodeUnit, TP>;
+    static constexpr size_t SMALL_BUF_SIZE =
+        SmallBufSizeSelector<sizeof(CU)>::Value;
+
+    using LargeBuf = RefCountedBuf<CU, TP>;
 
     union
     {
         struct
         {
-            typename CS::CodeUnit buf[SMALL_BUF_SIZE];
+            CU buf[SMALL_BUF_SIZE];
             std::uint8_t len;
         } small_;
 
         struct
         {
-            LargeBuf *buf;
-            const typename CS::CodeUnit *beg;
-            const typename CS::CodeUnit *end;
+            largeBuf_ *buf;
+            const CU *beg;
+            const CU *end;
         } large_;
     };
+
+    void AllocSmall(size_t len);
+    void AllocLarge(size_t len);
+
+    CU *GetSmallMutableData();
+    CU *GetLargeMutableData();
+
+    CU *GetMutableData();
+
+public:
+
+    using Self = Storage<CU, TP>;
+
+    static constexpr bool IsThreadSafe = LargeBuf::IsThreadSafe;
+
+    static_assert(std::is_trivially_copyable_v<CU>);
+
+    Storage(size_t len);
+    Storage(const CU *data, size_t len);
+    Storage(const CU *beg, const CU *end);
+
+    Storage(const Self &copyFrom);
+    Storage(const Self &copyFrom, size_t begIdx, size_t endIdx);
+    Storage(Self &&moveFrom);
+
+    ~Storage();
+
+    Self &operator=(const Self &copyFrom);
+    Self &operator=(Self &&moveFrom);
 
     bool IsSmallStorage() const;
     bool IsLargeStorage() const;
 
-    size_t GetSmallLen() const;
-    size_t GetLargeLen() const;
-    size_t GetLen() const;
+    size_t GetSmallLength() const;
+    size_t GetLargeLength() const;
+    size_t GetLength() const;
 
-    const typename CS::CodeUnit *End() const;
+    const CU *Begin() const;
+    const CU *End() const;
 
-    // Assume *this uninitialized
-    void Init(const typename CS::CodeUnit *beg,
-              const typename CS::CodeUnit *end);
+    std::pair<const CU*, size_t> BeginAndLength() const;
+    std::pair<const CU*, const CU*> BeginAndEnd() const;
+};
 
-    // Assume *this uninitialized
-    void Init2(const typename CS::CodeUnit *beg1,
-               const typename CS::CodeUnit *end1,
-               const typename CS::CodeUnit *beg2,
-               const typename CS::CodeUnit *end2);
+template<typename CS, typename TP = MultiThreaded>
+class String
+{
+    friend class StringBuilder;
 
-    String<CS, TP> &CopyFromSelf(const String<CS, TP> &copyFrom);
+    Storage<typename CS::CodeUnit, TP> storage_;
 
-    void ConstructFromSelf(const String<CS, TP> &copyFrom);
+    typename CS::CodeUnit *GetMutableData();
+
+    explicit String(size_t len);
 
 public:
 
-    using CharSet   = CS;
+    using Charset   = CS;
     using CodeUnit  = typename CS::CodeUnit;
     using CodePoint = typename CS::CodePoint;
     using Self      = String<CS, TP>;
 
-    using Iterator        = const CodeUnit*;
+    using Iterator = const CodeUnit*;
 
-    constexpr static size_t NPOS = StrAlgo::NPOS;
+    class View
+    {
+        String<CS, TP> *str_;
+        typename CS::CodeUnit *beg_;
+        size_t len_;
+
+    public:
+
+        using Charset   = CS;
+        using CodeUnit  = typename CS::CodeUnit;
+        using CodePoint = typename CS::CodePoint;
+        using Self      = View;
+        using Str       = String<CS, TP>;
+
+        using Iterator = const CodeUnit*;
+
+        static constexpr size_t NPOS = std::numeric_limits<size_t>::max();
+
+        View(const Str &str);
+        View(const Str &str, const CodeUnit* beg, size_t len);
+        View(const Str &str, size_t begIdx, size_t endIdx);
+
+        View()                       = delete;
+        View(const Self &)           = default;
+        ~View()                      = default;
+        Self &operator=(const Self &) = default;
+
+        const CodeUnit *Data() const;
+        std::pair<const CodeUnit*, size_t> DataAndLength() const;
+
+        size_t Length() const;
+        bool Empty()    const;
+
+        View Trim()      const;
+        View TrimLeft()  const;
+        View TrimRight() const;
+
+        View Slice(size_t begIdx)                const;
+        View Slice(size_t begIdx, size_t endIdx) const;
+
+        View Prefix(size_t n) const;
+        View Suffix(size_t n) const;
+
+        bool StartsWith(const Self &prefix) const;
+        bool EndsWith(const Self &suffix)   const;
+
+        std::vector<Self> Split()                    const;
+        std::vector<Self> Split(const Self &spliter) const;
+
+        template<typename R>
+        Str Join(R &&strRange) const;
+
+        size_t Find(const Self &dst, size_t begIdx = 0)   const;
+        size_t FindR(const Self &dst, size_t rbegIdx = 0) const;
+
+        Iterator begin() const;
+        Iterator end()   const;
+
+        bool operator==(const Self &rhs) const;
+        bool operator!=(const Self &rhs) const;
+        bool operator< (const Self &rhs) const;
+        bool operator> (const Self &rhs) const;
+        bool operator<=(const Self &rhs) const;
+        bool operator>=(const Self &rhs) const;
+    };
+
+    static constexpr size_t NPOS = View::NPOS;
 
     String();
-
-    // Construct from existed buffer
-    // Will copy all data to owned storage
-    // Faster than the with-checking version bellow
-    // UB when [beg, end) is invalid
-    String(CONS_FLAG_NOCHECK_t, const CodeUnit *beg, const CodeUnit *end);
-
-    // Construct from existed buffer
-    // Will copy all data to owned storage
+    String(const View &view);
+    String(const CodeUnit *beg, size_t len);
     String(const CodeUnit *beg, const CodeUnit *end);
-
-    // Construct with concat([beg1, end1), [beg2, end2))
-    String(CONS_FLAG_NOCHECK_t, const CodeUnit *beg1, const CodeUnit *end1,
-                                const CodeUnit *beg2, const CodeUnit *end2);
-
-    // Construct with concat([beg1, end1), [beg2, end2))
-    String(const CodeUnit *beg1, const CodeUnit *end1,
-           const CodeUnit *beg2, const CodeUnit *end2);
-
-    // Construct from existed buffer
-    // Will copy all data to owned storage
-    String(const CodeUnit *beg, size_t n) : String(beg, beg + n) { }
-
-    // Construct from existed buffer using another CharSet
-    template<typename OCS>
-    String(CONS_FLAG_FROM_t<OCS>, const typename OCS::CodeUnit *beg,
-                                  const typename OCS::CodeUnit *end);
-
-    // Construct from existed buffer using another CharSet
-    template<typename OCS>
-    String(CONS_FLAG_FROM_t<OCS>, const typename OCS::CodeUnit *beg,
-                                  size_t n);
-
-    template<typename OCS, typename OTP>
-    explicit String(const String<OCS, OTP> &copyFrom);
+    String(const Self &copyFrom, size_t begIdx, size_t endIdx);
 
     String(const Self &copyFrom);
+    String(Self &&moveFrom);
 
-    String(Self &&moveFrom) noexcept;
+    template<typename OTP, std::enable_if_t<!std::is_same_v<TP, OTP>, int> = 0>
+    String(const String<CS, OTP> &copyFrom);
 
-    String(const CodeUnit *beg, const CodeUnit *end, size_t repeat);
-
-    String(const char *cStr);
-    String(const std::string &cppStr);
-    String(const char *cStr, CharEncoding encoding);
-    String(const std::string &cppStr, CharEncoding encoding);
-
-    String(const Self &copyFrom, size_t beg, size_t end);
-
-    template<typename OCS, typename OTP>
-    Self &operator=(const String<OCS, OTP> &copyFrom);
+    ~String() = default;
 
     Self &operator=(const Self &copyFrom);
+    Self &operator=(Self &&moveFrom);
 
-    Self &operator=(Self &&moveFrom) noexcept;
+    template<typename OTP, std::enable_if_t<!std::is_same_v<TP, OTP>, int> = 0>
+    Self &operator=(const String<CS, OTP> &copyFrom);
 
-    ~String();
-
-    void Swap(Self &other);
-
-    // Set with a new value and return the old one
-    Self Exchange(const Self &value);
+    View AsView() const;
 
     const CodeUnit *Data() const;
+    std::pair<const CodeUnit*, size_t> DataAndLength() const;
 
     size_t Length() const;
+    bool Empty()    const;
 
-    bool IsEmpty() const;
+    View Trim()      const;
+    View TrimLeft()  const;
+    View TrimRight() const;
 
-    std::pair<const CodeUnit*, size_t> DataAndLength() const;
-    std::pair<const CodeUnit*, const CodeUnit*> BeginAndEnd() const;
+    View Slice(size_t begIdx)                const;
+    View Slice(size_t begIdx, size_t endIdx) const;
 
-    std::string ToStdString() const;
-
-    CodeUnit operator[](size_t idx) const;
-    Self operator+(const Self &rhs);
-    Self operator*(size_t n);
-
-    CharRange<CS, TP> Chars() const;
-
-    Iterator begin() const;
-    Iterator end() const;
+    View Prefix(size_t n) const;
+    View Suffix(size_t n) const;
 
     bool StartsWith(const Self &prefix) const;
-    bool EndsWith(const Self &suffix) const;
+    bool EndsWith(const Self &suffix)   const;
 
-    size_t Find(const Self &dst, size_t beg = 0) const;
-    size_t RFind(const Self &dst, size_t rbeg = 0) const;
-
-    Self Slice(size_t beg, size_t end) const;
-    Self Slice(size_t beg) const;
-
-    Self LeftStrip() const;
-    Self RightStrip() const;
-    Self Strip() const;
-
-    std::vector<Self> Split(const std::vector<Self> &spliters =
-                            { u8" ", u8"\t", u8"\n", u8"\r\n" });
-    std::vector<Self> Lines() const;
+    std::vector<Self> Split()                    const;
+    std::vector<Self> Split(const Self &spliter) const;
 
     template<typename R>
-    Self Join(const R &strs) const;
+    Str Join(R &&strRange) const;
 
-    bool operator==(const Self &rhs) const;
-    bool operator!=(const Self &rhs) const;
-    bool operator<(const Self &rhs) const;
-    bool operator<=(const Self &rhs) const;
-    bool operator>=(const Self &rhs) const;
-    bool operator>(const Self &rhs) const;
+    size_t Find(const Self &dst, size_t begIdx = 0)   const;
+    size_t FindR(const Self &dst, size_t rbegIdx = 0) const;
 
-    bool operator==(const std::string &rhs) const;
-    bool operator!=(const std::string &rhs) const;
-    bool operator<(const std::string &rhs) const;
-    bool operator<=(const std::string &rhs) const;
-    bool operator>=(const std::string &rhs) const;
-    bool operator>(const std::string &rhs) const;
-
-    bool operator==(const char *rhs) const;
-    bool operator!=(const char *rhs) const;
-    bool operator<(const char *rhs) const;
-    bool operator<=(const char *rhs) const;
-    bool operator>=(const char *rhs) const;
-    bool operator>(const char *rhs) const;
+    Iterator begin() const;
+    Iterator end()   const;
 };
 
-template<typename CS, typename TP>
-String<CS, TP> &operator+=(String<CS, TP> &lhs, R &&rhs);
+template<typename CS, typename TP = SingleThreaded>
+class StringBuilder
+{
+    std::list<String<CS, TP>> strs_;
 
-template<typename CS, typename TP>
-bool operator==(const std::string &lhs, const String<CS, TP> &rhs);
-template<typename CS, typename TP>
-bool operator!=(const std::string &lhs, const String<CS, TP> &rhs);
-template<typename CS, typename TP>
-bool operator<(const std::string &lhs, const String<CS, TP> &rhs);
-template<typename CS, typename TP>
-bool operator<=(const std::string &lhs, const String<CS, TP> &rhs);
-template<typename CS, typename TP>
-bool operator>=(const std::string &lhs, const String<CS, TP> &rhs);
-template<typename CS, typename TP>
-bool operator>(const std::string &lhs, const String<CS, TP> &rhs);
+public:
 
-template<typename CS, typename TP>
-bool operator==(const char *lhs, const String<CS, TP> &rhs);
-template<typename CS, typename TP>
-bool operator!=(const char *lhs, const String<CS, TP> &rhs);
-template<typename CS, typename TP>
-bool operator<(const char *lhs, const String<CS, TP> &rhs);
-template<typename CS, typename TP>
-bool operator<=(const char *lhs, const String<CS, TP> &rhs);
-template<typename CS, typename TP>
-bool operator>=(const char *lhs, const String<CS, TP> &rhs);
-template<typename CS, typename TP>
-bool operator>(const char *lhs, const String<CS, TP> &rhs);
+    using Self = StringBuilder<CS>;
 
-template<typename CS, typename TP>
-String<CS, TP> operator*(size_t n, const String<CS, TP> &s);
+    template<typename TPs>
+    Self &Append(const typename String<CS, TPs>::View &view);
 
-template<typename CS, typename TP>
-std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s);
+    template<typename TPs>
+    Self &operator<<(const typename String<CS, TPs>::View &view);
 
-using Str8  = String<UTF8<>>;
-using Str16 = String<UTF16<>>;
-using Str32 = String<UTF32<>>;
-using WStr  = String<WUTF>;
+    template<typename TPs = MultiThreaded>
+    String<CS, TPs> Get() const;
 
-struct StringJoinRHS { Str8 mid, empty; };
+    void Clear();
+};
 
-inline StringJoinRHS Join(const Str8 &mid = u8" ",
-                          const Str8 &empty = u8"");
-
-template<typename R>
-auto operator|(R &&strs, const StringJoinRHS &rhs);
-
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::StrImpl)
 
 #include "String.inl"

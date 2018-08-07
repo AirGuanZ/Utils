@@ -70,6 +70,12 @@ public:
     {
         return OCS::FromUnicode(Core::ToUnicode(cp));
     }
+
+    static bool IsSpace(CodeUnit cu)
+    {
+        return cu == ' ' || cu == '\t' ||
+               cu == '\n' || cu == '\r';
+    }
 };
 
 AGZ_NS_END(AGZ)

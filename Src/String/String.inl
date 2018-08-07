@@ -1,906 +1,731 @@
-#pragma once
+#include <algorithm>
 
-#include <cctype>
-#include <cstring>
-#include <string>
-#include <tuple>
-#include <vector>
+#include "../Misc/Malloc.h"
+#include "../Range/Reverse.h"
+#include "StrAlgo.h"
 
-AGZ_NS_BEG(AGZ)
+AGZ_NS_BEG(AGZ::StrImpl)
 
-namespace StringAux
+template<typename CU, typename TP>
+void Storage<CU, TP>::AllocSmall(size_t len)
 {
-    template<typename T>
-    void CopyConstruct(T *dst, const T *src, size_t n)
-    {
-        for(size_t i = 0; i < n; ++i)
-            new(dst++) T(*src++);
-    }
-
-    template<typename CU, typename TP>
-    typename RefCountedBuf<CU, TP>::Self *RefCountedBuf<CU, TP>::New(size_t n)
-    {
-        AGZ_ASSERT(n >= 1);
-        size_t bytes = sizeof(Self) + (n-1) * sizeof(CU);
-        Self *ret = reinterpret_cast<Self*>(std::malloc(bytes));
-        ret->refs = 1;
-        return ret;
-    }
+    AGZ_ASSERT(len <= SMALL_BUF_SIZE);
+    small_.len = len;
 }
 
-template<typename CS, typename TP>
-CharRange<CS, TP>::CharRange(LargeBuf *buf, const CodeUnit *beg,
-                                            const CodeUnit *end)
-    : largeBuf_(buf), small_(false), beg_(beg), end_(end)
+template<typename E, typename TP>
+RefCountedBuf<E, TP> *RefCountedBuf<E, TP>::New(size_t n)
 {
-    AGZ_ASSERT(beg <= end && buf);
-    buf->IncRef();
+    size_t allocSize = (sizeof(Self) - sizeof(E)) + n * sizeof(E);
+    Self *ret = alloc_throw(std::malloc, allocSize);
+    ret->refs_ = 1;
+    return ret;
 }
 
-template<typename CS, typename TP>
-CharRange<CS, TP>::CharRange(const CodeUnit *beg, const CodeUnit *end)
-    : small_(true)
+template<typename E, typename TP>
+void RefCountedBuf<E, TP>::IncRef() const
 {
-    AGZ_ASSERT(beg <= end && end - beg <= SMALL_BUF_SIZE);
-    StringAux::CopyConstruct(&smallBuf_[0], beg, end - beg);
-    beg_ = &smallBuf_[0];
-    end_ = beg_ + (end - beg);
+    ++refs_;
 }
 
-template<typename CS, typename TP>
-CharRange<CS, TP>::CharRange(const Self &copyFrom)
-    : small_(copyFrom.small_)
+template<typename E, typename TP>
+void RefCountedBuf<E, TP>::DecRef() const
 {
-    if(small_)
+    if(!--refs_)
+        std::free(this);
+}
+
+template<typename E, typename TP>
+E *RefCountedBuf<E, TP>::GetData()
+{
+    return &data_[0];
+}
+
+template<typename E, typename TP>
+const E *RefCountedBuf<E, TP>::GetData() const
+{
+    return &data_[0];
+}
+
+template<typename CU, typename TP>
+void Storage<CU, TP>::AllocSmall(size_t len)
+{
+    AGZ_ASSERT(len <= SMALL_BUF_SIZE);
+    small_.len = len;
+}
+
+template<typename CU, typename TP>
+void Storage<CU, TP>::AllocLarge(size_t len)
+{
+    small_.len = SMALL_BUF_SIZE + 1;
+    large_.buf = LargeBuf::New(len);
+    large_.beg = large_.buf.GetData();
+    large_.end = large_.beg + len;
+}
+
+template<typename CU, typename TP>
+CU *Storage<CU, TP>::GetSmallMutableData()
+{
+    AGZ_ASSERT(IsSmallStorage());
+    return &small_.buf[0];
+}
+
+template<typename CU, typename TP>
+CU *Storage<CU, TP>::GetLargeMutableData()
+{
+    AGZ_ASSERT(IsLargeStorage());
+    return large_.beg;
+}
+
+template<typename CU, typename TP>
+CU *Storage<CU, TP>::GetMutableData()
+{
+    return IsSmallStorage() ? GetSmallMutableData() :
+                              GetLargeMutableData();
+}
+
+template<typename CU, typename TP>
+Storage<CU, TP>::Storage(size_t len)
+{
+    if(len <= SMALL_BUF_SIZE)
+        AllocSmall();
+    else
+        AllocLarge();
+}
+
+template<typename CU, typename TP>
+Storage<CU, TP>::Storage(const CU *data, size_t len)
+{
+    if(len <= SMALL_BUF_SIZE)
     {
-        StringAux::CopyConstruct(smallBuf_, copyFrom.smallBuf_, SMALL_BUF_SIZE);
-        beg_ = &smallBuf_[0];
-        end_ = beg_ + (copyFrom.end_ - copyFrom.beg_);
+        AllocSmall();
+        std::copy_n(data, len, GetSmallMutableData());
     }
     else
     {
-        largeBuf_ = copyFrom.largeBuf_;
-        largeBuf_->IncRef();
-        beg_ = copyFrom.beg_;
-        end_ = copyFrom.end_;
+        AllocLarge();
+        std::copy_n(data, len, GetLargeMutableData());
     }
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::IsSmallStorage() const
+template<typename CU, typename TP>
+Storage<CU, TP>::Storage(const CU *beg, const CU *end)
+    : Storage(beg, static_cast<size_t>(end - beg))
+{
+
+}
+
+template<typename CU, typename TP>
+Storage<CU, TP>::Storage(const Self &copyFrom)
+    : Storage(copyFrom, 0, copyFrom.GetLength())
+{
+
+}
+
+template<typename CU, typename TP>
+Storage<CU, TP>::Storage(const Self &copyFrom, size_t beg, size_t end)
+{
+    AGZ_ASSERT(beg <= end);
+    size_t len = end - beg;
+    if(len <= SMALL_BUF_SIZE)
+    {
+        AllocSmall();
+        std::copy_n(&copyFrom.Begin()[beg], len, GetSmallMutableData());
+    }
+    else
+    {
+        small_.len = copyFrom.small_.len;
+        large_.buf = copyFrom.large_.buf;
+        large_.beg = &copyFrom.Begin()[beg];
+        large_.end = large_.beg + len;
+    }
+}
+
+template<typename CU, typename TP>
+Storage<CU, TP>::Storage(Self &&moveFrom)
+{
+    if(moveFrom.IsLargeStorage())
+    {
+        small_.len = moveFrom.small_.len;
+        large_ = moveFrom.large_;
+        moveFrom.small_.len = 0;
+    }
+    else
+    {
+        auto [data, len] = moveFrom.DataAndLength();
+        AllocSmall(len);
+        std::copy_n(data, len, GetSmallMutableData());
+    }
+}
+
+template<typename CU, typename TP>
+Storage<CU, TP>::~Storage()
+{
+    if(IsLargeStorage())
+        large_.buf->DecRef();
+}
+
+template<typename CU, typename TP>
+Storage<CU, TP> &Storage<CU, TP>::operator=(const Self &copyFrom)
+{
+    if(IsLargeStorage())
+        large_.buf->DecRef();
+    new(this) Self(copyFrom);
+    return *this;
+}
+
+template<typename CU, typename TP>
+Storage<CU, TP> &Storage<CU, TP>::operator=(Self &&moveFrom)
+{
+    if(IsLargeStorage())
+        large_.buf->DecRef();
+    new(this) Self(std::move(moveFrom));
+    return *this;
+}
+
+template<typename CU, typename TP>
+bool Storage<CU, TP>::IsSmallStorage() const
 {
     return small_.len <= SMALL_BUF_SIZE;
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::IsLargeStorage() const
+template<typename CU, typename TP>
+bool Storage<CU, TP>::IsLargeStorage() const
 {
-    return small_.len > SMALL_BUF_SIZE;
+    return !IsSmallStorage();
 }
 
-template<typename CS, typename TP>
-size_t String<CS, TP>::GetSmallLen() const
+template<typename CU, typename TP>
+size_t Storage<CU, TP>::GetSmallLength() const
 {
     AGZ_ASSERT(IsSmallStorage());
     return small_.len;
 }
 
-template<typename CS, typename TP>
-size_t String<CS, TP>::GetLargeLen() const
+template<typename CU, typename TP>
+size_t Storage<CU, TP>::GetLargeLength() const
 {
-    AGZ_ASSERT(IsLargeStorage() && large_.beg < large_.end);
-    return large_.end - large_.beg;
+    AGZ_ASSERT(IsLargeStorage() && large_.beg <= large_.end);
+    return return large_.end - large_.beg;
+}
+
+template<typename CU, typename TP>
+size_t Storage<CU, TP>::GetLength() const
+{
+    return IsSmallStorage() ? GetSmallLength() : GetLargeLength();
+}
+
+template<typename CU, typename TP>
+const CU *Storage<CU, TP>::Begin() const
+{
+    return IsSmallStorage() ? &small_.buf[0] : large_.beg;
+}
+
+template<typename CU, typename TP>
+const CU *Storage<CU, TP>::End() const
+{
+    return IsSmallStorage() ? (&small_.buf[small_.len]) : large_.end;
+}
+
+template<typename CU, typename TP>
+std::pair<const CU*, size_t> Storage<CU, TP>::BeginAndLength() const
+{
+    return IsSmallStorage() ?
+                { &small_.buf[0], small_.len } :
+                { large_.beg, large_.end - large_.beg };
+}
+
+template<typename CU, typename TP>
+std::pair<const CU*, size_t> Storage<CU, TP>::BeginAndEnd() const
+{
+    return IsSmallStorage() ?
+                { &small_.buf[0], &small_.buf[small_.len] } :
+                { large_.beg, large_.end };
 }
 
 template<typename CS, typename TP>
-size_t String<CS, TP>::GetLen() const
+String<CS, TP>::View::View(const Str &str)
+    : str_(&str)
 {
-    return IsSmallStorage() ? GetSmallLen() : GetLargeLen();
+    std::tie(beg_, len_) = str.DataAndLength();
 }
 
 template<typename CS, typename TP>
-const typename CS::CodeUnit *String<CS, TP>::End() const
+String<CS, TP>::View::View(const Str &str, size_t begIdx, size_t endIdx)
+    : str_(&str)
 {
-    return IsSmallStorage() ? &small_.buf[0] + GetSmallLen() :
-                              large_.buf->GetData() + GetLargeLen();
+    AGZ_ASSERT(begIdx <= endIdx);
+    AGZ_ASSERT(endIdx <= str.Length());
+    auto d = str.Data();
+    beg_   = d + begIdx;
+    len_   = endIdx - begIdx;
 }
 
 template<typename CS, typename TP>
-void String<CS, TP>::Init(const typename CS::CodeUnit *beg,
-                          const typename CS::CodeUnit *end)
+String<CS, TP>::View::View(const Str &str, const CodeUnit* beg, size_t len)
+    : str_(&str), beg_(beg), len_(len)
 {
-    AGZ_ASSERT(beg <= end);
-    size_t len = end - beg;
-    if(len <= SMALL_BUF_SIZE) // Small storage
-    {
-        StringAux::CopyConstruct(&small_.buf[0], beg, len);
-        small_.len = static_cast<uint8_t>(len);
-    }
-    else // Large storage
-    {
-        small_.len = SMALL_BUF_SIZE + 1;
-        large_.buf = LargeBuf::New(len);
-        large_.beg = large_.buf->GetData();
-        large_.end = large_.beg + len;
-        StringAux::CopyConstruct(large_.buf->GetData(), beg, len);
-    }
+    AGZ_ASSERT(beg_ >= str.Data() && beg_ + len_ <= str.Data() + str.Length());
 }
 
 template<typename CS, typename TP>
-void String<CS, TP>::Init2(const typename CS::CodeUnit *beg1,
-                           const typename CS::CodeUnit *end1,
-                           const typename CS::CodeUnit *beg2,
-                           const typename CS::CodeUnit *end2)
+const typename CS::CodeUnit *String<CS, TP>::View::Data() const
 {
-    AGZ_ASSERT(beg1 <= end1 && beg2 <= end2);
-    size_t len1 = end1 - beg1, len2 = end2 - beg2, len = len1 + len2;
-    if(len <= SMALL_BUF_SIZE) // Small storage
-    {
-        StringAux::CopyConstruct(&small_.buf[0], beg1, len1);
-        StringAux::CopyConstruct(&small_.buf[0] + len1, beg2, len2);
-        small_.len = static_cast<uint8_t>(len);
-    }
-    else // Large storage
-    {
-        small_.len = SMALL_BUF_SIZE + 1;
-        large_.buf = LargeBuf::New(len);
-        large_.beg = large_.buf->GetData();
-        large_.end = large_.beg + len;
-        StringAux::CopyConstruct(large_.buf->GetData(), beg1, len1);
-        StringAux::CopyConstruct(large_.buf->GetData() + len1, beg2, len2);
-    }
+    return beg_;
 }
 
 template<typename CS, typename TP>
-String<CS, TP> &String<CS, TP>::CopyFromSelf(const Self &copyFrom)
+std::pair<const typename CS::CodeUnit*, size_t>
+String<CS, TP>::View::DataAndLength() const
 {
-    if(IsLargeStorage())
-        large_.buf->DecRef();
-    ConstructFromSelf(copyFrom);
-    return *this;
+    return { beg_, len_ };
 }
 
 template<typename CS, typename TP>
-void String<CS, TP>::ConstructFromSelf(const Self &copyFrom)
+size_t String<CS, TP>::View::Length() const
 {
-    if(copyFrom.IsSmallStorage())
+    return len_;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::View::Empty() const
+{
+    return Length() == 0;
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::View String<CS, TP>::View::Trim() const
+{
+    return TrimLeft().TrimRight();
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::View String<CS, TP>::View::TrimLeft() const
+{
+    auto beg = beg_; auto len = len_;
+    while(len > 0 && CS::IsSpace(*beg))
+        ++beg, --len;
+    return Self(*str_, beg, len);
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::View String<CS, TP>::View::TrimRight() const
+{
+    auto len = len_;
+    while(len > 0 && CS::IsSpace(beg_[len - 1]))
+        --len;
+    return Self(*str_, beg_, len);
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::View String<CS, TP>::View::Slice(size_t begIdx) const
+{
+    return this->Slice(begIdx, len_);
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::View
+String<CS, TP>::View::Slice(size_t begIdx, size_t endIdx) const
+{
+    AGZ_ASSERT(begIdx <= endIdx && endIdx <= len_);
+    return Self(*str_, beg_ + begIdx, beg_ + endIdx);
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::View String<CS, TP>::View::Prefix(size_t n) const
+{
+    AGZ_ASSERT(n <= len_);
+    return this->Slice(0, n);
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::View String<CS, TP>::View::Suffix(size_t n) const
+{
+    AGZ_ASSERT(n <= len_);
+    return this->Slice(len_ - n);
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::View::StartsWith(const Self &prefix) const
+{
+    return len_ < prefix.Length() ?
+                false :
+                (Prefix(prefix.Length()) == prefix);
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::View::EndsWith(const Self &suffix) const
+{
+    return len_ < suffix.Length() ?
+                false :
+                (Suffix(suffix.Length()) == suffix);
+}
+
+template<typename CS, typename TP>
+std::vector<typename String<CS, TP>::View> String<CS, TP>::View::Split() const
+{
+    std::vector<Self> ret;
+    const CodeUnit *segBeg = nullptr; size_t segLen = 0;
+    for(auto p = beg_, e = beg_ + len_; p < e; ++p)
     {
-        static_assert(std::is_trivially_copyable_v<CodeUnit>);
-        std::memcpy(&small_, &copyFrom.small_, sizeof(small_));
+        if(CS::IsSpace(*p))
+        {
+            if(segLen)
+            {
+                ret.emplace_back(*str_, segBeg, segLen);
+                segLen = 0;
+            }
+        }
+        else if(!segLen++)
+            segBeg = p;
     }
-    else
+    return std::move(ret);
+}
+
+template<typename CS, typename TP>
+std::vector<typename String<CS, TP>::View>
+String<CS, TP>::View::Split(const Self &spliter) const
+{
+    AGZ_ASSERT(spliter.Empty() == false);
+    std::vector<Self> ret;
+    size_t segBeg = 0;
+    while(segBeg < len_)
     {
-        small_.len = copyFrom.small_.len;
-        large_ = copyFrom.large_;
-        large_.buf->IncRef();
+        size_t fi = Find(spliter, segBeg);
+        if(fi == NPOS)
+        {
+            ret.emplace_back(*str_, segBeg, len_);
+            return std::move(ret);
+        }
+
+        if(fi != segBeg)
+            ret.emplace_back(*str_, segBeg, fi);
+        segBeg = fi + spliter.Length();
     }
+    return std::move(ret);
+}
+
+template<typename CS, typename TP>
+template<typename R>
+String<CS, TP> String<CS, TP>::Join(R &&strRange) const
+{
+    if(strRange.empty())
+        return Str();
+    StringBuilder<CS> builder;
+    auto beg = std::begin(strRange), end = std::end(strRange);
+    builder.Append(*beg++);
+    while(beg != end)
+        builder.Append(*this).Append(*beg++);
+    return builder.Get();
+}
+
+template<typename CS, typename TP>
+size_t String<CS, TP>::View::Find(const Self &dst, size_t begIdx) const
+{
+    AGZ_ASSERT(begIdx <= len_);
+    auto rt = FindSubPattern(begin() + begIdx, end(), dst.begin(), dst.end());
+    return rt == end() ? NPOS : (rt - beg_)
+}
+
+template<typename CS, typename TP>
+size_t String<CS, TP>::View::FindR(const Self &dst, size_t rbegIdx) const
+{
+    AGZ_ASSERT(rbegIdx <= len_);
+    using R = ReverseIterator<Iterator>;
+    auto rbeg = R(end()) + rbegIdx, rend = R(begin());
+    auto rt = FindSubPattern(rbeg, rend, R(dst.end()), R(dst.begin()));
+    return rt == rend ? NPOS : (len_ - (rt - rbeg) - dst.Length());
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::View::Iterator String<CS, TP>::View::begin() const
+{
+    return beg_;
+}
+
+template<typename CS, typename TP>
+typename String<CS, TP>::View::Iterator String<CS, TP>::View::end() const
+{
+    return beg_ + len_;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::View::operator==(const Self &rhs) const
+{
+    if(len_ != rhs.len_)
+        return false;
+    for(size_t i = 0; i < len_; ++i)
+    {
+        if(beg_[i] != rhs.beg_[i])
+            return false;
+    }
+    return true;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::View::operator==(const Self &rhs) const
+{
+    return !(*this == rhs);
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::View::operator<(const Self &rhs) const
+{
+    return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
+        == StrAlgo::CompareResult::Less;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::View::operator>(const Self &rhs) const
+{
+    return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
+        == StrAlgo::CompareResult::Greater;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::View::operator<=(const Self &rhs) const
+{
+    return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
+        != StrAlgo::CompareResult::Greater;
+}
+
+template<typename CS, typename TP>
+bool String<CS, TP>::View::operator>=(const Self &rhs) const
+{
+    return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
+        != StrAlgo::CompareResult::Less;
 }
 
 template<typename CS, typename TP>
 String<CS, TP>::String()
-{
-    small_.len = 0;
-}
-
-template<typename CS, typename TP>
-String<CS, TP>::String(CONS_FLAG_NOCHECK_t, const CodeUnit *beg,
-                                            const CodeUnit *end)
-{
-    Init(beg, end);
-}
-
-template <typename CS, typename TP>
-String<CS, TP>::String(const CodeUnit* beg, const CodeUnit* end)
-{
-    if(!CS::Check(beg, end - beg))
-    {
-        throw EncodingException("Input [beg, end) is not a valid "
-                              + CS::Name() + " sequence");
-    }
-    Init(beg, end);
-}
-
-template<typename CS, typename TP>
-String<CS, TP>::String(CONS_FLAG_NOCHECK_t,
-                       const CodeUnit* beg1, const CodeUnit* end1,
-                       const CodeUnit* beg2, const CodeUnit* end2)
-{
-    Init2(beg1, end1, beg2, end2);
-}
-
-template<typename CS, typename TP>
-String<CS, TP>::String(const CodeUnit* beg1, const CodeUnit* end1,
-                       const CodeUnit* beg2, const CodeUnit* end2)
-{
-    if(!CS::Check(beg1, end1 - beg1) || !CS::Check(beg2, end2 - beg2))
-    {
-        throw EncodingException("Input [beg, end) is not a valid "
-                              + CS::Name() + " sequence");
-    }
-    Init2(beg1, end1, beg2, end2);
-}
-
-template<typename CS, typename TP>
-template<typename OCS>
-String<CS, TP>::String(CONS_FLAG_FROM_t<OCS>, const typename OCS::CodeUnit *beg,
-                                              const typename OCS::CodeUnit *end)
-{
-    if constexpr (std::is_same_v<CS, OCS>)
-        new(this) Self(beg, end);
-    else
-    {
-        std::vector<CodeUnit> cus;
-        CodeUnit sgl[CS::MaxCUInCP];
-        while(beg < end)
-        {
-            typename OCS::CodePoint ocp;
-            size_t skip = OCS::CU2CP(beg, &ocp, end - beg);
-            if(!skip)
-            {
-                throw EncodingException("Input [beg, end) is not a valid "
-                                      + OCS::Name() + " sequence");
-            }
-            beg += skip;
-
-            size_t sgls = CS::CP2CU(CS::template From<OCS>(ocp), sgl);
-            AGZ_ASSERT(sgls);
-            for(size_t i = 0; i < sgls; ++i)
-                cus.push_back(sgl[i]);
-        }
-
-        Init(cus.data(), cus.data() + cus.size());
-    }
-}
-
-template<typename CS, typename TP>
-template<typename OCS>
-String<CS, TP>::String(CONS_FLAG_FROM_t<OCS>, const typename OCS::CodeUnit *beg,
-                                              size_t n)
-    : String(FROM<OCS>, beg, beg + n)
+    : storage_(0)
 {
 
 }
 
 template<typename CS, typename TP>
-template<typename OCS, typename OTP>
-String<CS, TP>::String(const String<OCS, OTP>& copyFrom)
-    : String(FROM<OCS>, copyFrom.Data(), copyFrom.Length())
+String<CS, TP>::String(const CodeUnit *beg, size_t len)
+    : storage_(beg, len)
+{
+
+}
+
+template<typename CS, typename TP>
+String<CS, TP>::String(const CodeUnit *beg, const CodeUnit *end)
+    : storage_(beg, end)
+{
+
+}
+
+template<typename CS, typename TP>
+String<CS, TP>::String(const Self &copyFrom, size_t begIdx, size_t endIdx)
+    : storage_(copyFrom.storage_, begIdx, endIdx)
 {
 
 }
 
 template<typename CS, typename TP>
 String<CS, TP>::String(const Self &copyFrom)
+    : storage_(copyFrom.storage_)
 {
-    ConstructFromSelf(copyFrom);
+
 }
 
 template<typename CS, typename TP>
-String<CS, TP>::String(Self &&moveFrom) noexcept
+String<CS, TP>::String(Self &&moveFrom)
+    : storage_(std::move(moveFrom.storage_))
 {
-    if(moveFrom.IsSmallStorage())
-    {
-        static_assert(std::is_trivially_copyable_v<CodeUnit>);
-        std::memcpy(&small_, &moveFrom.small_, sizeof(small_));
-    }
-    else
-    {
-        large_ = moveFrom.large_;
-        small_.len = SMALL_BUF_SIZE + 1;
-        moveFrom.small_.len = 0;
-    }
+
 }
 
 template<typename CS, typename TP>
-template<typename OCS, typename OTP>
-String<CS, TP> &String<CS, TP>::operator=(const String<OCS, OTP> &copyFrom)
+template<typename OTP, std::enable_if_t<!std::is_same_v<TP, OTP>, int>>
+String<CS, TP>::String(const String<CS, OTP> &copyFrom)
 {
-    if constexpr(std::is_same_v<CS, OCS>)
-        return CopyFromSelf(copyFrom);
-    else
-        return *this = Self(FROM<OCS>, copyFrom.Data(),
-                            copyFrom.Data() + copyFrom.Length());
-}
-
-template<typename CS, typename TP>
-typename String<CS, TP>::Self &
-String<CS, TP>::operator=(Self &&moveFrom) noexcept
-{
-    if(IsLargeStorage())
-        large_.buf->DecRef();
-    if(moveFrom.IsSmallStorage())
-    {
-        static_assert(std::is_trivially_copyable_v<CodeUnit>);
-        std::memcpy(&small_, &moveFrom.small_, sizeof(small_));
-    }
-    else
-    {
-        small_.len = moveFrom.small_.len;
-        large_ = moveFrom.large_;
-        moveFrom.small_.len = 0;
-    }
-    return *this;
+    auto [data, len] = copyFrom.DataAndLength();
+    new(this) Self(data, len);
 }
 
 template<typename CS, typename TP>
 String<CS, TP> &String<CS, TP>::operator=(const Self &copyFrom)
 {
-    CopyFromSelf(copyFrom);
+    storage_ = copyFrom.storage_;
     return *this;
 }
 
 template<typename CS, typename TP>
-String<CS, TP>::String(const CodeUnit *beg, const CodeUnit *end, size_t repeat)
+String<CS, TP> &String<CS, TP>::operator=(Self &&moveFrom)
 {
-    AGZ_ASSERT(beg <= end);
-    size_t ulen = end - beg, tlen = ulen * repeat;
-    if(!ulen)
-    {
-        new(this) Self();
-        return;
-    }
-
-    if(tlen <= SMALL_BUF_SIZE)
-    {
-        CodeUnit *buf = &small_.buf[0];
-        for(size_t i = 0; i < repeat; ++i, buf += ulen)
-            StringAux::CopyConstruct(buf, beg, ulen);
-        small_.len = static_cast<uint8_t>(tlen);
-    }
-    else
-    {
-        small_.len = SMALL_BUF_SIZE + 1;
-        large_.buf = LargeBuf::New(tlen);
-        large_.beg = large_.buf->GetData();
-        large_.end = large_.beg + tlen;
-
-        CodeUnit *buf = large_.buf->GetData();
-        for(size_t i = 0; i < repeat; ++i, buf += ulen)
-            StringAux::CopyConstruct(buf, beg, ulen);
-    }
+    storage_ = std::move(moveFrom.storage_);
+    return *this;
 }
 
 template<typename CS, typename TP>
-String<CS, TP>::String(const char *cStr)
-    : String(cStr, CharEncoding::UTF8)
+template<typename OTP, std::enable_if_t<!std::is_same_v<TP, OTP>, int>>
+String<CS, TP> &String<CS, TP>::operator=(const String<CS, OTP> &copyFrom)
 {
-
+    this->~String();
+    auto [data, len] = copyFrom.DataAndLength();
+    new(this) Self(data, len);
+    return *this;
 }
 
 template<typename CS, typename TP>
-String<CS, TP>::String(const std::string &cppStr)
-    : String(cppStr, CharEncoding::UTF8)
+typename String<CS, TP>::View String<CS, TP>::AsView() const
 {
-
+    return View(*this);
 }
 
 template<typename CS, typename TP>
-String<CS, TP>::String(const char *cStr, CharEncoding encoding)
+const typename CS::CodeUnit *String<CS, TP>::Data() const
 {
-    switch(encoding)
-    {
-    case CharEncoding::UTF8:
-        new(this) Self(FROM<UTF8<char>>, cStr, std::strlen(cStr));
-        break;
-    default:
-        throw EncodingException("Unknown encoding: "
-                + std::to_string(
-                    static_cast<std::underlying_type_t<CharEncoding>>
-                    (encoding)));
-    }
+    return storage_.Begin();
 }
 
 template<typename CS, typename TP>
-String<CS, TP>::String(const std::string &cppStr, CharEncoding encoding)
+std::pair<const typename CS::CodeUnit*, size_t>
+String<CS, TP>::DataAndLength() const
 {
-    switch(encoding)
-    {
-    case CharEncoding::UTF8:
-        new(this) Self(FROM<UTF8<char>>, cppStr.c_str(), cppStr.length());
-        break;
-    default:
-        throw EncodingException("Unknown encoding: "
-                + std::to_string(
-                    static_cast<std::underlying_type_t<CharEncoding>>
-                    (encoding)));
-    }
-}
-
-template<typename CS, typename TP>
-String<CS, TP>::String(const Self &copyFrom, size_t beg, size_t end)
-{
-    AGZ_ASSERT(beg <= end);
-    if(beg == end)
-    {
-        small_.len = 0;
-    }
-    else if(copyFrom.IsSmallStorage())
-    {
-        auto d = copyFrom.Data()
-        Init(d + beg, d + end);
-    }
-    else
-    {
-        small_.len = copyFrom.small_.len;
-        large_.buf = copyFrom.large_.buf;
-        large_.buf->IncRef();
-        large_.beg = large_.buf->GetData() + beg;
-        large_.beg = large_.buf->GetData() + end;
-    }
-}
-
-template<typename CS, typename TP>
-String<CS, TP>::~String()
-{
-    if(IsLargeStorage())
-        large_.buf->DecRef();
-}
-
-template<typename CS, typename TP>
-void String<CS, TP>::Swap(Self &other)
-{
-    // IMPROVE
-    Self t = *this;
-    *this = other;
-    other = t;
-}
-
-template<typename CS, typename TP>
-typename String<CS, TP>::Self String<CS, TP>::Exchange(const Self &value)
-{
-    // IMPROVE
-    Self ret = *this;
-    *this = value;
-    return ret;
-}
-
-template<typename CS, typename TP>
-const typename String<CS, TP>::CodeUnit *String<CS, TP>::Data() const
-{
-    return IsSmallStorage() ? &small_.buf[0] : large_.beg;
+    return storage_.BeginAndLength();
 }
 
 template<typename CS, typename TP>
 size_t String<CS, TP>::Length() const
 {
-    return GetLen();
+    return storage_.GetLength();
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::IsEmpty() const
+bool String<CS, TP>::Empty() const
 {
     return Length() == 0;
 }
 
 template<typename CS, typename TP>
-std::pair<const typename String<CS, TP>::CodeUnit*, size_t>
-String<CS, TP>::DataAndLength() const
+typename String<CS, TP>::View String<CS, TP>::Trim() const
 {
-    if(IsSmallStorage())
-        return { &small_.buf[0], static_cast<size_t>(small_.len) };
-    return { large_.beg, large_.end - large_.beg };
+    return AsView().Trim();
 }
 
 template<typename CS, typename TP>
-std::pair<const typename String<CS, TP>::CodeUnit*,
-          const typename String<CS, TP>::CodeUnit*>
-String<CS, TP>::BeginAndEnd() const
+typename String<CS, TP>::View String<CS, TP>::View::TrimLeft() const
 {
-    if(IsSmallStorage())
-        return { &small_.buf[0], &small_.buf[0] + small_.len };
-    return { large_.beg, large_.end };
-}
-
-template <typename CS, typename TP>
-typename String<CS, TP>::CodeUnit String<CS, TP>::operator[](size_t idx) const
-{
-    AGZ_ASSERT(idx < GetLen());
-    return Data()[idx];
+    return AsView().TrimLeft();
 }
 
 template<typename CS, typename TP>
-std::string String<CS, TP>::ToStdString() const
+typename String<CS, TP>::View String<CS, TP>::View::TrimRight() const
 {
-    if constexpr (std::is_same_v<CodeUnit, char>)
-        return std::make_from_tuple<std::string>(DataAndLength());
-    else
-    {
-        String<UTF8<char>, TP> t(*this);
-        return t.ToStdString();
-    }
+    return AsView().TrimRight();
 }
 
 template<typename CS, typename TP>
-typename String<CS, TP>::Self String<CS, TP>::operator+(const Self &rhs)
+typename String<CS, TP>::View String<CS, TP>::View::Slice(size_t begIdx) const
 {
-    auto args = std::tuple_cat(std::make_tuple(NOCHECK), BeginAndEnd(), rhs.BeginAndEnd());
-    return std::make_from_tuple<Self>(args);
+    return AsView().Slice(begIdx);
 }
 
 template<typename CS, typename TP>
-typename String<CS, TP>::Self String<CS, TP>::operator*(size_t n)
+typename String<CS, TP>::View
+String<CS, TP>::View::Slice(size_t begIdx, size_t endIdx) const
 {
-    return Self(Data(), Data() + Length(), n);
+    return AsView().Slice(begIdx, endIdx);
 }
 
 template<typename CS, typename TP>
-CharRange<CS, TP> String<CS, TP>::Chars() const
+typename String<CS, TP>::View String<CS, TP>::View::Prefix(size_t n) const
 {
-    if(IsSmallStorage())
-        return CharRange<CS, TP>(Data(), End());
-    return CharRange<CS, TP>(large_.buf, Data(), End());
+    return AsView().Prefix(n);
 }
 
 template<typename CS, typename TP>
-typename String<CS, TP>::Iterator String<CS, TP>::begin() const
+typename String<CS, TP>::View String<CS, TP>::View::Suffix(size_t n) const
 {
-    return Data();
+    return AsView().Suffix(n);
 }
 
 template<typename CS, typename TP>
-typename String<CS, TP>::Iterator String<CS, TP>::end() const
+bool String<CS, TP>::View::StartsWith(const View &prefix) const
 {
-    return End();
+    return AsView().StartsWith(prefix);
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::StartsWith(const Self &prefix) const
+bool String<CS, TP>::View::EndsWith(const View &suffix) const
 {
-    return StrAlgo::StartsWith(begin(), end(),
-                               std::begin(prefix), std::end(prefix));
+    return AsView().EndsWith(suffix);
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::EndsWith(const Self &suffix) const
+std::vector<typename String<CS, TP>::View> String<CS, TP>::View::Split() const
 {
-    return StrAlgo::EndsWith(begin(), end(),
-                                std::begin(suffix), std::end(suffix));
+    return AsView().Split();
 }
 
 template<typename CS, typename TP>
-size_t String<CS, TP>::Find(const Self &dst, size_t beg) const
+std::vector<typename String<CS, TP>::View>
+String<CS, TP>::View::Split(const View &spliter) const
 {
-    if(beg >= Length())
-        return NPOS;
-    return StrAlgo::Find(begin() + beg, end(),
-                         std::begin(dst), std::end(dst));
-}
-
-template<typename CS, typename TP>
-size_t String<CS, TP>::RFind(const Self &dst, size_t rbeg) const
-{
-    if(rbeg >= Length())
-        return NPOS;
-    return StrAlgo::RFind(begin(), end() - rbeg,
-                          std::begin(dst), std::end(dst));
-}
-
-template<typename CS, typename TP>
-String<CS, TP> String<CS, TP>::Slice(size_t beg, size_t end) const
-{
-    AGZ_ASSERT(beg <= end && end <= Length());
-    return Self(*this, beg, end);
-}
-
-template<typename CS, typename TP>
-String<CS, TP> String<CS, TP>::Slice(size_t beg) const
-{
-    return Slice(beg, Length());
-}
-
-template<typename CS, typename TP>
-String<CS, TP> String<CS, TP>::LeftStrip() const
-{
-    size_t idx = 0;
-    auto [data, len] = DataAndLength();
-    while(idx < len && std::isspace(data[idx]))
-        ++idx;
-    return Slice(idx);
-}
-
-template<typename CS, typename TP>
-String<CS, TP> String<CS, TP>::RightStrip() const
-{
-    auto [data, end] = DataAndLength();
-    while(end > 0 && std::isspace(data[idx]))
-        --end;
-    return Slice(0, end);
-}
-
-template<typename CS, typename TP>
-String<CS, TP> String<CS, TP>::Strip() const
-{
-    return LeftStrip().RightStrip();
-}
-
-template<typename CS, typename TP>
-std::vector<String<CS, TP>> String<CS, TP>::Split(
-                    const std::vector<Self> &spliters)
-{
-    std::vector<Self> ret; Self s = *this;
-
-    while(!s.IsEmpty())
-    {
-        size_t splitBeg = NPOS, splitLen = 0;
-        for(auto &spliter : rhs.spliters)
-        {
-            AGZ_ASSERT(!spliter.IsEmpty());
-            size_t beg = s.Find(spliter);
-            if(beg < splitBeg)
-            {
-                splitBeg = beg;
-                splitLen = spliter.Length();
-            }
-        }
-
-        if(splitBeg == NPOS)
-        {
-            ret.push_back(std::move(s));
-            return std::move(ret);
-        }
-
-        if(splitBeg != 0)
-            ret.push_back(s.Slice(0, splitBeg));
-
-        s = s.Slice(splitBeg + splitLen);
-    }
-
-    return std::move(ret);
-}
-
-template<typename CS, typename TP>
-std::vector<String<CS, TP>> String<CS, TP>::Lines()
-{
-    return Split({ u8"\n", u8"\r\n" });
+    return AsView().Split(spliter);
 }
 
 template<typename CS, typename TP>
 template<typename R>
-String<CS, TP> String<CS, TP>::Join(const R &strs) const
+String<CS, TP> String<CS, TP>::Join(R &&strRange) const
 {
-    return strs | Join(*this);
+    return AsView().Join(std::forward<R>(strRange))
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::operator==(const Self &rhs) const
+size_t String<CS, TP>::View::Find(const View &dst, size_t begIdx) const
 {
-    auto [b1, e1] = BeginAndEnd();
-    auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Compare(b1, e1, b2, e2)
-        == StrAlgo::CompareResult::Equal;
+    return AsView().Find(dst, begIdx);
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::operator!=(const Self &rhs) const
+size_t String<CS, TP>::View::FindR(const View &dst, size_t rbegIdx) const
 {
-    auto [b1, e1] = BeginAndEnd();
-    auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Compare(b1, e1, b2, e2)
-        != StrAlgo::CompareResult::Equal;
+    return AsView().FindR(dst, rbegIdx);
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::operator<(const Self &rhs) const
+template<typename TPs>
+StringBuilder<CS, TP> &StringBuilder<CS, TP>::Append(
+    const typename String<CS, TPs>::View &view)
 {
-    auto [b1, e1] = BeginAndEnd();
-    auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Compare(b1, e1, b2, e2)
-        == StrAlgo::CompareResult::Less;
+    strs_.emplace_back(view);
+    return *this;
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::operator<=(const Self &rhs) const
+template<typename TPs>
+StringBuilder<CS, TP> &StringBuilder<CS, TP>::operator<<(
+    const typename String<CS, TPs>::View &view)
 {
-    auto [b1, e1] = BeginAndEnd();
-    auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Compare(b1, e1, b2, e2)
-        != StrAlgo::CompareResult::Greater;
+    return Append(view);
 }
 
 template<typename CS, typename TP>
-bool String<CS, TP>::operator>=(const Self &rhs) const
+template<typename TPs>
+String<CS, TPs> StringBuilder<CS, TP>::Get() const
 {
-    auto [b1, e1] = BeginAndEnd();
-    auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Compare(b1, e1, b2, e2)
-        != StrAlgo::CompareResult::Less;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator>(const Self &rhs) const
-{
-    auto [b1, e1] = BeginAndEnd();
-    auto [b2, e2] = rhs.BeginAndEnd();
-    return StrAlgo::Compare(b1, e1, b2, e2)
-        == StrAlgo::CompareResult::Greater;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator==(const std::string &rhs) const
-{
-    return ToStdString() == rhs;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator!=(const std::string &rhs) const
-{
-    return ToStdString() != rhs;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator<(const std::string &rhs) const
-{
-    return ToStdString() < rhs;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator<=(const std::string &rhs) const
-{
-    return ToStdString() <= rhs;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator>=(const std::string &rhs) const
-{
-    return ToStdString() >= rhs;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator>(const std::string &rhs) const
-{
-    return ToStdString() > rhs;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator==(const char *rhs) const
-{
-    return ToStdString() == rhs;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator!=(const char *rhs) const
-{
-    return ToStdString() != rhs;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator<(const char *rhs) const
-{
-    return ToStdString() < rhs;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator<=(const char *rhs) const
-{
-    return ToStdString() <= rhs;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator>=(const char *rhs) const
-{
-    return ToStdString() >= rhs;
-}
-
-template<typename CS, typename TP>
-bool String<CS, TP>::operator>(const char *rhs) const
-{
-    return ToStdString() > rhs;
-}
-
-template<typename CS, typename TP, typename R>
-String<CS, TP> &operator+=(String<CS, TP> &lhs, R &&rhs)
-{
-    return lhs = lhs + std::forward<R>(rhs);
-}
-
-template<typename CS, typename TP>
-bool operator==(const std::string &lhs, const String<CS, TP> &rhs)
-{
-    return lhs == rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-bool operator!=(const std::string &lhs, const String<CS, TP> &rhs)
-{
-    return lhs != rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-bool operator<(const std::string &lhs, const String<CS, TP> &rhs)
-{
-    return lhs < rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-bool operator<=(const std::string &lhs, const String<CS, TP> &rhs)
-{
-    return lhs <= rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-bool operator>=(const std::string &lhs, const String<CS, TP> &rhs)
-{
-    return lhs >= rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-bool operator>(const std::string &lhs, const String<CS, TP> &rhs)
-{
-    return lhs > rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-bool operator==(const char *lhs, const String<CS, TP> &rhs)
-{
-    return lhs == rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-bool operator!=(const char *lhs, const String<CS, TP> &rhs)
-{
-    return lhs != rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-bool operator<(const char *lhs, const String<CS, TP> &rhs)
-{
-    return lhs < rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-bool operator<=(const char *lhs, const String<CS, TP> &rhs)
-{
-    return lhs <= rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-bool operator>=(const char *lhs, const String<CS, TP> &rhs)
-{
-    return lhs >= rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-bool operator>(const char *lhs, const String<CS, TP> &rhs)
-{
-    return lhs > rhs.ToStdString();
-}
-
-template<typename CS, typename TP>
-String<CS, TP> operator*(size_t n, const String<CS, TP> &s)
-{
-    return s * n;
-}
-
-template<typename CS, typename TP>
-std::ostream &operator<<(std::ostream &out, const String<CS, TP> &s)
-{
-    return out << s.ToStdString();
-}
-
-inline StringJoinRHS Join(const Str8 &mid, const Str8 &empty)
-{
-    return StringJoinRHS{ mid, empty };
-}
-
-template<typename R>
-auto operator|(const R &strs, const StringJoinRHS &rhs)
-{
-    // IMPROVE
-
-    using RT = typename R::value_type;
-    if(strs.empty())
-        return RT(rhs.empty);
-    RT ret = strs[0];
-    auto cur = std::begin(strs), end = std::end(strs);
-    while(++cur != end)
-        ret += rhs.mid + *cur;
+    size_t len = 0;
+    for(auto &s : strs_)
+        len += s.Length();
+    String<CS, TPs> ret(len);
+    auto data = ret.GetMutableData();
+    for(auto &s : strs_)
+    {
+        std::copy_n(s.Data(), s.Length(), data);
+        data += s.Length();
+    }
     return std::move(ret);
 }
 
-inline StringSplitRHS Split(const std::vector<Str8> &spliters =
-                            { u8" ", u8"\t", u8"\n", u8"\r\n" })
+template<typename CS, typename TP>
+void StringBuilder<CS, TP>::Clear()
 {
-    return StringSplitRHS { spliters };
+    strs_.clear();
 }
 
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::StrImpl)

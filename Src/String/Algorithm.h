@@ -107,13 +107,6 @@ Compare(It beg1, It end1, It beg2, It end2)
         if(c1 > c2) return CompareResult::Greater;
     }
 
-    if(beg1 == end1)
-    {
-        if(beg2 == end2)
-            return CompareResult::Equal;
-        return CompareResult::Less;
-    }
-
     return beg1 == end1 ? (beg2 == end2 ? CompareResult::Equal
                                         : CompareResult::Less)
                         : CompareResult::Greater;
