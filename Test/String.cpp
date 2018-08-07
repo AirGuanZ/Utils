@@ -37,6 +37,24 @@ TEST_CASE("String")
     SECTION("Trim")
     {
         REQUIRE(Str8(u8"  Minecraft\n\t").Trim() == Str8(u8"Minecraft"));
+        REQUIRE(Str8(u8"  Minecraft\n\t").TrimLeft() == Str8(u8"Minecraft\n\t"));
+        REQUIRE(Str8(u8"  Minecraft\n\t").TrimRight() == Str8(u8"  Minecraft"));
+    }
+
+    SECTION("Split")
+    {
+        using It = GetIteratorType<vector<Str8>>;
+        REQUIRE((Str8("Mine cr aft ").Split()
+                | Map([](const Str8::View &v) { return v.AsString(); })
+                | Collect<vector<Str8>>())
+             == vector<Str8>{ u8"Mine", u8"cr", u8"aft" });
+        It it;
+    }
+
+    SECTION("Join")
+    {
+        REQUIRE(Str8(" + ").Join(vector<Str8>{ u8"a", u8"b", u8"c" }) == u8"a + b + c");
+        REQUIRE(Str8(" + ").Join(vector<Str8>{ }).Empty());
     }
 
     SECTION("Find")

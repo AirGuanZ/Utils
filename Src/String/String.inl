@@ -602,6 +602,22 @@ String<CS>::String(const char *cstr, NativeCharset cs)
 }
 
 template<typename CS>
+String<CS>::String(const std::string & cppStr, NativeCharset cs)
+    : storage_(0)
+{
+    switch(cs)
+    {
+    case NativeCharset::UTF8:
+        *this = Self(CharsetConvertor::Convert<CS, UTF8<>>(Str8(cppStr.c_str(), cppStr.length())));
+        break;
+    default:
+        throw CharsetException("Unknown charset " +
+            std::to_string(static_cast<
+                std::underlying_type_t<NativeCharset>>(cs)));
+    }
+}
+
+template<typename CS>
 String<CS>::String(const Self &copyFrom)
     : storage_(copyFrom.storage_)
 {
@@ -808,370 +824,17 @@ bool String<CS>::operator>=(const Self &rhs) const
 }
 
 template<typename CS>
-bool operator==(const String<CS> &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.AsView() == rhs;
-}
-
-template<typename CS>
-bool operator!=(const String<CS> &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.AsView() != rhs;
-}
-
-template<typename CS>
-bool operator<(const String<CS> &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.AsView() < rhs;
-}
-
-template<typename CS>
-bool operator>(const String<CS> &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.AsView() > rhs;
-}
-
-template<typename CS>
-bool operator<=(const String<CS> &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.AsView() <= rhs;
-}
-
-template<typename CS>
-bool operator>=(const String<CS> &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.AsView() >= rhs;
-}
-
-template<typename CS>
-bool operator==(const typename String<CS>::View &lhs, const String<CS> &rhs)
-{
-    return lhs == rhs.AsView();
-}
-
-template<typename CS>
-bool operator!=(const typename String<CS>::View &lhs, const String<CS> &rhs)
-{
-    return lhs != rhs.AsView();
-}
-
-template<typename CS>
-bool operator<(const typename String<CS>::View &lhs, const String<CS> &rhs)
-{
-    return lhs < rhs.AsView();
-}
-
-template<typename CS>
-bool operator>(const typename String<CS>::View &lhs, const String<CS> &rhs)
-{
-    return lhs > rhs.AsView();
-}
-
-template<typename CS>
-bool operator<=(const typename String<CS>::View &lhs, const String<CS> &rhs)
-{
-    return lhs <= rhs.AsView();
-}
-
-template<typename CS>
-bool operator>=(const typename String<CS>::View &lhs, const String<CS> &rhs)
-{
-    return lhs >= rhs.AsView();
-}
-
-template<typename CS>
-bool operator==(const String<CS> &lhs, const char *rhs)
-{
-    return lhs == String<CS>(rhs);
-}
-
-template<typename CS>
-bool operator!=(const String<CS> &lhs, const char *rhs)
-{
-    return lhs != String<CS>(rhs);
-}
-
-template<typename CS>
-bool operator<(const String<CS> &lhs, const char *rhs)
-{
-    return lhs < String<CS>(rhs);
-}
-
-template<typename CS>
-bool operator>(const String<CS> &lhs, const char *rhs)
-{
-    return lhs > String<CS>(rhs);
-}
-
-template<typename CS>
-bool operator<=(const String<CS> &lhs, const char *rhs)
-{
-    return lhs <= String<CS>(rhs);
-}
-
-template<typename CS>
-bool operator>=(const String<CS> &lhs, const char *rhs)
-{
-    return lhs >= String<CS>(rhs);
-}
-
-template<typename CS>
-bool operator==(const char *lhs, const String<CS> &rhs)
-{
-    return String<CS>(lhs) == rhs;
-}
-
-template<typename CS>
-bool operator!=(const char *lhs, const String<CS> &rhs)
-{
-    return String<CS>(lhs) != rhs;
-}
-
-template<typename CS>
-bool operator<(const char *lhs, const String<CS> &rhs)
-{
-    return String<CS>(lhs) < rhs;
-}
-
-template<typename CS>
-bool operator>(const char *lhs, const String<CS> &rhs)
-{
-    return String<CS>(lhs) > rhs;
-}
-
-template<typename CS>
-bool operator<=(const char *lhs, const String<CS> &rhs)
-{
-    return String<CS>(lhs) <= rhs;
-}
-
-template<typename CS>
-bool operator>=(const char *lhs, const String<CS> &rhs)
-{
-    return String<CS>(lhs) >= rhs;
-}
-
-template<typename CS>
-bool operator==(const typename String<CS>::View &lhs, const char *rhs)
-{
-    return lhs == String<CS>(rhs).AsView();
-}
-
-template<typename CS>
-bool operator!=(const typename String<CS>::View &lhs, const char *rhs)
-{
-    return lhs != String<CS>(rhs).AsView();
-}
-
-template<typename CS>
-bool operator<(const typename String<CS>::View &lhs, const char *rhs)
-{
-    return lhs < String<CS>(rhs).AsView();
-}
-
-template<typename CS>
-bool operator>(const typename String<CS>::View &lhs, const char *rhs)
-{
-    return lhs > String<CS>(rhs).AsView();
-}
-
-template<typename CS>
-bool operator<=(const typename String<CS>::View &lhs, const char *rhs)
-{
-    return lhs <= String<CS>(rhs).AsView();
-}
-
-template<typename CS>
-bool operator>=(const typename String<CS>::View &lhs, const char *rhs)
-{
-    return lhs >= String<CS>(rhs).AsView();
-}
-
-template<typename CS>
-bool operator==(const char *lhs, const typename String<CS>::View &rhs)
-{
-    return String<CS>(lhs).AsView() == rhs;
-}
-
-template<typename CS>
-bool operator!=(const char *lhs, const typename String<CS>::View &rhs)
-{
-    return String<CS>(lhs).AsView() != rhs;
-}
-
-template<typename CS>
-bool operator<(const char *lhs, const typename String<CS>::View &rhs)
-{
-    return String<CS>(lhs).AsView() < rhs;
-}
-
-template<typename CS>
-bool operator>(const char *lhs, const typename String<CS>::View &rhs)
-{
-    return String<CS>(lhs).AsView() > rhs;
-}
-
-template<typename CS>
-bool operator<=(const char *lhs, const typename String<CS>::View &rhs)
-{
-    return String<CS>(lhs).AsView() <= rhs;
-}
-
-template<typename CS>
-bool operator>=(const char *lhs, const typename String<CS>::View &rhs)
-{
-    return String<CS>(lhs).AsView() >= rhs;
-}
-
-template<typename CS>
-bool operator==(const String<CS> &lhs, const std::string &rhs)
-{
-    return lhs == rhs.c_str();
-}
-
-template<typename CS>
-bool operator!=(const String<CS> &lhs, const std::string &rhs)
-{
-    return lhs != rhs.c_str();
-}
-
-template<typename CS>
-bool operator<(const String<CS> &lhs, const std::string &rhs)
-{
-    return lhs < rhs.c_str();
-}
-
-template<typename CS>
-bool operator>(const String<CS> &lhs, const std::string &rhs)
-{
-    return lhs > rhs.c_str();
-}
-
-template<typename CS>
-bool operator<=(const String<CS> &lhs, const std::string &rhs)
-{
-    return lhs <= rhs.c_str();
-}
-
-template<typename CS>
-bool operator>=(const String<CS> &lhs, const std::string &rhs)
-{
-    return lhs >= rhs.c_str();
-}
-
-template<typename CS>
-bool operator==(const std::string &lhs, const String<CS> &rhs)
-{
-    return lhs.c_str() == rhs;
-}
-
-template<typename CS>
-bool operator!=(const std::string &lhs, const String<CS> &rhs)
-{
-    return lhs.c_str() != rhs;
-}
-
-template<typename CS>
-bool operator<(const std::string &lhs, const String<CS> &rhs)
-{
-    return lhs.c_str() < rhs;
-}
-
-template<typename CS>
-bool operator>(const std::string &lhs, const String<CS> &rhs)
-{
-    return lhs.c_str() > rhs;
-}
-
-template<typename CS>
-bool operator<=(const std::string &lhs, const String<CS> &rhs)
-{
-    return lhs.c_str() <= rhs;
-}
-
-template<typename CS>
-bool operator>=(const std::string &lhs, const String<CS> &rhs)
-{
-    return lhs.c_str() >= rhs;
-}
-
-template<typename CS>
-bool operator==(const typename String<CS>::View &lhs, const std::string &rhs)
-{
-    return lhs == rhs.c_str();
-}
-
-template<typename CS>
-bool operator!=(const typename String<CS>::View &lhs, const std::string &rhs)
-{
-    return lhs != rhs.c_str();
-}
-
-template<typename CS>
-bool operator<(const typename String<CS>::View &lhs, const std::string &rhs)
-{
-    return lhs < rhs.c_str();
-}
-
-template<typename CS>
-bool operator>(const typename String<CS>::View &lhs, const std::string &rhs)
-{
-    return lhs > rhs.c_str();
-}
-
-template<typename CS>
-bool operator<=(const typename String<CS>::View &lhs, const std::string &rhs)
-{
-    return lhs <= rhs.c_str();
-}
-
-template<typename CS>
-bool operator>=(const typename String<CS>::View &lhs, const std::string &rhs)
-{
-    return lhs >= rhs.c_str();
-}
-
-template<typename CS>
-bool operator==(const std::string &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.c_str() == rhs;
-}
-
-template<typename CS>
-bool operator!=(const std::string &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.c_str() != rhs;
-}
-
-template<typename CS>
-bool operator<(const std::string &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.c_str() < rhs;
-}
-
-template<typename CS>
-bool operator>(const std::string &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.c_str() > rhs;
-}
-
-template<typename CS>
-bool operator<=(const std::string &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.c_str() <= rhs;
-}
-
-template<typename CS>
-bool operator>=(const std::string &lhs, const typename String<CS>::View &rhs)
-{
-    return lhs.c_str() >= rhs;
-}
-
-template<typename CS>
 StringBuilder<CS> &StringBuilder<CS>::Append(
     const typename String<CS>::View &view)
 {
     strs_.emplace_back(view);
+    return *this;
+}
+
+template<typename CS>
+StringBuilder<CS> &StringBuilder<CS>::Append(const String<CS> &str)
+{
+    strs_.emplace_back(str);
     return *this;
 }
 

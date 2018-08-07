@@ -81,6 +81,9 @@ class Storage
 
     using LargeBuf = RefCountedBuf<CU>;
 
+    template<typename CS>
+    friend class String;
+
     union
     {
         struct
@@ -268,6 +271,7 @@ public:
     String(const Self &copyFrom, size_t begIdx, size_t endIdx);
 
     String(const char *cstr, NativeCharset cs = NativeCharset::UTF8);
+    String(const std::string &cppStr, NativeCharset cs = NativeCharset::UTF8);
 
     String(const Self &copyFrom);
     String(Self &&moveFrom) noexcept;
@@ -323,161 +327,32 @@ public:
     bool operator>=(const Self &rhs) const;
 };
 
-template<typename CS>
-bool operator==(const String<CS> &lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator!=(const String<CS> &lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator< (const String<CS> &lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator> (const String<CS> &lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator<=(const String<CS> &lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator>=(const String<CS> &lhs, const typename String<CS>::View &rhs);
+#define AGZ_WRAP_STR_COMP(LHS, RHS, LOP, ROP) \
+    template<typename CS> \
+    bool operator==(const LHS lhs, const RHS rhs) {  return LOP == ROP; } \
+    template<typename CS> \
+    bool operator!=(const LHS lhs, const RHS rhs) { return LOP != ROP; } \
+    template<typename CS> \
+    bool operator<(const LHS lhs, const RHS rhs) { return LOP < ROP; } \
+    template<typename CS> \
+    bool operator>(const LHS lhs, const RHS rhs) { return LOP > ROP; } \
+    template<typename CS> \
+    bool operator<=(const LHS lhs, const RHS rhs) { return LOP <= ROP; } \
+    template<typename CS> \
+    bool operator>=(const LHS lhs, const RHS rhs) { return LOP >= ROP; }
 
-template<typename CS>
-bool operator==(const typename String<CS>::View &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator!=(const typename String<CS>::View &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator< (const typename String<CS>::View &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator> (const typename String<CS>::View &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator<=(const typename String<CS>::View &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator>=(const typename String<CS>::View &lhs, const String<CS> &rhs);
+AGZ_WRAP_STR_COMP(String<CS>&, typename String<CS>::View&, lhs.AsView(), rhs)
+AGZ_WRAP_STR_COMP(typename String<CS>::View&, String<CS>&, lhs, rhs.AsView())
+AGZ_WRAP_STR_COMP(String<CS>&, char*, lhs, String<CS>(rhs))
+AGZ_WRAP_STR_COMP(char*, String<CS>&, String<CS>(lhs), rhs)
+AGZ_WRAP_STR_COMP(typename String<CS>::View&, char*, lhs, String<CS>(rhs).AsView())
+AGZ_WRAP_STR_COMP(char*, typename String<CS>::View&, String<CS>(lhs).AsView(), rhs)
+AGZ_WRAP_STR_COMP(String<CS>&, std::string&, lhs, String<CS>(rhs))
+AGZ_WRAP_STR_COMP(std::string&, String<CS>&, String<CS>(lhs), rhs)
+AGZ_WRAP_STR_COMP(typename String<CS>::View&, std::string&, lhs, String<CS>(rhs))
+AGZ_WRAP_STR_COMP(std::string&, typename String<CS>::View&, String<CS>(lhs), rhs)
 
-template<typename CS>
-bool operator==(const String<CS> &lhs, const char *rhs);
-template<typename CS>
-bool operator!=(const String<CS> &lhs, const char *rhs);
-template<typename CS>
-bool operator< (const String<CS> &lhs, const char *rhs);
-template<typename CS>
-bool operator> (const String<CS> &lhs, const char *rhs);
-template<typename CS>
-bool operator<=(const String<CS> &lhs, const char *rhs);
-template<typename CS>
-bool operator>=(const String<CS> &lhs, const char *rhs);
-
-template<typename CS>
-bool operator==(const char *lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator!=(const char *lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator< (const char *lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator> (const char *lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator<=(const char *lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator>=(const char *lhs, const String<CS> &rhs);
-
-template<typename CS>
-bool operator==(const typename String<CS>::View &lhs, const char *rhs);
-template<typename CS>
-bool operator!=(const typename String<CS>::View &lhs, const char *rhs);
-template<typename CS>
-bool operator< (const typename String<CS>::View &lhs, const char *rhs);
-template<typename CS>
-bool operator> (const typename String<CS>::View &lhs, const char *rhs);
-template<typename CS>
-bool operator<=(const typename String<CS>::View &lhs, const char *rhs);
-template<typename CS>
-bool operator>=(const typename String<CS>::View &lhs, const char *rhs);
-
-template<typename CS>
-bool operator==(const char *lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator!=(const char *lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator< (const char *lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator> (const char *lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator<=(const char *lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator>=(const char *lhs, const typename String<CS>::View &rhs);
-
-template<typename CS>
-bool operator==(const String<CS> &lhs, const std::string &rhs);
-template<typename CS>
-bool operator!=(const String<CS> &lhs, const std::string &rhs);
-template<typename CS>
-bool operator< (const String<CS> &lhs, const std::string &rhs);
-template<typename CS>
-bool operator> (const String<CS> &lhs, const std::string &rhs);
-template<typename CS>
-bool operator<=(const String<CS> &lhs, const std::string &rhs);
-template<typename CS>
-bool operator>=(const String<CS> &lhs, const std::string &rhs);
-
-template<typename CS>
-bool operator==(const std::string &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator!=(const std::string &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator< (const std::string &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator> (const std::string &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator<=(const std::string &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator>=(const std::string &lhs, const String<CS> &rhs);
-
-template<typename CS>
-bool operator==(const String<CS> &lhs, const std::string &rhs);
-template<typename CS>
-bool operator!=(const String<CS> &lhs, const std::string &rhs);
-template<typename CS>
-bool operator< (const String<CS> &lhs, const std::string &rhs);
-template<typename CS>
-bool operator> (const String<CS> &lhs, const std::string &rhs);
-template<typename CS>
-bool operator<=(const String<CS> &lhs, const std::string &rhs);
-template<typename CS>
-bool operator>=(const String<CS> &lhs, const std::string &rhs);
-
-template<typename CS>
-bool operator==(const std::string &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator!=(const std::string &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator< (const std::string &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator> (const std::string &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator<=(const std::string &lhs, const String<CS> &rhs);
-template<typename CS>
-bool operator>=(const std::string &lhs, const String<CS> &rhs);
-
-template<typename CS>
-bool operator==(const typename String<CS>::View &lhs, const std::string &rhs);
-template<typename CS>
-bool operator!=(const typename String<CS>::View &lhs, const std::string &rhs);
-template<typename CS>
-bool operator< (const typename String<CS>::View &lhs, const std::string &rhs);
-template<typename CS>
-bool operator> (const typename String<CS>::View &lhs, const std::string &rhs);
-template<typename CS>
-bool operator<=(const typename String<CS>::View &lhs, const std::string &rhs);
-template<typename CS>
-bool operator>=(const typename String<CS>::View &lhs, const std::string &rhs);
-
-template<typename CS>
-bool operator==(const std::string &lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator!=(const std::string &lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator< (const std::string &lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator> (const std::string &lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator<=(const std::string &lhs, const typename String<CS>::View &rhs);
-template<typename CS>
-bool operator>=(const std::string &lhs, const typename String<CS>::View &rhs);
+#undef AGZ_WRAP_STR_COMP
 
 template<typename CS>
 class StringBuilder
@@ -489,6 +364,7 @@ public:
     using Self = StringBuilder<CS>;
 
     Self &Append(const typename String<CS>::View &view);
+    Self &Append(const String<CS> &str);
 
     Self &operator<<(const typename String<CS>::View &view);
 

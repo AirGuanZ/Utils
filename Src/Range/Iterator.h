@@ -29,6 +29,22 @@ I AdvanceTo(const I &cur, const I &end, typename I::difference_type n)
     return cur + std::min(end - cur, n);
 }
 
+template<typename R, typename T = void>
+struct GetIteratorImpl { };
+template<typename R>
+struct GetIteratorImpl<R, std::void_t<typename R::Iterator>>
+{
+    using Type = typename R::Iterator;
+};
+template<typename R>
+struct GetIteratorImpl<R, std::void_t<typename R::const_iterator>>
+{
+    using Type = typename R::const_iterator;
+};
+
+template<typename R>
+using GetIteratorType = typename GetIteratorImpl<R>::Type;
+
 template<typename I, std::enable_if_t<(!IsRandomAccessIterator<I> &&
                                        IsForwardIterator<I>), int> = 0>
 I AdvanceTo(const I &cur, const I &end, typename I::difference_type n)

@@ -3,6 +3,7 @@
 #include <iterator>
 
 #include "../Misc/Common.h"
+#include "Iterator.h"
 #include "Transform.h"
 
 AGZ_NS_BEG(AGZ)
@@ -15,15 +16,19 @@ namespace RangeAux
         R range_;
         mutable F func_;
 
-        using InIt = typename R::Iterator;
+        using InIt = GetIteratorType<R>;
 
     public:
 
         class Iterator
         {
+            friend class MapImpl;
+
             using _value_type =
                 decltype(std::declval<F>()(
-                    std::declval<typename InIt::value_type>()));
+                    std::declval<
+                        typename std::iterator_traits<InIt>
+                            ::value_type>()));
 
             InIt it;
             F *f;
@@ -66,7 +71,8 @@ namespace RangeAux
             using iterator_category =
                 typename std::iterator_traits<InIt>::iterator_category;
             using value_type        = _value_type;
-            using difference_type   = typename InIt::difference_type;
+            using difference_type   =
+                typename std::iterator_traits<InIt>::difference_type;
             using pointer           = ptr_t;
             using reference         = value_type&;
 
@@ -191,17 +197,14 @@ namespace RangeAux
 
         Iterator begin() const
         {
-            return Iterator(std::begin(range_), &func_);
+            return Iterator::Iterator(std::begin(range_), &func_);
         }
 
         Iterator end() const
         {
-            return Iterator(std::end(range_), &func_);
+            return Iterator::Iterator(std::end(range_), &func_);
         }
     };
-
-    template<typename F>
-    struct MapRHS { F f; };
 
     template<typename F>
     struct MapTrait
@@ -210,17 +213,6 @@ namespace RangeAux
         using Impl = MapImpl<R, F>;
     };
 }
-
-/*template<typename F>
-RangeAux::MapRHS<F> Map(F f) { return RangeAux::MapRHS<F>{ std::move(f) }; }
-
-template<typename R, typename F>
-auto operator|(R &&range, RangeAux::MapRHS<F> rhs)
-{
-    using RT = RangeAux::MapImpl<remove_rcv_t<R>,
-                                 std::remove_reference_t<F>>;
-    return RT(std::forward<R>(range), std::move(rhs.f));
-}*/
 
 template<typename F>
 auto Map(F f)
