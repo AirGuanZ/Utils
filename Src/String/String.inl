@@ -328,7 +328,7 @@ typename String<CS>::View String<CS>::View::TrimRight() const
 template<typename CS>
 typename String<CS>::View String<CS>::View::Slice(size_t begIdx) const
 {
-    return this->Slice(begIdx, len_);
+    return Slice(begIdx, len_);
 }
 
 template<typename CS>
@@ -343,14 +343,14 @@ template<typename CS>
 typename String<CS>::View String<CS>::View::Prefix(size_t n) const
 {
     AGZ_ASSERT(n <= len_);
-    return this->Slice(0, n);
+    return Slice(0, n);
 }
 
 template<typename CS>
 typename String<CS>::View String<CS>::View::Suffix(size_t n) const
 {
     AGZ_ASSERT(n <= len_);
-    return this->Slice(len_ - n);
+    return Slice(len_ - n);
 }
 
 template<typename CS>

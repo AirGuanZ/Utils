@@ -39,6 +39,7 @@ size_t BoyerMooreHorspool(const unsigned char *beg, const unsigned char *end,
     for(size_t i = 0; i < pLenM1; ++i)
         T[pbeg[i]] = pLenM1 - i;
 
+    // Matching
     size_t skip = 0, skipEnd = len - pLenM1;
     while(skip < skipEnd)
     {

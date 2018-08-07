@@ -12,8 +12,14 @@
 
 AGZ_NS_BEG(AGZ::StrImpl)
 
-enum class NativeCharset { UTF8 };
+// Charsets that can be used by c-style string and std::string
+// Code unit must be alias of char
+enum class NativeCharset
+{
+    UTF8
+};
 
+// Determinating how many values can SSO buffer hold.
 template<size_t>
 struct SmallBufSizeSelector;
 
@@ -35,6 +41,8 @@ struct SmallBufSizeSelector<4>
     static constexpr size_t Value = 7;
 };
 
+// Reference counted value container
+// Used for large string storage
 template<typename E>
 class RefCountedBuf
 {
@@ -59,6 +67,11 @@ public:
     const E *GetData() const;
 };
 
+// Implementation of string storage.
+// Small strings are stored in internal buffer (small_.buf),
+// while larges ones are shared by a reference counted buffer (large_.buf).
+// Immutable design due to safe consideration.
+// Can only be modified by StringBuilder to initialize contents.
 template<typename CU>
 class Storage
 {
@@ -146,6 +159,7 @@ public:
 
     using Iterator = const CodeUnit*;
 
+    // Immutable string slice
     class View
     {
         String<CS> *str_;
@@ -173,39 +187,65 @@ public:
         ~View()                       = default;
         Self &operator=(const Self &) = default;
 
+        // Construct a new string object from this view
         Str AsString() const;
 
+        // Raw data (not zero-terminated)
         const CodeUnit *Data() const;
+        // Raw data and count of code units.
+        // Usually faster than calling Data() and Length() seperately
         std::pair<const CodeUnit*, size_t> DataAndLength() const;
 
+        // Count of code units
         size_t Length() const;
+        // Return true if Length() == 0
         bool Empty()    const;
 
+        // ELiminate whitespaces in both side side
         View Trim()      const;
+        // Eliminate whitespaces in left side
         View TrimLeft()  const;
+        // Eliminate whitespaces in right side
         View TrimRight() const;
 
+        // Part of this string slice.
+        // Same as Suffix(Length() - begIdx)
         View Slice(size_t begIdx)                const;
+        // Part of this string slice. Left: inclusive; right: exclusive
         View Slice(size_t begIdx, size_t endIdx) const;
 
+        // Prefix of length n. UB if n > Length().
         View Prefix(size_t n) const;
+        // Suffix of length n. UB if n > Length()
         View Suffix(size_t n) const;
 
-        bool StartsWith(const Self &prefix) const;
-        bool EndsWith(const Self &suffix)   const;
+        // Is s a prefix of this string?
+        bool StartsWith(const Self &s) const;
+        // Is s a suffix of this string?
+        bool EndsWith(const Self &s)   const;
 
+        // Split with whitespaces
         std::vector<Self> Split()                    const;
+        // Split with given string.
+        // Example: "xyzabcdefaag" =(split with "a")=> "xyz", "bcdef", "g"
         std::vector<Self> Split(const Self &spliter) const;
 
+        // Concat elements in strRange with this string
         template<typename R>
         Str Join(R &&strRange) const;
 
+        // Search for a substring dst from left to right, starting at begIdx
+        // Return NPOS if not found
         size_t Find(const Self &dst, size_t begIdx = 0)   const;
+        // Same as Find except it's from right to left
         size_t FindR(const Self &dst, size_t rbegIdx = 0) const;
 
+        // Begin iterator for traversal code units
         Iterator begin() const;
+        // End iterator for traversal code units
         Iterator end()   const;
 
+        // Convert self to std::string with specified encoding (default to UTF8)
         std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const;
 
         bool operator==(const Self &rhs) const;
@@ -234,6 +274,7 @@ public:
     Self &operator=(const Self &copyFrom);
     Self &operator=(Self &&moveFrom);
 
+    // Construct a view for the whole string
     View AsView() const;
 
     const CodeUnit *Data() const;
