@@ -14,10 +14,10 @@ public:
 
     using iterator_category =
         typename std::iterator_traits<It>::iterator_category;
-    using value_type        = typename It::value_type;
-    using difference_type   = typename It::difference_type;
-    using pointer           = typename It::pointer;
-    using reference         = typename It::reference;
+    using value_type        = typename std::iterator_traits<It>::value_type;
+    using difference_type   = typename std::iterator_traits<It>::difference_type;
+    using pointer           = typename std::iterator_traits<It>::pointer;
+    using reference         = typename std::iterator_traits<It>::reference;
 
     explicit ReverseIterator(It it)
         : it(std::move(it))
@@ -76,7 +76,7 @@ public:
     friend ReverseIterator operator+(difference_type n,
                                      const ReverseIterator &i)
     {
-        return i - n;
+        return i + n;
     }
 
     ReverseIterator &operator-=(difference_type n)

@@ -189,6 +189,8 @@ public:
         ~View()                       = default;
         Self &operator=(const Self &) = default;
 
+        operator Str() const;
+
         // Construct a new string object from this view
         Str AsString() const;
 
@@ -238,9 +240,8 @@ public:
 
         // Search for a substring dst from left to right, starting at begIdx
         // Return NPOS if not found
-        size_t Find(const Self &dst, size_t begIdx = 0)   const;
-        // Same as Find except it's from right to left
-        size_t FindR(const Self &dst, size_t rbegIdx = 0) const;
+        size_t Find(const Self &dst, size_t begIdx = 0) const;
+        size_t Find(const char *dst, size_t begIdx = 0) const;
 
         // Begin iterator for traversal code units
         Iterator begin() const;
@@ -306,14 +307,177 @@ public:
     template<typename R>
     Self Join(R &&strRange) const;
 
-    size_t Find(const View &dst, size_t begIdx = 0)   const;
-    size_t FindR(const View &dst, size_t rbegIdx = 0) const;
+    size_t Find(const View &dst, size_t begIdx = 0) const;
+    size_t Find(const char *dst, size_t begIdx = 0) const;
 
     Iterator begin() const;
     Iterator end()   const;
 
     std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const;
+
+    bool operator==(const Self &rhs) const;
+    bool operator!=(const Self &rhs) const;
+    bool operator< (const Self &rhs) const;
+    bool operator> (const Self &rhs) const;
+    bool operator<=(const Self &rhs) const;
+    bool operator>=(const Self &rhs) const;
 };
+
+template<typename CS>
+bool operator==(const String<CS> &lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator!=(const String<CS> &lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator< (const String<CS> &lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator> (const String<CS> &lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator<=(const String<CS> &lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator>=(const String<CS> &lhs, const typename String<CS>::View &rhs);
+
+template<typename CS>
+bool operator==(const typename String<CS>::View &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator!=(const typename String<CS>::View &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator< (const typename String<CS>::View &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator> (const typename String<CS>::View &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator<=(const typename String<CS>::View &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator>=(const typename String<CS>::View &lhs, const String<CS> &rhs);
+
+template<typename CS>
+bool operator==(const String<CS> &lhs, const char *rhs);
+template<typename CS>
+bool operator!=(const String<CS> &lhs, const char *rhs);
+template<typename CS>
+bool operator< (const String<CS> &lhs, const char *rhs);
+template<typename CS>
+bool operator> (const String<CS> &lhs, const char *rhs);
+template<typename CS>
+bool operator<=(const String<CS> &lhs, const char *rhs);
+template<typename CS>
+bool operator>=(const String<CS> &lhs, const char *rhs);
+
+template<typename CS>
+bool operator==(const char *lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator!=(const char *lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator< (const char *lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator> (const char *lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator<=(const char *lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator>=(const char *lhs, const String<CS> &rhs);
+
+template<typename CS>
+bool operator==(const typename String<CS>::View &lhs, const char *rhs);
+template<typename CS>
+bool operator!=(const typename String<CS>::View &lhs, const char *rhs);
+template<typename CS>
+bool operator< (const typename String<CS>::View &lhs, const char *rhs);
+template<typename CS>
+bool operator> (const typename String<CS>::View &lhs, const char *rhs);
+template<typename CS>
+bool operator<=(const typename String<CS>::View &lhs, const char *rhs);
+template<typename CS>
+bool operator>=(const typename String<CS>::View &lhs, const char *rhs);
+
+template<typename CS>
+bool operator==(const char *lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator!=(const char *lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator< (const char *lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator> (const char *lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator<=(const char *lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator>=(const char *lhs, const typename String<CS>::View &rhs);
+
+template<typename CS>
+bool operator==(const String<CS> &lhs, const std::string &rhs);
+template<typename CS>
+bool operator!=(const String<CS> &lhs, const std::string &rhs);
+template<typename CS>
+bool operator< (const String<CS> &lhs, const std::string &rhs);
+template<typename CS>
+bool operator> (const String<CS> &lhs, const std::string &rhs);
+template<typename CS>
+bool operator<=(const String<CS> &lhs, const std::string &rhs);
+template<typename CS>
+bool operator>=(const String<CS> &lhs, const std::string &rhs);
+
+template<typename CS>
+bool operator==(const std::string &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator!=(const std::string &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator< (const std::string &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator> (const std::string &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator<=(const std::string &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator>=(const std::string &lhs, const String<CS> &rhs);
+
+template<typename CS>
+bool operator==(const String<CS> &lhs, const std::string &rhs);
+template<typename CS>
+bool operator!=(const String<CS> &lhs, const std::string &rhs);
+template<typename CS>
+bool operator< (const String<CS> &lhs, const std::string &rhs);
+template<typename CS>
+bool operator> (const String<CS> &lhs, const std::string &rhs);
+template<typename CS>
+bool operator<=(const String<CS> &lhs, const std::string &rhs);
+template<typename CS>
+bool operator>=(const String<CS> &lhs, const std::string &rhs);
+
+template<typename CS>
+bool operator==(const std::string &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator!=(const std::string &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator< (const std::string &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator> (const std::string &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator<=(const std::string &lhs, const String<CS> &rhs);
+template<typename CS>
+bool operator>=(const std::string &lhs, const String<CS> &rhs);
+
+template<typename CS>
+bool operator==(const typename String<CS>::View &lhs, const std::string &rhs);
+template<typename CS>
+bool operator!=(const typename String<CS>::View &lhs, const std::string &rhs);
+template<typename CS>
+bool operator< (const typename String<CS>::View &lhs, const std::string &rhs);
+template<typename CS>
+bool operator> (const typename String<CS>::View &lhs, const std::string &rhs);
+template<typename CS>
+bool operator<=(const typename String<CS>::View &lhs, const std::string &rhs);
+template<typename CS>
+bool operator>=(const typename String<CS>::View &lhs, const std::string &rhs);
+
+template<typename CS>
+bool operator==(const std::string &lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator!=(const std::string &lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator< (const std::string &lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator> (const std::string &lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator<=(const std::string &lhs, const typename String<CS>::View &rhs);
+template<typename CS>
+bool operator>=(const std::string &lhs, const typename String<CS>::View &rhs);
 
 template<typename CS>
 class StringBuilder
@@ -346,10 +510,16 @@ public:
 
 AGZ_NS_END(AGZ::StrImpl)
 
-using Str8  = AGZ::StrImpl::String<AGZ::UTF8<>>;
-using Str16 = AGZ::StrImpl::String<AGZ::UTF16<>>;
-using Str32 = AGZ::StrImpl::String<AGZ::UTF32<>>;
-using AStr  = AGZ::StrImpl::String<AGZ::ASCII<>>;
-using WStr  = AGZ::StrImpl::String<AGZ::WUTF>;
+AGZ_NS_BEG(AGZ)
+
+using Str8  = StrImpl::String<UTF8<>>;
+using Str16 = StrImpl::String<UTF16<>>;
+using Str32 = StrImpl::String<UTF32<>>;
+using AStr  = StrImpl::String<ASCII<>>;
+using WStr  = StrImpl::String<WUTF>;
+
+using CSConv = StrImpl::CharsetConvertor;
+
+AGZ_NS_END(AGZ)
 
 #include "String.inl"
