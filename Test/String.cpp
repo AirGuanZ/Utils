@@ -43,12 +43,14 @@ TEST_CASE("String")
 
     SECTION("Split")
     {
-        using It = GetIteratorType<vector<Str8>>;
-        REQUIRE((Str8("Mine cr aft ").Split()
+        REQUIRE((Str8(u8"Mine cr aft ").Split()
                 | Map([](const Str8::View &v) { return v.AsString(); })
                 | Collect<vector<Str8>>())
              == vector<Str8>{ u8"Mine", u8"cr", u8"aft" });
-        It it;
+        REQUIRE((Str8(u8"Minecreaft").Split(Str8(u8"e").AsView())
+            | Map([](const Str8::View &v) { return v.AsString(); })
+            | Collect<vector<Str8>>())
+            == vector<Str8>{ u8"Min", u8"cr", u8"aft" });
     }
 
     SECTION("Join")
