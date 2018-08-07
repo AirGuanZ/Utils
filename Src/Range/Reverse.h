@@ -12,7 +12,8 @@ class ReverseIterator
 
 public:
 
-    using iterator_category = typename It::iterator_category;
+    using iterator_category =
+        typename std::iterator_traits<It>::iterator_category;
     using value_type        = typename It::value_type;
     using difference_type   = typename It::difference_type;
     using pointer           = typename It::pointer;

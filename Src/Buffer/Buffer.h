@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "../Misc/Common.h"
+#include "../Misc/Malloc.h"
 
 AGZ_NS_BEG(AGZ::Buf)
 
@@ -35,9 +36,8 @@ class Buffer
     void Alloc(size_t s)
     {
         AGZ_ASSERT(s > 0);
-        d_ = static_cast<E*>(AGZ_ALIGNED_ALLOC(alignof(E), s * sizeof(E)));
-        if(!d_)
-            throw std::bad_alloc();
+        d_ = static_cast<E*>(alloc_throw(::AGZ::aligned_alloc,
+                                         alignof(E), s * sizeof(E)));
     }
 
     void Free()
@@ -45,7 +45,7 @@ class Buffer
         AGZ_ASSERT(d_ != nullptr);
         for(size_t i = 0; i < s_; ++i)
             (d_ + i)->~E();
-        AGZ_ALIGNED_FREE(d_);
+        ::AGZ::aligned_free(d_);
     }
 
 public:

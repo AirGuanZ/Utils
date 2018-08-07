@@ -2,8 +2,8 @@
 
 #include <type_traits>
 
-#include "../Misc/Common.h"
-#include "../Range/Iterator.h"
+#include "../../Misc/Common.h"
+#include "../../Range/Iterator.h"
 #include "Charset.h"
 
 AGZ_NS_BEG(AGZ)
@@ -116,7 +116,7 @@ size_t UTF8Core<T>::CP2CU(CodePoint cp, CodeUnit *cu)
 template<typename T>
 size_t UTF8Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp)
 {
-    AGZ_ASSERT(cu && cp && cu_num);
+    AGZ_ASSERT(cu && cp);
 
     CodeUnit fst = *cu++;
 

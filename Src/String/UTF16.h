@@ -2,8 +2,8 @@
 
 #include <type_traits>
 
-#include "../Misc/Common.h"
-#include "../Range/Iterator.h"
+#include "../../Misc/Common.h"
+#include "../../Range/Iterator.h"
 #include "Charset.h"
 
 AGZ_NS_BEG(AGZ)
@@ -58,7 +58,6 @@ public:
     static size_t CUInCP(CodePoint cp);
 
     static size_t CP2CU(CodePoint cp, CodeUnit *cu);
-
     static size_t CU2CP(const CodeUnit *cu, CodePoint *cp);
 
     static char32_t ToUnicode(CodePoint cp) { return cp; }
@@ -98,7 +97,7 @@ size_t UTF16Core<T>::CP2CU(CodePoint cp, CodeUnit *cu)
 template<typename T>
 size_t UTF16Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp)
 {
-    AGZ_ASSERT(cu && cp && cu_num);
+    AGZ_ASSERT(cu && cp);
     char32_t high = static_cast<char32_t>(*cu);
 
     // 1 code unit
