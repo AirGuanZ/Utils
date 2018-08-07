@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "../Misc/Common.h"
+#include "ASCII.h"
+#include "UTF.h"
 
 AGZ_NS_BEG(AGZ::StrImpl)
 
@@ -45,7 +47,7 @@ struct SmallBufSizeSelector<4>
 template<typename E>
 class RefCountedBuf
 {
-    mutable std::atomic<size_t> refs_;
+    std::atomic<size_t> refs_;
     E data_[1];
 
 public:
@@ -59,8 +61,8 @@ public:
     ~RefCountedBuf()             = delete;
     Self &operator=(const Self&) = delete;
 
-    void IncRef() const;
-    void DecRef() const;
+    void IncRef();
+    void DecRef();
 
     E *GetData();
     const E *GetData() const;
@@ -162,8 +164,8 @@ public:
     // Immutable string slice
     class View
     {
-        String<CS> *str_;
-        typename CS::CodeUnit *beg_;
+        const String<CS> *str_;
+        const typename CS::CodeUnit *beg_;
         size_t len_;
 
     public:
@@ -264,6 +266,8 @@ public:
     String(const CodeUnit *beg, const CodeUnit *end);
     String(const Self &copyFrom, size_t begIdx, size_t endIdx);
 
+    String(const char *cstr, NativeCharset cs = NativeCharset::UTF8);
+
     String(const Self &copyFrom);
     String(Self &&moveFrom) noexcept;
 
@@ -329,14 +333,23 @@ public:
     void Clear();
 };
 
-class StringConvertor
+class CharsetConvertor
 {
 public:
 
     template<typename DCS, typename SCS>
     static String<DCS> Convert(const typename String<SCS>::View &src);
+
+    template<typename DCS, typename SCS>
+    static String<DCS> Convert(const String<SCS> &src);
 };
 
 AGZ_NS_END(AGZ::StrImpl)
+
+using Str8  = AGZ::StrImpl::String<AGZ::UTF8<>>;
+using Str16 = AGZ::StrImpl::String<AGZ::UTF16<>>;
+using Str32 = AGZ::StrImpl::String<AGZ::UTF32<>>;
+using AStr  = AGZ::StrImpl::String<AGZ::ASCII<>>;
+using WStr  = AGZ::StrImpl::String<AGZ::WUTF>;
 
 #include "String.inl"

@@ -19,8 +19,8 @@ class Buffer2D
     void Alloc(size_t num)
     {
         AGZ_ASSERT(num > 0);
-        d_ = static_cast<E*>(alloc_throw(::AGZ::aligned_alloc,
-                                         alignof(E), num * sizeof(E)));
+        d_ = alloc_throw<E>(::AGZ::aligned_alloc,
+                            alignof(E), num * sizeof(E));
     }
 
     void Free()

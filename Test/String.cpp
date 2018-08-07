@@ -1,7 +1,6 @@
 ﻿#include <Utils.h>
 
-#include <string>
-#include <vector>
+#include <cstring>
 
 #include "Catch.hpp"
 
@@ -10,9 +9,23 @@ using namespace std;
 
 TEST_CASE("UTF")
 {
-    SECTION("UTF-8")
+    SECTION("Constructor")
     {
-        
+        REQUIRE(Str8().Length() == 0);
+        REQUIRE(Str8(u8"minecraftminecraftminecraftminecraft", 36).Length() == 36);
+        REQUIRE(Str8(u8"今", std::strlen(u8"今")).Length() == 3);
+        REQUIRE(Str8(u8"今天mine天气craft不错").ToStdString() == u8"今天mine天气craft不错");
+        REQUIRE(Str16(u8"今天mine天气craft不错").ToStdString() == u8"今天mine天气craft不错");
+        REQUIRE(Str32(u8"今天mine天气craft不错").ToStdString() == u8"今天mine天气craft不错");
+    }
+
+    SECTION("Find")
+    {
+        REQUIRE(Str8(u8"Minecraft").Find(Str8(u8"Mine").AsView()) == 0);
+        REQUIRE(Str8(u8"Minecraft").Find(Str8(u8"necraft").AsView()) == 2);
+        REQUIRE(Str8(u8"Minecraft").Find(Str8(u8"Minecraft").AsView()) == 0);
+        REQUIRE(Str8(u8"Minecraft").Find(Str8(u8"eecraft").AsView()) == Str8::NPOS);
+        REQUIRE(Str8(u8"Minecraft").Find(Str8(u8"er").AsView()) == Str8::NPOS);
     }
 }
 

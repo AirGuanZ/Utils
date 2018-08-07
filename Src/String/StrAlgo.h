@@ -1,12 +1,9 @@
 #pragma once
 
-#include <cstdint>
-#include <iterator>
 #include <limits>
 #include <type_traits>
 
 #include "../Misc/Common.h"
-#include "../Range/Iterator.h"
 
 AGZ_NS_BEG(AGZ::StrAlgo)
 
@@ -14,14 +11,14 @@ AGZ_NS_BEG(AGZ::StrAlgo)
 // See https://en.wikipedia.org/wiki/Boyer–Moore–Horspool_algorithm
 template<size_t AlignBytes>
 const unsigned char *BoyerMooreHorspool(const unsigned char *beg, const unsigned char *end,
-                          const unsigned char *pbeg, const unsigned char *pend)
+                                        const unsigned char *pbeg, const unsigned char *pend)
 {
     AGZ_ASSERT(beg <= end && pbeg <= pend);
 
     // Align to AlignByte + alignOffset:
     //     ALIGN_TO(p - alignOffset, AlignByte) + alignOffset
     size_t alignOffset = reinterpret_cast<size_t>(beg) & (AlignBytes - 1);
-    size_t alignFactor = AlignBytes - alignOffset;
+    size_t alignFactor = (AlignBytes - 1) - alignOffset;
     size_t len = end - beg, pLen = pend - pbeg;
     if(len < pLen)
         return end;
@@ -43,12 +40,12 @@ const unsigned char *BoyerMooreHorspool(const unsigned char *beg, const unsigned
     size_t skip = 0, skipEnd = len - pLenM1;
     while(skip < skipEnd)
     {
-        auto i = static_cast<std::make_signed_t<size_t>>(pLenM1);
-        auto j = skip + i;
-        while(beg[j--] == pbeg[i])
+        auto i = pLenM1, j = skip + i;
+        while(beg[j] == pbeg[i])
         {
-            if(!i--)
+            if(!i)
                 return beg + skip;
+            --i, --j;
         }
         skip = ((skip + T[beg[skip + pLenM1]] + alignFactor)
                 & ~(AlignBytes - 1)) + alignOffset;
@@ -62,12 +59,12 @@ template<typename CU>
 const CU *FindSubPattern(const CU *beg, const CU *end,
                          const CU *pbeg, const CU *pend)
 {
-    return static_cast<const CU*>(
+    return reinterpret_cast<const CU*>(
             BoyerMooreHorspool<sizeof(CU)>(
-                static_cast<const unsigned char*>(beg),
-                static_cast<const unsigned char*>(end),
-                static_cast<const unsigned char*>(pbeg),
-                static_cast<const unsigned char*>(pend)));
+                reinterpret_cast<const unsigned char*>(beg),
+                reinterpret_cast<const unsigned char*>(end),
+                reinterpret_cast<const unsigned char*>(pbeg),
+                reinterpret_cast<const unsigned char*>(pend)));
 }
 
 enum class CompareResult { Greater, Equal, Less };
@@ -78,9 +75,9 @@ CompareResult Compare(const CU *lhs, const CU *rhs, size_t lLen, size_t rLen)
     size_t i = 0, minLen = std::min(lLen, rLen);
     while(i < minLen)
     {
-        if(lhs[i] < rhs[j])
+        if(lhs[i] < rhs[i])
             return CompareResult::Less;
-        if(lhs[i] > rhs[j])
+        if(lhs[i] > rhs[i])
             return CompareResult::Greater;
         ++i;
     }

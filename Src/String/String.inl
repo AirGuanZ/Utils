@@ -1,6 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <cstring>
+#include <type_traits>
 
 #include "../Misc/Malloc.h"
 #include "../Range/Reverse.h"
@@ -10,22 +12,29 @@
 AGZ_NS_BEG(AGZ::StrImpl)
 
 template<typename E>
+void Copy(const E *src, size_t cnt, E *dst)
+{
+    static_assert(std::is_trivially_copyable_v<E>);
+    std::memcpy(dst, src, sizeof(E) * cnt);
+}
+
+template<typename E>
 RefCountedBuf<E> *RefCountedBuf<E>::New(size_t n)
 {
     size_t allocSize = (sizeof(Self) - sizeof(E)) + n * sizeof(E);
-    Self *ret = alloc_throw(std::malloc, allocSize);
+    Self *ret = alloc_throw<Self>(std::malloc, allocSize);
     ret->refs_ = 1;
     return ret;
 }
 
 template<typename E>
-void RefCountedBuf<E>::IncRef() const
+void RefCountedBuf<E>::IncRef()
 {
     ++refs_;
 }
 
 template<typename E>
-void RefCountedBuf<E>::DecRef() const
+void RefCountedBuf<E>::DecRef()
 {
     if(!--refs_)
         std::free(this);
@@ -47,7 +56,7 @@ template<typename CU>
 void Storage<CU>::AllocSmall(size_t len)
 {
     AGZ_ASSERT(len <= SMALL_BUF_SIZE);
-    small_.len = len;
+    small_.len = static_cast<std::uint8_t>(len);
 }
 
 template<typename CU>
@@ -55,7 +64,7 @@ void Storage<CU>::AllocLarge(size_t len)
 {
     small_.len = SMALL_BUF_SIZE + 1;
     large_.buf = LargeBuf::New(len);
-    large_.beg = large_.buf.GetData();
+    large_.beg = large_.buf->GetData();
     large_.end = large_.beg + len;
 }
 
@@ -70,7 +79,8 @@ template<typename CU>
 CU *Storage<CU>::GetLargeMutableData()
 {
     AGZ_ASSERT(IsLargeStorage());
-    return large_.beg;
+    auto d = large_.buf->GetData();
+    return d + (large_.beg - d);
 }
 
 template<typename CU>
@@ -95,12 +105,12 @@ Storage<CU>::Storage(const CU *data, size_t len)
     if(len <= SMALL_BUF_SIZE)
     {
         AllocSmall(len);
-        std::copy_n(data, len, GetSmallMutableData());
+        Copy(data, len, GetSmallMutableData());
     }
     else
     {
         AllocLarge(len);
-        std::copy_n(data, len, GetLargeMutableData());
+        Copy(data, len, GetLargeMutableData());
     }
 }
 
@@ -126,7 +136,7 @@ Storage<CU>::Storage(const Self &copyFrom, size_t beg, size_t end)
     if(len <= SMALL_BUF_SIZE)
     {
         AllocSmall(len);
-        std::copy_n(&copyFrom.Begin()[beg], len, GetSmallMutableData());
+        Copy(&copyFrom.Begin()[beg], len, GetSmallMutableData());
     }
     else
     {
@@ -134,6 +144,7 @@ Storage<CU>::Storage(const Self &copyFrom, size_t beg, size_t end)
         large_.buf = copyFrom.large_.buf;
         large_.beg = &copyFrom.Begin()[beg];
         large_.end = large_.beg + len;
+        large_.buf->IncRef();
     }
 }
 
@@ -150,7 +161,7 @@ Storage<CU>::Storage(Self &&moveFrom) noexcept
     {
         auto [data, len] = moveFrom.BeginAndLength();
         AllocSmall(len);
-        std::copy_n(data, len, GetSmallMutableData());
+        Copy(data, len, GetSmallMutableData());
     }
 }
 
@@ -227,16 +238,20 @@ template<typename CU>
 std::pair<const CU*, size_t> Storage<CU>::BeginAndLength() const
 {
     return IsSmallStorage() ?
-        std::pair<const CU*, size_t> { &small_.buf[0], small_.len } :
-        std::pair<const CU*, size_t> { large_.beg, large_.end - large_.beg };
+        std::pair<const CU*, size_t>
+            { &small_.buf[0], small_.len } :
+        std::pair<const CU*, size_t>
+            { large_.beg, large_.end - large_.beg };
 }
 
 template<typename CU>
 std::pair<const CU*, const CU*> Storage<CU>::BeginAndEnd() const
 {
     return IsSmallStorage() ?
-        std::pair<const CU*, const CU*> { &small_.buf[0], &small_.buf[small_.len] } :
-        std::pair<const CU*, const CU*> { large_.beg, large_.end };
+        std::pair<const CU*, const CU*>
+            { &small_.buf[0], &small_.buf[small_.len] } :
+        std::pair<const CU*, const CU*>
+            { large_.beg, large_.end };
 }
 
 template<typename CS>
@@ -427,7 +442,7 @@ template<typename CS>
 size_t String<CS>::View::Find(const Self &dst, size_t begIdx) const
 {
     AGZ_ASSERT(begIdx <= len_);
-    auto rt = FindSubPattern(begin() + begIdx, end(), dst.begin(), dst.end());
+    auto rt = StrAlgo::FindSubPattern(begin() + begIdx, end(), dst.begin(), dst.end());
     return rt == end() ? NPOS : (rt - beg_);
 }
 
@@ -437,7 +452,7 @@ size_t String<CS>::View::FindR(const Self &dst, size_t rbegIdx) const
     AGZ_ASSERT(rbegIdx <= len_);
     using R = ReverseIterator<Iterator>;
     auto rbeg = R(end()) + rbegIdx, rend = R(begin());
-    auto rt = FindSubPattern(rbeg, rend, R(dst.end()), R(dst.begin()));
+    auto rt = StrAlgo::FindSubPattern(rbeg, rend, R(dst.end()), R(dst.begin()));
     return rt == rend ? NPOS : (len_ - (rt - rbeg) - dst.Length());
 }
 
@@ -466,7 +481,7 @@ std::string String<CS>::View::ToStdString(NativeCharset cs) const
         }
         else
         {
-            return StringConvertor::Convert<UTF8<>>(*this)
+            return CharsetConvertor::Convert<UTF8<>, CS>(*this)
                         .ToStdString(NativeCharset::UTF8);
         }
     }
@@ -571,6 +586,22 @@ String<CS>::String(const Self &copyFrom, size_t begIdx, size_t endIdx)
 }
 
 template<typename CS>
+String<CS>::String(const char *cstr, NativeCharset cs)
+    : storage_(0)
+{
+    switch(cs)
+    {
+    case NativeCharset::UTF8:
+        *this = Self(CharsetConvertor::Convert<CS, UTF8<>>(Str8(cstr, std::strlen(cstr))));
+        break;
+    default:
+        throw CharsetException("Unknown charset " +
+            std::to_string(static_cast<
+                std::underlying_type_t<NativeCharset>>(cs)));
+    }
+}
+
+template<typename CS>
 String<CS>::String(const Self &copyFrom)
     : storage_(copyFrom.storage_)
 {
@@ -660,7 +691,8 @@ typename String<CS>::View String<CS>::Slice(size_t begIdx) const
 }
 
 template<typename CS>
-typename String<CS>::View String<CS>::Slice(size_t begIdx, size_t endIdx) const
+typename String<CS>::View String<CS>::Slice(
+                                size_t begIdx, size_t endIdx) const
 {
     return AsView().Slice(begIdx, endIdx);
 }
@@ -764,7 +796,7 @@ String<CS> StringBuilder<CS>::Get() const
     auto data = ret.GetMutableData();
     for(auto &s : strs_)
     {
-        std::copy_n(s.Data(), s.Length(), data);
+        Copy(s.Data(), s.Length(), data);
         data += s.Length();
     }
     return std::move(ret);
@@ -777,7 +809,7 @@ void StringBuilder<CS>::Clear()
 }
 
 template<typename DCS, typename SCS>
-String<DCS> StringConvertor::Convert(const typename String<SCS>::View &src)
+String<DCS> CharsetConvertor::Convert(const typename String<SCS>::View &src)
 {
     if constexpr(std::is_same_v<DCS, SCS>)
         return String<SCS>(src.AsString());
@@ -803,6 +835,12 @@ String<DCS> StringConvertor::Convert(const typename String<SCS>::View &src)
 
         return String<DCS>(cus.data(), cus.size());
     }
+}
+
+template<typename DCS, typename SCS>
+String<DCS> CharsetConvertor::Convert(const String<SCS>& src)
+{
+    return Convert<DCS, SCS>(src.AsView());
 }
 
 AGZ_NS_END(AGZ::StrImpl)

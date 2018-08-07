@@ -34,6 +34,7 @@
     <ClInclude Include="..\Src\Misc\Bench.h" />
     <ClInclude Include="..\Src\Misc\Common.h" />
     <ClInclude Include="..\Src\Misc\Endian.h" />
+    <ClInclude Include="..\Src\Misc\Malloc.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
     <ClInclude Include="..\Src\Range\Aggregate.h" />
     <ClInclude Include="..\Src\Range\All.h" />

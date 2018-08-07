@@ -142,6 +142,9 @@
     <ClInclude Include="..\Src\String\String.h">
       <Filter>String</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Misc\Malloc.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">

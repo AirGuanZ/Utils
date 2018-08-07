@@ -36,8 +36,8 @@ class Buffer
     void Alloc(size_t s)
     {
         AGZ_ASSERT(s > 0);
-        d_ = static_cast<E*>(alloc_throw(::AGZ::aligned_alloc,
-                                         alignof(E), s * sizeof(E)));
+        d_ = alloc_throw<E>(::AGZ::aligned_alloc,
+                            alignof(E), s * sizeof(E));
     }
 
     void Free()
