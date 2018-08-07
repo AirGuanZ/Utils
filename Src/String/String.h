@@ -12,17 +12,7 @@
 
 AGZ_NS_BEG(AGZ::StrImpl)
 
-struct SingleThreaded
-{
-    using RefCounter = std::size_t;
-    static constexpr bool IsThreadSafe = false;
-};
-
-struct MultiThreaded
-{
-    using RefCounter = std::atomic<size_t>;
-    static constexpr bool IsThreadSafe = true;
-};
+enum class NativeCharset { UTF8 };
 
 template<size_t>
 struct SmallBufSizeSelector;
@@ -45,17 +35,15 @@ struct SmallBufSizeSelector<4>
     static constexpr size_t Value = 7;
 };
 
-template<typename E, typename TP>
+template<typename E>
 class RefCountedBuf
 {
-    mutable typename TP::RefCounter refs_;
+    mutable std::atomic<size_t> refs_;
     E data_[1];
 
 public:
 
-    using Self = RefCountedBuf<E, TP>;
-
-    static constexpr bool IsThreadSafe = TP::IsThreadSafe;
+    using Self = RefCountedBuf<E>;
 
     static Self *New(size_t n);
 
@@ -71,7 +59,7 @@ public:
     const E *GetData() const;
 };
 
-template<typename CU, typename TP>
+template<typename CU>
 class Storage
 {
     friend class StringBuilder;
@@ -79,7 +67,7 @@ class Storage
     static constexpr size_t SMALL_BUF_SIZE =
         SmallBufSizeSelector<sizeof(CU)>::Value;
 
-    using LargeBuf = RefCountedBuf<CU, TP>;
+    using LargeBuf = RefCountedBuf<CU>;
 
     union
     {
@@ -107,9 +95,7 @@ class Storage
 
 public:
 
-    using Self = Storage<CU, TP>;
-
-    static constexpr bool IsThreadSafe = LargeBuf::IsThreadSafe;
+    using Self = Storage<CU>;
 
     static_assert(std::is_trivially_copyable_v<CU>);
 
@@ -140,12 +126,12 @@ public:
     std::pair<const CU*, const CU*> BeginAndEnd() const;
 };
 
-template<typename CS, typename TP = MultiThreaded>
+template<typename CS>
 class String
 {
     friend class StringBuilder;
 
-    Storage<typename CS::CodeUnit, TP> storage_;
+    Storage<typename CS::CodeUnit> storage_;
 
     typename CS::CodeUnit *GetMutableData();
 
@@ -156,13 +142,13 @@ public:
     using Charset   = CS;
     using CodeUnit  = typename CS::CodeUnit;
     using CodePoint = typename CS::CodePoint;
-    using Self      = String<CS, TP>;
+    using Self      = String<CS>;
 
     using Iterator = const CodeUnit*;
 
     class View
     {
-        String<CS, TP> *str_;
+        String<CS> *str_;
         typename CS::CodeUnit *beg_;
         size_t len_;
 
@@ -172,7 +158,7 @@ public:
         using CodeUnit  = typename CS::CodeUnit;
         using CodePoint = typename CS::CodePoint;
         using Self      = View;
-        using Str       = String<CS, TP>;
+        using Str       = String<CS>;
 
         using Iterator = const CodeUnit*;
 
@@ -182,10 +168,12 @@ public:
         View(const Str &str, const CodeUnit* beg, size_t len);
         View(const Str &str, size_t begIdx, size_t endIdx);
 
-        View()                       = delete;
-        View(const Self &)           = default;
-        ~View()                      = default;
+        View()                        = delete;
+        View(const Self &)            = default;
+        ~View()                       = default;
         Self &operator=(const Self &) = default;
+
+        Str AsString() const;
 
         const CodeUnit *Data() const;
         std::pair<const CodeUnit*, size_t> DataAndLength() const;
@@ -218,6 +206,8 @@ public:
         Iterator begin() const;
         Iterator end()   const;
 
+        std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const;
+
         bool operator==(const Self &rhs) const;
         bool operator!=(const Self &rhs) const;
         bool operator< (const Self &rhs) const;
@@ -237,16 +227,12 @@ public:
     String(const Self &copyFrom);
     String(Self &&moveFrom);
 
-    template<typename OTP, std::enable_if_t<!std::is_same_v<TP, OTP>, int> = 0>
-    String(const String<CS, OTP> &copyFrom);
-
     ~String() = default;
+
+    operator View() const;
 
     Self &operator=(const Self &copyFrom);
     Self &operator=(Self &&moveFrom);
-
-    template<typename OTP, std::enable_if_t<!std::is_same_v<TP, OTP>, int> = 0>
-    Self &operator=(const String<CS, OTP> &copyFrom);
 
     View AsView() const;
 
@@ -266,41 +252,48 @@ public:
     View Prefix(size_t n) const;
     View Suffix(size_t n) const;
 
-    bool StartsWith(const Self &prefix) const;
-    bool EndsWith(const Self &suffix)   const;
+    bool StartsWith(const View &prefix) const;
+    bool EndsWith(const View &suffix)   const;
 
-    std::vector<Self> Split()                    const;
-    std::vector<Self> Split(const Self &spliter) const;
+    std::vector<View> Split()                    const;
+    std::vector<View> Split(const View &spliter) const;
 
     template<typename R>
     Str Join(R &&strRange) const;
 
-    size_t Find(const Self &dst, size_t begIdx = 0)   const;
-    size_t FindR(const Self &dst, size_t rbegIdx = 0) const;
+    size_t Find(const View &dst, size_t begIdx = 0)   const;
+    size_t FindR(const View &dst, size_t rbegIdx = 0) const;
 
     Iterator begin() const;
     Iterator end()   const;
+
+    std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const;
 };
 
-template<typename CS, typename TP = SingleThreaded>
+template<typename CS>
 class StringBuilder
 {
-    std::list<String<CS, TP>> strs_;
+    std::list<String<CS>> strs_;
 
 public:
 
     using Self = StringBuilder<CS>;
 
-    template<typename TPs>
-    Self &Append(const typename String<CS, TPs>::View &view);
+    Self &Append(const typename String<CS>::View &view);
 
-    template<typename TPs>
-    Self &operator<<(const typename String<CS, TPs>::View &view);
+    Self &operator<<(const typename String<CS>::View &view);
 
-    template<typename TPs = MultiThreaded>
-    String<CS, TPs> Get() const;
+    String<CS> Get() const;
 
     void Clear();
+};
+
+class StringConvertor
+{
+public:
+
+    template<typename DCS, typename SCS>
+    static String<DCS> Convert(const String<SCS>::View &src);
 };
 
 AGZ_NS_END(AGZ::StrImpl)

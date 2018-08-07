@@ -6,15 +6,15 @@
 
 AGZ_NS_BEG(AGZ::StrImpl)
 
-template<typename CU, typename TP>
-void Storage<CU, TP>::AllocSmall(size_t len)
+template<typename CU>
+void Storage<CU>::AllocSmall(size_t len)
 {
     AGZ_ASSERT(len <= SMALL_BUF_SIZE);
     small_.len = len;
 }
 
-template<typename E, typename TP>
-RefCountedBuf<E, TP> *RefCountedBuf<E, TP>::New(size_t n)
+template<typename E>
+RefCountedBuf<E> *RefCountedBuf<E>::New(size_t n)
 {
     size_t allocSize = (sizeof(Self) - sizeof(E)) + n * sizeof(E);
     Self *ret = alloc_throw(std::malloc, allocSize);
@@ -22,40 +22,40 @@ RefCountedBuf<E, TP> *RefCountedBuf<E, TP>::New(size_t n)
     return ret;
 }
 
-template<typename E, typename TP>
-void RefCountedBuf<E, TP>::IncRef() const
+template<typename E>
+void RefCountedBuf<E>::IncRef() const
 {
     ++refs_;
 }
 
-template<typename E, typename TP>
-void RefCountedBuf<E, TP>::DecRef() const
+template<typename E>
+void RefCountedBuf<E>::DecRef() const
 {
     if(!--refs_)
         std::free(this);
 }
 
-template<typename E, typename TP>
-E *RefCountedBuf<E, TP>::GetData()
+template<typename E>
+E *RefCountedBuf<E>::GetData()
 {
     return &data_[0];
 }
 
-template<typename E, typename TP>
-const E *RefCountedBuf<E, TP>::GetData() const
+template<typename E>
+const E *RefCountedBuf<E>::GetData() const
 {
     return &data_[0];
 }
 
-template<typename CU, typename TP>
-void Storage<CU, TP>::AllocSmall(size_t len)
+template<typename CU>
+void Storage<CU>::AllocSmall(size_t len)
 {
     AGZ_ASSERT(len <= SMALL_BUF_SIZE);
     small_.len = len;
 }
 
-template<typename CU, typename TP>
-void Storage<CU, TP>::AllocLarge(size_t len)
+template<typename CU>
+void Storage<CU>::AllocLarge(size_t len)
 {
     small_.len = SMALL_BUF_SIZE + 1;
     large_.buf = LargeBuf::New(len);
@@ -63,29 +63,29 @@ void Storage<CU, TP>::AllocLarge(size_t len)
     large_.end = large_.beg + len;
 }
 
-template<typename CU, typename TP>
-CU *Storage<CU, TP>::GetSmallMutableData()
+template<typename CU>
+CU *Storage<CU>::GetSmallMutableData()
 {
     AGZ_ASSERT(IsSmallStorage());
     return &small_.buf[0];
 }
 
-template<typename CU, typename TP>
-CU *Storage<CU, TP>::GetLargeMutableData()
+template<typename CU>
+CU *Storage<CU>::GetLargeMutableData()
 {
     AGZ_ASSERT(IsLargeStorage());
     return large_.beg;
 }
 
-template<typename CU, typename TP>
-CU *Storage<CU, TP>::GetMutableData()
+template<typename CU>
+CU *Storage<CU>::GetMutableData()
 {
     return IsSmallStorage() ? GetSmallMutableData() :
                               GetLargeMutableData();
 }
 
-template<typename CU, typename TP>
-Storage<CU, TP>::Storage(size_t len)
+template<typename CU>
+Storage<CU>::Storage(size_t len)
 {
     if(len <= SMALL_BUF_SIZE)
         AllocSmall();
@@ -93,8 +93,8 @@ Storage<CU, TP>::Storage(size_t len)
         AllocLarge();
 }
 
-template<typename CU, typename TP>
-Storage<CU, TP>::Storage(const CU *data, size_t len)
+template<typename CU>
+Storage<CU>::Storage(const CU *data, size_t len)
 {
     if(len <= SMALL_BUF_SIZE)
     {
@@ -108,22 +108,22 @@ Storage<CU, TP>::Storage(const CU *data, size_t len)
     }
 }
 
-template<typename CU, typename TP>
-Storage<CU, TP>::Storage(const CU *beg, const CU *end)
+template<typename CU>
+Storage<CU>::Storage(const CU *beg, const CU *end)
     : Storage(beg, static_cast<size_t>(end - beg))
 {
 
 }
 
-template<typename CU, typename TP>
-Storage<CU, TP>::Storage(const Self &copyFrom)
+template<typename CU>
+Storage<CU>::Storage(const Self &copyFrom)
     : Storage(copyFrom, 0, copyFrom.GetLength())
 {
 
 }
 
-template<typename CU, typename TP>
-Storage<CU, TP>::Storage(const Self &copyFrom, size_t beg, size_t end)
+template<typename CU>
+Storage<CU>::Storage(const Self &copyFrom, size_t beg, size_t end)
 {
     AGZ_ASSERT(beg <= end);
     size_t len = end - beg;
@@ -141,8 +141,8 @@ Storage<CU, TP>::Storage(const Self &copyFrom, size_t beg, size_t end)
     }
 }
 
-template<typename CU, typename TP>
-Storage<CU, TP>::Storage(Self &&moveFrom)
+template<typename CU>
+Storage<CU>::Storage(Self &&moveFrom)
 {
     if(moveFrom.IsLargeStorage())
     {
@@ -158,15 +158,15 @@ Storage<CU, TP>::Storage(Self &&moveFrom)
     }
 }
 
-template<typename CU, typename TP>
-Storage<CU, TP>::~Storage()
+template<typename CU>
+Storage<CU>::~Storage()
 {
     if(IsLargeStorage())
         large_.buf->DecRef();
 }
 
-template<typename CU, typename TP>
-Storage<CU, TP> &Storage<CU, TP>::operator=(const Self &copyFrom)
+template<typename CU>
+Storage<CU> &Storage<CU>::operator=(const Self &copyFrom)
 {
     if(IsLargeStorage())
         large_.buf->DecRef();
@@ -174,8 +174,8 @@ Storage<CU, TP> &Storage<CU, TP>::operator=(const Self &copyFrom)
     return *this;
 }
 
-template<typename CU, typename TP>
-Storage<CU, TP> &Storage<CU, TP>::operator=(Self &&moveFrom)
+template<typename CU>
+Storage<CU> &Storage<CU>::operator=(Self &&moveFrom)
 {
     if(IsLargeStorage())
         large_.buf->DecRef();
@@ -183,75 +183,75 @@ Storage<CU, TP> &Storage<CU, TP>::operator=(Self &&moveFrom)
     return *this;
 }
 
-template<typename CU, typename TP>
-bool Storage<CU, TP>::IsSmallStorage() const
+template<typename CU>
+bool Storage<CU>::IsSmallStorage() const
 {
     return small_.len <= SMALL_BUF_SIZE;
 }
 
-template<typename CU, typename TP>
-bool Storage<CU, TP>::IsLargeStorage() const
+template<typename CU>
+bool Storage<CU>::IsLargeStorage() const
 {
     return !IsSmallStorage();
 }
 
-template<typename CU, typename TP>
-size_t Storage<CU, TP>::GetSmallLength() const
+template<typename CU>
+size_t Storage<CU>::GetSmallLength() const
 {
     AGZ_ASSERT(IsSmallStorage());
     return small_.len;
 }
 
-template<typename CU, typename TP>
-size_t Storage<CU, TP>::GetLargeLength() const
+template<typename CU>
+size_t Storage<CU>::GetLargeLength() const
 {
     AGZ_ASSERT(IsLargeStorage() && large_.beg <= large_.end);
     return return large_.end - large_.beg;
 }
 
-template<typename CU, typename TP>
-size_t Storage<CU, TP>::GetLength() const
+template<typename CU>
+size_t Storage<CU>::GetLength() const
 {
     return IsSmallStorage() ? GetSmallLength() : GetLargeLength();
 }
 
-template<typename CU, typename TP>
-const CU *Storage<CU, TP>::Begin() const
+template<typename CU>
+const CU *Storage<CU>::Begin() const
 {
     return IsSmallStorage() ? &small_.buf[0] : large_.beg;
 }
 
-template<typename CU, typename TP>
-const CU *Storage<CU, TP>::End() const
+template<typename CU>
+const CU *Storage<CU>::End() const
 {
     return IsSmallStorage() ? (&small_.buf[small_.len]) : large_.end;
 }
 
-template<typename CU, typename TP>
-std::pair<const CU*, size_t> Storage<CU, TP>::BeginAndLength() const
+template<typename CU>
+std::pair<const CU*, size_t> Storage<CU>::BeginAndLength() const
 {
     return IsSmallStorage() ?
                 { &small_.buf[0], small_.len } :
                 { large_.beg, large_.end - large_.beg };
 }
 
-template<typename CU, typename TP>
-std::pair<const CU*, size_t> Storage<CU, TP>::BeginAndEnd() const
+template<typename CU>
+std::pair<const CU*, size_t> Storage<CU>::BeginAndEnd() const
 {
     return IsSmallStorage() ?
                 { &small_.buf[0], &small_.buf[small_.len] } :
                 { large_.beg, large_.end };
 }
 
-template<typename CS, typename TP>
-String<CS, TP>::View::View(const Str &str)
+template<typename CS>
+String<CS>::View::View(const Str &str)
     : str_(&str)
 {
     std::tie(beg_, len_) = str.DataAndLength();
 }
 
-template<typename CS, typename TP>
-String<CS, TP>::View::View(const Str &str, size_t begIdx, size_t endIdx)
+template<typename CS>
+String<CS>::View::View(const Str &str, size_t begIdx, size_t endIdx)
     : str_(&str)
 {
     AGZ_ASSERT(begIdx <= endIdx);
@@ -261,46 +261,54 @@ String<CS, TP>::View::View(const Str &str, size_t begIdx, size_t endIdx)
     len_   = endIdx - begIdx;
 }
 
-template<typename CS, typename TP>
-String<CS, TP>::View::View(const Str &str, const CodeUnit* beg, size_t len)
+template<typename CS>
+String<CS>::View::View(const Str &str, const CodeUnit* beg, size_t len)
     : str_(&str), beg_(beg), len_(len)
 {
     AGZ_ASSERT(beg_ >= str.Data() && beg_ + len_ <= str.Data() + str.Length());
 }
 
-template<typename CS, typename TP>
-const typename CS::CodeUnit *String<CS, TP>::View::Data() const
+template<typename CS>
+const String<CS> String<CS>::View::AsString() const
+{
+    if(beg_ == str_->Data() && len_ == str_->Length())
+        return *str_;
+    return Str(beg_, len_);
+}
+
+template<typename CS>
+const typename CS::CodeUnit *String<CS>::View::Data() const
 {
     return beg_;
 }
 
-template<typename CS, typename TP>
+template<typename CS>
 std::pair<const typename CS::CodeUnit*, size_t>
-String<CS, TP>::View::DataAndLength() const
+String<CS>::View::DataAndLength() const
 {
     return { beg_, len_ };
 }
 
-template<typename CS, typename TP>
-size_t String<CS, TP>::View::Length() const
+template<typename CS>
+size_t String<CS>::View::Length() const
 {
     return len_;
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::View::Empty() const
+template<typename CS>
+bool String<CS>::View::Empty() const
 {
     return Length() == 0;
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::View::Trim() const
+template<typename CS>
+typename String<CS>::View String<CS>::View::Trim() const
 {
     return TrimLeft().TrimRight();
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::View::TrimLeft() const
+template<typename CS>
+typename String<CS>::View String<CS>::View::TrimLeft() const
 {
     auto beg = beg_; auto len = len_;
     while(len > 0 && CS::IsSpace(*beg))
@@ -308,8 +316,8 @@ typename String<CS, TP>::View String<CS, TP>::View::TrimLeft() const
     return Self(*str_, beg, len);
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::View::TrimRight() const
+template<typename CS>
+typename String<CS>::View String<CS>::View::TrimRight() const
 {
     auto len = len_;
     while(len > 0 && CS::IsSpace(beg_[len - 1]))
@@ -317,52 +325,52 @@ typename String<CS, TP>::View String<CS, TP>::View::TrimRight() const
     return Self(*str_, beg_, len);
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::View::Slice(size_t begIdx) const
+template<typename CS>
+typename String<CS>::View String<CS>::View::Slice(size_t begIdx) const
 {
     return this->Slice(begIdx, len_);
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View
-String<CS, TP>::View::Slice(size_t begIdx, size_t endIdx) const
+template<typename CS>
+typename String<CS>::View
+String<CS>::View::Slice(size_t begIdx, size_t endIdx) const
 {
     AGZ_ASSERT(begIdx <= endIdx && endIdx <= len_);
     return Self(*str_, beg_ + begIdx, beg_ + endIdx);
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::View::Prefix(size_t n) const
+template<typename CS>
+typename String<CS>::View String<CS>::View::Prefix(size_t n) const
 {
     AGZ_ASSERT(n <= len_);
     return this->Slice(0, n);
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::View::Suffix(size_t n) const
+template<typename CS>
+typename String<CS>::View String<CS>::View::Suffix(size_t n) const
 {
     AGZ_ASSERT(n <= len_);
     return this->Slice(len_ - n);
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::View::StartsWith(const Self &prefix) const
+template<typename CS>
+bool String<CS>::View::StartsWith(const Self &prefix) const
 {
     return len_ < prefix.Length() ?
                 false :
                 (Prefix(prefix.Length()) == prefix);
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::View::EndsWith(const Self &suffix) const
+template<typename CS>
+bool String<CS>::View::EndsWith(const Self &suffix) const
 {
     return len_ < suffix.Length() ?
                 false :
                 (Suffix(suffix.Length()) == suffix);
 }
 
-template<typename CS, typename TP>
-std::vector<typename String<CS, TP>::View> String<CS, TP>::View::Split() const
+template<typename CS>
+std::vector<typename String<CS>::View> String<CS>::View::Split() const
 {
     std::vector<Self> ret;
     const CodeUnit *segBeg = nullptr; size_t segLen = 0;
@@ -382,9 +390,9 @@ std::vector<typename String<CS, TP>::View> String<CS, TP>::View::Split() const
     return std::move(ret);
 }
 
-template<typename CS, typename TP>
-std::vector<typename String<CS, TP>::View>
-String<CS, TP>::View::Split(const Self &spliter) const
+template<typename CS>
+std::vector<typename String<CS>::View>
+String<CS>::View::Split(const Self &spliter) const
 {
     AGZ_ASSERT(spliter.Empty() == false);
     std::vector<Self> ret;
@@ -405,9 +413,9 @@ String<CS, TP>::View::Split(const Self &spliter) const
     return std::move(ret);
 }
 
-template<typename CS, typename TP>
+template<typename CS>
 template<typename R>
-String<CS, TP> String<CS, TP>::Join(R &&strRange) const
+String<CS> String<CS>::Join(R &&strRange) const
 {
     if(strRange.empty())
         return Str();
@@ -419,16 +427,16 @@ String<CS, TP> String<CS, TP>::Join(R &&strRange) const
     return builder.Get();
 }
 
-template<typename CS, typename TP>
-size_t String<CS, TP>::View::Find(const Self &dst, size_t begIdx) const
+template<typename CS>
+size_t String<CS>::View::Find(const Self &dst, size_t begIdx) const
 {
     AGZ_ASSERT(begIdx <= len_);
     auto rt = FindSubPattern(begin() + begIdx, end(), dst.begin(), dst.end());
     return rt == end() ? NPOS : (rt - beg_)
 }
 
-template<typename CS, typename TP>
-size_t String<CS, TP>::View::FindR(const Self &dst, size_t rbegIdx) const
+template<typename CS>
+size_t String<CS>::View::FindR(const Self &dst, size_t rbegIdx) const
 {
     AGZ_ASSERT(rbegIdx <= len_);
     using R = ReverseIterator<Iterator>;
@@ -437,20 +445,43 @@ size_t String<CS, TP>::View::FindR(const Self &dst, size_t rbegIdx) const
     return rt == rend ? NPOS : (len_ - (rt - rbeg) - dst.Length());
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View::Iterator String<CS, TP>::View::begin() const
+template<typename CS>
+typename String<CS>::View::Iterator String<CS>::View::begin() const
 {
     return beg_;
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View::Iterator String<CS, TP>::View::end() const
+template<typename CS>
+typename String<CS>::View::Iterator String<CS>::View::end() const
 {
     return beg_ + len_;
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::View::operator==(const Self &rhs) const
+template<typename CS>
+std::string String<CS>::View::ToStdString(NativeCharset cs) const
+{
+    switch(cs)
+    {
+    case NativeCharset::UTF8:
+        if constexpr(std::is_same_v<CS, UTF8<char>>)
+        {
+            auto [d, l] = DataAndLength();
+            return std::string(d, l);
+        }
+        else
+        {
+            return StringConvertor::Convert<UTF8<>>(*this)
+                        .ToStdString(NativeCharset::UTF8);
+        }
+        break;
+    }
+    throw CharsetException("Unknown charset " +
+            std::to_string(static_cast<
+                std::underlying_type_t<NativeCharset>>(cs)));
+}
+
+template<typename CS>
+bool String<CS>::View::operator==(const Self &rhs) const
 {
     if(len_ != rhs.len_)
         return false;
@@ -462,257 +493,259 @@ bool String<CS, TP>::View::operator==(const Self &rhs) const
     return true;
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::View::operator==(const Self &rhs) const
+template<typename CS>
+bool String<CS>::View::operator==(const Self &rhs) const
 {
     return !(*this == rhs);
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::View::operator<(const Self &rhs) const
+template<typename CS>
+bool String<CS>::View::operator<(const Self &rhs) const
 {
     return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
         == StrAlgo::CompareResult::Less;
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::View::operator>(const Self &rhs) const
+template<typename CS>
+bool String<CS>::View::operator>(const Self &rhs) const
 {
     return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
         == StrAlgo::CompareResult::Greater;
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::View::operator<=(const Self &rhs) const
+template<typename CS>
+bool String<CS>::View::operator<=(const Self &rhs) const
 {
     return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
         != StrAlgo::CompareResult::Greater;
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::View::operator>=(const Self &rhs) const
+template<typename CS>
+bool String<CS>::View::operator>=(const Self &rhs) const
 {
     return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
         != StrAlgo::CompareResult::Less;
 }
 
-template<typename CS, typename TP>
-String<CS, TP>::String()
+template<typename CS>
+String<CS>::String()
     : storage_(0)
 {
 
 }
 
-template<typename CS, typename TP>
-String<CS, TP>::String(const CodeUnit *beg, size_t len)
+template<typename CS>
+String<CS>::String(const CodeUnit *beg, size_t len)
     : storage_(beg, len)
 {
 
 }
 
-template<typename CS, typename TP>
-String<CS, TP>::String(const CodeUnit *beg, const CodeUnit *end)
+template<typename CS>
+String<CS>::String(const CodeUnit *beg, const CodeUnit *end)
     : storage_(beg, end)
 {
 
 }
 
-template<typename CS, typename TP>
-String<CS, TP>::String(const Self &copyFrom, size_t begIdx, size_t endIdx)
+template<typename CS>
+String<CS>::String(const Self &copyFrom, size_t begIdx, size_t endIdx)
     : storage_(copyFrom.storage_, begIdx, endIdx)
 {
 
 }
 
-template<typename CS, typename TP>
-String<CS, TP>::String(const Self &copyFrom)
+template<typename CS>
+String<CS>::String(const Self &copyFrom)
     : storage_(copyFrom.storage_)
 {
 
 }
 
-template<typename CS, typename TP>
-String<CS, TP>::String(Self &&moveFrom)
+template<typename CS>
+String<CS>::String(Self &&moveFrom)
     : storage_(std::move(moveFrom.storage_))
 {
 
 }
 
-template<typename CS, typename TP>
-template<typename OTP, std::enable_if_t<!std::is_same_v<TP, OTP>, int>>
-String<CS, TP>::String(const String<CS, OTP> &copyFrom)
+template<typename CS>
+String<CS>::operator View() const
 {
-    auto [data, len] = copyFrom.DataAndLength();
-    new(this) Self(data, len);
+    return AsView();
 }
 
-template<typename CS, typename TP>
-String<CS, TP> &String<CS, TP>::operator=(const Self &copyFrom)
+template<typename CS>
+String<CS> &String<CS>::operator=(const Self &copyFrom)
 {
     storage_ = copyFrom.storage_;
     return *this;
 }
 
-template<typename CS, typename TP>
-String<CS, TP> &String<CS, TP>::operator=(Self &&moveFrom)
+template<typename CS>
+String<CS> &String<CS>::operator=(Self &&moveFrom)
 {
     storage_ = std::move(moveFrom.storage_);
     return *this;
 }
 
-template<typename CS, typename TP>
-template<typename OTP, std::enable_if_t<!std::is_same_v<TP, OTP>, int>>
-String<CS, TP> &String<CS, TP>::operator=(const String<CS, OTP> &copyFrom)
-{
-    this->~String();
-    auto [data, len] = copyFrom.DataAndLength();
-    new(this) Self(data, len);
-    return *this;
-}
-
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::AsView() const
+template<typename CS>
+typename String<CS>::View String<CS>::AsView() const
 {
     return View(*this);
 }
 
-template<typename CS, typename TP>
-const typename CS::CodeUnit *String<CS, TP>::Data() const
+template<typename CS>
+const typename CS::CodeUnit *String<CS>::Data() const
 {
     return storage_.Begin();
 }
 
-template<typename CS, typename TP>
+template<typename CS>
 std::pair<const typename CS::CodeUnit*, size_t>
-String<CS, TP>::DataAndLength() const
+String<CS>::DataAndLength() const
 {
     return storage_.BeginAndLength();
 }
 
-template<typename CS, typename TP>
-size_t String<CS, TP>::Length() const
+template<typename CS>
+size_t String<CS>::Length() const
 {
     return storage_.GetLength();
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::Empty() const
+template<typename CS>
+bool String<CS>::Empty() const
 {
     return Length() == 0;
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::Trim() const
+template<typename CS>
+typename String<CS>::View String<CS>::Trim() const
 {
     return AsView().Trim();
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::View::TrimLeft() const
+template<typename CS>
+typename String<CS>::View String<CS>::TrimLeft() const
 {
     return AsView().TrimLeft();
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::View::TrimRight() const
+template<typename CS>
+typename String<CS>::View String<CS>::TrimRight() const
 {
     return AsView().TrimRight();
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::View::Slice(size_t begIdx) const
+template<typename CS>
+typename String<CS>::View String<CS>::Slice(size_t begIdx) const
 {
     return AsView().Slice(begIdx);
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View
-String<CS, TP>::View::Slice(size_t begIdx, size_t endIdx) const
+template<typename CS>
+typename String<CS>::View String<CS>::Slice(size_t begIdx, size_t endIdx) const
 {
     return AsView().Slice(begIdx, endIdx);
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::View::Prefix(size_t n) const
+template<typename CS>
+typename String<CS>::View String<CS>::Prefix(size_t n) const
 {
     return AsView().Prefix(n);
 }
 
-template<typename CS, typename TP>
-typename String<CS, TP>::View String<CS, TP>::View::Suffix(size_t n) const
+template<typename CS>
+typename String<CS>::View String<CS>::Suffix(size_t n) const
 {
     return AsView().Suffix(n);
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::View::StartsWith(const View &prefix) const
+template<typename CS>
+bool String<CS>::StartsWith(const View &prefix) const
 {
     return AsView().StartsWith(prefix);
 }
 
-template<typename CS, typename TP>
-bool String<CS, TP>::View::EndsWith(const View &suffix) const
+template<typename CS>
+bool String<CS>::EndsWith(const View &suffix) const
 {
     return AsView().EndsWith(suffix);
 }
 
-template<typename CS, typename TP>
-std::vector<typename String<CS, TP>::View> String<CS, TP>::View::Split() const
+template<typename CS>
+std::vector<typename String<CS>::View> String<CS>::Split() const
 {
     return AsView().Split();
 }
 
-template<typename CS, typename TP>
-std::vector<typename String<CS, TP>::View>
-String<CS, TP>::View::Split(const View &spliter) const
+template<typename CS>
+std::vector<typename String<CS>::View>
+String<CS>::Split(const View &spliter) const
 {
     return AsView().Split(spliter);
 }
 
-template<typename CS, typename TP>
+template<typename CS>
 template<typename R>
-String<CS, TP> String<CS, TP>::Join(R &&strRange) const
+String<CS> String<CS>::Join(R &&strRange) const
 {
     return AsView().Join(std::forward<R>(strRange))
 }
 
-template<typename CS, typename TP>
-size_t String<CS, TP>::View::Find(const View &dst, size_t begIdx) const
+template<typename CS>
+size_t String<CS>::Find(const View &dst, size_t begIdx) const
 {
     return AsView().Find(dst, begIdx);
 }
 
-template<typename CS, typename TP>
-size_t String<CS, TP>::View::FindR(const View &dst, size_t rbegIdx) const
+template<typename CS>
+size_t String<CS>::FindR(const View &dst, size_t rbegIdx) const
 {
     return AsView().FindR(dst, rbegIdx);
 }
 
-template<typename CS, typename TP>
-template<typename TPs>
-StringBuilder<CS, TP> &StringBuilder<CS, TP>::Append(
-    const typename String<CS, TPs>::View &view)
+template<typename CS>
+typename String<CS>::Iterator String<CS>::begin() const
+{
+    return storage_.Begin();
+}
+
+template<typename CS>
+typename String<CS>::Iterator String<CS>::end() const
+{
+    return storage_.End();
+}
+
+template<typename CS>
+std::string String<CS>::ToStdString() const
+{
+    return AsView().ToStdString();
+}
+
+template<typename CS>
+StringBuilder<CS> &StringBuilder<CS>::Append(
+    const typename String<CS>::View &view)
 {
     strs_.emplace_back(view);
     return *this;
 }
 
-template<typename CS, typename TP>
-template<typename TPs>
-StringBuilder<CS, TP> &StringBuilder<CS, TP>::operator<<(
-    const typename String<CS, TPs>::View &view)
+template<typename CS>
+StringBuilder<CS> &StringBuilder<CS>::operator<<(
+    const typename String<CS>::View &view)
 {
     return Append(view);
 }
 
-template<typename CS, typename TP>
-template<typename TPs>
-String<CS, TPs> StringBuilder<CS, TP>::Get() const
+template<typename CS>
+String<CS> StringBuilder<CS>::Get() const
 {
     size_t len = 0;
     for(auto &s : strs_)
         len += s.Length();
-    String<CS, TPs> ret(len);
+    String<CS> ret(len);
     auto data = ret.GetMutableData();
     for(auto &s : strs_)
     {
@@ -722,10 +755,39 @@ String<CS, TPs> StringBuilder<CS, TP>::Get() const
     return std::move(ret);
 }
 
-template<typename CS, typename TP>
-void StringBuilder<CS, TP>::Clear()
+template<typename CS>
+void StringBuilder<CS>::Clear()
 {
     strs_.clear();
+}
+
+template<typename DCS, typename SCS>
+String<DCS> StringConvertor::Convert(const String<SCS>::View &src)
+{
+    if constexpr(std::is_same_v<DCS, SCS>)
+        return String<SCS>(src.AsString());
+    else
+    {
+        std::vector<typename DCS::CodeUnit> cus;
+        CodeUnit sgl[DCS::MaxCUInCP];
+
+        auto beg = src.begin(), end = src.end();
+        while(beg < end)
+        {
+            typename SCS::CodePoint scp;
+            size_t skip = SCS::CU2CP(beg, &scp);
+            if(!skip)
+                throw CharsetException("Invalid " + SCS::Name() + " sequence");
+            beg += skip;
+
+            size_t sgls = DCS::CP2CU(DCS::template From<SCS>(scp), sgl);
+            AGZ_ASSERT(sgls);
+            for(size_t i = 0; i < sgls; ++i)
+                cus.push_back(sgl[i]);
+        }
+
+        return String<DCS>(cus.data(), cus.size());
+    }
 }
 
 AGZ_NS_END(AGZ::StrImpl)
