@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Alloc/Alloc.h"
+#include "Alloc/FixedSizedArena.h"
+#include "Alloc/Malloc.h"
+
 #include "Buffer/Buffer.h"
 #include "Buffer/Buffer2D.h"
 
@@ -29,10 +33,11 @@
 #include "Range/Filter.h"
 #include "Range/Map.h"
 #include "Range/PartialFoldl.h"
-#include "Range/Reverse.h"
 #include "Range/Reduce.h"
 #include "Range/Reverse.h"
 #include "Range/Seq.h"
 #include "Range/Take.h"
+#include "Range/Transform.h"
 
+#include "String/Regex.h"
 #include "String/String.h"
