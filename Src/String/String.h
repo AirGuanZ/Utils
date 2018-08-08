@@ -216,6 +216,28 @@ public:
         bool EndsWith(const Self &s) const;
         bool EndsWith(const Str &s)  const { return EndsWith(s.AsView()); }
 
+        bool IsDigit(unsigned int base = 10)  const;
+        bool IsDigits(unsigned int base = 10) const;
+
+        bool IsAlpha()  const;
+        bool IsAlphas() const;
+
+        bool IsAlnum(unsigned int base = 10)  const;
+        bool IsAlnums(unsigned int base = 10) const;
+
+        bool IsUpper()  const;
+        bool IsUppers() const;
+
+        bool IsLower()  const;
+        bool IsLowers() const;
+
+        bool IsWhitespace()  const;
+        bool IsWhitespaces() const;
+
+        Str ToUpper() const;
+        Str ToLower() const;
+        Str SwapCase() const;
+
         std::vector<Self> Split()                    const;
         std::vector<Self> Split(const Self &spliter) const;
         std::vector<Self> Split(const Str &spliter)  const { return Split(spliter.AsView()); }
@@ -226,12 +248,13 @@ public:
         size_t Find(const Self &dst, size_t begIdx = 0) const;
         size_t Find(const Str &dst, size_t begIdx = 0)  const { return Find(dst.AsView(), begIdx); }
 
+        std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const;
+
         Iterator begin() const;
         Iterator end()   const;
 
-        std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const;
-
         Str operator+(const Self &rhs) const;
+
         bool operator==(const Self &rhs) const;
         bool operator!=(const Self &rhs) const;
         bool operator< (const Self &rhs) const;
@@ -259,6 +282,18 @@ public:
     Self &operator=(const Self &copyFrom);
     Self &operator=(Self &&moveFrom) noexcept;
 
+    static Self From(char v,               unsigned int base = 10);
+    static Self From(signed char v,        unsigned int base = 10);
+    static Self From(unsigned char v,      unsigned int base = 10);
+    static Self From(short v,              unsigned int base = 10);
+    static Self From(unsigned short v,     unsigned int base = 10);
+    static Self From(int v,                unsigned int base = 10);
+    static Self From(unsigned int v,       unsigned int base = 10);
+    static Self From(long v,               unsigned int base = 10);
+    static Self From(unsigned long v,      unsigned int base = 10);
+    static Self From(long long v,          unsigned int base = 10);
+    static Self From(unsigned long long v, unsigned int base = 10);
+
     View AsView() const;
 
     const CodeUnit *Data() const;
@@ -267,28 +302,42 @@ public:
     size_t Length() const;
     bool Empty()    const;
 
-    View Trim()                                     const { return AsView().Trim(); }
-    View TrimLeft()                                 const { return AsView().TrimLeft(); }
-    View TrimRight()                                const { return AsView().TrimRight(); }
-    View Slice(size_t begIdx)                       const { return AsView().Slice(begIdx); }
-    View Slice(size_t begIdx, size_t endIdx)        const { return AsView().Slice(begIdx, endIdx); }
-    View Prefix(size_t n)                           const { return AsView().Prefix(n); }
-    View Suffix(size_t n)                           const { return AsView().Suffix(n); }
-    bool StartsWith(const View &prefix)             const { return AsView().StartsWith(prefix); }
-    bool StartsWith(const Self &prefix)             const { return AsView().StartsWith(prefix); }
-    bool EndsWith(const View &suffix)               const { return AsView().EndsWith(suffix); }
-    bool EndsWith(const Self &suffix)               const { return AsView().EndsWith(suffix); }
-    std::vector<View> Split()                       const { return AsView().Split(); }
-    std::vector<View> Split(const View &spliter)    const { return AsView().Split(spliter); }
-    std::vector<View> Split(const Self &spliter)    const { return AsView().Split(spliter); }
+    View Trim()                                     const { return AsView().Trim();                          }
+    View TrimLeft()                                 const { return AsView().TrimLeft();                      }
+    View TrimRight()                                const { return AsView().TrimRight();                     }
+    View Slice(size_t begIdx)                       const { return AsView().Slice(begIdx);                   }
+    View Slice(size_t begIdx, size_t endIdx)        const { return AsView().Slice(begIdx, endIdx);           }
+    View Prefix(size_t n)                           const { return AsView().Prefix(n);                       }
+    View Suffix(size_t n)                           const { return AsView().Suffix(n);                       }
+    bool StartsWith(const View &prefix)             const { return AsView().StartsWith(prefix);              }
+    bool StartsWith(const Self &prefix)             const { return AsView().StartsWith(prefix);              }
+    bool EndsWith(const View &suffix)               const { return AsView().EndsWith(suffix);                }
+    bool EndsWith(const Self &suffix)               const { return AsView().EndsWith(suffix);                }
+    bool IsDigit(unsigned int base = 10)            const { return AsView().IsDigit(base);                   }
+    bool IsDigits(unsigned int base = 10)           const { return AsView().IsDigits(base);                  }
+    bool IsAlpha()                                  const { return AsView().IsAlpha();                       }
+    bool IsAlphas()                                 const { return AsView().IsAlphas();                      }
+    bool IsAlnum(unsigned int base = 10)            const { return AsView().IsAlnum(base);                   }
+    bool IsAlnums(unsigned int base = 10)           const { return AsView().IsAlnums(base);                  }
+    bool IsUpper()                                  const { return AsView().IsUpper();                       }
+    bool IsUppers()                                 const { return AsView().IsUppers();                      }
+    bool IsLower()                                  const { return AsView().IsLower();                       }
+    bool IsLowers()                                 const { return AsView().IsLowers();                      }
+    bool IsWhitespace()                             const { return AsView().IsWhitespace();                  }
+    bool IsWhitespaces()                            const { return AsView().IsWhitespaces();                 }
+    Self ToUpper()                                  const { return AsView().ToUpper();                       }
+    Self ToLower()                                  const { return AsView().ToLower();                       }
+    Self SwapCase()                                 const { return AsView().SwapCase();                      }
+    std::vector<View> Split()                       const { return AsView().Split();                         }
+    std::vector<View> Split(const View &spliter)    const { return AsView().Split(spliter);                  }
+    std::vector<View> Split(const Self &spliter)    const { return AsView().Split(spliter);                  }
     template<typename R> Self Join(R &&strRange)    const { return AsView().Join(std::forward<R>(strRange)); }
-    size_t Find(const View &dst, size_t begIdx = 0) const { return AsView().Find(dst, begIdx); }
-    size_t Find(const Self &dst, size_t begIdx = 0) const { return AsView().Find(dst, begIdx); }
+    size_t Find(const View &dst, size_t begIdx = 0) const { return AsView().Find(dst, begIdx);               }
+    size_t Find(const Self &dst, size_t begIdx = 0) const { return AsView().Find(dst, begIdx);               }
+    std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const { return AsView().ToStdString(cs); }
 
     Iterator begin() const;
     Iterator end()   const;
-
-    std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const { return AsView().ToStdString(cs); }
 };
 
 template<typename CS>

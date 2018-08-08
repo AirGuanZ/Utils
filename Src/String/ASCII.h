@@ -41,6 +41,16 @@ public:
             return static_cast<CodePoint>('?');
         return static_cast<CodePoint>(cp);
     }
+
+    static const CodeUnit *NextCodePoint(const CodeUnit *cur)
+    {
+        return cur + 1;
+    }
+
+    static const CodeUnit *LastCodePoint(const CodeUnit *cur)
+    {
+        return cur - 1;
+    }
 };
 
 template<typename T = char>

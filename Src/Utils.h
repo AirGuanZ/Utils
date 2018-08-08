@@ -36,6 +36,5 @@
 #include "Range/Take.h"
 
 #include "String/ASCII.h"
-#include "String/StrConv.h"
 #include "String/String.h"
 #include "String/UTF.h"

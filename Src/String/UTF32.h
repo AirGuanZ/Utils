@@ -41,6 +41,16 @@ public:
     static char32_t ToUnicode(CodePoint cp) { return cp; }
 
     static CodePoint FromUnicode(char32_t cp) { return cp; }
+
+    static const CodeUnit *NextCodePoint(const CodeUnit *cur)
+    {
+        return cur + 1;
+    }
+
+    static const CodeUnit *LastCodePoint(const CodeUnit *cur)
+    {
+        return cur - 1;
+    }
 };
 
 template<typename T = char32_t>

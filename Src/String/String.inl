@@ -6,6 +6,7 @@
 
 #include "../Misc/Malloc.h"
 #include "StrAlgo.h"
+#include "StrConv.inl"
 
 AGZ_NS_BEG(AGZ::StrImpl)
 
@@ -378,6 +379,204 @@ bool String<CS>::View::EndsWith(const Self &suffix) const
                 (Suffix(suffix.Length()) == suffix);
 }
 
+// < 10    : digit
+// [10, 36): alpha
+// 128     : whitespaces
+// 255     : others
+inline const unsigned char DIGIT_CHAR_VALUE_TABLE[128] =
+{
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 128,
+    128, 128, 128, 128, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 128, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 0,   1,
+    2,   3,   4,   5,   6,   7,   8,   9,   255, 255,
+    255, 255, 255, 255, 255, 10,  11,  12,  13,  14,
+    15,  16,  17,  18,  19,  20,  21,  22,  23,  24,
+    25,  26,  27,  28,  29,  30,  31,  32,  33,  34,
+    35,  255, 255, 255, 255, 255, 255, 10,  11,  12,
+    13,  14,  15,  16,  17,  18,  19,  20,  21,  22,
+    23,  24,  25,  26,  27,  28,  29,  30,  31,  32,
+    33,  34,  35,  255, 255, 255, 255, 255
+};
+
+template<typename CS>
+bool String<CS>::View::IsDigit(unsigned int base = 10) const
+{
+    AGZ_ASSERT(base <= 36);
+    auto [d, l] = DataAndLength();
+    return l == 1 && d[0] < 128 &&
+           DIGIT_CHAR_VALUE_TABLE[d[0]] < base;
+}
+
+template<typename CS>
+bool String<CS>::View::IsDigits(unsigned int base = 10) const
+{
+    AGZ_ASSERT(base <= 36);
+    auto [d, l] = DataAndLength();
+    for(size_t i = 0; i < l; ++i)
+    {
+        if(d[i] >= 128 || d[i] >= base)
+            return false;
+    }
+    return true;
+}
+
+template<typename CS>
+bool String<CS>::View::IsAlpha() const
+{
+    auto [d, l] = DataAndLength();
+    return l == 1 && (('a' <= d[0] && d[0] <= 'z') ||
+                      ('A' <= d[0] && d[0] <= 'Z'))
+}
+
+template<typename CS>
+bool String<CS>::View::IsAlphas() const
+{
+    auto [d, l] = DataAndLength();
+    for(size_t i = 0; i < l; ++i)
+    {
+        if(!(('a' <= d[i] && d[i] <= 'z') || ('A' <= d[i] && d[i] <= 'Z')))
+            return false;
+    }
+    return true;
+}
+
+template<typename CS>
+bool String<CS>::View::IsAlnum() const
+{
+    auto [d, l] = DataAndLength();
+    return l == 1 && d[0] < 128 && DIGIT_CHAR_VALUE_TABLE[d[0]] != 255;
+}
+
+template<typename CS>
+bool String<CS>::View::IsAlnums() const
+{
+    auto [d, l] = DataAndLength();
+    for(size_t i = 0; i < l; ++i)
+    {
+        if(d[i] >= 128 || DIGIT_CHAR_VALUE_TABLE[d[i]] == 255)
+            return false;
+    }
+    return true;
+}
+
+template<typename CS>
+bool String<CS>::View::IsUpper() const
+{
+    auto [d, l] = DataAndLength();
+    return l == 1 && 'A' <= d[0] && d[0] <= 'Z';
+}
+
+template<typename CS>
+bool String<CS>::View::IsUppers() const
+{
+    auto [d, l] = DataAndLength();
+    for(size_t i = 0; i < l; ++i)
+    {
+        if(d[i] < 'A' || d[i] > 'Z')
+            return false;
+    }
+    return true;
+}
+
+template<typename CS>
+bool String<CS>::View::IsLower() const
+{
+    auto [d, l] = DataAndLength();
+    return l == 1 && 'a' <= d[0] && d[0] <= 'z';
+}
+
+template<typename CS>
+bool String<CS>::View::IsLowers() const
+{
+    auto [d, l] = DataAndLength();
+    for(size_t i = 0; i < l; ++i)
+    {
+        if(d[i] < 'a' || d[i] > 'z')
+            return false;
+    }
+    return true;
+}
+
+template<typename CS>
+bool String<CS>::View::IsWhitespace() const
+{
+    auto [d, l] = DataAndLength();
+    return l == 1 && d[i] < 128 && DIGIT_CHAR_VALUE_TABLE[d[i]] == 128;
+}
+
+template<typename CS>
+bool String<CS>::View::IsWhitespaces() const
+{
+    auto [d, l] = DataAndLength();
+    for(size_t i = 0; i < l; ++i)
+    {
+        if(d[i] >= 128 || DIGIT_CHAR_VALUE_TABLE[d[i]] != 128)
+            return false;
+    }
+    return true;
+}
+
+template<typename CS>
+String<CS> String<CS>::ToUpper() const
+{
+    String<CS> ret = *this;
+    auto [b, e] = ret.BeginAndEnd();
+    while(b < e)
+    {
+        if('a' <= *b && *b <= 'z')
+        {
+            *b = *b + ('A' - 'a');
+            b++;
+        }
+        else
+            b = CS::NextCodePoint(b);
+    }
+    return std::move(ret);
+}
+
+template<typename CS>
+String<CS> String<CS>::ToLower() const
+{
+    String<CS> ret = *this;
+    auto [b, e] = ret.BeginAndEnd();
+    while(b < e)
+    {
+        if('A' <= *b && *b <= 'Z')
+        {
+            *b = *b + ('a' - 'A');
+            b++;
+        }
+        else
+            b = CS::NextCodePoint(b);
+    }
+    return std::move(ret);
+}
+
+template<typename CS>
+String<CS> String<CS>::SwapCase() const
+{
+    String<CS> ret = *this;
+    auto [b, e] = ret.BeginAndEnd();
+    while(b < e)
+    {
+        if('a' <= *b && *b <= 'z')
+        {
+            *b = *b + ('A' - 'a');
+            b++;
+        }
+        else if('A' <= *b && *b <= 'Z')
+        {
+            *b = *b + ('a' - 'A');
+            b++;
+        }
+        else
+            b = CS::NextCodePoint(b);
+    }
+    return std::move(ret);
+}
+
 template<typename CS>
 std::vector<typename String<CS>::View> String<CS>::View::Split() const
 {
@@ -643,6 +842,25 @@ String<CS> &String<CS>::operator=(Self &&moveFrom) noexcept
     storage_ = std::move(moveFrom.storage_);
     return *this;
 }
+
+#define AGZ_STR_FROM_INT_IMPL(T) \
+    template<typename CS> \
+    String<CS> String<CS>::From(T v, unsigned int base) \
+    { return Int2Str<T, CS>(v, base); }
+
+AGZ_STR_FROM_INT_IMPL(char)
+AGZ_STR_FROM_INT_IMPL(signed char)
+AGZ_STR_FROM_INT_IMPL(unsigned char)
+AGZ_STR_FROM_INT_IMPL(short)
+AGZ_STR_FROM_INT_IMPL(unsigned short)
+AGZ_STR_FROM_INT_IMPL(int)
+AGZ_STR_FROM_INT_IMPL(unsigned int)
+AGZ_STR_FROM_INT_IMPL(long)
+AGZ_STR_FROM_INT_IMPL(unsigned long)
+AGZ_STR_FROM_INT_IMPL(long long)
+AGZ_STR_FROM_INT_IMPL(unsigned long long)
+
+#undef AGZ_STR_FROM_INT_IMPL
 
 template<typename CS>
 typename String<CS>::View String<CS>::AsView() const
