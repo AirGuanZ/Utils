@@ -16,6 +16,12 @@
     <Filter Include="Range">
       <UniqueIdentifier>{c15bab53-935c-406b-9cb1-0e6e06a56b40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="String\Charset">
+      <UniqueIdentifier>{041ae47a-d3f7-46b6-8d5c-f2ea0f7ddccf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Alloc">
+      <UniqueIdentifier>{bbc86d95-b5c8-4adc-b421-2e908041f776}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Math\Scalar.h">
@@ -67,12 +73,6 @@
     <ClInclude Include="..\Src\Misc\Common.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\String\UTF8.h">
-      <Filter>String</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\UTF32.h">
-      <Filter>String</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Range\Take.h">
       <Filter>Range</Filter>
     </ClInclude>
@@ -109,15 +109,6 @@
     <ClInclude Include="..\Src\Range\Transform.h">
       <Filter>Range</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\String\UTF.h">
-      <Filter>String</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\UTF16.h">
-      <Filter>String</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Charset.h">
-      <Filter>String</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Range\Reduce.h">
       <Filter>Range</Filter>
     </ClInclude>
@@ -133,17 +124,38 @@
     <ClInclude Include="..\Src\Range\Any.h">
       <Filter>Range</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\String\ASCII.h">
-      <Filter>String</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\StrAlgo.h">
-      <Filter>String</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\String\String.h">
       <Filter>String</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Misc\Malloc.h">
-      <Filter>Misc</Filter>
+    <ClInclude Include="..\Src\String\Charset\ASCII.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Charset\CharSet.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Charset\UTF.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Charset\UTF8.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Charset\UTF16.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Charset\UTF32.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Regex.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Alloc\Alloc.h">
+      <Filter>Alloc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Alloc\FixedSizedArena.h">
+      <Filter>Alloc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Alloc\Malloc.h">
+      <Filter>Alloc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +169,9 @@
       <Filter>Math</Filter>
     </None>
     <None Include="..\Src\String\String.inl">
+      <Filter>String</Filter>
+    </None>
+    <None Include="..\Src\String\StrAlgo.inl">
       <Filter>String</Filter>
     </None>
   </ItemGroup>

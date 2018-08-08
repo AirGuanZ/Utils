@@ -34,11 +34,27 @@ TEST_CASE("String")
         }
     }
 
+    SECTION("From")
+    {
+        REQUIRE(Str8::From(10) == u8"10");
+        REQUIRE(Str8::From(2, 2) == u8"10");
+        REQUIRE(Str8::From(0xFF35B, 16) == u8"FF35B");
+        REQUIRE(Str32::From(01234567u, 8) == u8"1234567");
+        REQUIRE(AStr::From(12 * 35 * 35 * 35 + 4 * 35 * 35 + 34 * 35, 35) == u8"C4Y0");
+    }
+
     SECTION("Trim")
     {
-        REQUIRE(Str8(u8"  Minecraft\n\t").Trim() == Str8(u8"Minecraft"));
-        REQUIRE(Str8(u8"  Minecraft\n\t").TrimLeft() == Str8(u8"Minecraft\n\t"));
-        REQUIRE(Str8(u8"  Minecraft\n\t").TrimRight() == Str8(u8"  Minecraft"));
+        REQUIRE(Str8(u8"  Minecraft\n\t").Trim() == u8"Minecraft");
+        REQUIRE(Str8(u8"  Minecraft\n\t").TrimLeft() == u8"Minecraft\n\t");
+        REQUIRE(Str8(u8"  Minecraft\n\t").TrimRight() == u8"  Minecraft");
+    }
+
+    SECTION("Slice")
+    {
+        REQUIRE(Str8(u8"Minecraft").Slice(3) == u8"ecraft");
+        REQUIRE(Str8(u8"Minecraft").Slice(0, 3) == u8"Min");
+        REQUIRE(Str8(u8"Minecraft").Slice(0, 6) == u8"Minecr");
     }
 
     SECTION("Split")
@@ -47,7 +63,7 @@ TEST_CASE("String")
                 | Map([](const Str8::View &v) { return v.AsString(); })
                 | Collect<vector<Str8>>())
              == vector<Str8>{ u8"Mine", u8"cr", u8"aft" });
-        REQUIRE((Str8(u8"Minecreaft").Split(Str8(u8"e").AsView())
+        REQUIRE((Str8(u8"Minecreaft").Split(u8"e")
                 | Map([](const Str8::View &v) { return v.AsString(); })
                 | Collect<vector<Str8>>())
              == vector<Str8>{ u8"Min", u8"cr", u8"aft" });

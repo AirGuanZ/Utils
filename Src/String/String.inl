@@ -253,14 +253,14 @@ std::pair<const CU*, const CU*> Storage<CU>::BeginAndEnd() const
 }
 
 template<typename CS>
-String<CS>::View::View(const Str &str)
+StringView<CS>::StringView(const Str &str)
     : str_(&str), beg_(str.Data()), len_(str.Length())
 {
 
 }
 
 template<typename CS>
-String<CS>::View::View(const Str &str, size_t begIdx, size_t endIdx)
+StringView<CS>::StringView(const Str &str, size_t begIdx, size_t endIdx)
     : str_(&str)
 {
     AGZ_ASSERT(begIdx <= endIdx);
@@ -271,14 +271,14 @@ String<CS>::View::View(const Str &str, size_t begIdx, size_t endIdx)
 }
 
 template<typename CS>
-String<CS>::View::View(const Str &str, const CodeUnit* beg, size_t len)
+StringView<CS>::StringView(const Str &str, const CodeUnit* beg, size_t len)
     : str_(&str), beg_(beg), len_(len)
 {
     AGZ_ASSERT(beg_ >= str.Data() && beg_ + len_ <= str.Data() + str.Length());
 }
 
 template<typename CS>
-String<CS> String<CS>::View::AsString() const
+String<CS> StringView<CS>::AsString() const
 {
     if(beg_ == str_->Data() && len_ == str_->Length())
         return *str_;
@@ -286,38 +286,38 @@ String<CS> String<CS>::View::AsString() const
 }
 
 template<typename CS>
-const typename CS::CodeUnit *String<CS>::View::Data() const
+const typename CS::CodeUnit *StringView<CS>::Data() const
 {
     return beg_;
 }
 
 template<typename CS>
 std::pair<const typename CS::CodeUnit*, size_t>
-String<CS>::View::DataAndLength() const
+StringView<CS>::DataAndLength() const
 {
     return { beg_, len_ };
 }
 
 template<typename CS>
-size_t String<CS>::View::Length() const
+size_t StringView<CS>::Length() const
 {
     return len_;
 }
 
 template<typename CS>
-bool String<CS>::View::Empty() const
+bool StringView<CS>::Empty() const
 {
     return Length() == 0;
 }
 
 template<typename CS>
-typename String<CS>::View String<CS>::View::Trim() const
+StringView<CS> StringView<CS>::Trim() const
 {
     return TrimLeft().TrimRight();
 }
 
 template<typename CS>
-typename String<CS>::View String<CS>::View::TrimLeft() const
+StringView<CS> StringView<CS>::TrimLeft() const
 {
     auto beg = beg_; auto len = len_;
     while(len > 0 && CS::IsSpace(*beg))
@@ -326,7 +326,7 @@ typename String<CS>::View String<CS>::View::TrimLeft() const
 }
 
 template<typename CS>
-typename String<CS>::View String<CS>::View::TrimRight() const
+StringView<CS> StringView<CS>::TrimRight() const
 {
     auto len = len_;
     while(len > 0 && CS::IsSpace(beg_[len - 1]))
@@ -335,35 +335,35 @@ typename String<CS>::View String<CS>::View::TrimRight() const
 }
 
 template<typename CS>
-typename String<CS>::View String<CS>::View::Slice(size_t begIdx) const
+StringView<CS> StringView<CS>::Slice(size_t begIdx) const
 {
     return Slice(begIdx, len_);
 }
 
 template<typename CS>
-typename String<CS>::View
-String<CS>::View::Slice(size_t begIdx, size_t endIdx) const
+StringView<CS> StringView<CS>::Slice(size_t begIdx, size_t endIdx) const
 {
     AGZ_ASSERT(begIdx <= endIdx && endIdx <= len_);
-    return Self(*str_, beg_ + begIdx, beg_ + endIdx);
+    size_t idxOffset = beg_ - str_->begin();
+    return Self(*str_, idxOffset + begIdx, idxOffset + endIdx);
 }
 
 template<typename CS>
-typename String<CS>::View String<CS>::View::Prefix(size_t n) const
+StringView<CS> StringView<CS>::Prefix(size_t n) const
 {
     AGZ_ASSERT(n <= len_);
     return Slice(0, n);
 }
 
 template<typename CS>
-typename String<CS>::View String<CS>::View::Suffix(size_t n) const
+StringView<CS> StringView<CS>::Suffix(size_t n) const
 {
     AGZ_ASSERT(n <= len_);
     return Slice(len_ - n);
 }
 
 template<typename CS>
-bool String<CS>::View::StartsWith(const Self &prefix) const
+bool StringView<CS>::StartsWith(const Self &prefix) const
 {
     return len_ < prefix.Length() ?
                 false :
@@ -371,7 +371,7 @@ bool String<CS>::View::StartsWith(const Self &prefix) const
 }
 
 template<typename CS>
-bool String<CS>::View::EndsWith(const Self &suffix) const
+bool StringView<CS>::EndsWith(const Self &suffix) const
 {
     return len_ < suffix.Length() ?
                 false :
@@ -400,7 +400,7 @@ inline const unsigned char DIGIT_CHAR_VALUE_TABLE[128] =
 };
 
 template<typename CS>
-bool String<CS>::View::IsDigit(unsigned int base = 10) const
+bool StringView<CS>::IsDigit(unsigned int base) const
 {
     AGZ_ASSERT(base <= 36);
     auto [d, l] = DataAndLength();
@@ -409,7 +409,7 @@ bool String<CS>::View::IsDigit(unsigned int base = 10) const
 }
 
 template<typename CS>
-bool String<CS>::View::IsDigits(unsigned int base = 10) const
+bool StringView<CS>::IsDigits(unsigned int base) const
 {
     AGZ_ASSERT(base <= 36);
     auto [d, l] = DataAndLength();
@@ -422,15 +422,15 @@ bool String<CS>::View::IsDigits(unsigned int base = 10) const
 }
 
 template<typename CS>
-bool String<CS>::View::IsAlpha() const
+bool StringView<CS>::IsAlpha() const
 {
     auto [d, l] = DataAndLength();
     return l == 1 && (('a' <= d[0] && d[0] <= 'z') ||
-                      ('A' <= d[0] && d[0] <= 'Z'))
+                      ('A' <= d[0] && d[0] <= 'Z'));
 }
 
 template<typename CS>
-bool String<CS>::View::IsAlphas() const
+bool StringView<CS>::IsAlphas() const
 {
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
@@ -442,33 +442,33 @@ bool String<CS>::View::IsAlphas() const
 }
 
 template<typename CS>
-bool String<CS>::View::IsAlnum() const
+bool StringView<CS>::IsAlnum(unsigned int base) const
 {
     auto [d, l] = DataAndLength();
-    return l == 1 && d[0] < 128 && DIGIT_CHAR_VALUE_TABLE[d[0]] != 255;
+    return l == 1 && d[0] < 128 && DIGIT_CHAR_VALUE_TABLE[d[0]] < 36;
 }
 
 template<typename CS>
-bool String<CS>::View::IsAlnums() const
+bool StringView<CS>::IsAlnums(unsigned int base) const
 {
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(d[i] >= 128 || DIGIT_CHAR_VALUE_TABLE[d[i]] == 255)
+        if(d[i] >= 128 || DIGIT_CHAR_VALUE_TABLE[d[i]] >= 36)
             return false;
     }
     return true;
 }
 
 template<typename CS>
-bool String<CS>::View::IsUpper() const
+bool StringView<CS>::IsUpper() const
 {
     auto [d, l] = DataAndLength();
     return l == 1 && 'A' <= d[0] && d[0] <= 'Z';
 }
 
 template<typename CS>
-bool String<CS>::View::IsUppers() const
+bool StringView<CS>::IsUppers() const
 {
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
@@ -480,14 +480,14 @@ bool String<CS>::View::IsUppers() const
 }
 
 template<typename CS>
-bool String<CS>::View::IsLower() const
+bool StringView<CS>::IsLower() const
 {
     auto [d, l] = DataAndLength();
     return l == 1 && 'a' <= d[0] && d[0] <= 'z';
 }
 
 template<typename CS>
-bool String<CS>::View::IsLowers() const
+bool StringView<CS>::IsLowers() const
 {
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
@@ -499,14 +499,14 @@ bool String<CS>::View::IsLowers() const
 }
 
 template<typename CS>
-bool String<CS>::View::IsWhitespace() const
+bool StringView<CS>::IsWhitespace() const
 {
     auto [d, l] = DataAndLength();
-    return l == 1 && d[i] < 128 && DIGIT_CHAR_VALUE_TABLE[d[i]] == 128;
+    return l == 1 && d[0] < 128 && DIGIT_CHAR_VALUE_TABLE[d[0]] == 128;
 }
 
 template<typename CS>
-bool String<CS>::View::IsWhitespaces() const
+bool StringView<CS>::IsWhitespaces() const
 {
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
@@ -518,7 +518,7 @@ bool String<CS>::View::IsWhitespaces() const
 }
 
 template<typename CS>
-bool String<CS>::View::IsASCII() const
+bool StringView<CS>::IsASCII() const
 {
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
@@ -530,7 +530,7 @@ bool String<CS>::View::IsASCII() const
 }
 
 template<typename CS>
-String<CS> String<CS>::ToUpper() const
+String<CS> StringView<CS>::ToUpper() const
 {
     String<CS> ret = *this;
     auto [b, e] = ret.BeginAndEnd();
@@ -539,7 +539,7 @@ String<CS> String<CS>::ToUpper() const
         if('a' <= *b && *b <= 'z')
         {
             *b = *b + ('A' - 'a');
-            b++;
+            ++b;
         }
         else
             b = CS::NextCodePoint(b);
@@ -548,7 +548,7 @@ String<CS> String<CS>::ToUpper() const
 }
 
 template<typename CS>
-String<CS> String<CS>::ToLower() const
+String<CS> StringView<CS>::ToLower() const
 {
     String<CS> ret = *this;
     auto [b, e] = ret.BeginAndEnd();
@@ -557,7 +557,7 @@ String<CS> String<CS>::ToLower() const
         if('A' <= *b && *b <= 'Z')
         {
             *b = *b + ('a' - 'A');
-            b++;
+            ++b;
         }
         else
             b = CS::NextCodePoint(b);
@@ -566,7 +566,7 @@ String<CS> String<CS>::ToLower() const
 }
 
 template<typename CS>
-String<CS> String<CS>::SwapCase() const
+String<CS> StringView<CS>::SwapCase() const
 {
     String<CS> ret = *this;
     auto [b, e] = ret.BeginAndEnd();
@@ -575,12 +575,12 @@ String<CS> String<CS>::SwapCase() const
         if('a' <= *b && *b <= 'z')
         {
             *b = *b + ('A' - 'a');
-            b++;
+            ++b;
         }
         else if('A' <= *b && *b <= 'Z')
         {
             *b = *b + ('a' - 'A');
-            b++;
+            ++b;
         }
         else
             b = CS::NextCodePoint(b);
@@ -589,7 +589,7 @@ String<CS> String<CS>::SwapCase() const
 }
 
 template<typename CS>
-std::vector<typename String<CS>::View> String<CS>::View::Split() const
+std::vector<StringView<CS>> StringView<CS>::Split() const
 {
     std::vector<Self> ret;
     const CodeUnit *segBeg = nullptr; size_t segLen = 0;
@@ -610,8 +610,8 @@ std::vector<typename String<CS>::View> String<CS>::View::Split() const
 }
 
 template<typename CS>
-std::vector<typename String<CS>::View>
-String<CS>::View::Split(const Self &spliter) const
+std::vector<StringView<CS>>
+StringView<CS>::Split(const Self &spliter) const
 {
     AGZ_ASSERT(spliter.Empty() == false);
     std::vector<Self> ret;
@@ -634,7 +634,7 @@ String<CS>::View::Split(const Self &spliter) const
 
 template<typename CS>
 template<typename R>
-String<CS> String<CS>::View::Join(R &&strRange) const
+String<CS> StringView<CS>::Join(R &&strRange) const
 {
     if(strRange.empty())
         return Str();
@@ -647,7 +647,7 @@ String<CS> String<CS>::View::Join(R &&strRange) const
 }
 
 template<typename CS>
-size_t String<CS>::View::Find(const Self &dst, size_t begIdx) const
+size_t StringView<CS>::Find(const Self &dst, size_t begIdx) const
 {
     AGZ_ASSERT(begIdx <= len_);
     auto rt = StrAlgo::FindSubPattern(begin() + begIdx, end(),
@@ -656,19 +656,19 @@ size_t String<CS>::View::Find(const Self &dst, size_t begIdx) const
 }
 
 template<typename CS>
-typename String<CS>::View::Iterator String<CS>::View::begin() const
+typename StringView<CS>::Iterator StringView<CS>::begin() const
 {
     return beg_;
 }
 
 template<typename CS>
-typename String<CS>::View::Iterator String<CS>::View::end() const
+typename StringView<CS>::Iterator StringView<CS>::end() const
 {
     return beg_ + len_;
 }
 
 template<typename CS>
-std::string String<CS>::View::ToStdString(NativeCharset cs) const
+std::string StringView<CS>::ToStdString(NativeCharset cs) const
 {
     switch(cs)
     {
@@ -690,7 +690,7 @@ std::string String<CS>::View::ToStdString(NativeCharset cs) const
 }
 
 template<typename CS>
-String<CS> String<CS>::View::operator==(const Self &rhs) const
+String<CS> StringView<CS>::operator+(const Self &rhs) const
 {
     StringBuilder<CS> builder;
     builder << *this << rhs;
@@ -698,7 +698,7 @@ String<CS> String<CS>::View::operator==(const Self &rhs) const
 }
 
 template<typename CS>
-bool String<CS>::View::operator==(const Self &rhs) const
+bool StringView<CS>::operator==(const Self &rhs) const
 {
     if(len_ != rhs.len_)
         return false;
@@ -711,34 +711,34 @@ bool String<CS>::View::operator==(const Self &rhs) const
 }
 
 template<typename CS>
-bool String<CS>::View::operator!=(const Self &rhs) const
+bool StringView<CS>::operator!=(const Self &rhs) const
 {
     return !(*this == rhs);
 }
 
 template<typename CS>
-bool String<CS>::View::operator<(const Self &rhs) const
+bool StringView<CS>::operator<(const Self &rhs) const
 {
     return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
         == StrAlgo::CompareResult::Less;
 }
 
 template<typename CS>
-bool String<CS>::View::operator>(const Self &rhs) const
+bool StringView<CS>::operator>(const Self &rhs) const
 {
     return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
         == StrAlgo::CompareResult::Greater;
 }
 
 template<typename CS>
-bool String<CS>::View::operator<=(const Self &rhs) const
+bool StringView<CS>::operator<=(const Self &rhs) const
 {
     return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
         != StrAlgo::CompareResult::Greater;
 }
 
 template<typename CS>
-bool String<CS>::View::operator>=(const Self &rhs) const
+bool StringView<CS>::operator>=(const Self &rhs) const
 {
     return StrAlgo::Compare(beg_, rhs.beg_, len_, rhs.len_)
         != StrAlgo::CompareResult::Less;
@@ -874,7 +874,7 @@ AGZ_STR_FROM_INT_IMPL(unsigned long long)
 #undef AGZ_STR_FROM_INT_IMPL
 
 template<typename CS>
-typename String<CS>::View String<CS>::AsView() const
+StringView<CS> String<CS>::AsView() const
 {
     return View(*this);
 }
@@ -926,7 +926,7 @@ String<CS> operator*(const String<CS> &lhs, size_t rhs)
 
 template<typename CS>
 StringBuilder<CS> &StringBuilder<CS>::Append(
-    const typename String<CS>::View &view, size_t n)
+    const StringView<CS> &view, size_t n)
 {
     // IMPROVE
     while(n-- > 0)
@@ -944,8 +944,7 @@ StringBuilder<CS> &StringBuilder<CS>::Append(const String<CS> &str, size_t n)
 }
 
 template<typename CS>
-StringBuilder<CS> &StringBuilder<CS>::operator<<(
-    const typename String<CS>::View &view)
+StringBuilder<CS> &StringBuilder<CS>::operator<<(const StringView<CS> &view)
 {
     return Append(view);
 }
@@ -969,7 +968,7 @@ String<CS> StringBuilder<CS>::Get() const
     }
 
     strs_.clear();
-    if(!ret.empty())
+    if(!ret.Empty())
         strs_.push_back(ret);
     return std::move(ret);
 }

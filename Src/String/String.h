@@ -149,6 +149,111 @@ template<typename CS>
 class StringBuilder;
 
 template<typename CS>
+class String;
+
+template<typename CS>
+// Immutable string slice
+class StringView
+{
+    const String<CS> *str_;
+    const typename CS::CodeUnit *beg_;
+    size_t len_;
+
+public:
+
+    using Charset = CS;
+    using CodeUnit = typename CS::CodeUnit;
+    using CodePoint = typename CS::CodePoint;
+    using Self = StringView<CS>;
+    using Str = String<CS>;
+
+    using Iterator = const CodeUnit*;
+
+    static constexpr size_t NPOS = std::numeric_limits<size_t>::max();
+
+    StringView(const Str &str);
+    StringView(const Str &str, const CodeUnit* beg, size_t len);
+    StringView(const Str &str, size_t begIdx, size_t endIdx);
+
+    StringView() = delete;
+    StringView(const Self &) = default;
+    ~StringView() = default;
+    Self &operator=(const Self &) = default;
+
+    Str AsString() const;
+
+    const CodeUnit *Data() const;
+    std::pair<const CodeUnit*, size_t> DataAndLength() const;
+
+    size_t Length() const;
+    bool Empty()    const;
+
+    Self Trim()      const;
+    Self TrimLeft()  const;
+    Self TrimRight() const;
+
+    Self Slice(size_t begIdx)                const;
+    Self Slice(size_t begIdx, size_t endIdx) const;
+
+    Self Prefix(size_t n) const;
+    Self Suffix(size_t n) const;
+
+    bool StartsWith(const Self &s) const;
+    bool StartsWith(const Str &s)  const { return StartsWith(s.AsView()); }
+
+    bool EndsWith(const Self &s) const;
+    bool EndsWith(const Str &s)  const { return EndsWith(s.AsView()); }
+
+    bool IsDigit(unsigned int base = 10)  const;
+    bool IsDigits(unsigned int base = 10) const;
+
+    bool IsAlpha()  const;
+    bool IsAlphas() const;
+
+    bool IsAlnum(unsigned int base = 10)  const;
+    bool IsAlnums(unsigned int base = 10) const;
+
+    bool IsUpper()  const;
+    bool IsUppers() const;
+
+    bool IsLower()  const;
+    bool IsLowers() const;
+
+    bool IsWhitespace()  const;
+    bool IsWhitespaces() const;
+
+    bool IsASCII() const;
+
+    Str ToUpper() const;
+    Str ToLower() const;
+    Str SwapCase() const;
+
+    std::vector<Self> Split()                    const;
+    std::vector<Self> Split(const Self &spliter) const;
+    std::vector<Self> Split(const Str &spliter)  const { return Split(spliter.AsView()); }
+
+    template<typename R>
+    Str Join(R &&strRange) const;
+
+    size_t Find(const Self &dst, size_t begIdx = 0) const;
+    size_t Find(const Str &dst, size_t begIdx = 0)  const { return Find(dst.AsView(), begIdx); }
+
+    std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const;
+
+    Iterator begin() const;
+    Iterator end()   const;
+
+    Str operator+(const Self &rhs) const;
+
+    bool operator==(const Self &rhs) const;
+    bool operator!=(const Self &rhs) const;
+    bool operator< (const Self &rhs) const;
+    bool operator> (const Self &rhs) const;
+    bool operator<=(const Self &rhs) const;
+    bool operator>=(const Self &rhs) const;
+};
+
+template<typename CS>
 class String
 {
     friend class StringBuilder<CS>;
@@ -164,110 +269,10 @@ public:
     using Charset   = CS;
     using CodeUnit  = typename CS::CodeUnit;
     using CodePoint = typename CS::CodePoint;
+    using View      = StringView<CS>;
     using Self      = String<CS>;
 
     using Iterator = const CodeUnit*;
-
-    // Immutable string slice
-    class View
-    {
-        const String<CS> *str_;
-        const typename CS::CodeUnit *beg_;
-        size_t len_;
-
-    public:
-
-        using Charset   = CS;
-        using CodeUnit  = typename CS::CodeUnit;
-        using CodePoint = typename CS::CodePoint;
-        using Self      = View;
-        using Str       = String<CS>;
-
-        using Iterator = const CodeUnit*;
-
-        static constexpr size_t NPOS = std::numeric_limits<size_t>::max();
-
-        View(const Str &str);
-        View(const Str &str, const CodeUnit* beg, size_t len);
-        View(const Str &str, size_t begIdx, size_t endIdx);
-
-        View()                        = delete;
-        View(const Self &)            = default;
-        ~View()                       = default;
-        Self &operator=(const Self &) = default;
-
-        Str AsString() const;
-
-        const CodeUnit *Data() const;
-        std::pair<const CodeUnit*, size_t> DataAndLength() const;
-
-        size_t Length() const;
-        bool Empty()    const;
-
-        View Trim()      const;
-        View TrimLeft()  const;
-        View TrimRight() const;
-
-        View Slice(size_t begIdx)                const;
-        View Slice(size_t begIdx, size_t endIdx) const;
-
-        View Prefix(size_t n) const;
-        View Suffix(size_t n) const;
-
-        bool StartsWith(const Self &s) const;
-        bool StartsWith(const Str &s)  const { return StartsWith(s.AsView()); }
-
-        bool EndsWith(const Self &s) const;
-        bool EndsWith(const Str &s)  const { return EndsWith(s.AsView()); }
-
-        bool IsDigit(unsigned int base = 10)  const;
-        bool IsDigits(unsigned int base = 10) const;
-
-        bool IsAlpha()  const;
-        bool IsAlphas() const;
-
-        bool IsAlnum(unsigned int base = 10)  const;
-        bool IsAlnums(unsigned int base = 10) const;
-
-        bool IsUpper()  const;
-        bool IsUppers() const;
-
-        bool IsLower()  const;
-        bool IsLowers() const;
-
-        bool IsWhitespace()  const;
-        bool IsWhitespaces() const;
-
-        bool IsASCII() const;
-
-        Str ToUpper() const;
-        Str ToLower() const;
-        Str SwapCase() const;
-
-        std::vector<Self> Split()                    const;
-        std::vector<Self> Split(const Self &spliter) const;
-        std::vector<Self> Split(const Str &spliter)  const { return Split(spliter.AsView()); }
-
-        template<typename R>
-        Str Join(R &&strRange) const;
-
-        size_t Find(const Self &dst, size_t begIdx = 0) const;
-        size_t Find(const Str &dst, size_t begIdx = 0)  const { return Find(dst.AsView(), begIdx); }
-
-        std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const;
-
-        Iterator begin() const;
-        Iterator end()   const;
-
-        Str operator+(const Self &rhs) const;
-
-        bool operator==(const Self &rhs) const;
-        bool operator!=(const Self &rhs) const;
-        bool operator< (const Self &rhs) const;
-        bool operator> (const Self &rhs) const;
-        bool operator<=(const Self &rhs) const;
-        bool operator>=(const Self &rhs) const;
-    };
 
     static constexpr size_t NPOS = View::NPOS;
 
@@ -345,6 +350,8 @@ public:
 
     Iterator begin() const;
     Iterator end()   const;
+
+    std::pair<const CodeUnit*, const CodeUnit*> BeginAndEnd() const { return storage_.BeginAndEnd(); }
 };
 
 template<typename CS>
@@ -352,12 +359,12 @@ String<CS> operator*(const String<CS> &L, size_t R);
 template<typename CS>
 String<CS> operator*(size_t L, const String<CS> &R) { return R * L; }
 template<typename CS>
-String<CS> operator*(const typename String<CS>::View &L, size_t R) { return L.AsString() * R }
+String<CS> operator*(const StringView<CS> &L, size_t R) { return L.AsString() * R; }
 template<typename CS>
-String<CS> operator*(size_t L, const typename String<CS>::View &R) { return R * L; }
+String<CS> operator*(size_t L, const StringView<CS> &R) { return R * L; }
 
 #define AGZ_WRAP_STR_COMP(LHS, RHS, LOP, ROP) \
-    tempate<typename CS> String<CS> operator+(const LHS lhs, const RHS rhs) { return LOP + ROP; } \
+    template<typename CS> String<CS> operator+(const LHS lhs, const RHS rhs) { return LOP + ROP; } \
     template<typename CS> bool operator==(const LHS lhs, const RHS rhs) { return LOP == ROP; } \
     template<typename CS> bool operator!=(const LHS lhs, const RHS rhs) { return LOP != ROP; } \
     template<typename CS> bool operator< (const LHS lhs, const RHS rhs) { return LOP < ROP; } \
@@ -366,16 +373,16 @@ String<CS> operator*(size_t L, const typename String<CS>::View &R) { return R * 
     template<typename CS> bool operator>=(const LHS lhs, const RHS rhs) { return LOP >= ROP; }
 
 AGZ_WRAP_STR_COMP(String<CS>&,                String<CS>&,                lhs.AsView(),             rhs.AsView())
-AGZ_WRAP_STR_COMP(String<CS>&,                typename String<CS>::View&, lhs.AsView(),             rhs)
-AGZ_WRAP_STR_COMP(typename String<CS>::View&, String<CS>&,                lhs,                      rhs.AsView())
+AGZ_WRAP_STR_COMP(String<CS>&,                StringView<CS>&,            lhs.AsView(),             rhs)
+AGZ_WRAP_STR_COMP(StringView<CS>&,            String<CS>&,                lhs,                      rhs.AsView())
 AGZ_WRAP_STR_COMP(String<CS>&,                char*,                      lhs,                      String<CS>(rhs))
 AGZ_WRAP_STR_COMP(char*,                      String<CS>&,                String<CS>(lhs),          rhs)
-AGZ_WRAP_STR_COMP(typename String<CS>::View&, char*,                      lhs,                      String<CS>(rhs).AsView())
-AGZ_WRAP_STR_COMP(char*,                      typename String<CS>::View&, String<CS>(lhs).AsView(), rhs)
+AGZ_WRAP_STR_COMP(StringView<CS>&,            char*,                      lhs,                      String<CS>(rhs).AsView())
+AGZ_WRAP_STR_COMP(char*,                      StringView<CS>&,            String<CS>(lhs).AsView(), rhs)
 AGZ_WRAP_STR_COMP(String<CS>&,                std::string&,               lhs,                      String<CS>(rhs))
 AGZ_WRAP_STR_COMP(std::string&,               String<CS>&,                String<CS>(lhs),          rhs)
-AGZ_WRAP_STR_COMP(typename String<CS>::View&, std::string&,               lhs,                      String<CS>(rhs))
-AGZ_WRAP_STR_COMP(std::string&,               typename String<CS>::View&, String<CS>(lhs),          rhs)
+AGZ_WRAP_STR_COMP(StringView<CS>&,            std::string&,               lhs,                      String<CS>(rhs))
+AGZ_WRAP_STR_COMP(std::string&,               StringView<CS>&,            String<CS>(lhs),          rhs)
 
 #undef AGZ_WRAP_STR_COMP
 
@@ -388,10 +395,10 @@ public:
 
     using Self = StringBuilder<CS>;
 
-    Self &Append(const typename String<CS>::View &view, size_t n = 1);
+    Self &Append(const StringView<CS> &view, size_t n = 1);
     Self &Append(const String<CS> &str, size_t n = 1);
 
-    Self &operator<<(const typename String<CS>::View &view);
+    Self &operator<<(const StringView<CS> &view);
 
     String<CS> Get() const;
 

@@ -2,6 +2,7 @@
 
 #include "../Misc/Common.h"
 #include "Aggregate.h"
+#include "Iterator.h"
 
 AGZ_NS_BEG(AGZ)
 
