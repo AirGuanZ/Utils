@@ -27,7 +27,7 @@ template<typename F>
 bool All(F &&func)
 {
     return RangeAux::AggregateWrapper<RangeAux::AllRHS<F>, F>(
-        std::forward<F>(func));
+                            std::forward<F>(func));
 }
 
 AGZ_NS_END(AGZ)

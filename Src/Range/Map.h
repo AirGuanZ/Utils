@@ -25,10 +25,8 @@ namespace RangeAux
             friend class MapImpl;
 
             using _value_type =
-                decltype(std::declval<F>()(
-                    std::declval<
-                        typename std::iterator_traits<InIt>
-                            ::value_type>()));
+                decltype(std::declval<F>()(std::declval<
+                        typename std::iterator_traits<InIt>::value_type>()));
 
             InIt it;
             F *f;
@@ -197,12 +195,12 @@ namespace RangeAux
 
         Iterator begin() const
         {
-            return Iterator::Iterator(std::begin(range_), &func_);
+            return Iterator(std::begin(range_), &func_);
         }
 
         Iterator end() const
         {
-            return Iterator::Iterator(std::end(range_), &func_);
+            return Iterator(std::end(range_), &func_);
         }
     };
 

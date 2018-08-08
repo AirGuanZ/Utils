@@ -15,13 +15,14 @@ namespace RangeAux
     class TakeImpl
     {
         R range_;
-        typename R::Iterator end_;
+        GetIteratorType<R> end_;
 
     public:
 
-        using Iterator = typename R::Iterator;
+        using Iterator = GetIteratorType<R>;
 
-        TakeImpl(R range, typename Iterator::difference_type num)
+        TakeImpl(R range,
+                 typename std::iterator_traits<Iterator>::difference_type num)
             : range_(std::move(range))
         {
             end_ = AdvanceTo(std::begin(range_), std::end(range_), num);
@@ -42,11 +43,11 @@ namespace RangeAux
     class TakeWhileImpl
     {
         R range_;
-        typename R::Iterator end_;
+        GetIteratorType<R> end_;
 
     public:
 
-        using Iterator = typename R::Iterator;
+        using Iterator = GetIteratorType<R>;
 
         TakeWhileImpl(R &&range, F &&func)
             : range_(std::move(range))

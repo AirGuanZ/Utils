@@ -48,9 +48,9 @@ TEST_CASE("String")
                 | Collect<vector<Str8>>())
              == vector<Str8>{ u8"Mine", u8"cr", u8"aft" });
         REQUIRE((Str8(u8"Minecreaft").Split(Str8(u8"e").AsView())
-            | Map([](const Str8::View &v) { return v.AsString(); })
-            | Collect<vector<Str8>>())
-            == vector<Str8>{ u8"Min", u8"cr", u8"aft" });
+                | Map([](const Str8::View &v) { return v.AsString(); })
+                | Collect<vector<Str8>>())
+             == vector<Str8>{ u8"Min", u8"cr", u8"aft" });
     }
 
     SECTION("Join")

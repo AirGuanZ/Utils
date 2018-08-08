@@ -12,13 +12,14 @@ namespace RangeAux
         template<typename R>
         static auto Eval(R &&range)
         {
-            if constexpr(IsRandomAccessIterator<typename R::Iterator>)
+            if constexpr(IsRandomAccessIterator<GetIteratorType<R>>)
             {
                 return std::end(range) - std::begin(range);
             }
             else
             {
-                typename R::Iterator::difference_type ret = 0;
+                typename std::iterator_traits<
+                    GetIteratorType<R>>::difference_type ret = 0;
                 auto it = std::begin(range), end = std::end(range);
                 while(it++ != end)
                     ++ret;
@@ -33,7 +34,8 @@ namespace RangeAux
         template<typename R>
         static auto Eval(R &&range, F &&func)
         {
-            typename R::Iterator::difference_type ret = 0;
+            typename std::iterator_traits<GetIteratorType<R>>
+                ::difference_type ret = 0;
             auto it = std::begin(range), end = std::end(range);
             while(it != end)
             {

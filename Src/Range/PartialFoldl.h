@@ -19,7 +19,7 @@ namespace RangeAux
 
         class Iterator
         {
-            using It = typename R::Iterator;
+            using It = GetIteratorType<R>;
 
             It it;
             I lastVal;
@@ -29,7 +29,8 @@ namespace RangeAux
 
             using iterator_category = std::forward_iterator_tag;
             using value_type        = I;
-            using difference_type   = typename It::difference_type;
+            using difference_type   =
+                typename std::iterator_traits<It>::difference_type;
             using pointer           = ValuePointer<I>;
             using reference         = I&;
 

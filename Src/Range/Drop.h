@@ -12,17 +12,18 @@ namespace RangeAux
     class DropImpl
     {
         R range_;
-        typename R::Iterator beg_;
+        GetIteratorType<R> beg_;
 
     public:
 
-        using Iterator = typename R::Iterator;
+        using Iterator = GetIteratorType<R>;
 
         DropImpl(R &&range, size_t n)
             : range_(std::move(range))
         {
             beg_ = AdvanceTo(std::begin(range_), std::end(range_),
-                        static_cast<typename R::Iterator::difference_type>(n));
+                        static_cast<typename std::iterator_traits<
+                            GetIteratorType<R>>::difference_type>(n));
         }
 
         Iterator begin() const { return beg_; }
@@ -33,11 +34,11 @@ namespace RangeAux
     class DropWhileImpl
     {
         R range_;
-        typename R::Iterator beg_;
+        GetIteratorType<R> beg_;
 
     public:
 
-        using Iterator = typename R::Iterator;
+        using Iterator = GetIteratorType<R>;
 
         DropWhileImpl(R &&range, F &&func)
             : range_(std::move(range))

@@ -20,7 +20,7 @@ namespace RangeAux
 
         class Iterator
         {
-            using InIt = typename R::Iterator;
+            using InIt = GetIteratorType<R>;
 
             InIt it, end;
             F *f;
@@ -34,10 +34,14 @@ namespace RangeAux
                     std::bidirectional_iterator_tag,
                     typename std::iterator_traits<InIt>::iterator_category>;
 
-            using value_type        = typename InIt::value_type;
-            using difference_type   = typename InIt::difference_type;
-            using pointer           = typename InIt::pointer;
-            using reference         = typename InIt::reference;
+            using value_type        =
+                typename std::iterator_traits<InIt>::value_type;
+            using difference_type   =
+                typename std::iterator_traits<InIt>::difference_type;
+            using pointer           =
+                typename std::iterator_traits<InIt>::pointer;
+            using reference         =
+                typename std::iterator_traits<InIt>::reference;
 
             Iterator(InIt _it, InIt _end, F *f)
                 : it(std::move(_it)), end(_end), f(f)

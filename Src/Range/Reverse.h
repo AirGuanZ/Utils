@@ -142,7 +142,7 @@ namespace RangeAux
 
     public:
 
-        using Iterator = ReverseIterator<typename R::Iterator>;
+        using Iterator = ReverseIterator<GetIteratorType<R>>;
 
         explicit ReverseImpl(R &&range)
             : range_(std::move(range))
