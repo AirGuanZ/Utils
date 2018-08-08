@@ -5,8 +5,7 @@
 #include <type_traits>
 
 #include "../Misc/Malloc.h"
-#include "StrAlgo.h"
-#include "StrConv.inl"
+#include "StrAlgo.inl"
 
 AGZ_NS_BEG(AGZ::StrImpl)
 
@@ -519,6 +518,18 @@ bool String<CS>::View::IsWhitespaces() const
 }
 
 template<typename CS>
+bool String<CS>::View::IsASCII() const
+{
+    auto [d, l] = DataAndLength();
+    for(size_t i = 0; i < l; ++i)
+    {
+        if(d[i] >= 128)
+            return false;
+    }
+    return true;
+}
+
+template<typename CS>
 String<CS> String<CS>::ToUpper() const
 {
     String<CS> ret = *this;
@@ -846,7 +857,7 @@ String<CS> &String<CS>::operator=(Self &&moveFrom) noexcept
 #define AGZ_STR_FROM_INT_IMPL(T) \
     template<typename CS> \
     String<CS> String<CS>::From(T v, unsigned int base) \
-    { return Int2Str<T, CS>(v, base); }
+    { return StrAlgo::Int2Str<T, CS>(v, base); }
 
 AGZ_STR_FROM_INT_IMPL(char)
 AGZ_STR_FROM_INT_IMPL(signed char)

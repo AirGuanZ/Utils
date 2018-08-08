@@ -8,8 +8,8 @@
 #include <vector>
 
 #include "../Misc/Common.h"
-#include "ASCII.h"
-#include "UTF.h"
+#include "Charset/ASCII.h"
+#include "Charset/UTF.h"
 
 AGZ_NS_BEG(AGZ::StrImpl)
 
@@ -47,7 +47,11 @@ struct SmallBufSizeSelector<4>
 template<typename E>
 class RefCountedBuf
 {
+#ifdef AGZ_THREAD_SAFE_STRING
     std::atomic<size_t> refs_;
+#else
+    size_t refs_;
+#endif
     E data_[1];
 
 public:
@@ -234,6 +238,8 @@ public:
         bool IsWhitespace()  const;
         bool IsWhitespaces() const;
 
+        bool IsASCII() const;
+
         Str ToUpper() const;
         Str ToLower() const;
         Str SwapCase() const;
@@ -325,6 +331,7 @@ public:
     bool IsLowers()                                 const { return AsView().IsLowers();                      }
     bool IsWhitespace()                             const { return AsView().IsWhitespace();                  }
     bool IsWhitespaces()                            const { return AsView().IsWhitespaces();                 }
+    bool IsASCII()                                  const { return AsView().IsASCII();                       }
     Self ToUpper()                                  const { return AsView().ToUpper();                       }
     Self ToLower()                                  const { return AsView().ToLower();                       }
     Self SwapCase()                                 const { return AsView().SwapCase();                      }

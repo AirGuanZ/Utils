@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+#include "Config.h"
+
 #ifdef _MSC_VER
 
 #define AGZ_INLINE inline
@@ -24,8 +26,6 @@
 
 #include <cassert>
 #define AGZ_ASSERT(X) assert(X)
-
-#define AGZ_USE_SSE2
 
 #ifndef __BYTE_ORDER__
 
