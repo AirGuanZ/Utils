@@ -357,11 +357,14 @@ AGZ_NS_END(AGZ::StrImpl)
 
 AGZ_NS_BEG(AGZ)
 
-using Str8  = StrImpl::String<UTF8<>>;
-using Str16 = StrImpl::String<UTF16<>>;
-using Str32 = StrImpl::String<UTF32<>>;
-using AStr  = StrImpl::String<ASCII<>>;
-using WStr  = StrImpl::String<WUTF>;
+template<typename CS>
+using String = StrImpl::String<CS>;
+
+using Str8  = String<UTF8<>>;
+using Str16 = String<UTF16<>>;
+using Str32 = String<UTF32<>>;
+using AStr  = String<ASCII<>>;
+using WStr  = String<WUTF>;
 
 using CSConv  = StrImpl::CharsetConvertor;
 
