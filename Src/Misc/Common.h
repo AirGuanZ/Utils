@@ -4,12 +4,12 @@
 
 #ifdef _MSC_VER
 
-#define AGZ_INLINE inline //__forceinline
+#define AGZ_INLINE inline
 #define AGZ_FORCEINLINE __forceinline
 
 #elif defined __GNUC__
 
-#define AGZ_INLINE inline //__attribute__((always_inline))
+#define AGZ_INLINE inline
 #define AZG_FORCEINLINE __attribute__((always_inline))
 
 #else

@@ -278,12 +278,6 @@ String<CS>::View::View(const Str &str, const CodeUnit* beg, size_t len)
 }
 
 template<typename CS>
-String<CS>::View::operator Str() const
-{
-    return AsString();
-}
-
-template<typename CS>
 String<CS> String<CS>::View::AsString() const
 {
     if(beg_ == str_->Data() && len_ == str_->Length())
@@ -446,14 +440,9 @@ template<typename CS>
 size_t String<CS>::View::Find(const Self &dst, size_t begIdx) const
 {
     AGZ_ASSERT(begIdx <= len_);
-    auto rt = StrAlgo::FindSubPattern(begin() + begIdx, end(), dst.begin(), dst.end());
+    auto rt = StrAlgo::FindSubPattern(begin() + begIdx, end(),
+                                      dst.begin(), dst.end());
     return rt == end() ? NPOS : (rt - beg_);
-}
-
-template<typename CS>
-size_t String<CS>::View::Find(const char *dst, size_t begIdx) const
-{
-    return Find(Str(dst).AsView());
 }
 
 template<typename CS>
@@ -488,6 +477,14 @@ std::string String<CS>::View::ToStdString(NativeCharset cs) const
     throw CharsetException("Unknown charset " +
             std::to_string(static_cast<
                 std::underlying_type_t<NativeCharset>>(cs)));
+}
+
+template<typename CS>
+String<CS> String<CS>::View::operator==(const Self &rhs) const
+{
+    StringBuilder<CS> builder;
+    builder << *this << rhs;
+    return builder.Get();
 }
 
 template<typename CS>
@@ -547,7 +544,7 @@ template<typename CS>
 String<CS>::String(size_t len)
     : storage_(len)
 {
-    
+
 }
 
 template<typename CS>
@@ -592,7 +589,8 @@ String<CS>::String(const char *cstr, NativeCharset cs)
     switch(cs)
     {
     case NativeCharset::UTF8:
-        *this = Self(CharsetConvertor::Convert<CS, UTF8<>>(Str8(cstr, std::strlen(cstr))));
+        *this = Self(CharsetConvertor::Convert<CS, UTF8<>>(
+                        Str8(cstr, std::strlen(cstr))));
         break;
     default:
         throw CharsetException("Unknown charset " +
@@ -608,7 +606,8 @@ String<CS>::String(const std::string & cppStr, NativeCharset cs)
     switch(cs)
     {
     case NativeCharset::UTF8:
-        *this = Self(CharsetConvertor::Convert<CS, UTF8<>>(Str8(cppStr.c_str(), cppStr.length())));
+        *this = Self(CharsetConvertor::Convert<CS, UTF8<>>(
+                        Str8(cppStr.c_str(), cppStr.length())));
         break;
     default:
         throw CharsetException("Unknown charset " +
@@ -629,12 +628,6 @@ String<CS>::String(Self &&moveFrom) noexcept
     : storage_(std::move(moveFrom.storage_))
 {
 
-}
-
-template<typename CS>
-String<CS>::operator View() const
-{
-    return AsView();
 }
 
 template<typename CS>
@@ -683,93 +676,6 @@ bool String<CS>::Empty() const
 }
 
 template<typename CS>
-typename String<CS>::View String<CS>::Trim() const
-{
-    return AsView().Trim();
-}
-
-template<typename CS>
-typename String<CS>::View String<CS>::TrimLeft() const
-{
-    return AsView().TrimLeft();
-}
-
-template<typename CS>
-typename String<CS>::View String<CS>::TrimRight() const
-{
-    return AsView().TrimRight();
-}
-
-template<typename CS>
-typename String<CS>::View String<CS>::Slice(size_t begIdx) const
-{
-    return AsView().Slice(begIdx);
-}
-
-template<typename CS>
-typename String<CS>::View String<CS>::Slice(
-                                size_t begIdx, size_t endIdx) const
-{
-    return AsView().Slice(begIdx, endIdx);
-}
-
-template<typename CS>
-typename String<CS>::View String<CS>::Prefix(size_t n) const
-{
-    return AsView().Prefix(n);
-}
-
-template<typename CS>
-typename String<CS>::View String<CS>::Suffix(size_t n) const
-{
-    return AsView().Suffix(n);
-}
-
-template<typename CS>
-bool String<CS>::StartsWith(const View &prefix) const
-{
-    return AsView().StartsWith(prefix);
-}
-
-template<typename CS>
-bool String<CS>::EndsWith(const View &suffix) const
-{
-    return AsView().EndsWith(suffix);
-}
-
-template<typename CS>
-std::vector<typename String<CS>::View> String<CS>::Split() const
-{
-    return AsView().Split();
-}
-
-template<typename CS>
-std::vector<typename String<CS>::View>
-String<CS>::Split(const View &spliter) const
-{
-    return AsView().Split(spliter);
-}
-
-template<typename CS>
-template<typename R>
-String<CS> String<CS>::Join(R &&strRange) const
-{
-    return AsView().Join(std::forward<R>(strRange));
-}
-
-template<typename CS>
-size_t String<CS>::Find(const View &dst, size_t begIdx) const
-{
-    return AsView().Find(dst, begIdx);
-}
-
-template<typename CS>
-size_t String<CS>::Find(const char *dst, size_t begIdx) const
-{
-    return AsView().Find(dst, begIdx);
-}
-
-template<typename CS>
 typename String<CS>::Iterator String<CS>::begin() const
 {
     return storage_.Begin();
@@ -782,59 +688,29 @@ typename String<CS>::Iterator String<CS>::end() const
 }
 
 template<typename CS>
-std::string String<CS>::ToStdString(NativeCharset cs) const
+String<CS> operator*(const String<CS> &lhs, size_t rhs)
 {
-    return AsView().ToStdString(cs);
-}
-
-template<typename CS>
-bool String<CS>::operator==(const Self &rhs) const
-{
-    return AsView() == rhs.AsView();
-}
-
-template<typename CS>
-bool String<CS>::operator!=(const Self &rhs) const
-{
-    return AsView() != rhs.AsView();
-}
-
-template<typename CS>
-bool String<CS>::operator<(const Self &rhs) const
-{
-    return AsView() < rhs.AsView();
-}
-
-template<typename CS>
-bool String<CS>::operator>(const Self &rhs) const
-{
-    return AsView() > rhs.AsView();
-}
-
-template<typename CS>
-bool String<CS>::operator<=(const Self &rhs) const
-{
-    return AsView() <= rhs.AsView();
-}
-
-template<typename CS>
-bool String<CS>::operator>=(const Self &rhs) const
-{
-    return AsView() >= rhs.AsView();
+    StringBuilder<CS> b;
+    b.Append(lhs, rhs);
+    return b.Get();
 }
 
 template<typename CS>
 StringBuilder<CS> &StringBuilder<CS>::Append(
-    const typename String<CS>::View &view)
+    const typename String<CS>::View &view, size_t n)
 {
-    strs_.emplace_back(view);
+    // IMPROVE
+    while(n-- > 0)
+        strs_.emplace_back(view);
     return *this;
 }
 
 template<typename CS>
-StringBuilder<CS> &StringBuilder<CS>::Append(const String<CS> &str)
+StringBuilder<CS> &StringBuilder<CS>::Append(const String<CS> &str, size_t n)
 {
-    strs_.emplace_back(str);
+    // IMPROVE
+    while(n-- > 0)
+        strs_.emplace_back(str);
     return *this;
 }
 
@@ -848,9 +724,13 @@ StringBuilder<CS> &StringBuilder<CS>::operator<<(
 template<typename CS>
 String<CS> StringBuilder<CS>::Get() const
 {
+    if(strs_.size() == 1)
+        return strs_.front();
+
     size_t len = 0;
     for(auto &s : strs_)
         len += s.Length();
+
     String<CS> ret(len);
     auto data = ret.GetMutableData();
     for(auto &s : strs_)
@@ -858,6 +738,10 @@ String<CS> StringBuilder<CS>::Get() const
         Copy(s.Data(), s.Length(), data);
         data += s.Length();
     }
+
+    strs_.clear();
+    if(!ret.empty())
+        strs_.push_back(ret);
     return std::move(ret);
 }
 
@@ -894,12 +778,6 @@ String<DCS> CharsetConvertor::Convert(const typename String<SCS>::View &src)
 
         return String<DCS>(cus.data(), cus.size());
     }
-}
-
-template<typename DCS, typename SCS>
-String<DCS> CharsetConvertor::Convert(const String<SCS>& src)
-{
-    return Convert<DCS, SCS>(src.AsView());
 }
 
 AGZ_NS_END(AGZ::StrImpl)
