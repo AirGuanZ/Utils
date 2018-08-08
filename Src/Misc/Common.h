@@ -64,10 +64,22 @@ inline CONS_FLAG_UNSPECIFIED_t UNSPECIFIED;
 
 struct Void_t { };
 
-class CharsetException : public std::invalid_argument
+class Exception : public std::runtime_error
 {
 public:
-    explicit CharsetException(const std::string &err) : invalid_argument(err) { }
+    explicit Exception(const std::string &err) : runtime_error(err) { }
+};
+
+class CharsetException : public Exception
+{
+public:
+    explicit CharsetException(const std::string &err) : Exception(err) { }
+};
+
+class ArgumentException : public Exception
+{
+public:
+    explicit ArgumentException(const std::string &err) : Exception(err) { }
 };
 
 template<typename T>

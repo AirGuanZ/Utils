@@ -4,7 +4,7 @@
 #include <cstring>
 #include <type_traits>
 
-#include "../Misc/Malloc.h"
+#include "../Alloc/Malloc.h"
 #include "StrAlgo.inl"
 
 AGZ_NS_BEG(AGZ::StrImpl)

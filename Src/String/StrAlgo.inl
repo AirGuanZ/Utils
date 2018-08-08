@@ -87,7 +87,7 @@ CompareResult Compare(const CU *lhs, const CU *rhs, size_t lLen, size_t rLen)
 }
 
 template<typename T, typename CS,
-         std::enable_if_t<std::is_intergal_v<T>, int> = 0>
+         std::enable_if_t<std::is_integral_v<T>, int> = 0>
 String<CS> Int2Str(T v, unsigned int base)
 {
     // IMPROVE

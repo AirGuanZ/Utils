@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "../Misc/Common.h"
-#include "../Misc/Malloc.h"
+#include "../Alloc/Malloc.h"
 
 AGZ_NS_BEG(AGZ::Buf)
 
