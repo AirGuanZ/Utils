@@ -27,6 +27,7 @@ public:
         using pointer           = ValuePointer<T>;
         using reference         = char32_t&;
 
+        Iterator() : cur(nullptr) { }
         explicit Iterator(const T *cur);
 
         value_type operator*() const;

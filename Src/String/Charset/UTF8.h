@@ -23,6 +23,7 @@ public:
     using pointer           = ValuePointer<char32_t>;
     using reference         = char32_t&;
 
+    UTF8Iterator() : cur(nullptr) { }
     explicit UTF8Iterator(const T *cur);
 
     char32_t operator*() const;

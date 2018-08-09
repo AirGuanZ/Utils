@@ -99,7 +99,7 @@ enum class InstOpCode
 {
     Char,   // Match single character
     Jump,   // Unconditional Jump
-    Branch, // Branch into two execution stream
+    Branch, // Branch into two execution threads
     Save,   // Save current data pointer to given slot
     Match   // Report a successful matching
 };
@@ -140,9 +140,69 @@ struct Thread
     SaveSlots saveSlots;
 };
 
+template<typename CS>
+class PikeCompiler
+{
+public:
+
+    using CP    = typename CS::CodePoint;
+    using Inst  = Instruction<CP>;
+    using Insts = std::vector<Inst>;
+    using It    = typename CS::Iterator;
+
+    bool inSub_ = false;
+    const StringView<CS> *src_ = nullptr;
+
+    It cur_, end_;
+
+    Insts *insts_;
+
+private:
+
+    /* Grammar
+        Regex  := Cat Cat ... Cat
+        Cat    := [Factor Factor ... Factor] | Factor | $Cat
+        Factor := Factor* | Factor+ | Factor? | Core
+        Core   := Char | (Regex)
+    */
+    size_t ParseRegex()
+    {
+        size_t ret = 0, dret;
+        while(ParseCat(&dret))
+            ret += dret;
+        return ret;
+    }
+
+    bool ParseCat(size_t *slotCount)
+    {
+        // TODO
+        *slotCount = 0;
+        return true;
+    }
+
+public:
+
+    void Compile(const StringView<CS> &src,
+                 Insts &insts, size_t *slotCount)
+    {
+        AGZ_ASSERT(slotCount);
+
+        auto cpSeq = src.CodePoints();
+
+        inSub_     = false;
+        src_       = &src;
+        cur_       = cpSeq.begin();
+        end_       = cpSeq.end();
+        *slotCount = ParseRegex();
+
+        if(cur_ != end_)
+            throw ArgumentException("Invalid regular expression");
+    }
+};
+
 // See https://swtch.com/~rsc/regexp/regexp2.html
 template<typename CS>
-class PikeVM
+class PikeMachine
 {
     using CodeUnit  = typename CS::CodeUnit;
     using CodePoint = typename CS::CodePoint;
