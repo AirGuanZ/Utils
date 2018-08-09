@@ -26,7 +26,7 @@ class FixedSizedArena
 
 public:
 
-    FixedSizedArena(size_t nodeSize, size_t chunkSize)
+    explicit FixedSizedArena(size_t nodeSize, size_t chunkSize = 32 * nodeSize)
         : nodeSize_(nodeSize), chunkSize_(chunkSize),
           freeNodes_(nullptr), chunkEntry_(nullptr)
     {

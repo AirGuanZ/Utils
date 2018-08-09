@@ -253,6 +253,133 @@ std::pair<const CU*, const CU*> Storage<CU>::BeginAndEnd() const
 }
 
 template<typename CS>
+CodePointRange<CS>::CodePointRange(const CodeUnit *beg, const CodeUnit *end)
+    : beg_(beg), end_(end)
+{
+    AGZ_ASSERT(beg <= end);
+}
+
+template<typename CS>
+CodePointRange<CS>::CodePointRange(const String<CS> &str, const CodeUnit *beg,
+                                                          const CodeUnit *end)
+    : str_(str)
+{
+    AGZ_ASSERT(str.begin() <= beg && beg <= end && end <= str.end());
+    auto base = str.begin();
+    beg_ = str_.begin() + (beg - base);
+    end_ = str_.end()   + (end - base);
+}
+
+template<typename CS>
+typename CodePointRange<CS>::Iterator CodePointRange<CS>>::begin() const
+{
+    return Iterator(beg_);
+}
+
+template<typename CS>
+typename CodePointRange<CS>::Iterator CodePointRange<CS>::end() const
+{
+    return Iterator(end_);
+}
+
+template<typename CS>
+StringView<CS>::CharRange::Iterator::Iterator(const String<CS> &str, InIt it)
+    : str_(str), it_(it)
+{
+
+}
+
+template<typename CS>
+StringView<CS> StringView<CS>::CharRange::Iterator::operator*() const
+{
+    auto [b, e] = CS::CodeUnitsFromCodePointIterator(it);
+    return StringView<CS>(str_, b, e - b);
+}
+
+template<typename CS>
+typename StringView<CS>::CharRange::Iterator::pointer
+StringView<CS>::CharRange::Iterator::operator->() const
+{
+    return pointer(**this);
+}
+
+template<typename CS>
+typename StringView<CS>::CharRange::Iterator &
+StringView<CS>::CharRange::Iterator::operator++()
+{
+    ++it;
+    return *this;
+}
+
+template<typename CS>
+typename StringView<CS>::CharRange::Iterator
+StringView<CS>::CharRange::Iterator::operator++(int)
+{
+    auto ret = *this;
+    ++*this;
+    return ret;
+}
+
+template<typename CS>
+typename StringView<CS>::CharRange::Iterator &
+StringView<CS>::CharRange::Iterator::operator--()
+{
+    --it;
+    return *this;
+}
+
+template<typename CS>
+typename StringView<CS>::CharRange::Iterator
+StringView<CS>::CharRange::Iterator::operator--(int)
+{
+    auto ret = *this;
+    --*this;
+    return ret;
+}
+
+template<typename CS>
+bool StringView<CS>::CharRange::Iterator::operator==(const Self &rhs) const
+{
+    AGZ_ASSERT(&str_ == &rhs.str_);
+    return it_ == rhs.it_;
+}
+
+template<typename CS>
+bool StringView<CS>::CharRange::Iterator::operator!=(const Self &rhs) const
+{
+    return !(*this == rhs);
+}
+
+template<typename CS>
+StringView<CS>::CharRange::CharRange(const CodeUnit *beg, const CodeUnit *end)
+    : CPR_(beg, end)
+{
+
+}
+
+template<typename CS>
+StringView<CS>::CharRange::CharRange(const String<CS> &str, const CodeUnit *beg,
+                                                            const CodeUnit *end)
+    : CPR_(str, beg, end)
+{
+
+}
+
+template<typename CS>
+typename StringView<CS>::CharRange::Iterator
+StringView<CS>::CharRange::begin() const
+{
+    return Iterator(CPR_.GetStr(), CPR_.begin());
+}
+
+template<typename CS>
+typename StringView<CS>::CharRange::Iterator
+StringView<CS>::CharRange::end() const
+{
+    return Iterator(CPR_.GetStr(), CPR_.end());
+}
+
+template<typename CS>
 StringView<CS>::StringView(const Str &str)
     : str_(&str), beg_(str.Data()), len_(str.Length())
 {

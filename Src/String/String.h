@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "../Misc/Common.h"
+#include "../Range/Iterator.h"
 #include "Charset/ASCII.h"
 #include "Charset/UTF.h"
 
@@ -152,6 +153,29 @@ template<typename CS>
 class String;
 
 template<typename CS>
+class CodePointRange
+{
+    String<CS> str_;
+    const typename CS::CodeUnit *beg_;
+    const typename CS::CodeUnit *end_;
+
+public:
+
+    using CodeUnit  = typename CS::CodeUnit;
+    using CodePoint = typename CS::CodePoint;
+    using Iterator  = GetIteratorType<CS>;
+
+    CodePointRange(const CodeUnit *beg, const CodeUnit *end);
+    CodePointRange(const String<CS> &str, const CodeUnit *beg,
+                                          const CodeUnit *end);
+
+    Iterator begin() const;
+    Iterator end()   const;
+
+    const String<CS> &GetStr() const { return str_; }
+};
+
+template<typename CS>
 // Immutable string slice
 class StringView
 {
@@ -160,6 +184,55 @@ class StringView
     size_t len_;
 
 public:
+
+    class CharRange
+    {
+        using InIt = GetIteratorType<CS>;
+
+        CodePointRange<CS> CPR_;
+
+    public:
+
+        using CodeUnit  = typename CS::CodeUnit;
+        using CodePoint = typename CS::CodePoint;
+
+        class Iterator
+        {
+            const String<CS> &str_
+            InIt it_;
+
+        public:
+
+            using iterator_category = std::bidirectional_iterator_tag;
+            using value_type        = StringView<CS>;
+            using difference_type   =
+                typename std::iterator_traits<InIt>::difference_type;
+            using pointer           = ValuePointer<value_type>;
+            using reference         = value_type&;
+
+            using Self = Iterator;
+
+            Iterator(const String<CS> &str, InIt it);
+
+            value_type operator*() const;
+            pointer operator->() const;
+
+            Self &operator++();
+            Self operator++(int);
+            Self &operator--();
+            Self operator--(int);
+
+            bool operator==(const Self &rhs) const;
+            bool operator!=(const Self &rhs) const;
+        };
+
+        CharRange(const CodeUnit *beg, const CodeUnit *end);
+        CharRange(const String<CS> &str, const CodeUnit *beg,
+                                         const CodeUnit *end);
+
+        Iterator begin() const;
+        Iterator end()   const;
+    };
 
     using Charset = CS;
     using CodeUnit = typename CS::CodeUnit;
@@ -238,6 +311,12 @@ public:
     size_t Find(const Self &dst, size_t begIdx = 0) const;
     size_t Find(const Str &dst, size_t begIdx = 0)  const { return Find(dst.AsView(), begIdx); }
 
+    CodePointRange<CS> CodePoints() const &  { return CodePointRange<CS>(beg_, beg_ + len_); }
+    CodePointRange<CS> CodePoints() const && { return CodePointRange<CS>(*str_, beg_, beg_ + len_); }
+
+    CharRange Chars() const &  { return CharRange(beg_, beg_ + len_); }
+    CharRange Chars() const && { return CharRange(*str_, beg_, beg_ + len_); }
+
     std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const;
 
     Iterator begin() const;
@@ -271,6 +350,8 @@ public:
     using CodePoint = typename CS::CodePoint;
     using View      = StringView<CS>;
     using Self      = String<CS>;
+
+    using CharRange = typename View::CharRange;
 
     using Iterator = const CodeUnit*;
 
@@ -351,6 +432,12 @@ public:
     Iterator begin() const;
     Iterator end()   const;
 
+    CodePointRange<CS> CodePoints() const &  { return CodePointRange<CS>(begin(), end()); }
+    CodePointRange<CS> CodePoints() const && { return CodePointRange<CS>(*this, begin(), end()); }
+
+    CharRange Chars() const &  { return CharRange(begin(), end()); }
+    CharRange Chars() const && { return CharRange(*this, begin(), end()); }
+
     std::pair<const CodeUnit*, const CodeUnit*> BeginAndEnd() const { return storage_.BeginAndEnd(); }
 };
 
@@ -372,17 +459,17 @@ String<CS> operator*(size_t L, const StringView<CS> &R) { return R * L; }
     template<typename CS> bool operator<=(const LHS lhs, const RHS rhs) { return LOP <= ROP; } \
     template<typename CS> bool operator>=(const LHS lhs, const RHS rhs) { return LOP >= ROP; }
 
-AGZ_WRAP_STR_COMP(String<CS>&,                String<CS>&,                lhs.AsView(),             rhs.AsView())
-AGZ_WRAP_STR_COMP(String<CS>&,                StringView<CS>&,            lhs.AsView(),             rhs)
-AGZ_WRAP_STR_COMP(StringView<CS>&,            String<CS>&,                lhs,                      rhs.AsView())
-AGZ_WRAP_STR_COMP(String<CS>&,                char*,                      lhs,                      String<CS>(rhs))
-AGZ_WRAP_STR_COMP(char*,                      String<CS>&,                String<CS>(lhs),          rhs)
-AGZ_WRAP_STR_COMP(StringView<CS>&,            char*,                      lhs,                      String<CS>(rhs).AsView())
-AGZ_WRAP_STR_COMP(char*,                      StringView<CS>&,            String<CS>(lhs).AsView(), rhs)
-AGZ_WRAP_STR_COMP(String<CS>&,                std::string&,               lhs,                      String<CS>(rhs))
-AGZ_WRAP_STR_COMP(std::string&,               String<CS>&,                String<CS>(lhs),          rhs)
-AGZ_WRAP_STR_COMP(StringView<CS>&,            std::string&,               lhs,                      String<CS>(rhs))
-AGZ_WRAP_STR_COMP(std::string&,               StringView<CS>&,            String<CS>(lhs),          rhs)
+AGZ_WRAP_STR_COMP(String<CS>&,     String<CS>&,     lhs.AsView(),             rhs.AsView())
+AGZ_WRAP_STR_COMP(String<CS>&,     StringView<CS>&, lhs.AsView(),             rhs)
+AGZ_WRAP_STR_COMP(StringView<CS>&, String<CS>&,     lhs,                      rhs.AsView())
+AGZ_WRAP_STR_COMP(String<CS>&,     char*,           lhs,                      String<CS>(rhs))
+AGZ_WRAP_STR_COMP(char*,           String<CS>&,     String<CS>(lhs),          rhs)
+AGZ_WRAP_STR_COMP(StringView<CS>&, char*,           lhs,                      String<CS>(rhs).AsView())
+AGZ_WRAP_STR_COMP(char*,           StringView<CS>&, String<CS>(lhs).AsView(), rhs)
+AGZ_WRAP_STR_COMP(String<CS>&,     std::string&,    lhs,                      String<CS>(rhs))
+AGZ_WRAP_STR_COMP(std::string&,    String<CS>&,     String<CS>(lhs),          rhs)
+AGZ_WRAP_STR_COMP(StringView<CS>&, std::string&,    lhs,                      String<CS>(rhs))
+AGZ_WRAP_STR_COMP(std::string&,    StringView<CS>&, String<CS>(lhs),          rhs)
 
 #undef AGZ_WRAP_STR_COMP
 

@@ -4,6 +4,27 @@
 
 AGZ_NS_BEG(AGZ)
 
+namespace CharsetAux
+{
+    template<typename It>
+    struct CodeUnitsFromCodePointIteratorImpl
+    {
+        static auto Eval(const It &it)
+        {
+            return it.CodeUnitsFromCodePointIterator();
+        }
+    };
+
+    template<typename CU>
+    struct CodeUnitsFromCodePointIteratorImpl<CU*>
+    {
+        static auto Eval(const CU *it)
+        {
+            return std::pair<const CU*, const CU*>{ it, it + 1 };
+        }
+    };
+}
+
 template<typename Core>
 class Charset : public Core
 {
@@ -75,6 +96,13 @@ public:
     {
         return cu == ' ' || cu == '\t' ||
                cu == '\n' || cu == '\r';
+    }
+
+    static std::pair<const CodeUnit*, const CodeUnit*>
+    CodeUnitsFromCodePointIterator(const typename Core::Iterator &it)
+    {
+        return CharsetAux::CodeUnitsFromCodePointIteratorImpl<
+                                    typename Core::Iterator>(it);
     }
 };
 

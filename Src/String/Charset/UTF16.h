@@ -44,6 +44,8 @@ public:
         bool operator==(const Self &rhs) const;
 
         bool operator!=(const Self &rhs) const { return !(*this == rhs); }
+
+        std::pair<const T *, const T *> CodeUnits() const;
     };
 
     static_assert(sizeof(T) >= 2);
@@ -201,6 +203,12 @@ template<typename T>
 bool UTF16Core<T>::Iterator::operator==(const Self &rhs) const
 {
     return cur == rhs.cur;
+}
+
+template<typename T>
+std::pair<const T*, const T*> UTF16Core<T>::Iterator::CodeUnits() const
+{
+    return { cur, UTF16Core<T>::NextCodePoint(cur) };
 }
 
 AGZ_NS_END(AGZ)

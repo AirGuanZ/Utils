@@ -35,6 +35,8 @@ public:
 
     bool operator==(const Self &rhs) const;
     bool operator!=(const Self &rhs) const;
+
+    std::pair<const T *, const T *> CodeUnits() const;
 };
 
 template<typename T>
@@ -269,6 +271,12 @@ template<typename T>
 bool UTF8Iterator<T>::operator!=(const UTF8Iterator<T> &rhs) const
 {
     return !(*this == rhs);
+}
+
+template<typename T>
+std::pair<const T*, const T*> UTF8Iterator<T>::CodeUnits() const
+{
+    return { cur, UTF8Core<T>::NextCodePoint(cur) };
 }
 
 AGZ_NS_END(AGZ)
