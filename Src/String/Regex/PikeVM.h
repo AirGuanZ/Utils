@@ -42,7 +42,7 @@ public:
     SaveSlots(size_t slotCount, FixedSizedArena<> &arena)
         : slotCount_(slotCount), arena_(arena)
     {
-        storage_ = reinterpret_cast<SaveSlotsStorage*>(arena_.Malloc());
+        storage_ = arena_.Malloc<SaveSlotsStorage>();
         storage_->refs = 1;
         for(size_t i = 0; i < slotCount_; ++i)
             storage_->slots[i] = std::numeric_limits<size_t>::max();
@@ -77,7 +77,7 @@ public:
         // Copy-On-Write Strategy
         if(storage_->refs > 1)
         {
-            auto newSto = reinterpret_cast<SaveSlotsStorage*>(arena_.Malloc());
+            auto newSto = arena_.Malloc<SaveSlotsStorage>();
             newSto->refs = 1;
             for(size_t i = 0; i < slotCount_; ++i)
                 newSto->slots[i] = storage_->slots[i];
@@ -149,7 +149,7 @@ class PikeVM
         const Instruction<CodePoint> *pc,
         SaveSlots &&slots)
     {
-        Thread *ret = reinterpret_cast<Thread*>(arena.Malloc());
+        Thread *ret = arena.Malloc<Thread>();
         return new(ret) Thread{ pc, std::move(slots) };
     }
 
@@ -267,8 +267,7 @@ class PikeVM
         return { false, { } };
     }
 
-    // Compile regex to VM instructions
-    void Compile();
+    // TODO: Compile regex to VM instructions
 
 public:
 

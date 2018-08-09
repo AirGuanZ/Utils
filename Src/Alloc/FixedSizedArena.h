@@ -45,13 +45,14 @@ public:
     FixedSizedArena(const FixedSizedArena<Alloc>&)            = delete;
     FixedSizedArena &operator=(const FixedSizedArena<Alloc>&) = delete;
 
-    void *Malloc()
+    template<typename T = void>
+    T *Malloc()
     {
         if(freeNodes_)
         {
             Node *ret = freeNodes_;
             freeNodes_ = freeNodes_->next;
-            return ret;
+            return reinterpret_cast<T*>(ret);
         }
 
         Chunk *nChunk = Alloc::Malloc(chunkSize_);
@@ -66,7 +67,7 @@ public:
             node += nodeSize_;
         }
 
-        return Malloc();
+        return Malloc<T>();
     }
 
     void Free(void *ptr)
