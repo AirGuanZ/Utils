@@ -39,5 +39,5 @@
 #include "Range/Take.h"
 #include "Range/Transform.h"
 
-#include "String/Regex.h"
+#include "String/Regex/Regex.h"
 #include "String/String.h"

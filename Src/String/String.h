@@ -173,6 +173,11 @@ public:
     Iterator end()   const;
 
     const String<CS> &GetStr() const { return str_; }
+
+    size_t CodeUnitIndex(const Iterator &it) const
+    {
+        return CS::CodeUnitsBeginFromCodePointIterator(it) - beg_;
+    }
 };
 
 template<typename CS>
@@ -198,7 +203,7 @@ public:
 
         class Iterator
         {
-            const String<CS> &str_
+            const String<CS> &str_;
             InIt it_;
 
         public:
@@ -509,6 +514,8 @@ AGZ_NS_BEG(AGZ)
 
 template<typename CS>
 using String = StrImpl::String<CS>;
+template<typename CS>
+using StringView = StrImpl::StringView<CS>;
 
 using Str8  = String<UTF8<>>;
 using Str16 = String<UTF16<>>;

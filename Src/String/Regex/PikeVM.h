@@ -6,7 +6,6 @@
 
 #include "../../Alloc/FixedSizedArena.h"
 #include "../../Misc/Common.h"
-#include "../../Range/Iterator.h"
 #include "../String.h"
 
 AGZ_NS_BEG(AGZ::RegexImpl::Pike)
@@ -56,10 +55,10 @@ public:
         ++storage_->refs;
     }
 
-    SaveSlots(Self &&moveFrom)
-        : slotCount_(copyFrom.slotCount_),
-          storage_(copyFrom.storage_),
-          arena_(copyFrom.arena_)
+    SaveSlots(Self &&moveFrom) noexcept
+        : slotCount_(moveFrom.slotCount_),
+          storage_(moveFrom.storage_),
+          arena_(moveFrom.arena_)
     {
         moveFrom.storage_ = nullptr;
     }
@@ -88,7 +87,7 @@ public:
         storage_->slots[slot] = value;
     }
 
-    size_t Get(size_t idx)
+    size_t Get(size_t idx) const
     {
         AGZ_ASSERT(idx < slotCount_ && storage_);
         return storage_->slots[idx];
@@ -108,7 +107,7 @@ enum class InstOpCode
 template<typename CP>
 struct Instruction
 {
-    static_assert(std::is_trivially_constructable_v<CP>);
+    static_assert(std::is_trivially_constructible_v<CP>);
 
     InstOpCode op;
 
@@ -119,7 +118,7 @@ struct Instruction
         const Instruction *jumpDest;      // For Jump
         const Instruction *branchDest[2]; // For Branch
         size_t saveSlot;                  // For Save
-    }
+    };
 
     // Character index when last thread running at this instruction
     // was added to ready list. Used to avoid more than one threads with the
@@ -130,6 +129,13 @@ struct Instruction
 template<typename CS>
 struct Thread
 {
+    Thread(const Instruction<typename CS::CodePoint> *pc,
+           SaveSlots &&saveSlots)
+        : pc(pc), saveSlots(std::move(saveSlots))
+    {
+        
+    }
+
     const Instruction<typename CS::CodePoint> *pc;
     SaveSlots saveSlots;
 };
@@ -141,19 +147,21 @@ class PikeVM
     using CodeUnit  = typename CS::CodeUnit;
     using CodePoint = typename CS::CodePoint;
 
+    using Arena = FixedSizedArena<>;
+
     std::vector<Instruction<typename CS::CodePoint>> prog_;
     String<CS> regex_;
 
-    static Thread *NewThread(
-        FixedSizedArena<> &arena,
+    static Thread<CS> *NewThread(
+        Arena &arena,
         const Instruction<CodePoint> *pc,
         SaveSlots &&slots)
     {
-        Thread *ret = arena.Malloc<Thread>();
-        return new(ret) Thread{ pc, std::move(slots) };
+        Thread<CS> *ret = arena.Malloc<Thread<CS>>();
+        return new(ret) Thread<CS>(pc, std::move(slots));
     }
 
-    static void FreeThread(FixedSizedArena<> &arena, Thread *th)
+    static void FreeThread(Arena &arena, Thread<CS> *th)
     {
         th->~Thread();
         arena.Free(th);
@@ -162,19 +170,19 @@ class PikeVM
     static std::pair<bool, std::vector<std::pair<size_t, size_t>>> Run(
         const std::vector<Instruction<CodePoint>> prog,
         size_t slotCount,
-        const StringView<CS> &dst) const
+        const StringView<CS> &dst)
     {
         AGZ_ASSERT(slotCount % 2 == 0);
 
-        FixedSizedArena<> threadArena(sizeof(Thread));
-        FixedSizedArena<> slotsArena(
-            SaveSlots::AllocSize(slotCount));
+        Arena threadArena(sizeof(Thread<CS>), 32 * sizeof(Thread<CS>));
+        Arena slotsArena(SaveSlots::AllocSize(slotCount),
+                         32 * SaveSlots::AllocSize(slotCount));
 
-        std::vector<Thread*> rdyThds = {
+        std::vector<Thread<CS>*> rdyThds = {
             NewThread(threadArena, &prog[0],
                       SaveSlots(slotCount, slotsArena))
         };
-        std::vector<Thread*> newThds;
+        std::vector<Thread<CS>*> newThds;
 
         for(auto &inst : prog)
             inst.lastStep = std::numeric_limits<size_t>::max();
@@ -189,7 +197,7 @@ class PikeVM
                 break;
             for(size_t i = 0; i < rdyThds.size(); ++i)
             {
-                Thread *th = &rdyThds[i];
+                Thread<CS> *th = rdyThds[i];
                 auto pc = th->pc;
 
                 switch(pc->op)
@@ -205,12 +213,12 @@ class PikeVM
                 case InstOpCode::Char:
                     if(pc->cp == cp && (pc + 1)->lastStep != step)
                     {
-                        th->pc++;
+                        ++th->pc;
                         th->pc->lastStep = step;
                         newThds.push_back(th);
                     }
                     else
-                        FreeThread(th);
+                        FreeThread(threadArena, th);
                     break;
                 case InstOpCode::Branch:
                     // IMPROVE: Save a copy construction when
@@ -228,19 +236,19 @@ class PikeVM
                         rdyThds.push_back(th);
                     }
                     else
-                        FreeThread(th);
+                        FreeThread(threadArena, th);
                     break;
                 case InstOpCode::Save:
                     if((pc + 1)->lastStep != step)
                     {
-                        th->saveSlots.Set(pc->saveSlot, it->CodeUnitIndex());
-                        th->pc++;
-                        th->lastStep = step;
+                        th->saveSlots.Set(pc->saveSlot, cpSeq.CodeUnitIndex(it));
+                        ++th->pc;
+                        th->pc->lastStep = step;
                         rdyThds.push_back(th);
                     }
                     break;
                 default:
-                    ::AGZ::Unreachable();
+                    Unreachable();
                 }
             }
 
@@ -250,11 +258,11 @@ class PikeVM
         }
 
         // Any thread matched?
-        for(Thread *th : rdyThds)
+        for(auto th : rdyThds)
         {
-            if(th->pc->op == InstOpCode::Matched)
+            if(th->pc->op == InstOpCode::Match)
             {
-                std::vector<std::pair<size_t, size_t>> slots(slotCount_ / 2);
+                std::vector<std::pair<size_t, size_t>> slots(slotCount / 2);
                 for(size_t i = 0; i < slots.size(); ++i)
                 {
                     slots[i].first  = th->saveSlots.Get(i << 2);

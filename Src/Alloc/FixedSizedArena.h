@@ -21,12 +21,13 @@ class FixedSizedArena
 
     size_t nodeSize_;
     size_t chunkSize_;
-    Chunk *chunkEntry_;
+
     Node *freeNodes_;
+    Chunk *chunkEntry_;
 
 public:
 
-    explicit FixedSizedArena(size_t nodeSize, size_t chunkSize = 32 * nodeSize)
+    explicit FixedSizedArena(size_t nodeSize, size_t chunkSize)
         : nodeSize_(nodeSize), chunkSize_(chunkSize),
           freeNodes_(nullptr), chunkEntry_(nullptr)
     {
@@ -55,7 +56,7 @@ public:
             return reinterpret_cast<T*>(ret);
         }
 
-        Chunk *nChunk = Alloc::Malloc(chunkSize_);
+        Chunk *nChunk = reinterpret_cast<Chunk*>(Alloc::Malloc(chunkSize_));
         nChunk->next = chunkEntry_;
         chunkEntry_ = nChunk;
 

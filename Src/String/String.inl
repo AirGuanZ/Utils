@@ -271,7 +271,7 @@ CodePointRange<CS>::CodePointRange(const String<CS> &str, const CodeUnit *beg,
 }
 
 template<typename CS>
-typename CodePointRange<CS>::Iterator CodePointRange<CS>>::begin() const
+typename CodePointRange<CS>::Iterator CodePointRange<CS>::begin() const
 {
     return Iterator(beg_);
 }
@@ -292,7 +292,7 @@ StringView<CS>::CharRange::Iterator::Iterator(const String<CS> &str, InIt it)
 template<typename CS>
 StringView<CS> StringView<CS>::CharRange::Iterator::operator*() const
 {
-    auto [b, e] = CS::CodeUnitsFromCodePointIterator(it);
+    auto [b, e] = CS::CodeUnitsFromCodePointIterator(it_);
     return StringView<CS>(str_, b, e - b);
 }
 
@@ -307,7 +307,7 @@ template<typename CS>
 typename StringView<CS>::CharRange::Iterator &
 StringView<CS>::CharRange::Iterator::operator++()
 {
-    ++it;
+    ++it_;
     return *this;
 }
 
@@ -324,7 +324,7 @@ template<typename CS>
 typename StringView<CS>::CharRange::Iterator &
 StringView<CS>::CharRange::Iterator::operator--()
 {
-    --it;
+    --it_;
     return *this;
 }
 

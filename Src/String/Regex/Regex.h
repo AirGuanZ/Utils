@@ -63,7 +63,7 @@ public:
 
     const StrView &GetMatchSegments(size_t idx) const
     {
-        return (*this)[idx]
+        return (*this)[idx];
     }
 
     const StrView &operator[](size_t idx) const

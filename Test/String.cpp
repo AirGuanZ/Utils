@@ -83,4 +83,9 @@ TEST_CASE("String")
         REQUIRE(Str8(u8"Minecraft").Find(u8"eecraft") == Str8::NPOS);
         REQUIRE(Str8(u8"Minecraft").Find(u8"er") == Str8::NPOS);
     }
+
+    SECTION("Regex")
+    {
+
+    }
 }

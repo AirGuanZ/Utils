@@ -1,5 +1,6 @@
 #pragma once
 
+#include <exception>
 #include <stdexcept>
 
 #include "Config.h"
@@ -44,6 +45,17 @@
 #endif
 
 AGZ_NS_BEG(AGZ)
+
+[[noreturn]]AGZ_FORCEINLINE void Unreachable()
+{
+#ifdef _MSC_VER
+    __assume(0);
+#elif defined(__GUNC__)
+    __builtin_unreachable();
+#else
+    std::terminate();
+#endif
+}
 
 struct Uninitialized_t { };
 inline Uninitialized_t UNINITIALIZED;

@@ -45,6 +45,7 @@ public:
 
         bool operator!=(const Self &rhs) const { return !(*this == rhs); }
 
+        const T *CodeUnitsBegin() const { return cur; }
         std::pair<const T *, const T *> CodeUnits() const;
     };
 

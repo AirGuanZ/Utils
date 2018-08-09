@@ -7,11 +7,29 @@ AGZ_NS_BEG(AGZ)
 namespace CharsetAux
 {
     template<typename It>
+    struct CodeUnitsBeginFromCodePointIteratorImpl
+    {
+        static auto Eval(const It &it)
+        {
+            return it.CodeUnitsBegin();
+        }
+    };
+
+    template<typename CU>
+    struct CodeUnitsBeginFromCodePointIteratorImpl<CU*>
+    {
+        static auto Eval(const CU *it)
+        {
+            return it;
+        }
+    };
+
+    template<typename It>
     struct CodeUnitsFromCodePointIteratorImpl
     {
         static auto Eval(const It &it)
         {
-            return it.CodeUnitsFromCodePointIterator();
+            return it.CodeUnits();
         }
     };
 
@@ -65,7 +83,7 @@ public:
         while(beg < end && buf_size)
         {
             CodePoint cp;
-            adv = CU2CP(beg, &cp);
+            size_t adv = CU2CP(beg, &cp);
             if(!adv)
                 return 0;
             size_t tsize = OCS::CP2CU(To<OCS>(cp), tBuf);
@@ -98,11 +116,19 @@ public:
                cu == '\n' || cu == '\r';
     }
 
+
+    static const CodeUnit *
+        CodeUnitsBeginFromCodePointIterator(const typename Core::Iterator &it)
+    {
+        return CharsetAux::CodeUnitsBeginFromCodePointIteratorImpl<
+            typename Core::Iterator>::Eval(it);
+    }
+
     static std::pair<const CodeUnit*, const CodeUnit*>
     CodeUnitsFromCodePointIterator(const typename Core::Iterator &it)
     {
         return CharsetAux::CodeUnitsFromCodePointIteratorImpl<
-                                    typename Core::Iterator>(it);
+                                    typename Core::Iterator>::Eval(it);
     }
 };
 

@@ -22,6 +22,9 @@
     <Filter Include="Alloc">
       <UniqueIdentifier>{bbc86d95-b5c8-4adc-b421-2e908041f776}</UniqueIdentifier>
     </Filter>
+    <Filter Include="String\Regex">
+      <UniqueIdentifier>{90cdbbff-e04e-48e3-a5b6-07094d331477}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Math\Scalar.h">
@@ -145,9 +148,6 @@
     <ClInclude Include="..\Src\String\Charset\UTF32.h">
       <Filter>String\Charset</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\String\Regex.h">
-      <Filter>String</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Alloc\Alloc.h">
       <Filter>Alloc</Filter>
     </ClInclude>
@@ -156,6 +156,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\Alloc\Malloc.h">
       <Filter>Alloc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Regex\PikeVM.h">
+      <Filter>String\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Regex\Regex.h">
+      <Filter>String\Regex</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

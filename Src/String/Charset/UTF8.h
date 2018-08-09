@@ -36,6 +36,7 @@ public:
     bool operator==(const Self &rhs) const;
     bool operator!=(const Self &rhs) const;
 
+    const T *CodeUnitsBegin() const { return cur; }
     std::pair<const T *, const T *> CodeUnits() const;
 };
 
@@ -178,26 +179,26 @@ UTF8Core<T>::NextCodePoint(const CodeUnit *cur)
         return cur + 1;
     if((fst & 0b11100000) == 0b11000000)
     {
-        if((++*cur & 0b11000000) != 0b10000000)
-            throw EncodingException("Advancing in invalid UTF-8 sequence");
+        if((*++cur & 0b11000000) != 0b10000000)
+            throw CharsetException("Advancing in invalid UTF-8 sequence");
         return cur + 1;
     }
     if((fst & 0b11110000) == 0b11100000)
     {
-        if((++*cur & 0b11000000) != 0b10000000 ||
-           (++*cur & 0b11000000) != 0b10000000)
-            throw EncodingException("Advancing in invalid UTF-8 sequence");
+        if((*++cur & 0b11000000) != 0b10000000 ||
+           (*++cur & 0b11000000) != 0b10000000)
+            throw CharsetException("Advancing in invalid UTF-8 sequence");
         return cur + 1;
     }
     if((fst & 0b11111000) == 0b11110000)
     {
-        if((++*cur & 0b11000000) != 0b10000000 ||
-           (++*cur & 0b11000000) != 0b10000000 ||
-           (++*cur & 0b11000000) != 0b10000000)
-           throw EncodingException("Advancing in invalid UTF-8 sequence");
+        if((*++cur & 0b11000000) != 0b10000000 ||
+           (*++cur & 0b11000000) != 0b10000000 ||
+           (*++cur & 0b11000000) != 0b10000000)
+           throw CharsetException("Advancing in invalid UTF-8 sequence");
         return cur + 1;
     }
-    throw EncodingException("Advancing in invalid UTF-8 sequence");
+    throw CharsetException("Advancing in invalid UTF-8 sequence");
 }
 
 template<typename T>
@@ -221,7 +222,7 @@ char32_t UTF8Iterator<T>::operator*() const
 {
     char32_t ret;
     if(!UTF8Core<T>::CU2CP(cur, &ret))
-        throw EncodingException("Dereferencing invalid UTF-8 iterator");
+        throw CharsetException("Dereferencing invalid UTF-8 iterator");
     return ret;
 }
 
