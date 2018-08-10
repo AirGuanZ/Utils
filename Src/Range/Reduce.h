@@ -24,8 +24,10 @@ namespace RangeAux
 template<typename I, typename F>
 auto Reduce(I &&init, F &&func)
 {
-    return RangeAux::AggregateWrapper<RangeAux::ReduceRHS<I, F>, I, F>(
-                            std::forward<I>(init), std::forward<F>(func));
+    return RangeAux::AggregateWrapper<RangeAux::ReduceRHS<
+                remove_rcv_t<I>, remove_rcv_t<F>>,
+                remove_rcv_t<I>, remove_rcv_t<F>>(
+                    std::forward<I>(init), std::forward<F>(func));
 }
 
 AGZ_NS_END(AGZ)

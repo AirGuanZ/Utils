@@ -36,15 +36,17 @@ namespace RangeAux
 template<typename F>
 auto Each(F &&func)
 {
-    return RangeAux::AggregateWrapper<RangeAux::EachRHS<F>, F>(
-        std::forward<F>(func));
+    return RangeAux::AggregateWrapper<RangeAux::EachRHS<
+                remove_rcv_t<F>>, remove_rcv_t<F>>(
+                    std::forward<F>(func));
 }
 
 template<typename F>
 auto EachIndex(F &&func)
 {
-    return RangeAux::AggregateWrapper<RangeAux::EachIndexRHS<F>, F>(
-        std::forward<F>(func));
+    return RangeAux::AggregateWrapper<RangeAux::EachIndexRHS<
+                remove_rcv_t<F>>, remove_rcv_t<F>>(
+                    std::forward<F>(func));
 }
 
 AGZ_NS_END(AGZ)

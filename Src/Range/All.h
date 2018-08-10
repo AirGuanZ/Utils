@@ -26,8 +26,9 @@ namespace RangeAux
 template<typename F>
 bool All(F &&func)
 {
-    return RangeAux::AggregateWrapper<RangeAux::AllRHS<F>, F>(
-                            std::forward<F>(func));
+    return RangeAux::AggregateWrapper<RangeAux::AllRHS<
+                remove_rcv_t<F>>, remove_rcv_t<F>>(
+                    std::forward<F>(func));
 }
 
 AGZ_NS_END(AGZ)

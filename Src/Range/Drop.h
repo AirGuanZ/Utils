@@ -77,8 +77,9 @@ template<typename F>
 auto DropWhile(F &&func)
 {
     return RangeAux::TransformWrapper<
-            RangeAux::DropWhileTrait<F>, F>(
-                std::forward<F>(func));
+            RangeAux::DropWhileTrait<
+                remove_rcv_t<F>>, remove_rcv_t<F>>(
+                    std::forward<F>(func));
 }
 
 AGZ_NS_END(AGZ)
