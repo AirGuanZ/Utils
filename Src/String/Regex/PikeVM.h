@@ -383,7 +383,8 @@ private:
             */
             if(AdvanceIf('*'))
             {
-                auto branch = EmitFront(out, MakeBranch(&out.insts.front(), nullptr));
+                auto branch = EmitFront(
+                        out, MakeBranch(&out.insts.front(), nullptr));
                 Emit(out, MakeJump(branch));
                 FillBP(out, branch);
                 out.bps.push_back(&branch->branchDest[1]);
@@ -394,7 +395,8 @@ private:
             */
             else if(AdvanceIf('+'))
             {
-                auto branch = Emit(out, MakeBranch(&out.insts.front(), nullptr));
+                auto branch = Emit(
+                        out, MakeBranch(&out.insts.front(), nullptr));
                 FillBP(out, branch);
                 out.bps.push_back(&branch->branchDest[1]);
             }
@@ -404,7 +406,8 @@ private:
             */
             else if(AdvanceIf('?'))
             {
-                auto branch = EmitFront(out, MakeBranch(&out.insts.front(), nullptr));
+                auto branch = EmitFront(
+                        out, MakeBranch(&out.insts.front(), nullptr));
                 out.bps.push_back(&branch->branchDest[1]);
             }
             else
@@ -605,11 +608,26 @@ class PikeMachine
                     else
                         FreeThread(threadArena, th);
                     break;
+                
+                case InstOpCode::Alter:
+                    // IMPROVE: Ditto
+                    for(auto dest : *pc->alterDest)
+                    {
+                        if(dest->lastStep != step)
+                        {
+                            dest->lastStep = step;
+                            rdyThds.push_back(NewThread(threadArena,
+                                dest, SaveSlots(th->saveSlots)));
+                        }
+                    }
+                    FreeThread(threadArena, th);
+                    break;
 
                 case InstOpCode::Save:
                     if((pc + 1)->lastStep != step)
                     {
-                        th->saveSlots.Set(pc->saveSlot, cpSeq.CodeUnitIndex(it));
+                        th->saveSlots.Set(pc->saveSlot,
+                                          cpSeq.CodeUnitIndex(it));
                         ++th->pc;
                         th->pc->lastStep = step;
                         rdyThds.push_back(th);
