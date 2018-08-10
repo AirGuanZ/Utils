@@ -33,6 +33,8 @@ AGZ_NS_BEG(AGZ::RegexImpl)
 template<typename CS>
 class Match
 {
+    bool valid_;
+    size_t offset_;
     String<CS> whole_;
     std::vector<typename String<CS>::View> segs_;
 
@@ -43,17 +45,61 @@ public:
     using Self     = Match<CS>;
     using Iterator = GetIteratorType<decltype(segs_)>;
 
-    Match();
-    Match(Str &&whole, std::vector<std::pair<size_t, size_t>> &&segs);
-    Match(const Self &copyFrom);
-    Match(Self &&moveFrom);
+    Match()
+        : valid_(false)
+    {
 
-    Self &operator=(const Self &copyFrom);
-    Self &operator=(Self &&moveFrom);
+    }
+
+    Match(size_t offset, Str &&whole,
+          std::vector<std::pair<size_t, size_t>> &&segs)
+        : valid_(true), offset_(offset), whole_(std::move(whole))
+    {
+        for(auto &seg : segs)
+            segs_.push_back(whole_.Slice(seg.first, seg.second));
+    }
+
+    Match(const Self&) = delete;
+
+    Match(Self &&moveFrom)
+        : valid_(moveFrom.valid_),
+          offset_(moveFrom.offset_),
+          whole_(std::move(moveFrom.whole_)),
+          segs_(std::move(moveFrom.segs_))
+    {
+        moveFrom_.valid_ = false;
+    }
+
+    Self &operator=(const Self&) = delete;
+
+    Self &operator=(Self &&moveFrom)
+    {
+        valid_  = moveFrom.valid_;
+        offset_ = moveFrom.offset_;
+        whole_  = std::move(moveFrom.whole_);
+        segs_   = std::move(moveFrom.segs_);
+        moveFrom.valid_ = false;
+    }
+
+    operator bool() const
+    {
+        return Valid();
+    }
+
+    bool Valid() const
+    {
+        return valid_;
+    }
 
     size_t Size() const
     {
         return segs_.size();
+    }
+
+    size_t GetOffset() const
+    {
+        AGZ_ASSERT(Valid());
+        return offset_;
     }
 
     const Str &GetWholeMatch() const
@@ -80,6 +126,49 @@ public:
     Iterator end()   const
     {
         return segs_.end();
+    }
+};
+
+template<typename CS, typename Eng = Pike::PikeMachine<CS>>
+class Regex
+{
+    Eng engine_;
+
+public:
+
+    using Charset   = CS;
+    using CodeUnit  = typename CS::CodeUnit;
+    using CodePoint = typename CS::CodePoint;
+    using Engine    = Eng;
+    using Self      = Regex<CS, Eng>;
+
+    Regex(const StringView<CS> &expr)
+        : engine_(expr)
+    {
+
+    }
+
+    Regex(const String<CS> &expr)
+        : Regex(expr.AsView())
+    {
+
+    }
+
+    Regex(const Self&)           = delete;
+    Self &operator=(const Self&) = delete;
+    ~Regex()                     = default;
+
+    Match<CS> Match(const StringView<CS> &dst) const
+    {
+        auto [succ, subs] = engine_.Match(dst);
+        if(!succ)
+            return Match<CS>();
+        return std::move(Match<CS>(dst, subs));
+    }
+
+    Match<CS> Match(const String<CS> &dst) const
+    {
+        return Match(dst.AsView());
     }
 };
 

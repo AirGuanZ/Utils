@@ -226,21 +226,21 @@ public:
                  size_t *slotCount)
     {
         AGZ_ASSERT(insts && slotCount);
-        
+
         cpSeq = expr.CodePoints();
         cur_  = cpSeq.begin();
         end_  = cpSeq.end();
-        
+
         nextSaveSlot_  = 0;
         inSubmatching_ = false;
-        
+
         PartialResult result;
-        ParseRegex(result);
+        CompileRegex(result);
         FillBP(result, Emit(result, MakeMatch()));
-        
+
         if(cur_ != end_)
             Err();
-        
+
         *insts     = std::move(result.insts);
         *slotCount = slotCount_;
     }
@@ -287,20 +287,20 @@ private:
         out.push_front(inst);
         return &out.front();
     }
-    
+
     void Concat(L<Inst> &lhs, L<Inst> &&rhs)
     {
         lhs.splice(lhs.end(), std::move(rhs));
     }
-    
+
     void FillBP(PartialResult &out, const Inst *value)
     {
         for(auto &p : out.bps)
             p = value;
         out.bps.clear();
     }
-    
-    bool ParseChar(PartialResult &out)
+
+    bool CompileChar(PartialResult &out)
     {
         if(IsEnd())
             return false;
@@ -356,24 +356,24 @@ private:
         return true;
     }
 
-    bool ParseCore(PartialResult &out)
+    bool CompileCore(PartialResult &out)
     {
         if(IsEnd())
             return false;
         if(AdvanceIf('('))
         {
-            ParseRegex(out);
+            CompileRegex(out);
             AdvanceOrErr(')');
             return true;
         }
-        return ParseChar(out);
+        return CompileChar(out);
     }
-    
-    bool ParseFac(PartialResult &out)
+
+    bool CompileFac(PartialResult &out)
     {
-        if(!ParseCore(out))
+        if(!CompileCore(out))
             return false;
-        
+
         for(;;)
         {
             /*
@@ -410,27 +410,27 @@ private:
             else
                 break;
         }
-        
+
         return true;
     }
 
-    bool ParseCat(PartialResult &out)
+    bool CompileCat(PartialResult &out)
     {
         if(AdvanceIf('$'))
         {
             if(inSubmatching_)
                 Err();
             inSubmatching_ = true;
-            ParseCat(out);
+            CompileCat(out);
             inSubmatching_ = false;
-            
+
             EmitFront(out, MakeSave(nextSaveSlot_));
             FillBP(out, Emit(out, MakeSave(nextSaveSlot_ + 1)));
             nextSaveSlot_ += 2;
-            
+
             return true;
         }
-        
+
         /*
             A | B | C | D =>
                     Alter(L0, L1, L2, L3)
@@ -448,55 +448,55 @@ private:
             while(!AdvanceIf(']'))
             {
                 facs.push_back(PartialResult());
-                if(!ParseFac(facs.back()))
+                if(!CompileFac(facs.back()))
                     Err();
             }
-            
+
             if(facs.empty())
                 Err();
-            
+
             if(facs.size() == 1)
             {
                 out.lists = std::move(facs.front().lists);
                 out.bps   = std::move(facs.front().bps);
                 return true;
             }
-            
+
             for(auto &rt : facs)
                 out.bps.splice(out.bps.end(), rt.bps);
-            
+
             Concat(out.insts, std::move(facs.front().insts));
             std::vector<const Inst*> alterDest = { &out.insts.front() };
-            
+
             auto it = facs.begin();
-            for(++it; it 1= facs.end(); ++it)
+            for(++it; it != facs.end(); ++it)
             {
                 auto jump = Emit(out, MakeJump(nullptr));
                 out.bps.push_back(&jump->jumpDest);
-                
+
                 alterDest.push_back(&it->insts.front());
                 Concat(out.insts, std::move(it->insts));
             }
-            
+
             EmitFront(out, MakeAlter(std::move(alterDest)));
-            
+
             return true;
         }
-        
-        return ParseFac(out);
+
+        return CompileFac(out);
     }
-    
-    void ParseRegex(PartialResult &out)
+
+    void CompileRegex(PartialResult &out)
     {
-        if(!ParseCat(out))
+        if(!CompileCat(out))
             return;
         PartialResult trt;
-        while(ParseCat(trt))
+        while(CompileCat(trt))
         {
             FillBP(out, &trt.insts.front());
             Concat(out, trt);
             out.bps = std::move(trt.bps);
-            
+
             AGZ_ASSERT(trt.insts.empty() && trt.bps.empty());
         }
     }
@@ -531,7 +531,7 @@ class PikeMachine
     }
 
     std::pair<bool, std::vector<std::pair<size_t, size_t>>>
-        Run(const StringView<CS> &dst)
+        MatchImpl(const StringView<CS> &dst)
     {
         AGZ_ASSERT(slotCount_ % 2 == 0);
 
@@ -556,7 +556,7 @@ class PikeMachine
             CodePoint cp = *it;
             if(rdyThds.empty())
                 break;
-            
+
             for(size_t i = 0; i < rdyThds.size(); ++i)
             {
                 Thread<CS> *th = rdyThds[i];
@@ -574,7 +574,7 @@ class PikeMachine
                     else
                         FreeThread(threadArena, th);
                     break;
-                    
+
                 case InstOpCode::Char:
                     if(pc->cp == cp && (pc + 1)->lastStep != step)
                     {
@@ -585,10 +585,11 @@ class PikeMachine
                     else
                         FreeThread(threadArena, th);
                     break;
-                    
+
                 case InstOpCode::Branch:
-                    // IMPROVE: Save a copy construction when
-                    //      dest[0] != step and dest[1] == step
+                    // IMPROVE: Copy construction is unnecessary when
+                    //              dest[0]->lastStep != step and
+                    //              dest[1]->lastStep == step
                     if(pc->branchDest[0]->lastStep != step)
                     {
                         pc->branchDest[0]->lastStep = step;
@@ -604,7 +605,7 @@ class PikeMachine
                     else
                         FreeThread(threadArena, th);
                     break;
-                    
+
                 case InstOpCode::Save:
                     if((pc + 1)->lastStep != step)
                     {
@@ -614,7 +615,10 @@ class PikeMachine
                         rdyThds.push_back(th);
                     }
                     break;
-                    
+
+                case InstOpCode::Match:
+                    FreeThread(threadArena, th);
+
                 default:
                     Unreachable();
                 }
@@ -657,17 +661,17 @@ public:
     RegexEngine(connst StringView<CS> &regex)
         : regex_(regex), slotCount_(0)
     {
-        
+
     }
-    
+
     std::pair<bool, std::vector<std::pair<size_t, size_t>>>
     Match(const StringView<CS> &dst) const
     {
         if(prog_.empty())
             Compile();
         AGZ_ASSERT(prog_.size() && regex_.Empty());
-        
-        return Run(prog_. slotCount_, dst);
+
+        return MatchImpl(prog_. slotCount_, dst);
     }
 };
 
