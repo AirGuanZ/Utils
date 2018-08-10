@@ -1,6 +1,7 @@
 #pragma once
 
 #include <limits>
+#include <list>
 #include <type_traits>
 #include <vector>
 
@@ -99,7 +100,8 @@ enum class InstOpCode
 {
     Char,   // Match single character
     Jump,   // Unconditional Jump
-    Branch, // Branch into two execution threads
+    Branch, // Branch into two threads
+    Alter,  // Branch into many threads
     Save,   // Save current data pointer to given slot
     Match   // Report a successful matching
 };
@@ -114,10 +116,11 @@ struct Instruction
     // Instruction arguments
     union
     {
-        CP cp;                            // For Char
-        const Instruction *jumpDest;      // For Jump
-        const Instruction *branchDest[2]; // For Branch
-        size_t saveSlot;                  // For Save
+        CP cp;                                // For Char
+        const Instruction<CP> *jumpDest;      // For Jump
+        const Instruction<CP> *branchDest[2]; // For Branch
+        size_t saveSlot;                      // For Save
+        std::vector<const Instruction<CP>> *alterDest;
     };
 
     // Character index when last thread running at this instruction
@@ -126,6 +129,47 @@ struct Instruction
     mutable size_t lastStep;
 };
 
+Inst MakeChar(CP cp)
+{
+    Inst ret = { InstOpCode::Char };
+    ret.cp = cp;
+    return ret;
+}
+
+Inst MakeJump(const Instruction<CP> * dst)
+{
+    Inst ret = { InstOpCode::Jump };
+    ret.jumpDest = dst;
+    return ret;
+}
+
+Inst MakeBranch(const Instruction<CP> *d0, const Instruction<CP> *d1)
+{
+    Inst ret = { InstOpCode::Branch };
+    ret.branchDest[0] = d0; ret.branchDest[1] = d1;
+    return ret;
+}
+
+Inst MakeAlter(std::vector<const Instruction<CP>*> &&ds)
+{
+    Inst ret = { InstOpCode::Alter };
+    ret.alterDest = new std::vector<const Instruction<CP>*>(std::move(ds));
+    return ret;
+}
+
+Inst MakeSave(size_t slot)
+{
+    Inst ret = { InstOpCode::Save };
+    ret.saveSlot = slot;
+    return ret;
+}
+
+Inst MakeMatch()
+{
+    Inst ret = { InstOpCode::Match };
+    return ret;
+}
+
 template<typename CS>
 struct Thread
 {
@@ -133,70 +177,328 @@ struct Thread
            SaveSlots &&saveSlots)
         : pc(pc), saveSlots(std::move(saveSlots))
     {
-        
+
     }
 
     const Instruction<typename CS::CodePoint> *pc;
     SaveSlots saveSlots;
 };
 
+/* Grammars
+    Regex  := Cat Cat ... Cat
+    Cat    := [Fac Fac ... Fac] | Fac | $Cat
+    Fac    := Fac* | Fac+ | Fac? | Core
+    Core   := Char | (Regex)
+
+   Rules
+    A | B | C =>     Branch(L0, L1)
+                 L0: Branch(L2, L3)
+                 L1: Inst(A)
+                     Jump(Out)
+                 L2: Inst(B)
+                     Jump(Out)
+                 L3: Inst(C)
+
+    AB => Inst(A)
+          Inst(B)
+
+    $A => Save(SlotPairIndex * 2)
+          Inst(A)
+          Save(SlotPairIndex * 2 + 1)
+
+    A* => L0: Branch(L1, Out)
+          L1: Inst(A)
+              Jump(L0)
+
+    A+ => L0: Inst(A)
+              Branch(L0, Out)
+
+    A? =>     Branch(L0, Out)
+          L0: Inst(A)
+*/
 template<typename CS>
 class PikeCompiler
 {
 public:
 
-    using CP    = typename CS::CodePoint;
-    using Inst  = Instruction<CP>;
-    using Insts = std::vector<Inst>;
-    using It    = typename CS::Iterator;
-
-    bool inSub_ = false;
-    const StringView<CS> *src_ = nullptr;
-
-    It cur_, end_;
-
-    Insts *insts_;
+    void Compile(const StringView<CS> &expr,
+                 std::list<Instruction<CS>> *insts,
+                 size_t *slotCount)
+    {
+        AGZ_ASSERT(insts && slotCount);
+        
+        cpSeq = expr.CodePoints();
+        cur_  = cpSeq.begin();
+        end_  = cpSeq.end();
+        
+        nextSaveSlot_  = 0;
+        inSubmatching_ = false;
+        
+        PartialResult result;
+        ParseRegex(result);
+        FillBP(result, Emit(result, MakeMatch()));
+        
+        if(cur_ != end_)
+            Err();
+        
+        *insts     = std::move(result.insts);
+        *slotCount = slotCount_;
+    }
 
 private:
 
-    /* Grammar
-        Regex  := Cat Cat ... Cat
-        Cat    := [Factor Factor ... Factor] | Factor | $Cat
-        Factor := Factor* | Factor+ | Factor? | Core
-        Core   := Char | (Regex)
-    */
-    size_t ParseRegex()
+    using CP        = typename CS::CodePoint;
+    using Inst      = Instruction<CodePoint>;
+    using CInstPtr  = const Inst*;
+    using It        = typename CS::Iterator;
+
+    template<typename T>
+    using L = std::list<L>;
+
+    It cur_, end_;
+    size_t nextSaveSlot_;
+    bool inSubmatching_;
+
+    bool IsEnd()     const   { return cur_ == end_;                          }
+    CP   CurCh()     const   { AGZ_ASSERT(!IsEnd()); return *cur_;           }
+    CP   CurAndAdv() const   { CP rt = CurCh(); Advance(); return rt;        }
+    bool Match(CP cp)        { return !IsEnd() && CurCh() == cp;             }
+    void Advance()           { AGZ_ASSERT(!IsEnd()); ++cur_;                 }
+    bool AdvanceIf(CP cp)    { return Match(cp) ? (Advance(), true) : false; }
+    bool AdvanceOrErr(CP cp) { if(!AdvanceIf(cp)) Err();                     }
+
+    [[noreturn]] void Err() { throw ArgumentException("Invalid regex"); }
+    void ErrIfEnd() const { if(IsEnd()) Err(); }
+
+    struct PartialResult
     {
-        size_t ret = 0, dret;
-        while(ParseCat(&dret))
-            ret += dret;
-        return ret;
+        L<Inst> insts;
+        L<CInstPtr> bps;
+    };
+
+    Inst *Emit(PartialResult &out, const Inst &inst)
+    {
+        out.insts.push_back(inst);
+        return &out.back();
     }
 
-    bool ParseCat(size_t *slotCount)
+    Inst EmitFront(PartialResult &out, const Inst &inst)
     {
-        // TODO
-        *slotCount = 0;
+        out.push_front(inst);
+        return &out.front();
+    }
+    
+    void Concat(L<Inst> &lhs, L<Inst> &&rhs)
+    {
+        lhs.splice(lhs.end(), std::move(rhs));
+    }
+    
+    void FillBP(PartialResult &out, const Inst *value)
+    {
+        for(auto &p : out.bps)
+            p = value;
+        out.bps.clear();
+    }
+    
+    bool ParseChar(PartialResult &out)
+    {
+        if(IsEnd())
+            return false;
+        CP cp = CurCh();
+
+        // Special symbol
+        switch(cp)
+        {
+        case '[':
+        case ']':
+        case '(':
+        case ')':
+        case '+':
+        case '*':
+        case '?':
+        case '$':
+            return false;
+        }
+
+        Advance();
+        CP dst;
+
+        // Escape
+        if(cp == '\\')
+        {
+            ErrIfEnd();
+            CodePoint next = CurAndAdv();
+            switch(next)
+            {
+            case 'a': dst = '\a'; break;
+            case 'b': dst = '\b'; break;
+            case 'n': dst = '\n'; break;
+            case 'r': dst = '\r'; break;
+            case 't': dst = '\t'; break;
+            case '[':
+            case ']':
+            case '(':
+            case ')':
+            case '+':
+            case '*':
+            case '?':
+            case '$':
+            case '\\':
+                dst = next; break;
+            default:
+                Err();
+            }
+        }
+        else
+            dst = cp;
+
+        Emit(out, MakeChar(dst));
         return true;
     }
 
-public:
-
-    void Compile(const StringView<CS> &src,
-                 Insts &insts, size_t *slotCount)
+    bool ParseCore(PartialResult &out)
     {
-        AGZ_ASSERT(slotCount);
+        if(IsEnd())
+            return false;
+        if(AdvanceIf('('))
+        {
+            ParseRegex(out);
+            AdvanceOrErr(')');
+            return true;
+        }
+        return ParseChar(out);
+    }
+    
+    bool ParseFac(PartialResult &out)
+    {
+        if(!ParseCore(out))
+            return false;
+        
+        for(;;)
+        {
+            /*
+                A* => L0: Branch(L1, Out)
+                      L1: Inst(A)
+                          Jump(L0)
+            */
+            if(AdvanceIf('*'))
+            {
+                auto branch = EmitFront(out, MakeBranch(&out.insts.front(), nullptr));
+                Emit(out, MakeJump(branch));
+                FillBP(out, branch);
+                out.bps.push_back(&branch->branchDest[1]);
+            }
+            /*
+                A+ => L0: Inst(A)
+                          Branch(L0, Out)
+            */
+            else if(AdvanceIf('+'))
+            {
+                auto branch = Emit(out, MakeBranch(&out.insts.front(), nullptr));
+                FillBP(out, branch);
+                out.bps.push_back(&branch->branchDest[1]);
+            }
+            /*
+                A? =>     Branch(L0, Out)
+                      L0: Inst(A)
+            */
+            else if(AdvanceIf('?'))
+            {
+                auto branch = EmitFront(out, MakeBranch(&out.insts.front(), nullptr));
+                out.bps.push_back(&branch->branchDest[1]);
+            }
+            else
+                break;
+        }
+        
+        return true;
+    }
 
-        auto cpSeq = src.CodePoints();
-
-        inSub_     = false;
-        src_       = &src;
-        cur_       = cpSeq.begin();
-        end_       = cpSeq.end();
-        *slotCount = ParseRegex();
-
-        if(cur_ != end_)
-            throw ArgumentException("Invalid regular expression");
+    bool ParseCat(PartialResult &out)
+    {
+        if(AdvanceIf('$'))
+        {
+            if(inSubmatching_)
+                Err();
+            inSubmatching_ = true;
+            ParseCat(out);
+            inSubmatching_ = false;
+            
+            EmitFront(out, MakeSave(nextSaveSlot_));
+            FillBP(out, Emit(out, MakeSave(nextSaveSlot_ + 1)));
+            nextSaveSlot_ += 2;
+            
+            return true;
+        }
+        
+        /*
+            A | B | C | D =>
+                    Alter(L0, L1, L2, L3)
+                L0: Inst(A)
+                    Jump(Out)
+                L1: Inst(B)
+                    Jump(Out)
+                L2: Inst(C)
+                    Jump(Out)
+                L3: Inst(D)
+        */
+        if(AdvanceIf('['))
+        {
+            L<PartialResult> facs;
+            while(!AdvanceIf(']'))
+            {
+                facs.push_back(PartialResult());
+                if(!ParseFac(facs.back()))
+                    Err();
+            }
+            
+            if(facs.empty())
+                Err();
+            
+            if(facs.size() == 1)
+            {
+                out.lists = std::move(facs.front().lists);
+                out.bps   = std::move(facs.front().bps);
+                return true;
+            }
+            
+            for(auto &rt : facs)
+                out.bps.splice(out.bps.end(), rt.bps);
+            
+            Concat(out.insts, std::move(facs.front().insts));
+            std::vector<const Inst*> alterDest = { &out.insts.front() };
+            
+            auto it = facs.begin();
+            for(++it; it 1= facs.end(); ++it)
+            {
+                auto jump = Emit(out, MakeJump(nullptr));
+                out.bps.push_back(&jump->jumpDest);
+                
+                alterDest.push_back(&it->insts.front());
+                Concat(out.insts, std::move(it->insts));
+            }
+            
+            EmitFront(out, MakeAlter(std::move(alterDest)));
+            
+            return true;
+        }
+        
+        return ParseFac(out);
+    }
+    
+    void ParseRegex(PartialResult &out)
+    {
+        if(!ParseCat(out))
+            return;
+        PartialResult trt;
+        while(ParseCat(trt))
+        {
+            FillBP(out, &trt.insts.front());
+            Concat(out, trt);
+            out.bps = std::move(trt.bps);
+            
+            AGZ_ASSERT(trt.insts.empty() && trt.bps.empty());
+        }
     }
 };
 
@@ -209,8 +511,9 @@ class PikeMachine
 
     using Arena = FixedSizedArena<>;
 
-    std::vector<Instruction<typename CS::CodePoint>> prog_;
-    String<CS> regex_;
+    mutable std::list<Instruction<typename CS::CodePoint>> prog_;
+    mutable size_t slotCount_;
+    mutable String<CS> regex_;
 
     static Thread<CS> *NewThread(
         Arena &arena,
@@ -227,24 +530,22 @@ class PikeMachine
         arena.Free(th);
     }
 
-    static std::pair<bool, std::vector<std::pair<size_t, size_t>>> Run(
-        const std::vector<Instruction<CodePoint>> prog,
-        size_t slotCount,
-        const StringView<CS> &dst)
+    std::pair<bool, std::vector<std::pair<size_t, size_t>>>
+        Run(const StringView<CS> &dst)
     {
-        AGZ_ASSERT(slotCount % 2 == 0);
+        AGZ_ASSERT(slotCount_ % 2 == 0);
 
         Arena threadArena(sizeof(Thread<CS>), 32 * sizeof(Thread<CS>));
-        Arena slotsArena(SaveSlots::AllocSize(slotCount),
-                         32 * SaveSlots::AllocSize(slotCount));
+        Arena slotsArena(SaveSlots::AllocSize(slotCount_),
+                         32 * SaveSlots::AllocSize(slotCount_));
 
         std::vector<Thread<CS>*> rdyThds = {
-            NewThread(threadArena, &prog[0],
-                      SaveSlots(slotCount, slotsArena))
+            NewThread(threadArena, &prog_.front(),
+                      SaveSlots(slotCount_, slotsArena))
         };
         std::vector<Thread<CS>*> newThds;
 
-        for(auto &inst : prog)
+        for(auto &inst : prog_)
             inst.lastStep = std::numeric_limits<size_t>::max();
 
         size_t step = 0;
@@ -255,6 +556,7 @@ class PikeMachine
             CodePoint cp = *it;
             if(rdyThds.empty())
                 break;
+            
             for(size_t i = 0; i < rdyThds.size(); ++i)
             {
                 Thread<CS> *th = rdyThds[i];
@@ -266,10 +568,13 @@ class PikeMachine
                     if(pc->jumpDest->lastStep != step)
                     {
                         th->pc = pc->jumpDest;
-                        pc->jumpDest->lastStep = i;
+                        th->pc->lastStep = i;
                         rdyThds.push_back(th);
                     }
+                    else
+                        FreeThread(threadArena, th);
                     break;
+                    
                 case InstOpCode::Char:
                     if(pc->cp == cp && (pc + 1)->lastStep != step)
                     {
@@ -280,6 +585,7 @@ class PikeMachine
                     else
                         FreeThread(threadArena, th);
                     break;
+                    
                 case InstOpCode::Branch:
                     // IMPROVE: Save a copy construction when
                     //      dest[0] != step and dest[1] == step
@@ -298,6 +604,7 @@ class PikeMachine
                     else
                         FreeThread(threadArena, th);
                     break;
+                    
                 case InstOpCode::Save:
                     if((pc + 1)->lastStep != step)
                     {
@@ -307,6 +614,7 @@ class PikeMachine
                         rdyThds.push_back(th);
                     }
                     break;
+                    
                 default:
                     Unreachable();
                 }
@@ -322,7 +630,7 @@ class PikeMachine
         {
             if(th->pc->op == InstOpCode::Match)
             {
-                std::vector<std::pair<size_t, size_t>> slots(slotCount / 2);
+                std::vector<std::pair<size_t, size_t>> slots(slotCount_ / 2);
                 for(size_t i = 0; i < slots.size(); ++i)
                 {
                     slots[i].first  = th->saveSlots.Get(i << 2);
@@ -335,13 +643,32 @@ class PikeMachine
         return { false, { } };
     }
 
-    // TODO: Compile regex to VM instructions
+    void Compile()
+    {
+        AGZ_ASSERT(prog_.empty());
+        PikeCompiler().Compile(regex_, &prog_, &slotCount);
+        regex_ = String<CS>();
+    }
 
 public:
 
     static constexpr bool SupportSubmatching = true;
 
-    // TODO: Implement RegexEngine concept (see Regex.h)
+    RegexEngine(connst StringView<CS> &regex)
+        : regex_(regex), slotCount_(0)
+    {
+        
+    }
+    
+    std::pair<bool, std::vector<std::pair<size_t, size_t>>>
+    Match(const StringView<CS> &dst) const
+    {
+        if(prog_.empty())
+            Compile();
+        AGZ_ASSERT(prog_.size() && regex_.Empty());
+        
+        return Run(prog_. slotCount_, dst);
+    }
 };
 
 AGZ_NS_END(AGZ::RegexImpl::Pike)
