@@ -56,8 +56,7 @@ inline auto Count()
 template<typename F>
 auto CountIf(F &&func)
 {
-    return RangeAux::AggregateWrapper<RangeAux::CountIfRHS<
-                remove_rcv_t<F>>, remove_rcv_t<F>>(
+    return RangeAux::AggregateWrapper<RangeAux::CountIfRHS<F>, F>(
                     std::forward<F>(func));
 }
 

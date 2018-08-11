@@ -33,15 +33,14 @@ AGZ_NS_BEG(AGZ::RegexImpl)
 template<typename CS>
 class Match
 {
-    bool valid_;
-    size_t offset_;
+    bool valid_;\
     String<CS> whole_;
     std::vector<typename String<CS>::View> segs_;
 
 public:
 
     using Str      = String<CS>;
-    using StrView  = typename Str::View;
+    using StrView  = StringView<CS>;
     using Self     = Match<CS>;
     using Iterator = GetIteratorType<decltype(segs_)>;
 
@@ -51,9 +50,9 @@ public:
 
     }
 
-    Match(size_t offset, Str &&whole,
-          std::vector<std::pair<size_t, size_t>> &&segs)
-        : valid_(true), offset_(offset), whole_(std::move(whole))
+    Match(Str &&whole,
+          const std::vector<std::pair<size_t, size_t>> &segs)
+        : valid_(true), whole_(std::move(whole))
     {
         for(auto &seg : segs)
             segs_.push_back(whole_.Slice(seg.first, seg.second));
@@ -61,24 +60,23 @@ public:
 
     Match(const Self&) = delete;
 
-    Match(Self &&moveFrom)
+    Match(Self &&moveFrom) noexcept
         : valid_(moveFrom.valid_),
-          offset_(moveFrom.offset_),
           whole_(std::move(moveFrom.whole_)),
           segs_(std::move(moveFrom.segs_))
     {
-        moveFrom_.valid_ = false;
+        moveFrom.valid_ = false;
     }
 
     Self &operator=(const Self&) = delete;
 
-    Self &operator=(Self &&moveFrom)
+    Self &operator=(Self &&moveFrom) noexcept
     {
         valid_  = moveFrom.valid_;
-        offset_ = moveFrom.offset_;
         whole_  = std::move(moveFrom.whole_);
         segs_   = std::move(moveFrom.segs_);
         moveFrom.valid_ = false;
+        return *this;
     }
 
     operator bool() const
@@ -94,12 +92,6 @@ public:
     size_t Size() const
     {
         return segs_.size();
-    }
-
-    size_t GetOffset() const
-    {
-        AGZ_ASSERT(Valid());
-        return offset_;
     }
 
     const Str &GetWholeMatch() const
@@ -140,15 +132,16 @@ public:
     using CodeUnit  = typename CS::CodeUnit;
     using CodePoint = typename CS::CodePoint;
     using Engine    = Eng;
+    using Result    = Match<CS>;
     using Self      = Regex<CS, Eng>;
 
-    Regex(const StringView<CS> &expr)
+    explicit Regex(const StringView<CS> &expr)
         : engine_(expr)
     {
 
     }
 
-    Regex(const String<CS> &expr)
+    explicit Regex(const String<CS> &expr)
         : Regex(expr.AsView())
     {
 
@@ -158,18 +151,28 @@ public:
     Self &operator=(const Self&) = delete;
     ~Regex()                     = default;
 
-    Match<CS> Match(const StringView<CS> &dst) const
+    Result Match(const StringView<CS> &dst) const
     {
         auto [succ, subs] = engine_.Match(dst);
         if(!succ)
-            return Match<CS>();
-        return std::move(Match<CS>(dst, subs));
+            return Result();
+        return Result(std::move(dst), subs);
     }
 
-    Match<CS> Match(const String<CS> &dst) const
+    Result Match(const String<CS> &dst) const
     {
         return Match(dst.AsView());
     }
 };
 
 AGZ_NS_END(AGZ::RegexImpl)
+
+AGZ_NS_BEG(AGZ)
+
+template<typename CS>
+using RegexMatch = RegexImpl::Match<CS>;
+
+template<typename CS>
+using Regex = RegexImpl::Regex<CS>;
+
+AGZ_NS_END(AGZ)

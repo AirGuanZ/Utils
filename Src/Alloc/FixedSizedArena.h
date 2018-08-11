@@ -31,7 +31,7 @@ public:
         : nodeSize_(nodeSize), chunkSize_(chunkSize),
           freeNodes_(nullptr), chunkEntry_(nullptr)
     {
-        if(nodeSize < sizeof(Node*) || nodeSize + sizeof(Chunk*) < chunkSize)
+        if(nodeSize < sizeof(Node*) || nodeSize + sizeof(Chunk*) > chunkSize)
         {
             throw ArgumentException(
                 "Invalid size arguments for FixedSizedArena");

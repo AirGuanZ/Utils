@@ -11,7 +11,7 @@ namespace RangeAux
     struct ReduceRHS
     {
         template<typename R>
-        static remove_rcv_t<I> Eval(R &&range, I &&init, F &&func)
+        static remove_rcv_t<I> Eval(R &&range, I init, const F &func)
         {
             remove_rcv_t<I> ret = init;
             for(auto &&val : range)
@@ -25,9 +25,7 @@ template<typename I, typename F>
 auto Reduce(I &&init, F &&func)
 {
     return RangeAux::AggregateWrapper<RangeAux::ReduceRHS<
-                remove_rcv_t<I>, remove_rcv_t<F>>,
-                remove_rcv_t<I>, remove_rcv_t<F>>(
-                    std::forward<I>(init), std::forward<F>(func));
+                I, F>, I, F>(std::forward<I>(init), std::forward<F>(func));
 }
 
 AGZ_NS_END(AGZ)

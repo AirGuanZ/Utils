@@ -1,8 +1,11 @@
 #pragma once
 
+#include <iostream>
+
 #include <limits>
 #include <list>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "../../Alloc/FixedSizedArena.h"
@@ -95,6 +98,12 @@ public:
     }
 };
 
+template<typename CP>
+struct Instruction;
+
+template<typename CP>
+using PC = typename std::list<Instruction<CP>>::iterator;
+
 // VM Instruction type
 enum class InstOpCode
 {
@@ -109,7 +118,72 @@ enum class InstOpCode
 template<typename CP>
 struct Instruction
 {
-    static_assert(std::is_trivially_constructible_v<CP>);
+    explicit Instruction(InstOpCode op)
+        : op(op)
+    {
+        
+    }
+
+    Instruction(const Instruction<CP> &copyFrom)
+    {
+        op = copyFrom.op;
+        lastStep = copyFrom.lastStep;
+        switch(op)
+        {
+        case InstOpCode::Jump:
+            jumpDest = copyFrom.jumpDest;
+            break;
+        case InstOpCode::Branch:
+            branchDest[0] = copyFrom.branchDest[0];
+            branchDest[1] = copyFrom.branchDest[1];
+            break;
+        case InstOpCode::Alter:
+            alterDest = new std::vector<PC<CP>>(*copyFrom.alterDest);
+            break;
+        case InstOpCode::Char:
+            cp = copyFrom.cp;
+            break;
+        case InstOpCode::Save:
+            saveSlot = copyFrom.saveSlot;
+            break;
+        default:
+            break;
+        }
+    }
+
+    Instruction(Instruction<CP> &&moveFrom) noexcept
+    {
+        op = moveFrom.op;
+        lastStep = moveFrom.lastStep;
+        switch(op)
+        {
+        case InstOpCode::Jump:
+            jumpDest = std::move(moveFrom.jumpDest);
+            break;
+        case InstOpCode::Branch:
+            branchDest[0] = std::move(moveFrom.branchDest[0]);
+            branchDest[1] = std::move(moveFrom.branchDest[1]);
+            break;
+        case InstOpCode::Alter:
+            alterDest = moveFrom.alterDest;
+            moveFrom.alterDest = nullptr;
+            break;
+        case InstOpCode::Char:
+            cp = moveFrom.cp;
+            break;
+        case InstOpCode::Save:
+            saveSlot = moveFrom.saveSlot;
+            break;
+        default:
+            break;
+        }
+    }
+
+    ~Instruction()
+    {
+        if(op == InstOpCode::Alter && alterDest)
+            delete alterDest;
+    }
 
     InstOpCode op;
 
@@ -117,11 +191,11 @@ struct Instruction
     union
     {
         CP cp;                                // For Char
-        const Instruction<CP> *jumpDest;      // For Jump
-        const Instruction<CP> *branchDest[2]; // For Branch
         size_t saveSlot;                      // For Save
-        std::vector<const Instruction<CP>> *alterDest;
+        std::vector<PC<CP>> *alterDest;
     };
+    PC<CP> jumpDest;                          // For Jump
+    PC<CP> branchDest[2];                     // For Branch
 
     // Character index when last thread running at this instruction
     // was added to ready list. Used to avoid more than one threads with the
@@ -129,66 +203,72 @@ struct Instruction
     mutable size_t lastStep;
 };
 
-Inst MakeChar(CP cp)
+template<typename CP>
+Instruction<CP> MakeChar(CP cp)
 {
-    Inst ret = { InstOpCode::Char };
+    Instruction<CP> ret(InstOpCode::Char);
     ret.cp = cp;
     return ret;
 }
 
-Inst MakeJump(const Instruction<CP> * dst)
+template<typename CP>
+Instruction<CP> MakeJump(PC<CP> dst)
 {
-    Inst ret = { InstOpCode::Jump };
+    Instruction<CP> ret(InstOpCode::Jump);
     ret.jumpDest = dst;
     return ret;
 }
 
-Inst MakeBranch(const Instruction<CP> *d0, const Instruction<CP> *d1)
+template<typename CP>
+Instruction<CP> MakeBranch(PC<CP> d0, PC<CP> d1)
 {
-    Inst ret = { InstOpCode::Branch };
+    Instruction<CP> ret(InstOpCode::Branch);
     ret.branchDest[0] = d0; ret.branchDest[1] = d1;
     return ret;
 }
 
-Inst MakeAlter(std::vector<const Instruction<CP>*> &&ds)
+template<typename CP>
+Instruction<CP> MakeAlter(std::vector<PC<CP>> &&ds)
 {
-    Inst ret = { InstOpCode::Alter };
-    ret.alterDest = new std::vector<const Instruction<CP>*>(std::move(ds));
+    Instruction<CP> ret(InstOpCode::Alter);
+    ret.alterDest = new std::vector<PC<CP>>(std::move(ds));
     return ret;
 }
 
-Inst MakeSave(size_t slot)
+template<typename CP>
+Instruction<CP> MakeSave(size_t slot)
 {
-    Inst ret = { InstOpCode::Save };
+    Instruction<CP> ret(InstOpCode::Save);
     ret.saveSlot = slot;
     return ret;
 }
 
-Inst MakeMatch()
+template<typename CP>
+Instruction<CP> MakeMatch()
 {
-    Inst ret = { InstOpCode::Match };
+    Instruction<CP> ret(InstOpCode::Match);
     return ret;
 }
 
 template<typename CS>
 struct Thread
 {
-    Thread(const Instruction<typename CS::CodePoint> *pc,
+    Thread(PC<typename CS::CodePoint> pc,
            SaveSlots &&saveSlots)
         : pc(pc), saveSlots(std::move(saveSlots))
     {
 
     }
 
-    const Instruction<typename CS::CodePoint> *pc;
+    PC<typename CS::CodePoint>  pc;
     SaveSlots saveSlots;
 };
 
 /* Grammars
     Regex  := Cat Cat ... Cat
-    Cat    := [Fac Fac ... Fac] | Fac | $Cat
+    Cat    := Fac | $Cat
     Fac    := Fac* | Fac+ | Fac? | Core
-    Core   := Char | (Regex)
+    Core   := Char | (Regex) | [Fac Fac ... Fac]
 
    Rules
     A | B | C =>     Branch(L0, L1)
@@ -222,12 +302,12 @@ class PikeCompiler
 public:
 
     void Compile(const StringView<CS> &expr,
-                 std::list<Instruction<CS>> *insts,
+                 std::list<Instruction<typename CS::CodePoint>> *insts,
                  size_t *slotCount)
     {
         AGZ_ASSERT(insts && slotCount);
 
-        cpSeq = expr.CodePoints();
+        auto cpSeq = expr.CodePoints();
         cur_  = cpSeq.begin();
         end_  = cpSeq.end();
 
@@ -236,56 +316,56 @@ public:
 
         PartialResult result;
         CompileRegex(result);
-        FillBP(result, Emit(result, MakeMatch()));
+        FillBP(result, Emit(result, MakeMatch<CP>()));
 
         if(cur_ != end_)
             Err();
 
         *insts     = std::move(result.insts);
-        *slotCount = slotCount_;
+        *slotCount = nextSaveSlot_;
     }
 
 private:
 
     using CP        = typename CS::CodePoint;
-    using Inst      = Instruction<CodePoint>;
-    using CInstPtr  = const Inst*;
+    using Inst      = Instruction<CP>;
     using It        = typename CS::Iterator;
 
     template<typename T>
-    using L = std::list<L>;
+    using L = std::list<T>;
 
     It cur_, end_;
-    size_t nextSaveSlot_;
-    bool inSubmatching_;
+    size_t nextSaveSlot_ = 0;
+    bool inSubmatching_  = false;
 
     bool IsEnd()     const   { return cur_ == end_;                          }
     CP   CurCh()     const   { AGZ_ASSERT(!IsEnd()); return *cur_;           }
-    CP   CurAndAdv() const   { CP rt = CurCh(); Advance(); return rt;        }
+    CP   CurAndAdv()         { CP rt = CurCh(); Advance(); return rt;        }
     bool Match(CP cp)        { return !IsEnd() && CurCh() == cp;             }
     void Advance()           { AGZ_ASSERT(!IsEnd()); ++cur_;                 }
     bool AdvanceIf(CP cp)    { return Match(cp) ? (Advance(), true) : false; }
-    bool AdvanceOrErr(CP cp) { if(!AdvanceIf(cp)) Err();                     }
+    void AdvanceOrErr(CP cp) { if(!AdvanceIf(cp)) Err();                     }
 
-    [[noreturn]] void Err() { throw ArgumentException("Invalid regex"); }
+    [[noreturn]] static void Err() { throw ArgumentException("Invalid regex"); }
     void ErrIfEnd() const { if(IsEnd()) Err(); }
 
     struct PartialResult
     {
         L<Inst> insts;
-        L<CInstPtr> bps;
+        L<PC<CP>> bps;
     };
 
-    Inst *Emit(PartialResult &out, const Inst &inst)
+    static PC<CP> Emit(PartialResult &out, const Inst &inst)
     {
         out.insts.push_back(inst);
-        return &out.back();
+        auto ret = out.insts.end();
+        return --ret;
     }
 
-    Inst EmitFront(PartialResult &out, const Inst &inst)
+    static PC<CP> EmitFront(PartialResult &out, const Inst &inst)
     {
-        out.push_front(inst);
-        return &out.front();
+        out.insts.push_front(inst);
+        return out.insts.begin();
     }
 
     void Concat(L<Inst> &lhs, L<Inst> &&rhs)
@@ -293,10 +373,18 @@ private:
         lhs.splice(lhs.end(), std::move(rhs));
     }
 
-    void FillBP(PartialResult &out, const Inst *value)
+    void FillBP(PartialResult &out, PC<CP> value)
     {
         for(auto &p : out.bps)
-            p = value;
+        {
+            if(p->op == InstOpCode::Jump)
+                p->jumpDest = value;
+            else
+            {
+                AGZ_ASSERT(p->op == InstOpCode::Branch);
+                p->branchDest[1] = value;
+            }
+        }
         out.bps.clear();
     }
 
@@ -318,6 +406,8 @@ private:
         case '?':
         case '$':
             return false;
+        default:
+            break;
         }
 
         Advance();
@@ -327,7 +417,7 @@ private:
         if(cp == '\\')
         {
             ErrIfEnd();
-            CodePoint next = CurAndAdv();
+            CP next = CurAndAdv();
             switch(next)
             {
             case 'a': dst = '\a'; break;
@@ -360,12 +450,66 @@ private:
     {
         if(IsEnd())
             return false;
+
         if(AdvanceIf('('))
         {
             CompileRegex(out);
             AdvanceOrErr(')');
             return true;
         }
+
+        /*
+        A | B | C | D =>
+        Alter(L0, L1, L2, L3)
+        L0: Inst(A)
+        Jump(Out)
+        L1: Inst(B)
+        Jump(Out)
+        L2: Inst(C)
+        Jump(Out)
+        L3: Inst(D)
+        */
+        if(AdvanceIf('['))
+        {
+            L<PartialResult> facs;
+            while(!AdvanceIf(']'))
+            {
+                facs.push_back(PartialResult());
+                if(!CompileFac(facs.back()))
+                    Err();
+            }
+
+            if(facs.empty())
+                Err();
+
+            if(facs.size() == 1)
+            {
+                out.insts = std::move(facs.front().insts);
+                out.bps = std::move(facs.front().bps);
+                return true;
+            }
+
+            for(auto &rt : facs)
+                out.bps.splice(out.bps.end(), rt.bps);
+
+            Concat(out.insts, std::move(facs.front().insts));
+            std::vector<PC<CP>> alterDest = { out.insts.begin() };
+
+            auto it = facs.begin();
+            for(++it; it != facs.end(); ++it)
+            {
+                auto jump = Emit(out, MakeJump<CP>(PC<CP>()));
+                out.bps.push_back(jump);
+
+                alterDest.push_back(it->insts.begin());
+                Concat(out.insts, std::move(it->insts));
+            }
+
+            EmitFront(out, MakeAlter<CP>(std::move(alterDest)));
+
+            return true;
+        }
+
         return CompileChar(out);
     }
 
@@ -384,10 +528,10 @@ private:
             if(AdvanceIf('*'))
             {
                 auto branch = EmitFront(
-                        out, MakeBranch(&out.insts.front(), nullptr));
-                Emit(out, MakeJump(branch));
+                        out, MakeBranch<CP>(out.insts.begin(), PC<CP>()));
+                Emit(out, MakeJump<CP>(branch));
                 FillBP(out, branch);
-                out.bps.push_back(&branch->branchDest[1]);
+                out.bps.push_back(branch);
             }
             /*
                 A+ => L0: Inst(A)
@@ -396,9 +540,9 @@ private:
             else if(AdvanceIf('+'))
             {
                 auto branch = Emit(
-                        out, MakeBranch(&out.insts.front(), nullptr));
+                        out, MakeBranch<CP>(out.insts.begin(), PC<CP>()));
                 FillBP(out, branch);
-                out.bps.push_back(&branch->branchDest[1]);
+                out.bps.push_back(branch);
             }
             /*
                 A? =>     Branch(L0, Out)
@@ -407,8 +551,8 @@ private:
             else if(AdvanceIf('?'))
             {
                 auto branch = EmitFront(
-                        out, MakeBranch(&out.insts.front(), nullptr));
-                out.bps.push_back(&branch->branchDest[1]);
+                        out, MakeBranch<CP>(out.insts.begin(), PC<CP>()));
+                out.bps.push_back(branch);
             }
             else
                 break;
@@ -427,61 +571,9 @@ private:
             CompileCat(out);
             inSubmatching_ = false;
 
-            EmitFront(out, MakeSave(nextSaveSlot_));
-            FillBP(out, Emit(out, MakeSave(nextSaveSlot_ + 1)));
+            EmitFront(out, MakeSave<CP>(nextSaveSlot_));
+            FillBP(out, Emit(out, MakeSave<CP>(nextSaveSlot_ + 1)));
             nextSaveSlot_ += 2;
-
-            return true;
-        }
-
-        /*
-            A | B | C | D =>
-                    Alter(L0, L1, L2, L3)
-                L0: Inst(A)
-                    Jump(Out)
-                L1: Inst(B)
-                    Jump(Out)
-                L2: Inst(C)
-                    Jump(Out)
-                L3: Inst(D)
-        */
-        if(AdvanceIf('['))
-        {
-            L<PartialResult> facs;
-            while(!AdvanceIf(']'))
-            {
-                facs.push_back(PartialResult());
-                if(!CompileFac(facs.back()))
-                    Err();
-            }
-
-            if(facs.empty())
-                Err();
-
-            if(facs.size() == 1)
-            {
-                out.lists = std::move(facs.front().lists);
-                out.bps   = std::move(facs.front().bps);
-                return true;
-            }
-
-            for(auto &rt : facs)
-                out.bps.splice(out.bps.end(), rt.bps);
-
-            Concat(out.insts, std::move(facs.front().insts));
-            std::vector<const Inst*> alterDest = { &out.insts.front() };
-
-            auto it = facs.begin();
-            for(++it; it != facs.end(); ++it)
-            {
-                auto jump = Emit(out, MakeJump(nullptr));
-                out.bps.push_back(&jump->jumpDest);
-
-                alterDest.push_back(&it->insts.front());
-                Concat(out.insts, std::move(it->insts));
-            }
-
-            EmitFront(out, MakeAlter(std::move(alterDest)));
 
             return true;
         }
@@ -496,8 +588,8 @@ private:
         PartialResult trt;
         while(CompileCat(trt))
         {
-            FillBP(out, &trt.insts.front());
-            Concat(out, trt);
+            FillBP(out, trt.insts.begin());
+            Concat(out.insts, std::move(trt.insts));
             out.bps = std::move(trt.bps);
 
             AGZ_ASSERT(trt.insts.empty() && trt.bps.empty());
@@ -511,6 +603,7 @@ class PikeMachine
 {
     using CodeUnit  = typename CS::CodeUnit;
     using CodePoint = typename CS::CodePoint;
+    using CP = CodePoint;
 
     using Arena = FixedSizedArena<>;
 
@@ -519,9 +612,7 @@ class PikeMachine
     mutable String<CS> regex_;
 
     static Thread<CS> *NewThread(
-        Arena &arena,
-        const Instruction<CodePoint> *pc,
-        SaveSlots &&slots)
+        Arena &arena, PC<CP> pc, SaveSlots &&slots)
     {
         Thread<CS> *ret = arena.Malloc<Thread<CS>>();
         return new(ret) Thread<CS>(pc, std::move(slots));
@@ -534,7 +625,7 @@ class PikeMachine
     }
 
     std::pair<bool, std::vector<std::pair<size_t, size_t>>>
-        MatchImpl(const StringView<CS> &dst)
+        MatchImpl(const StringView<CS> &dst) const
     {
         AGZ_ASSERT(slotCount_ % 2 == 0);
 
@@ -543,7 +634,7 @@ class PikeMachine
                          32 * SaveSlots::AllocSize(slotCount_));
 
         std::vector<Thread<CS>*> rdyThds = {
-            NewThread(threadArena, &prog_.front(),
+            NewThread(threadArena, prog_.begin(),
                       SaveSlots(slotCount_, slotsArena))
         };
         std::vector<Thread<CS>*> newThds;
@@ -554,9 +645,14 @@ class PikeMachine
         size_t step = 0;
         auto cpSeq = dst.CodePoints();
         auto end = cpSeq.end();
-        for(auto it = cpSeq.begin(); it != end; ++it)
+        for(auto it = cpSeq.begin(); ; ++it)
         {
-            CodePoint cp = *it;
+            CodePoint cp;
+            if(it != end)
+                cp = *it;
+            else
+                cp = '\0';
+
             if(rdyThds.empty())
                 break;
 
@@ -579,10 +675,9 @@ class PikeMachine
                     break;
 
                 case InstOpCode::Char:
-                    if(pc->cp == cp && (pc + 1)->lastStep != step)
+                    if(pc->cp == cp && (++th->pc)->lastStep != step + 1)
                     {
-                        ++th->pc;
-                        th->pc->lastStep = step;
+                        th->pc->lastStep = step + 1;
                         newThds.push_back(th);
                     }
                     else
@@ -624,11 +719,9 @@ class PikeMachine
                     break;
 
                 case InstOpCode::Save:
-                    if((pc + 1)->lastStep != step)
+                    th->saveSlots.Set(pc->saveSlot, cpSeq.CodeUnitIndex(it));
+                    if((++th->pc)->lastStep != step)
                     {
-                        th->saveSlots.Set(pc->saveSlot,
-                                          cpSeq.CodeUnitIndex(it));
-                        ++th->pc;
                         th->pc->lastStep = step;
                         rdyThds.push_back(th);
                     }
@@ -636,11 +729,15 @@ class PikeMachine
 
                 case InstOpCode::Match:
                     FreeThread(threadArena, th);
+                    break;
 
                 default:
                     Unreachable();
                 }
             }
+
+            if(it == end)
+                break;
 
             rdyThds.swap(newThds);
             newThds.clear();
@@ -665,10 +762,10 @@ class PikeMachine
         return { false, { } };
     }
 
-    void Compile()
+    void Compile() const
     {
         AGZ_ASSERT(prog_.empty());
-        PikeCompiler().Compile(regex_, &prog_, &slotCount);
+        PikeCompiler<CS>().Compile(regex_, &prog_, &slotCount_);
         regex_ = String<CS>();
     }
 
@@ -676,10 +773,22 @@ public:
 
     static constexpr bool SupportSubmatching = true;
 
-    RegexEngine(connst StringView<CS> &regex)
-        : regex_(regex), slotCount_(0)
+    explicit PikeMachine(const StringView<CS> &regex)
+        : slotCount_(0), regex_(regex)
     {
+        Compile();
 
+        using namespace std;
+        
+        string names[] =
+        {
+            "Char", "Jump", "Branch", "Alter", "Save", "Match"
+        };
+
+        for(auto &ins : prog_)
+        {
+            cout << names[(int)ins.op] << endl;
+        }
     }
 
     std::pair<bool, std::vector<std::pair<size_t, size_t>>>
@@ -689,7 +798,7 @@ public:
             Compile();
         AGZ_ASSERT(prog_.size() && regex_.Empty());
 
-        return MatchImpl(prog_. slotCount_, dst);
+        return MatchImpl(dst);
     }
 };
 
