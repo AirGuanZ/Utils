@@ -33,7 +33,7 @@ struct Inst
         };
         size_t saveSlot;
     };
-    
+
     size_t lastStep;
 };
 
@@ -114,7 +114,7 @@ private:
     bool Match(CP c) const  { return !End() && Char() == c; }
     bool AdvanceIf(CP c)    { return Match(c) ? Advance(), true : false; }
     void AdvanceOrErr(CP c) { if(!AdvanceIf(c)) Error(); }
-    
+
     ASTNode *NewASTNode(ASTNode::Type type)
     {
         auto ret = astNodeArena_.Malloc();
@@ -283,11 +283,11 @@ class Program
 public:
 
     using Self = Program<CP>;
-    
+
     Program()
         : nextInst_(0), instCount_(0), insts_(nullptr)
     {
-        
+
     }
 
     Program(size_t instCount)
@@ -325,7 +325,7 @@ public:
     {
         return insts_ != nullptr;
     }
-    
+
     Inst &operator[](size_t idx)
     {
         AGZ_ASSERT(insts_ && idx < nextInst_);
@@ -346,6 +346,12 @@ public:
     }
 
     Inst<CP> *GetNextPtr() const { return &insts_[nextInst_]; }
+    
+    void ReinitLastSteps()
+    {
+        for(size_t i = 0; i < instCount_; ++i)
+            insts_[i].lastStep = 0;
+    }
 
 private:
 
@@ -620,40 +626,211 @@ public:
 template<typename CP>
 struct Thread
 {
-    Thread(Inst<CP> *pc, SaveSlots &&saveSlots)
-        : pc(pc), saveSlots(std::move(saveSlots))
+    Thread(Inst<CP> *pc, SaveSlots &&saveSlots, size_t startIdx)
+        : pc(pc), saveSlots(std::move(saveSlots)), startIdx_(startIdx)
     {
 
     }
-    
+
     Inst<CP> *pc;
     SaveSlots saveSlots;
+    
+    size_t startIdx_;
 };
 
 template<typename CS>
 class Machine
 {
 public:
+
     using CU = typename CS::CodeUnit;
     using CP = typename CS::CodePoint;
-    
-    using Arena = FixedSizedArena<>;
+
     using Interval = std::pair<size_t, size_t>;
 
 private:
 
-    mutable Program<CP> prog_;
-    mutable size_t slotCount_;
-    mutable String<CS> regex_;
+    using It = typename CS::Iterator;
+    using CPR = CodePointRange<CS>;
+
+    Program<CP> prog_;
+    size_t slotCount_;
+    String<CS> regex_;
     
-    Thread<CP> *NewThread(Arena &arena, Inst<CP> *pc,
-                          SaveSlots &&saveSlots)
+    CPR *cpr_;
+    It cur_;
+    
+    size_t matchedStart_, matchedEnd_;
+    std::optional<SaveSlots> matchedSaveSlots_;
+    
+    void SetMatched(SaveSlots &&saves)
     {
-        Thread<CP> *ret = arena.Malloc<Thread<CP>>();
-        return new(ret) Thread<CP>(pc, std::move(saveSlots));
+        matchedSaveSlots_.emplace(std::move(saves));
+    }
+
+    void AddThread(std::vector<Thread> &thds, size_t curStep,
+                   Inst<CP> *pc, SaveSlots &&saves, size_t startIdx)
+    {
+        if(pc->lastStep == curStep)
+            return;
+        switch(pc->op)
+        {
+        case Inst<CP>::Begin:
+            if(cpr_->begin() != cur_)
+                return;
+            return AddThread(thds, curStep,
+                             pc + 1, std::move(saves),
+                             startIdx);
+        case Inst<CP>::End:
+            if(cur_ != cpr_->end())
+                return;
+            return AddThread(thds, curStep,
+                             pc + 1, std::move(saves),
+                             startIdx);
+        case Inst<CP>::Jump:
+            return AddThread(thds, curStep,
+                             pc->jumpDest, std::move(saves),
+                             startIdx);
+        case Inst<CP>::Branch:
+            AddThread(thds, curStep,
+                      pc->branchDest[0], SaveSlots(saves),
+                      startIdx);
+            return AddThread(thds, curStep,
+                             pc->branchDest[1], std::move(saves),
+                             startIdx);
+        case Inst<CP>::Save:
+            saves.Set(pc->saveSlot, cpr_->CodeUnitIndex(cur));
+            return AddThread(thds, curStep,
+                             pc + 1, std::move(saves),
+                             startIdx);
+        case Inst<CP>::Alter:
+            for(size_t i = 0; i < pc->alterCount; ++i)
+            {
+                AddThread(thds, curStep,
+                          pc->alterDest[i], SaveSlots(saves),
+                          startIdx);
+            }
+            return;
+        default:
+            thds.push_back(Thread(pc, std::move(saves), startIdx));
+            return;
+        }
+        Unreachable();
     }
     
-    // TODO
+    template<bool AnchorBegin, bool AnchorEnd>
+    std::optional<std::pair<Internal, std::vector<size_t>>>
+    Run(const StringView<CS> &str)
+    {
+        AGZ_ASSERT(prog_.IsAvailable());
+        
+        size_t saveAllocSize = SaveSlots::AllocSize(slotCount_);
+        FixedSizedArena<> saveSlotsArena(
+            saveAllocSize, 16 * saveAllocSize);
+        
+        prog_.ReinitLastSteps();
+        std::vector<Thread> rdyThds, newThds;
+        
+        CPR cpr = str.CodePoints();
+        cpr_ = &cpr;
+        cur_ = cpr.begin();
+        
+        if constexpr(AnchorBegin)
+        {
+            AddThread(rdyThds, 0, &prog_[0],
+                      SaveSlots(slotCount_,
+                                saveSlotsArena),
+                      0);
+        }
+        
+        size_t cpIdx = 0;
+        for(; cur_ != cpr.end(); ++cur_, ++cpIdx)
+        {
+            if constexpr(!AnchorBegin)
+            {
+                AddThread(rdyThds, cpIdx, &prog_[0],
+                          SaveSlots(slotCount_, saveSlotsArena),
+                          cpIdx);
+            }
+            
+            CP cp = *cur_;
+            
+            if constexpr(AnchorBegin)
+            {
+                if(rdyThds.empty())
+                    break;
+            }
+            
+            for(size_t i = 0; i < rdyThds.size(); ++i)
+            {
+                Thread<CP> *th = &rdyThds[i];
+                Inst<CP> *pc = th->pc;
+                
+                switch(pc->op)
+                {
+                case Inst<CP>::Dot:
+                {
+                    auto oldCur = cur_;
+                    ++cur_;
+                    AddThread(newThds, cpIdx,
+                              pc + 1, std::move(th->saveSlots),
+                              th->startIdx);
+                    cur_ = oldCur;
+                    break;
+                }
+                case Inst<CP>::Char:
+                    if(pc->codePoint != cp)
+                        break;
+                {
+                    auto oldCur = cur_;
+                    ++cur_;
+                    AddThread(newThds, cpIdx,
+                              pc + 1, std::move(th->saveSlots),
+                              th->startIdx);
+                    cur_ = oldCur;
+                    break;
+                }
+                case Match:
+                    if constexpr(!AnchorEnd)
+                    {
+                        matchedSaveSlots_ = std::move(th->saveSlots);
+                        matchedStart_     = th->startIdx;
+                        matchedEnd_       = cpr.CodeUnitIndex(cur_);
+                        rdyThds.clear();
+                    }
+                    break;
+                default:
+                    Unreachable();
+                }
+            }
+            
+            rdyThds.swap(newThds);
+            newThds.clear();
+        }
+        
+        for(auto &th : rdyThds)
+        {
+            if(th->pc->op == Inst<CP>::Match)
+            {
+                matchedSaveSlots_ = std::move(th.saveSlots);
+                matchedStart_ = th.startIdx;
+                matchedEnd_   = str.Length();
+            }
+        }
+        
+        if(matchedSaveSlots_)
+        {
+            std::vector<size_t> slots(slotCount_);
+            for(size_t i = 0; i < slotCount_; ++i)
+                slots[i] = matchedSaveSlots_.value().Get(i);
+            return std::optional<std::pair<Internal, std::vector<size_t>>>
+                    (std::make_pair<Internal, std::vector<size_t>>(
+                        Internal { matchedStart_, matchedEnd_ },
+                        std::move(slots)));
+        }
+        
+        return { };
+    }
 };
 
 AGZ_NS_END(AGZ::VMEngine)

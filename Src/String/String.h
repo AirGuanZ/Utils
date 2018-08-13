@@ -528,6 +528,9 @@ using CSConv  = StrImpl::CharsetConvertor;
 template<typename CS>
 using StringBuilder = StrImpl::StringBuilder<CS>;
 
+template<typename CS>
+using CodePointRange = StrImpl::CodePointRange<CS>;
+
 AGZ_NS_END(AGZ)
 
 #include "String.inl"
