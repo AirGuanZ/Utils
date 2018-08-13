@@ -85,7 +85,6 @@ public:
         auto cpRange  = regexp.CodePoints();
         cur_          = cpRange.begin();
         end_          = cpRange.end();
-        nextSaveSlot_ = 0;
 
         auto ret = ParseRegex();
         if(cur_ != end_)
@@ -102,7 +101,6 @@ private:
     SmallObjArena<AlterListNode> alterNodeArena_;
 
     It cur_, end_;
-    size_t nextSaveSlot_;
 
     [[noreturn]] static void Error() { throw ArgumentException("Invalid regular expression"); }
 
@@ -286,23 +284,27 @@ public:
 
     }
 
-    Program(size_t instCount)
+    explicit Program(size_t instCount)
         : nextInst_(0), instCount_(instCount)
     {
         AGZ_ASSERT(instCount);
         insts_ = new Inst<CP>[instCount];
     }
 
-    Program(Self &&moveFrom)
-        : insts_(moveFrom.insts_)
+    Program(Self &&moveFrom) noexcept
+        : nextInst_(moveFrom.nextInst_),
+          instCount_(moveFrom.instCount_),
+          insts_(moveFrom.insts_)
     {
         moveFrom.insts_ = nullptr;
     }
 
-    Self &operator=(Self &&moveFrom)
+    Self &operator=(Self &&moveFrom) noexcept
     {
         if(insts_)
             delete insts_;
+        nextInst_ = moveFrom.nextInst_;
+        instCount_ = moveFrom.instCount_;
         insts_ = moveFrom.insts_;
         moveFrom.insts_ = nullptr;
         return *this;
@@ -384,8 +386,8 @@ public:
 
 private:
 
-    Program<CP> *prog_;
-    size_t saveSlotCount_;
+    Program<CP> *prog_ = nullptr;
+    size_t saveSlotCount_ = 0;
 
     using I = Inst<CP>;
     I MakeInst(typename I::Type type) { return I { type }; }

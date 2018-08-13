@@ -5,7 +5,6 @@
 #include "../../Misc/Common.h"
 #include "../../Range/Iterator.h"
 #include "../String.h"
-#include "PikeVM.h"
 #include "VMEngine.h"
 
 // Regular expression
