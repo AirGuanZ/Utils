@@ -12,6 +12,7 @@ AGZ_NS_BEG(AGZ)
     {
         // Support any 2-pow-bytes alignment?
         static constexpr bool AnyAlign;
+        static constexpr bool ThreadSafe;
 
         // Throw bad_alloc if failed
         static void *Malloc(size_t size);

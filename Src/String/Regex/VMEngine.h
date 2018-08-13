@@ -79,8 +79,8 @@ public:
 
     ASTNode *Parse(const StringView<CS> &regexp)
     {
-        astNodeArena_.Release();
-        alterNodeArena_.Release();
+        astNodeArena_.ReleaseAll();
+        alterNodeArena_.ReleaseAll();
 
         auto cpRange  = regexp.CodePoints();
         cur_          = cpRange.begin();
@@ -98,13 +98,13 @@ private:
     using CP      = typename CS::CodePoint;
     using It      = typename CS::Iterator;
 
-    SmallObjectArena<ASTNode>       astNodeArena_;
-    SmallObjectArena<AlterListNode> alterNodeArena_;
+    SmallObjArena<ASTNode>       astNodeArena_;
+    SmallObjArena<AlterListNode> alterNodeArena_;
 
     It cur_, end_;
     size_t nextSaveSlot_;
 
-    void Error() { throw ArgumentException("Invalid regular expression"); }
+    [[noreturn]] static void Error() { throw ArgumentException("Invalid regular expression"); }
 
     bool End() const        { return cur_ == end_; }
     CP   Char() const       { AGZ_ASSERT(!End()); return *cur_; }
@@ -124,7 +124,7 @@ private:
 
     ASTNode *ParseChar()
     {
-        if(IsEnd())
+        if(End())
             return nullptr;
         CP cp = Char();
 
@@ -133,11 +133,7 @@ private:
         if(cp == '$')
             return NewASTNode(ASTNode::End);
         if(cp == '&')
-        {
-            if(savable_)
-                return NewASTNode(ASTNode::Save);
-            Error();
-        }
+            return NewASTNode(ASTNode::Save);
 
         switch(cp)
         {
@@ -326,23 +322,23 @@ public:
         return insts_ != nullptr;
     }
 
-    Inst &operator[](size_t idx)
+    Inst<CP> &operator[](size_t idx)
     {
         AGZ_ASSERT(insts_ && idx < nextInst_);
         return insts_[idx];
     }
 
-    const Inst &operator[](size_t idx) const
+    const Inst<CP> &operator[](size_t idx) const
     {
         AGZ_ASSERT(insts_ && idx < nextInst_);
         return insts_[idx];
     }
 
-    Insts *Emit(const Inst<CP> &inst)
+    Inst<CP> *Emit(const Inst<CP> &inst)
     {
         AGZ_ASSERT(insts_ && nextInst_ < instCount_);
         insts_[nextInst_] = inst;
-        return &insts[nextInst_++];
+        return &insts_[nextInst_++];
     }
 
     Inst<CP> *GetNextPtr() const { return &insts_[nextInst_]; }
@@ -366,16 +362,16 @@ class Compiler
 public:
 
     using CP = typename CS::CodePoint;
-    using BP = std::list<Inst**>;
+    using BP = std::list<Inst<CP>**>;
 
     Program<CP> Compile(const StringView<CS> &regex,
                         size_t *saveSlotCount)
     {
-        AGZ_ASSERT(prog && saveSlotCount);
+        AGZ_ASSERT(saveSlotCount);
 
         auto ast = Parser<CP>::Parse(regex);
 
-        Program ret(CountInst(ast));
+        Program<CP> ret(CountInst(ast));
         prog_ = &ret;
         saveSlotCount_ = 0;
 
@@ -392,7 +388,7 @@ private:
     size_t saveSlotCount_;
 
     using I = Inst<CP>;
-    I MakeInst(I::Type type) { return I { type }; }
+    I MakeInst(typename I::Type type) { return I { type }; }
 
     void FillBP(BP &bps, Inst<CP> *val)
     {
@@ -401,7 +397,7 @@ private:
         bps.clear();
     }
 
-    size_t CountInst(ASTNode *n)
+    static size_t CountInst(ASTNode *n)
     {
         AGZ_ASSERT(n);
         switch(n->type)
@@ -431,8 +427,6 @@ private:
             return 1 + CountInst(n->plusDest);
         case ASTNode::Ques:
             return 1 + CountInst(n->quesDest);
-        default:
-            Unreachable();
         }
         Unreachable();
     }
@@ -469,8 +463,6 @@ private:
             return GeneratePlus(node);
         case ASTNode::Ques:
             return GenerateQues(node);
-        default;
-            Unreachable();
         }
         Unreachable();
     }
@@ -668,7 +660,7 @@ private:
         matchedSaveSlots_.emplace(std::move(saves));
     }
 
-    void AddThread(std::vector<Thread> &thds, size_t curStep,
+    void AddThread(std::vector<Thread<CP>> &thds, size_t curStep,
                    Inst<CP> *pc, SaveSlots &&saves, size_t startIdx)
     {
         if(pc->lastStep == curStep)
@@ -699,7 +691,7 @@ private:
                              pc->branchDest[1], std::move(saves),
                              startIdx);
         case Inst<CP>::Save:
-            saves.Set(pc->saveSlot, cpr_->CodeUnitIndex(cur));
+            saves.Set(pc->saveSlot, cpr_->CodeUnitIndex(cur_));
             return AddThread(thds, curStep,
                              pc + 1, std::move(saves),
                              startIdx);
@@ -712,14 +704,14 @@ private:
             }
             return;
         default:
-            thds.push_back(Thread(pc, std::move(saves), startIdx));
+            thds.push_back(Thread<CP>(pc, std::move(saves), startIdx));
             return;
         }
         Unreachable();
     }
     
     template<bool AnchorBegin, bool AnchorEnd>
-    std::optional<std::pair<Internal, std::vector<size_t>>>
+    std::optional<std::pair<Interval, std::vector<size_t>>>
     Run(const StringView<CS> &str)
     {
         AGZ_ASSERT(prog_.IsAvailable());
@@ -729,7 +721,7 @@ private:
             saveAllocSize, 16 * saveAllocSize);
         
         prog_.ReinitLastSteps();
-        std::vector<Thread> rdyThds, newThds;
+        std::vector<Thread<CP>> rdyThds, newThds;
         
         CPR cpr = str.CodePoints();
         cpr_ = &cpr;
@@ -790,7 +782,7 @@ private:
                     cur_ = oldCur;
                     break;
                 }
-                case Match:
+                case Inst<CP>::Match:
                     if constexpr(!AnchorEnd)
                     {
                         matchedSaveSlots_ = std::move(th->saveSlots);
@@ -823,9 +815,9 @@ private:
             std::vector<size_t> slots(slotCount_);
             for(size_t i = 0; i < slotCount_; ++i)
                 slots[i] = matchedSaveSlots_.value().Get(i);
-            return std::optional<std::pair<Internal, std::vector<size_t>>>
-                    (std::make_pair<Internal, std::vector<size_t>>(
-                        Internal { matchedStart_, matchedEnd_ },
+            return std::optional<std::pair<Interval, std::vector<size_t>>>
+                    (std::make_pair<Interval, std::vector<size_t>>(
+                        Interval{ matchedStart_, matchedEnd_ },
                         std::move(slots)));
         }
         

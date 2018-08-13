@@ -7,7 +7,6 @@
 #include "Buffer/Buffer.h"
 #include "Buffer/Buffer2D.h"
 #include "Buffer/COWObject.h"
-#include "Buffer/TaggedUnion.h"
 
 #include "Math/Angle.h"
 #include "Math/Color.h"

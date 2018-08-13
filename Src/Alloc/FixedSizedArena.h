@@ -28,14 +28,9 @@ class FixedSizedArena
 public:
 
     explicit FixedSizedArena(size_t nodeSize)
-        : nodeSize_(nodeSize), chunkSize_(nodeSize * 32 + sizeof(Chunk*)),
-          freeNodes_(nullptr), chunkEntry_(nullptr)
+        : FixedSizedArena(nodeSize, nodeSize * 32 + sizeof(Chunk*))
     {
-        if(nodeSize < sizeof(Node*) || nodeSize + sizeof(Chunk*) > chunkSize_)
-        {
-            throw ArgumentException(
-                "Invalid size arguments for FixedSizedArena");
-        }
+
     }
 
     FixedSizedArena(size_t nodeSize, size_t chunkSize)
