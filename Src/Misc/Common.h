@@ -97,4 +97,7 @@ public:
 template<typename T>
 using remove_rcv_t = std::remove_cv_t<std::remove_reference_t<T>>;
 
+template<typename T>
+constexpr T StaticMax(T lhs, T rhs) { return lhs < rhs ? rhs : lhs; }
+
 AGZ_NS_END(AGZ)

@@ -596,7 +596,7 @@ private:
         }
     }
 };
-
+using namespace std;
 // See https://swtch.com/~rsc/regexp/regexp2.html
 template<typename CS>
 class PikeMachine
@@ -629,9 +629,8 @@ class PikeMachine
     {
         AGZ_ASSERT(slotCount_ % 2 == 0);
 
-        Arena threadArena(sizeof(Thread<CS>), 32 * sizeof(Thread<CS>));
-        Arena slotsArena(SaveSlots::AllocSize(slotCount_),
-                         32 * SaveSlots::AllocSize(slotCount_));
+        Arena threadArena(sizeof(Thread<CS>));
+        Arena slotsArena(SaveSlots::AllocSize(slotCount_));
 
         std::vector<Thread<CS>*> rdyThds = {
             NewThread(threadArena, prog_.begin(),
@@ -645,17 +644,14 @@ class PikeMachine
         size_t step = 0;
         auto cpSeq = dst.CodePoints();
         auto end = cpSeq.end();
-        for(auto it = cpSeq.begin(); ; ++it)
+        for(auto it = cpSeq.begin(); it != end ; ++it)
         {
-            CodePoint cp;
-            if(it != end)
-                cp = *it;
-            else
-                cp = '\0';
+            CodePoint cp = *it;
 
             if(rdyThds.empty())
                 break;
 
+            cout << (char)cp << endl;
             for(size_t i = 0; i < rdyThds.size(); ++i)
             {
                 Thread<CS> *th = rdyThds[i];
@@ -664,6 +660,7 @@ class PikeMachine
                 switch(pc->op)
                 {
                 case InstOpCode::Jump:
+                    cout << "J" << endl;
                     if(pc->jumpDest->lastStep != step)
                     {
                         th->pc = pc->jumpDest;
@@ -675,6 +672,7 @@ class PikeMachine
                     break;
 
                 case InstOpCode::Char:
+                    cout << "C " << (char)pc->cp << endl;
                     if(pc->cp == cp && (++th->pc)->lastStep != step + 1)
                     {
                         th->pc->lastStep = step + 1;
@@ -685,6 +683,7 @@ class PikeMachine
                     break;
 
                 case InstOpCode::Branch:
+                    cout << "B" << endl;
                     // IMPROVE: Copy construction is unnecessary when
                     //              dest[0]->lastStep != step and
                     //              dest[1]->lastStep == step
@@ -705,6 +704,7 @@ class PikeMachine
                     break;
                 
                 case InstOpCode::Alter:
+                    cout << "A" << endl;
                     // IMPROVE: Ditto
                     for(auto dest : *pc->alterDest)
                     {
@@ -719,6 +719,7 @@ class PikeMachine
                     break;
 
                 case InstOpCode::Save:
+                    cout << "S" << endl;
                     th->saveSlots.Set(pc->saveSlot, cpSeq.CodeUnitIndex(it));
                     if((++th->pc)->lastStep != step)
                     {
@@ -728,6 +729,7 @@ class PikeMachine
                     break;
 
                 case InstOpCode::Match:
+                    cout << "M" << endl;
                     FreeThread(threadArena, th);
                     break;
 

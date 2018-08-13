@@ -26,7 +26,8 @@ class CRTAllocator
 {
 public:
 
-    static constexpr bool AnyAlign = true;
+    static constexpr bool AnyAlign   = true;
+    static constexpr bool ThreadSafe = true;
 
     static void *Malloc(size_t size)
     {

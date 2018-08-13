@@ -163,6 +163,12 @@
     <ClInclude Include="..\Src\String\Regex\Regex.h">
       <Filter>String\Regex</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\String\Regex\NFAVM.h">
+      <Filter>String\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Buffer\COWObject.h">
+      <Filter>Buffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">

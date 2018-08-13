@@ -27,7 +27,18 @@ class FixedSizedArena
 
 public:
 
-    explicit FixedSizedArena(size_t nodeSize, size_t chunkSize)
+    explicit FixedSizedArena(size_t nodeSize)
+        : nodeSize_(nodeSize), chunkSize_(nodeSize * 32 + sizeof(Chunk*)),
+          freeNodes_(nullptr), chunkEntry_(nullptr)
+    {
+        if(nodeSize < sizeof(Node*) || nodeSize + sizeof(Chunk*) > chunkSize_)
+        {
+            throw ArgumentException(
+                "Invalid size arguments for FixedSizedArena");
+        }
+    }
+
+    FixedSizedArena(size_t nodeSize, size_t chunkSize)
         : nodeSize_(nodeSize), chunkSize_(chunkSize),
           freeNodes_(nullptr), chunkEntry_(nullptr)
     {
@@ -86,6 +97,41 @@ public:
             Alloc::Free(chunkEntry_);
             chunkEntry_ = next;
         }
+    }
+};
+
+template<typename E, typename Alloc = DefaultAllocator>
+class SmallObjArena
+{
+    FixedSizedArena<Alloc> base_;
+
+public:
+
+    using Self = SmallObjArena<E, Alloc>;
+
+    explicit SmallObjArena(size_t chunkSize = 32)
+        : base_(sizeof(E), chunkSize)
+    {
+        
+    }
+
+    SmallObjArena(const Self &)   = delete;
+    Self &operator=(const Self &) = delete;
+    ~SmallObjArena()              = default;
+
+    E *Malloc()
+    {
+        return base_.template Malloc<E>();
+    }
+
+    void Free(void *ptr)
+    {
+        base_.Free(ptr);
+    }
+
+    void ReleaseAll()
+    {
+        base_.ReleaseAll();
     }
 };
 

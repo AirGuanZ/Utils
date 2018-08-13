@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <string>
 
 #include <Utils.h>
 
@@ -50,5 +51,20 @@ TEST_CASE("Buffer")
         REQUIRE(buf0(45, 46) == 45 * 46);
         REQUIRE(buf0(212, 13) == 212 * 13);
         REQUIRE(ApproxEq(buf2(212, 13), 212.0f * 13.0f, 1e-5f));
+    }
+
+    SECTION("COWObject")
+    {
+        COWObject<string> s0("Minecraft");
+        COWObject<string> s1 = s0;
+        REQUIRE(s0.Refs() == 2);
+        REQUIRE(*s1 == "Minecraft");
+        s1.Mutable() = "Dark Souls";
+        REQUIRE((s0.Refs() == 1 && s1.Refs() == 1));
+        s0.Release();
+        COWObject<string> s2 = std::move(s1);
+        REQUIRE((s0.Refs() == 0 && s1.Refs() == 0));
+
+        REQUIRE(s2->length() == 10);
     }
 }

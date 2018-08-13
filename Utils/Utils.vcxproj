@@ -24,6 +24,7 @@
     <ClInclude Include="..\Src\Alloc\Malloc.h" />
     <ClInclude Include="..\Src\Buffer\Buffer.h" />
     <ClInclude Include="..\Src\Buffer\Buffer2D.h" />
+    <ClInclude Include="..\Src\Buffer\COWObject.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />
     <ClInclude Include="..\Src\Math\Color.h" />
     <ClInclude Include="..\Src\Math\Mat4.h" />
@@ -72,6 +73,9 @@
     <None Include="..\Src\Math\SwizzleVec4.inl" />
     <None Include="..\Src\String\StrAlgo.inl" />
     <None Include="..\Src\String\String.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Src\String\Regex\NFAVM.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

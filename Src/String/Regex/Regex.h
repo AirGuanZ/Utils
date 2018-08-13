@@ -5,6 +5,7 @@
 #include "../../Misc/Common.h"
 #include "../../Range/Iterator.h"
 #include "../String.h"
+#include "NFAVM.h"
 #include "PikeVM.h"
 
 // Regular expression
@@ -174,5 +175,8 @@ using RegexMatch = RegexImpl::Match<CS>;
 
 template<typename CS>
 using Regex = RegexImpl::Regex<CS>;
+
+using RegexMatch8 = RegexMatch<UTF8<>>;
+using Regex8      = Regex<UTF8<>>;
 
 AGZ_NS_END(AGZ)
