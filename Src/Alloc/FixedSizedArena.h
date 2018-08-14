@@ -104,10 +104,10 @@ public:
 
     using Self = SmallObjArena<E, Alloc>;
 
-    explicit SmallObjArena(size_t chunkSize = 32)
+    explicit SmallObjArena(size_t chunkSize = 32 * sizeof(E))
         : base_(sizeof(E), chunkSize)
     {
-        
+
     }
 
     SmallObjArena(const Self &)   = delete;

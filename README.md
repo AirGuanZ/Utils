@@ -155,13 +155,34 @@ A non-null-terminated immutable string class...Just for fun.
 // using Str8 = String<UTF8<char>>; using Str32 = String<UTF32<uint32_t>>;
 
 Str8 a = u8"今天天气不错。Hello, world!";
-Str32 b = a;
-std::string c = b.ToStdString();
-REQUIRE(c == u8"今天天气不错。Hello, world!");
+REQUIRE(a == u8"今天天气不错。Hello, world!");
 
-REQUIRE(Str8(u8"0") * 5 == u8"00000");
+// Fiexiable convertion between different char encodings
+Str32 b = CSConv::Convert<UTF32<>>(a);
+REQUIRE(b == u8"今天天气不错。Hello, world!");
 
-// Traverse Unicode code points
-for(auto codePoint : a.Chars())
-    ...
+// Traversal code points easily
+for(char32_t codePoint : a)
+    ;
+// Typeof c is StringView<UTF8<>>.
+// Each c contains one single code point (perhaps multiple code units).
+for(auto c : a.Chars())
+    ;
+
+// Common string operations
+REQUIRE(Str8::From(0xFF35B, 16) == u8"FF35B")
+REQUIRE(Str32::From(0b1010110, 2) == u8"1010110")
+REQUIRE(Str8(u8"  Minecraft  ").Trim() == u8"Minecraft");
+REQUIRE(Str8(u8"Minecraft").Slice(0, 3) == u8"Min")
+REQUIRE(Str8(u8" + "),Join(vector<Str8>{ u8"a", u8"b", u8"c" }) == u8"a + b + c");
+REQUIRE(Str8(u8"Minecraft").Find(u8"necraft") == 2);
+//...
+
+// Compatiable with Range components perfectly
+REQUIRE((Str8(u8"Mine cr aft ").Split()
+        | Map([](const Str8::View &v) { return v.AsString(); })
+        | Collect<vector<Str8>>())
+     == vector<Str8>{ u8"Mine", u8"cr", u8"aft" });
+
+// Regex: coming soon
 ```
