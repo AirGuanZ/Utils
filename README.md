@@ -174,7 +174,7 @@ REQUIRE(Str8::From(0xFF35B, 16) == u8"FF35B")
 REQUIRE(Str32::From(0b1010110, 2) == u8"1010110")
 REQUIRE(Str8(u8"  Minecraft  ").Trim() == u8"Minecraft");
 REQUIRE(Str8(u8"Minecraft").Slice(0, 3) == u8"Min")
-REQUIRE(Str8(u8" + "),Join(vector<Str8>{ u8"a", u8"b", u8"c" }) == u8"a + b + c");
+REQUIRE(Str8(u8" + ").Join(vector<Str8>{ u8"a", u8"b", u8"c" }) == u8"a + b + c");
 REQUIRE(Str8(u8"Minecraft").Find(u8"necraft") == 2);
 //...
 
