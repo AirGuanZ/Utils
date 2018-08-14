@@ -526,12 +526,15 @@ inline const unsigned char DIGIT_CHAR_VALUE_TABLE[128] =
     33,  34,  35,  255, 255, 255, 255, 255
 };
 
+template<typename T>
+static bool IsASCII(T v) { return 0 <= v && v < 128; }
+
 template<typename CS>
 bool StringView<CS>::IsDigit(unsigned int base) const
 {
     AGZ_ASSERT(base <= 36);
     auto [d, l] = DataAndLength();
-    return l == 1 && d[0] < 128 &&
+    return l == 1 && IsASCII(d[0]) &&
            DIGIT_CHAR_VALUE_TABLE[d[0]] < base;
 }
 
@@ -542,7 +545,7 @@ bool StringView<CS>::IsDigits(unsigned int base) const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(d[i] >= 128 || d[i] >= base)
+        if(!IsASCII(d[i]) || d[i] >= base)
             return false;
     }
     return true;
@@ -572,7 +575,7 @@ template<typename CS>
 bool StringView<CS>::IsAlnum(unsigned int base) const
 {
     auto [d, l] = DataAndLength();
-    return l == 1 && d[0] < 128 && DIGIT_CHAR_VALUE_TABLE[d[0]] < 36;
+    return l == 1 && IsASCII(d[0]) && DIGIT_CHAR_VALUE_TABLE[d[0]] < 36;
 }
 
 template<typename CS>
@@ -581,7 +584,7 @@ bool StringView<CS>::IsAlnums(unsigned int base) const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(d[i] >= 128 || DIGIT_CHAR_VALUE_TABLE[d[i]] >= 36)
+        if(!IsASCII(d[i]) || DIGIT_CHAR_VALUE_TABLE[d[i]] >= 36)
             return false;
     }
     return true;
@@ -629,7 +632,7 @@ template<typename CS>
 bool StringView<CS>::IsWhitespace() const
 {
     auto [d, l] = DataAndLength();
-    return l == 1 && d[0] < 128 && DIGIT_CHAR_VALUE_TABLE[d[0]] == 128;
+    return l == 1 && IsASCII(d[0]) && DIGIT_CHAR_VALUE_TABLE[d[0]] == 128;
 }
 
 template<typename CS>
@@ -638,7 +641,7 @@ bool StringView<CS>::IsWhitespaces() const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(d[i] >= 128 || DIGIT_CHAR_VALUE_TABLE[d[i]] != 128)
+        if(!IsASCII(d[i]) || DIGIT_CHAR_VALUE_TABLE[d[i]] != 128)
             return false;
     }
     return true;
@@ -650,7 +653,7 @@ bool StringView<CS>::IsASCII() const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(d[i] >= 128)
+        if(!IsASCII(d[i]))
             return false;
     }
     return true;
