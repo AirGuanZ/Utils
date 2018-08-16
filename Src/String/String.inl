@@ -6,6 +6,7 @@
 
 #include "../Alloc/Malloc.h"
 #include "StrAlgo.inl"
+#include "String.h"
 
 AGZ_NS_BEG(AGZ::StrImpl)
 
@@ -438,6 +439,57 @@ bool StringView<CS>::Empty() const
 }
 
 template<typename CS>
+template<typename T, std::enable_if_t<std::is_integral_v<T>, int>>
+T StringView<CS>::Parse(unsigned int base) const
+{
+    return StrAlgo::Str2Int<T, CS>(*this, base);
+}
+
+template<typename T>
+struct Str2FloatImpl;
+
+template<>
+struct Str2FloatImpl<float>
+{
+    static float Convert(const std::string &s)
+    {
+        try
+        {
+            return std::stof(s);
+        }
+        catch(const std::exception &err)
+        {
+            throw ArgumentException(err.what());
+        }
+        Unreachable();
+    }
+};
+
+template<>
+struct Str2FloatImpl<double>
+{
+    static double Convert(const std::string &s)
+    {
+        try
+        {
+            return std::stod(s);
+        }
+        catch(const std::exception &err)
+        {
+            throw ArgumentException(err.what());
+        }
+        Unreachable();
+    }
+};
+
+template<typename CS>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
+T StringView<CS>::Parse() const
+{
+    return Str2FloatImpl<T>::Convert(this->ToStdString());
+}
+
+template<typename CS>
 StringView<CS> StringView<CS>::Trim() const
 {
     return TrimLeft().TrimRight();
@@ -505,27 +557,6 @@ bool StringView<CS>::EndsWith(const Self &suffix) const
                 (Suffix(suffix.Length()) == suffix);
 }
 
-// < 10    : digit
-// [10, 36): alpha
-// 128     : whitespaces
-// 255     : others
-inline const unsigned char DIGIT_CHAR_VALUE_TABLE[128] =
-{
-    255, 255, 255, 255, 255, 255, 255, 255, 255, 128,
-    128, 128, 128, 128, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 128, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255, 0,   1,
-    2,   3,   4,   5,   6,   7,   8,   9,   255, 255,
-    255, 255, 255, 255, 255, 10,  11,  12,  13,  14,
-    15,  16,  17,  18,  19,  20,  21,  22,  23,  24,
-    25,  26,  27,  28,  29,  30,  31,  32,  33,  34,
-    35,  255, 255, 255, 255, 255, 255, 10,  11,  12,
-    13,  14,  15,  16,  17,  18,  19,  20,  21,  22,
-    23,  24,  25,  26,  27,  28,  29,  30,  31,  32,
-    33,  34,  35,  255, 255, 255, 255, 255
-};
-
 template<typename T>
 static bool IsASCII(T v) { return 0 <= v && v < 128; }
 
@@ -535,7 +566,7 @@ bool StringView<CS>::IsDigit(unsigned int base) const
     AGZ_ASSERT(base <= 36);
     auto [d, l] = DataAndLength();
     return l == 1 && IsASCII(d[0]) &&
-           DIGIT_CHAR_VALUE_TABLE[d[0]] < base;
+           StrAlgo::DIGIT_CHAR_VALUE_TABLE[d[0]] < base;
 }
 
 template<typename CS>
@@ -575,7 +606,8 @@ template<typename CS>
 bool StringView<CS>::IsAlnum(unsigned int base) const
 {
     auto [d, l] = DataAndLength();
-    return l == 1 && IsASCII(d[0]) && DIGIT_CHAR_VALUE_TABLE[d[0]] < 36;
+    return l == 1 && IsASCII(d[0]) &&
+           StrAlgo::DIGIT_CHAR_VALUE_TABLE[d[0]] < 36;
 }
 
 template<typename CS>
@@ -584,7 +616,7 @@ bool StringView<CS>::IsAlnums(unsigned int base) const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(!IsASCII(d[i]) || DIGIT_CHAR_VALUE_TABLE[d[i]] >= 36)
+        if(!IsASCII(d[i]) || StrAlgo::DIGIT_CHAR_VALUE_TABLE[d[i]] >= 36)
             return false;
     }
     return true;
@@ -632,7 +664,8 @@ template<typename CS>
 bool StringView<CS>::IsWhitespace() const
 {
     auto [d, l] = DataAndLength();
-    return l == 1 && IsASCII(d[0]) && DIGIT_CHAR_VALUE_TABLE[d[0]] == 128;
+    return l == 1 && IsASCII(d[0]) &&
+           StrAlgo::DIGIT_CHAR_VALUE_TABLE[d[0]] == 128;
 }
 
 template<typename CS>
@@ -641,7 +674,7 @@ bool StringView<CS>::IsWhitespaces() const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(!IsASCII(d[i]) || DIGIT_CHAR_VALUE_TABLE[d[i]] != 128)
+        if(!IsASCII(d[i]) || StrAlgo::DIGIT_CHAR_VALUE_TABLE[d[i]] != 128)
             return false;
     }
     return true;
@@ -685,29 +718,6 @@ String<CS> StringView<CS>::ToLower() const
     while(b < e)
     {
         if('A' <= *b && *b <= 'Z')
-        {
-            *b = *b + ('a' - 'A');
-            ++b;
-        }
-        else
-            b = CS::NextCodePoint(b);
-    }
-    return std::move(ret);
-}
-
-template<typename CS>
-String<CS> StringView<CS>::SwapCase() const
-{
-    String<CS> ret = *this;
-    auto [b, e] = ret.BeginAndEnd();
-    while(b < e)
-    {
-        if('a' <= *b && *b <= 'z')
-        {
-            *b = *b + ('A' - 'a');
-            ++b;
-        }
-        else if('A' <= *b && *b <= 'Z')
         {
             *b = *b + ('a' - 'A');
             ++b;

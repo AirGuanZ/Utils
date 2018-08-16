@@ -46,6 +46,17 @@ TEST_CASE("String")
         REQUIRE(AStr::From(12 * 35 * 35 * 35 + 4 * 35 * 35 + 34 * 35, 35) == u8"C4Y0");
     }
 
+    SECTION("Parse")
+    {
+        REQUIRE(Str8("123456").Parse<int>()    == 123456);
+        REQUIRE(Str16("123abc").Parse<int>(16) == 0x123ABC);
+        REQUIRE(Str16("C4Y0").Parse<int>(35)   == 12 * 35 * 35 * 35 + 4 * 35 * 35 + 34 * 35);
+        REQUIRE(Str16("-123456").Parse<int>()  == -123456);
+        REQUIRE(Str16("-0").Parse<int>()       == 0);
+
+        REQUIRE(Math::ApproxEq(Str16("3.286").Parse<float>(), 3.286f, 1e-5));
+    }
+
     SECTION("Trim")
     {
         REQUIRE(Str8(u8"  Minecraft\n\t").Trim()      == u8"Minecraft");
@@ -87,14 +98,22 @@ TEST_CASE("String")
         REQUIRE(Str8(u8"Minecraft").Find(u8"er")        == Str8::NPOS);
     }
 
+    SECTION("Misc")
+    {
+        REQUIRE(Str8(u8"MINE").IsUppers());
+        REQUIRE(Str8(u8"mine").IsLowers());
+        REQUIRE(!Str8(u8"mine").IsUppers());
+        REQUIRE(!Str8(u8"MINE").IsLowers());
+    }
+
     SECTION("Regex")
     {
         REQUIRE(Regex8(u8"abc").Match(u8"abc"));
-        REQUIRE(Regex8(u8"abc").Match(u8"ac") == false);
+        REQUIRE(!Regex8(u8"abc").Match(u8"ac"));
         REQUIRE(Regex8(u8"abc[def]").Match(u8"abcd"));
         REQUIRE(Regex8(u8"abc*").Match(u8"abccc"));
         REQUIRE(Regex8(u8"abc*").Match(u8"ab"));
-        REQUIRE(Regex8(u8"abc+").Match(u8"ab") == false);
+        REQUIRE(!Regex8(u8"abc+").Match(u8"ab"));
         REQUIRE(Regex8(u8"abc?").Match(u8"ab"));
         REQUIRE(Regex8(u8"ab[def]+").Match(u8"abdefdeffeddef"));
         REQUIRE(Regex8(u8"今天天气不错").Search(u8"GoodMorning今天天气不错啊"));
@@ -120,6 +139,7 @@ TEST_CASE("String")
 
         {
             auto m = Regex8("&[def]+&").Search("abcddeeffxyz");
+            auto n = m;
             REQUIRE((m && m(0, 1) == "ddeeff"));
         }
 

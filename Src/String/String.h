@@ -266,6 +266,12 @@ public:
     size_t Length() const;
     bool Empty()    const;
 
+    template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
+    T Parse(unsigned base = 10) const;
+
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+    T Parse() const;
+
     Self Trim()      const;
     Self TrimLeft()  const;
     Self TrimRight() const;
@@ -304,7 +310,6 @@ public:
 
     Str ToUpper() const;
     Str ToLower() const;
-    Str SwapCase() const;
 
     std::vector<Self> Split()                    const;
     std::vector<Self> Split(const Self &spliter) const;
@@ -341,6 +346,7 @@ template<typename CS>
 class String
 {
     friend class StringBuilder<CS>;
+    friend class StringView<CS>;
 
     Storage<typename CS::CodeUnit> storage_;
 
@@ -353,6 +359,7 @@ public:
     using Charset   = CS;
     using CodeUnit  = typename CS::CodeUnit;
     using CodePoint = typename CS::CodePoint;
+    using Builder   = StringBuilder<CS>;
     using View      = StringView<CS>;
     using Self      = String<CS>;
 
@@ -391,6 +398,12 @@ public:
     static Self From(long long v,          unsigned int base = 10);
     static Self From(unsigned long long v, unsigned int base = 10);
 
+    template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
+    T Parse(unsigned int base = 10) const { return AsView().Parse<T>(base); }
+
+    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+    T Parse() const { return AsView().Parse<T>(); }
+
     View AsView() const;
 
     const CodeUnit *Data() const;
@@ -425,7 +438,6 @@ public:
     bool IsASCII()                                  const { return AsView().IsASCII();                       }
     Self ToUpper()                                  const { return AsView().ToUpper();                       }
     Self ToLower()                                  const { return AsView().ToLower();                       }
-    Self SwapCase()                                 const { return AsView().SwapCase();                      }
     std::vector<View> Split()                       const { return AsView().Split();                         }
     std::vector<View> Split(const View &spliter)    const { return AsView().Split(spliter);                  }
     std::vector<View> Split(const Self &spliter)    const { return AsView().Split(spliter);                  }
@@ -525,7 +537,7 @@ using Str32 = String<UTF32<>>;
 using AStr  = String<ASCII<>>;
 using WStr  = String<WUTF>;
 
-using CSConv  = StrImpl::CharsetConvertor;
+using CSConv = StrImpl::CharsetConvertor;
 
 template<typename CS>
 using StringBuilder = StrImpl::StringBuilder<CS>;

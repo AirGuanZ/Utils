@@ -88,7 +88,7 @@ CompareResult Compare(const CU *lhs, const CU *rhs, size_t lLen, size_t rLen)
 
 template<typename T, typename CS,
          std::enable_if_t<std::is_integral_v<T>, int> = 0>
-String<CS> Int2Str(T v, unsigned int base)
+    String<CS> Int2Str(T v, unsigned int base)
 {
     // IMPROVE
 
@@ -136,6 +136,76 @@ String<CS> Int2Str(T v, unsigned int base)
 
     std::reverse(std::begin(cus), std::end(cus));
     return String<CS>(cus.data(), cus.size());
+}
+
+// < 10    : digit
+// [10, 36): alpha
+// 128     : whitespaces
+// 255     : others
+inline const unsigned char DIGIT_CHAR_VALUE_TABLE[128] =
+{
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 128,
+    128, 128, 128, 128, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 128, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 0,   1,
+    2,   3,   4,   5,   6,   7,   8,   9,   255, 255,
+    255, 255, 255, 255, 255, 10,  11,  12,  13,  14,
+    15,  16,  17,  18,  19,  20,  21,  22,  23,  24,
+    25,  26,  27,  28,  29,  30,  31,  32,  33,  34,
+    35,  255, 255, 255, 255, 255, 255, 10,  11,  12,
+    13,  14,  15,  16,  17,  18,  19,  20,  21,  22,
+    23,  24,  25,  26,  27,  28,  29,  30,  31,  32,
+    33,  34,  35,  255, 255, 255, 255, 255
+};
+
+template<typename T, typename CS>
+struct Str2IntImpl
+{
+    static T Convert(const StringView<CS> &str, unsigned int base)
+    {
+        AGZ_ASSERT(base <= 36);
+
+        auto chars = str.CodePoints();
+        auto cur = chars.begin(), end = chars.end();
+
+        [[maybe_unused]]
+        bool neg = false;
+
+        auto begcp = *cur;
+        if(begcp == '+')
+            ++cur;
+        else if constexpr(std::is_signed_v<T>)
+        {
+            if(begcp == '-')
+            {
+                neg = true;
+                ++cur;
+            }
+        }
+
+        auto c = cur;
+        if(cur == end || (*++c == '0' && c != end))
+            throw ArgumentException("Parsing error in Str2Int");
+
+        T ret = T(0);
+        while(cur != end)
+        {
+            auto cp = *cur++;
+            if(cp < 0 || cp >= 128 || DIGIT_CHAR_VALUE_TABLE[cp] >= base)
+                throw ArgumentException("Parsing error in Str2Int");
+            ret = base * ret + DIGIT_CHAR_VALUE_TABLE[cp];
+        }
+
+        return neg ? -ret : ret;
+    }
+};
+
+template<typename T, typename CS,
+            std::enable_if_t<std::is_integral_v<T>, int> = 0>
+    T Str2Int(const StringView<CS> &str, unsigned int base)
+{
+    return Str2IntImpl<T, CS>::Convert(str, base);
 }
 
 AGZ_NS_END(AGZ::StrImpl::StrAlgo)

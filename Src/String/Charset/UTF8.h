@@ -245,7 +245,7 @@ UTF8Iterator<T> UTF8Iterator<T>::operator++(int)
 {
     auto ret = *this;
     ++*this;
-    return *this;
+    return ret;
 }
 
 template<typename T>
@@ -260,7 +260,7 @@ UTF8Iterator<T> UTF8Iterator<T>::operator--(int)
 {
     auto ret = *this;
     --*this;
-    return *this;
+    return ret;
 }
 
 template<typename T>

@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 
+#include "../../Buffer/COWObject.h"
 #include "../../Misc/Common.h"
 #include "../../Range/Iterator.h"
 #include "../String.h"
@@ -147,8 +148,11 @@ public:
     using CodePoint = typename CS::CodePoint;
     using CodeUnit  = typename CS::CodeUnit;
     using Engine    = Eng;
+    using EngObj    = COWObject<Engine>;
     using Result    = Match<CS>;
     using Self      = Regex<CS, Eng>;
+
+    Regex() = default;
 
     Regex(const StringView<CS> &regex)
         : engine_(regex)
@@ -162,6 +166,32 @@ public:
 
     }
 
+    Regex(const Self &copyFrom)
+        : engine_(copyFrom.engine_)
+    {
+
+    }
+
+    Regex(Self &&moveFrom)
+        : engine_(std::move(moveFrom.engine_))
+    {
+
+    }
+
+    Self &operator=(const Self &copyFrom)
+    {
+        engine_ = copyFrom.engine_;
+        return *this;
+    }
+
+    Self &operator=(Self &&moveFrom)
+    {
+        engine_ = std::move(moveFrom.engine_);
+        return *this;
+    }
+
+    ~Regex() = default;
+
     Result Match(const String<CS> &dst) const
     {
         return this->Match(dst.AsView());
@@ -174,7 +204,7 @@ public:
 
     Result Match(const StringView<CS> &dst) const
     {
-        auto rt = engine_.Match(dst);
+        auto rt = engine_->Match(dst);
         if(!rt.has_value())
             return Result();
         return Result(dst, { 0, dst.Length() }, std::move(rt.value()));
@@ -182,7 +212,7 @@ public:
 
     Result Search(const StringView<CS> &dst) const
     {
-        auto rt = engine_.Search(dst);
+        auto rt = engine_->Search(dst);
         if(!rt.has_value())
             return Result();
         return Result(dst, rt.value().first, std::move(rt.value().second));
@@ -190,7 +220,7 @@ public:
 
 private:
 
-    Engine engine_;
+    EngObj engine_;
 };
 
 using Regex8  = Regex<UTF8<>>;

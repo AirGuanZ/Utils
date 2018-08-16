@@ -327,7 +327,21 @@ public:
     ~Program()
     {
         if(insts_)
+        {
+            for(size_t i = 0; i < instCount_; ++i)
+            {
+                switch(insts_[i].op)
+                {
+                case Inst<CP>::Alter:
+                    if(insts_[i].alterDest)
+                        delete[] insts_[i].alterDest;
+                    break;
+                default:
+                    break;
+                }
+            }
             delete insts_;
+        }
     }
 
     bool IsAvailable() const
