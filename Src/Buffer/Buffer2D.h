@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdlib>
-#include <new>
 #include <utility>
 
 #include "../Misc/Common.h"
@@ -62,7 +61,7 @@ public:
 
     template<typename F>
     Buffer2D(CONS_FLAG_FROM_FN_t, size_t w, size_t h, F &&initer)
-        : w_(w), h_(h)
+        : w_(w), h_(h), d_(nullptr)
     {
         Alloc(w * h);
         E *d = d_;

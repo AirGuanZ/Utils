@@ -602,7 +602,7 @@ public:
     SaveSlots(size_t slotCount, FixedSizedArena<> &arena)
         : slotCount_(slotCount), arena_(arena)
     {
-        storage_ = arena_.template Malloc<SaveSlotsStorage>();
+        storage_ = arena_.Malloc<SaveSlotsStorage>();
         storage_->refs = 1;
         for(size_t i = 0; i < slotCount_; ++i)
             storage_->slots[i] = std::numeric_limits<size_t>::max();
@@ -680,8 +680,9 @@ public:
 
     using Interval = std::pair<size_t, size_t>;
 
-    Machine(const StringView<CS> &regex)
-        : regex_(regex)
+    explicit Machine(const StringView<CS> &regex)
+        : regex_(regex),
+          slotCount_(0), cpr_(nullptr), matchedStart_(0), matchedEnd_(0)
     {
         
     }
@@ -779,7 +780,6 @@ private:
             thds.push_back(Thread<CP>(pc, std::move(saves), startIdx));
             return;
         }
-        Unreachable();
     }
     
     template<bool AnchorBegin, bool AnchorEnd>

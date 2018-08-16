@@ -6,7 +6,6 @@
 
 #include "../../Buffer/COWObject.h"
 #include "../../Misc/Common.h"
-#include "../../Range/Iterator.h"
 #include "../String.h"
 #include "VMEngine.h"
 
@@ -57,10 +56,10 @@ public:
 
     }
 
-    Match(Self &&moveFrom)
+    Match(Self &&moveFrom) noexcept
         : whole_(std::move(moveFrom.whole_)),
           interval_(moveFrom.interval_),
-          savePoints_(std::move(moveFrom_.savePoints))
+          savePoints_(std::move(moveFrom.savePoints_))
     {
         moveFrom.interval_.second = std::numeric_limits<size_t>::max();
     }
@@ -75,7 +74,7 @@ public:
         return *this;
     }
 
-    Self &operator=(Self &&moveFrom)
+    Self &operator=(Self &&moveFrom) noexcept
     {
         whole_ = std::move(moveFrom.whole_);
         interval_ = moveFrom.interval_;
@@ -172,7 +171,7 @@ public:
 
     }
 
-    Regex(Self &&moveFrom)
+    Regex(Self &&moveFrom) noexcept
         : engine_(std::move(moveFrom.engine_))
     {
 
@@ -184,7 +183,7 @@ public:
         return *this;
     }
 
-    Self &operator=(Self &&moveFrom)
+    Self &operator=(Self &&moveFrom) noexcept
     {
         engine_ = std::move(moveFrom.engine_);
         return *this;

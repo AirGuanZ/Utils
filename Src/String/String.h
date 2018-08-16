@@ -399,10 +399,10 @@ public:
     static Self From(unsigned long long v, unsigned int base = 10);
 
     template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
-    T Parse(unsigned int base = 10) const { return AsView().Parse<T>(base); }
+    T Parse(unsigned int base = 10) const { return AsView().template Parse<T>(base); }
 
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
-    T Parse() const { return AsView().Parse<T>(); }
+    T Parse() const { return AsView().template Parse<T>(); }
 
     View AsView() const;
 

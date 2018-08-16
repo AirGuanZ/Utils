@@ -1,7 +1,5 @@
 #pragma once
 
-#include <type_traits>
-
 #include "../../Misc/Common.h"
 #include "Charset.h"
 

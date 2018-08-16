@@ -461,7 +461,6 @@ struct Str2FloatImpl<float>
         {
             throw ArgumentException(err.what());
         }
-        Unreachable();
     }
 };
 
@@ -478,7 +477,6 @@ struct Str2FloatImpl<double>
         {
             throw ArgumentException(err.what());
         }
-        Unreachable();
     }
 };
 
