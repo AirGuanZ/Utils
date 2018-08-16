@@ -135,9 +135,9 @@ UTF16Core<T>::NextCodePoint(const CodeUnit *cur)
         char32_t low = static_cast<char32_t>(*++cur);
         if(low <= 0xdfff)
             return cur + 1;
-        throw EncodingException("Advancing in invalid UTF-16 sequence");
+        throw CharsetException("Advancing in invalid UTF-16 sequence");
     }
-    throw EncodingException("Advancing in invalid UTF-16 sequence");
+    throw CharsetException("Advancing in invalid UTF-16 sequence");
 }
 
 template<typename T>
@@ -160,8 +160,8 @@ template<typename T>
 char32_t UTF16Core<T>::Iterator::operator*() const
 {
     char32_t ret;
-    if(!UTF16Core<T>::CU2CP(cur, &ret, UTF16Core<T>::MaxCUInCP))
-        throw EncodingException("Invalid UTF-16 sequence");
+    if(!UTF16Core<T>::CU2CP(cur, &ret))
+        throw CharsetException("Invalid UTF-16 sequence");
     return ret;
 }
 

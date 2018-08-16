@@ -126,6 +126,11 @@ public:
                             savePoints_[secondSavePoint]);
     }
 
+    size_t SavePointCount() const
+    {
+        return savePoints_.size();
+    }
+
 private:
 
     String<CS> whole_;

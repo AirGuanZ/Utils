@@ -177,6 +177,37 @@ REQUIRE((Str8(u8"Mine cr aft ").Split()
         | Map([](const Str8::View &v) { return v.AsString(); })
         | Collect<vector<Str8>>())
      == vector<Str8>{ u8"Mine", u8"cr", u8"aft" });
+```
 
-// Regex: coming soon
+## Regex
+
+- Various char encoding
+- Flexible submatching tracking
+
+`abc`: matches `abc`
+`abc[def]`: matches `abcd`/`abce`/`abcf`
+`abc?`: matches `ab`/`abc`
+`abc+`: matches concatenation of `ab` and one or more `c`
+`abc*`: matches concatenation of `ab` and zero or more `c`
+
+`&` defines a save point and can be used to indicate a location in matched strings.
+
+```cpp
+REQUIRE(Regex8("abc(def)+").Match("abcdefdefdef"));
+REQUIRE(Regex16("abc[def]+").Match("abcdddeeefffdef"));
+REQUIRE(Regex32("abc").Match("abd") == false);
+REQUIRE(Regex8("cde").Search("abcdef"));
+REQUIRE(Regex8("cDe").Search("abcdef") == false);
+
+{
+    auto m = Regex8("&abc&[def]*&xyz&").Match("abcddeeffxyz");
+    REQUIRE((m && m(0, 1) == "abc"
+               && m(1, 2) == "ddeeff"
+               && m(2, 3) == "xyz"));
+}
+
+{
+    auto m = Regex8("&[def]+&").Search("abcddeeffxyz");
+    REQUIRE((m && m(0, 1) == "ddeeff"));
+}
 ```
