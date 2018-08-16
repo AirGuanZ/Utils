@@ -7,7 +7,7 @@
 #include "../../Alloc/FixedSizedArena.h"
 #include "../../Misc/Common.h"
 
-AGZ_NS_BEG(AGZ::VMEngine)
+AGZ_NS_BEG(AGZ::VMEngineImpl)
 
 template<typename CP>
 struct Inst
@@ -642,6 +642,12 @@ public:
 
     using Interval = std::pair<size_t, size_t>;
 
+    std::optional<std::vector<size_t>>
+        Match(const StringView<CS> &dst)
+    {
+        if(!prog_.size())
+    }
+
 private:
 
     using It = typename CS::Iterator;
@@ -827,4 +833,4 @@ private:
     }
 };
 
-AGZ_NS_END(AGZ::VMEngine)
+AGZ_NS_END(AGZ::VMEngineImpl)
