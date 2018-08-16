@@ -10,6 +10,6 @@
 AGZ_NS_BEG(AGZ)
 
 // wchar_t on Windows holds UTF-16 code units
-using WUTF = std::conditional_t<sizeof(wchar_t) == 4, UTF32<>, UTF16<>>;
+using WUTF = std::conditional_t<sizeof(wchar_t) == 4, UTF32<wchar_t>, UTF16<wchar_t>>;
 
 AGZ_NS_END(AGZ)

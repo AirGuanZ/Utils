@@ -7,6 +7,9 @@
 #include "../../Alloc/FixedSizedArena.h"
 #include "../../Misc/Common.h"
 
+// Regular expression matching by virtual machine
+// See https://swtch.com/~rsc/regexp/regexp2.html
+
 AGZ_NS_BEG(AGZ::VMEngineImpl)
 
 template<typename CP>
@@ -779,6 +782,8 @@ private:
         
         prog_.ReinitLastSteps();
         vector<Thread<CP>> rdyThds, newThds;
+        rdyThds.reserve(prog_.GetInstCount());
+        newThds.reserve(prog_.GetInstCount());
         
         CPR cpr = str.CodePoints();
         cpr_ = &cpr;
