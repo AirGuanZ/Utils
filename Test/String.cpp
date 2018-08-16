@@ -41,7 +41,7 @@ TEST_CASE("String")
         REQUIRE(Str8::From(-10)                                           == u8"-10");
         REQUIRE(Str8::From(0)                                             == u8"0");
         REQUIRE(Str8::From(2, 2)                                          == u8"10");
-        REQUIRE(Str8::From(0xFF35B, 16)                                   == u8"FF35B");
+        REQUIRE(Str16::From(0xFF35B, 16)                                  == u8"FF35B");
         REQUIRE(Str32::From(01234567u, 8)                                 == u8"1234567");
         REQUIRE(AStr::From(12 * 35 * 35 * 35 + 4 * 35 * 35 + 34 * 35, 35) == u8"C4Y0");
     }
@@ -97,6 +97,8 @@ TEST_CASE("String")
         REQUIRE(Regex8(u8"abc+").Match(u8"ab") == false);
         REQUIRE(Regex8(u8"abc?").Match(u8"ab"));
         REQUIRE(Regex8(u8"ab[def]+").Match(u8"abdefdeffeddef"));
+        REQUIRE(Regex8(u8"今天天气不错").Search(u8"GoodMorning今天天气不错啊"));
+        REQUIRE(Regex16(u8"今天(天气)+不错啊?\\?").Match(u8"今天天气天气天气天气不错?"));
         
         {
             auto m = Regex8(u8"&abc&(def)+&xyz&").Match(u8"abcdefdefxyz");

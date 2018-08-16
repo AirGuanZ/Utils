@@ -869,6 +869,7 @@ private:
                 matchedSaveSlots_.emplace(move(th.saveSlots));
                 matchedStart_ = th.startIdx;
                 matchedEnd_   = str.Length();
+                break;
             }
         }
         

@@ -512,6 +512,8 @@ AGZ_NS_END(AGZ::StrImpl)
 
 AGZ_NS_BEG(AGZ)
 
+using NativeCharset = StrImpl::NativeCharset;
+
 template<typename CS>
 using String = StrImpl::String<CS>;
 template<typename CS>
