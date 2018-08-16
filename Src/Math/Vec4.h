@@ -201,6 +201,12 @@ Vec4<T> Homogenize(const Vec4<T> &vec)
     return Vec4<T>(vec.x * inv_w, vec.y * inv_w, vec.z * inv_w, T(1));
 }
 
+template<typename T>
+auto Brightness(const Vec4<T> &v)
+{
+    return T(0.2126) * v.r + T(0.7152) * v.g + T(0.0722) * v.b;
+}
+
 using Vec4f = Vec4<float>;
 using Vec4d = Vec4<double>;
 

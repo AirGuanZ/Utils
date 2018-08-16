@@ -188,6 +188,12 @@ bool ApproxEq(const Vec3<T> &lhs, const Vec3<T> &rhs, T epsilon)
            ApproxEq(lhs.z, rhs.z, epsilon);
 }
 
+template<typename T>
+auto Brightness(const Vec3<T> &v)
+{
+    return T(0.2126) * v.r + T(0.7152) * v.g + T(0.0722) * v.b;
+}
+
 using Vec3f = Vec3<float>;
 using Vec3d = Vec3<double>;
 

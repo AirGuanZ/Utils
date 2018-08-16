@@ -1,6 +1,6 @@
 ## Math
 
-Basic mathematica operations. Mainly for graphics programming.
+Basic mathematica operations. Mainly used for graphics programming.
 
 ### Scalar
 
@@ -61,24 +61,18 @@ Vec4f d = c.AsVec(); // d: (sqrt(3), sqrt(5), sqrt(7), sqrt(9))
 
 ```c++
 // Initialize buf with { 0, 1, 2, 3, ..., 7, 8, 9 }
-auto buf0 = Buffer<int>::FromFn(
-    10, [](size_t i, int *v) { *v = i });
+auto buf0 = Buffer<int>::FromFn(10, [](size_t i) { return i; });
 // Map buf to buf1 with x -> sqrt(x)
-auto buf1 = buf0.Map<float>(
-    [](int *s, float *d) { *d = Sqrt(float(*s)); });
-// Random access using element index
+auto buf1 = buf0.Map<float>([](int s) { return Sqrt(float(s)); });
+// Random access with element index
 float elem_at_2 = buf1(2);
 // Foldl
-float sum = buf1.Foldl(
-    0.0f, [](float a, float b) { return a + b; });
+float sum = buf1.Foldl(0.0f, [](float a, float b) { return a + b; });
 
 // Buffer2D is similar
 auto buf20 = Buffer2D<int>::New(100, 100);
-auto buf21 = Buffer2D<int>::FromFn(100, 100,
-    [](size_t x, size_t y, int *v)
-{
-    *v = int(x * y);
-});
+auto buf21 = Buffer2D<int>::FromFn(
+    100, 100, [](size_t x, size_t y){ return int(x * y); });
 ```
 
 ## Endian
@@ -89,16 +83,16 @@ if constexpr(IS_LITTLE_ENDIAN)
 else
     ...
 
-// Assuming native endian is little
+// Assume using little endian
 uint32_t v1 = Native2Big((uint32_t)0x12345678);
 assert(v1 == 0x78563412);
-assert(v1 == Native2Little(v1));
+assert(v1 == Native2Little(v1)); // Native-to-native calling does nothing
 assert(Big2Little(v1) == 0x12345678);
 ```
 
 ## Range
 
-Between, Collect, Drop, DropWhile, Filter, Map, PartialFoldl, Reverse, Seq(uence), Take, TakeWhile...
+Between, Collect, Drop, Filter, Map, PartialFoldl, Reverse, Sequence, Take...
 
 ```cpp
 vector<int> v;
@@ -148,8 +142,8 @@ REQUIRE((Seq(1) | TakeWhile(isLessThan10) | Collect<vector<int>>())
 
 A non-null-terminated immutable string class...Just for fun.
 
-1. Uses small string optimization & reference counting
-2. Supports various char encoding
+- Small string optimization & reference counting
+- Various char encoding
 
 ```cpp
 // using Str8 = String<UTF8<char>>; using Str32 = String<UTF32<uint32_t>>;
@@ -178,7 +172,7 @@ REQUIRE(Str8(u8" + ").Join(vector<Str8>{ u8"a", u8"b", u8"c" }) == u8"a + b + c"
 REQUIRE(Str8(u8"Minecraft").Find(u8"necraft") == 2);
 //...
 
-// Compatiable with Range components perfectly
+// Perfectly compatiable with Range components
 REQUIRE((Str8(u8"Mine cr aft ").Split()
         | Map([](const Str8::View &v) { return v.AsString(); })
         | Collect<vector<Str8>>())
