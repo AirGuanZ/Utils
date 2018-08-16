@@ -4,6 +4,10 @@
 #include <optional>
 #include <vector>
 
+// TODO
+#include <iostream>
+using namespace std;
+
 #include "../../Alloc/FixedSizedArena.h"
 #include "../../Misc/Common.h"
 
@@ -29,7 +33,7 @@ struct Inst
         struct
         {
             size_t alterCount;
-            Inst<CP> *alterDest;
+            Inst<CP> **alterDest;
         };
         size_t saveSlot;
     };
@@ -142,7 +146,6 @@ private:
         case '+':
         case '*':
         case '?':
-        case '&':
             return nullptr;
         default:
             break;
@@ -324,6 +327,11 @@ public:
         return insts_ != nullptr;
     }
 
+    size_t GetInstCount() const
+    {
+        return nextInst_;
+    }
+
     Inst<CP> &operator[](size_t idx)
     {
         AGZ_ASSERT(insts_ && idx < nextInst_);
@@ -348,7 +356,7 @@ public:
     void ReinitLastSteps()
     {
         for(size_t i = 0; i < instCount_; ++i)
-            insts_[i].lastStep = 0;
+            insts_[i].lastStep = std::numeric_limits<size_t>::max();
     }
 
 private:
@@ -371,9 +379,10 @@ public:
     {
         AGZ_ASSERT(saveSlotCount);
 
-        auto ast = Parser<CP>::Parse(regex);
+        Parser<CS> parser;
+        auto ast = parser.Parse(regex);
 
-        Program<CP> ret(CountInst(ast));
+        Program<CP> ret(CountInst(ast) + 1);
         prog_ = &ret;
         saveSlotCount_ = 0;
 
@@ -381,6 +390,7 @@ public:
         FillBP(bps, prog_->Emit(MakeInst(Inst<CP>::Match)));
 
         *saveSlotCount = saveSlotCount_;
+
         return std::move(ret);
     }
 
@@ -421,7 +431,7 @@ private:
                     ret += CountInst(nl->dest);
                     nl = nl->next;
                 }
-                return ret;
+                return ret + n->alterCount;
             }
         case ASTNode::Star:
             return 2 + CountInst(n->starDest);
@@ -455,8 +465,11 @@ private:
             prog_->Emit(MakeInst(I::Save))->saveSlot = saveSlotCount_++;
             return { };
         case ASTNode::Cat:
-            FillBP(Generate(node->catDest[0]));
+        {
+            auto bps = Generate(node->catDest[0]);
+            FillBP(bps, prog_->GetNextPtr());
             return Generate(node->catDest[1]);
+        }
         case ASTNode::Alter:
             return GenerateAlter(node);
         case ASTNode::Star:
@@ -474,9 +487,12 @@ private:
         AGZ_ASSERT(node && node->type == ASTNode::Alter);
 
         size_t alterCount = node->alterCount;
-        Inst<CP> *alterDest = new Inst<CP>[alterCount];
 
-        prog_->Emit(MakeInst(I::Alter));
+        auto alter = prog_->Emit(MakeInst(I::Alter));
+        alter->alterCount = alterCount;
+        alter->alterDest = new Inst<CP>*[alterCount];
+
+        auto alterDest = alter->alterDest;
         auto alterDestNode = node->alterDest;
         AGZ_ASSERT(alterDestNode);
 
@@ -488,7 +504,7 @@ private:
             alterDestNode = alterDestNode->next;
             AGZ_ASSERT(alterDestNode);
 
-            ret.push_back(&Emit(MakeInst(I::Jump))->jumpDest);
+            ret.push_back(&prog_->Emit(MakeInst(I::Jump))->jumpDest);
             alterDest[i] = prog_->GetNextPtr();
             ret.splice(ret.end(), Generate(alterDestNode->dest));
         }
@@ -542,7 +558,7 @@ class SaveSlots
 {
     struct SaveSlotsStorage
     {
-        size_t refs;
+        mutable size_t refs;
         size_t slots[1];
     };
 
@@ -564,7 +580,7 @@ public:
     SaveSlots(size_t slotCount, FixedSizedArena<> &arena)
         : slotCount_(slotCount), arena_(arena)
     {
-        storage_ = arena_.Malloc<SaveSlotsStorage>();
+        storage_ = arena_.template Malloc<SaveSlotsStorage>();
         storage_->refs = 1;
         for(size_t i = 0; i < slotCount_; ++i)
             storage_->slots[i] = std::numeric_limits<size_t>::max();
@@ -621,7 +637,7 @@ template<typename CP>
 struct Thread
 {
     Thread(Inst<CP> *pc, SaveSlots &&saveSlots, size_t startIdx)
-        : pc(pc), saveSlots(std::move(saveSlots)), startIdx_(startIdx)
+        : pc(pc), saveSlots(std::move(saveSlots)), startIdx(startIdx)
     {
 
     }
@@ -629,7 +645,7 @@ struct Thread
     Inst<CP> *pc;
     SaveSlots saveSlots;
     
-    size_t startIdx_;
+    size_t startIdx;
 };
 
 template<typename CS>
@@ -642,10 +658,35 @@ public:
 
     using Interval = std::pair<size_t, size_t>;
 
-    std::optional<std::vector<size_t>>
-        Match(const StringView<CS> &dst)
+    Machine(const StringView<CS> &regex)
+        : regex_(regex)
     {
-        if(!prog_.size())
+        
+    }
+
+    std::optional<std::vector<size_t>>
+        Match(const StringView<CS> &dst) const
+    {
+        if(!prog_.IsAvailable())
+        {
+            prog_ = Compiler<CS>().Compile(regex_, &slotCount_);
+            regex_ = String<CS>();
+        }
+        auto ret = Run<true, true>(dst);
+        return ret.has_value() ? std::make_optional(std::move(ret.value().second))
+                               : std::nullopt;
+    }
+
+    std::optional<std::pair<std::pair<size_t, size_t>,
+        std::vector<size_t>>>
+        Search(const StringView<CS> &dst) const
+    {
+        if(!prog_.IsAvailable())
+        {
+            prog_ = Compiler<CS>().Compile(regex_, &slotCount_);
+            regex_ = String<CS>();
+        }
+        return Run<false, false>(dst);
     }
 
 private:
@@ -653,23 +694,23 @@ private:
     using It = typename CS::Iterator;
     using CPR = CodePointRange<CS>;
 
-    Program<CP> prog_;
-    size_t slotCount_;
-    String<CS> regex_;
+    mutable Program<CP> prog_;
+    mutable size_t slotCount_;
+    mutable String<CS> regex_;
     
-    CPR *cpr_;
-    It cur_;
+    mutable CPR *cpr_;
+    mutable It cur_;
     
-    size_t matchedStart_, matchedEnd_;
-    std::optional<SaveSlots> matchedSaveSlots_;
+    mutable size_t matchedStart_, matchedEnd_;
+    mutable std::optional<SaveSlots> matchedSaveSlots_;
     
-    void SetMatched(SaveSlots &&saves)
+    void SetMatched(SaveSlots &&saves) const
     {
         matchedSaveSlots_.emplace(std::move(saves));
     }
 
     void AddThread(std::vector<Thread<CP>> &thds, size_t curStep,
-                   Inst<CP> *pc, SaveSlots &&saves, size_t startIdx)
+                   Inst<CP> *pc, SaveSlots &&saves, size_t startIdx) const
     {
         if(pc->lastStep == curStep)
             return;
@@ -720,7 +761,7 @@ private:
     
     template<bool AnchorBegin, bool AnchorEnd>
     std::optional<std::pair<Interval, std::vector<size_t>>>
-    Run(const StringView<CS> &str)
+        Run(const StringView<CS> &str) const
     {
         AGZ_ASSERT(prog_.IsAvailable());
         
@@ -793,7 +834,7 @@ private:
                 case Inst<CP>::Match:
                     if constexpr(!AnchorEnd)
                     {
-                        matchedSaveSlots_ = std::move(th->saveSlots);
+                        matchedSaveSlots_.emplace(std::move(th->saveSlots));
                         matchedStart_     = th->startIdx;
                         matchedEnd_       = cpr.CodeUnitIndex(cur_);
                         rdyThds.clear();
@@ -810,9 +851,9 @@ private:
         
         for(auto &th : rdyThds)
         {
-            if(th->pc->op == Inst<CP>::Match)
+            if(th.pc->op == Inst<CP>::Match)
             {
-                matchedSaveSlots_ = std::move(th.saveSlots);
+                matchedSaveSlots_.emplace(std::move(th.saveSlots));
                 matchedStart_ = th.startIdx;
                 matchedEnd_   = str.Length();
             }

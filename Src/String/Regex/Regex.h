@@ -25,9 +25,6 @@
 AGZ_NS_BEG(AGZ)
 
 template<typename CS>
-class Regex;
-
-template<typename CS>
 class Match
 {
 public:
@@ -35,10 +32,18 @@ public:
     using Interval = std::pair<size_t, size_t>;
     using Self = Match<CS>;
 
-    friend class Regex<CS>;
-
     Match()
         : interval_(0, std::numeric_limits<size_t>::max())
+    {
+
+    }
+
+    Match(const StringView<CS> &whole,
+          const Interval &interval,
+          std::vector<size_t> &&savePoints)
+        : whole_(whole),
+          interval_(interval),
+          savePoints_(std::move(savePoints))
     {
 
     }
@@ -80,7 +85,7 @@ public:
 
     bool Valid() const
     {
-        return matchedInterval_.second <= whole_.Length();
+        return interval_.second <= whole_.Length();
     }
 
     operator bool() const
@@ -97,13 +102,13 @@ public:
     size_t GetMatchedStart() const
     {
         AGZ_ASSERT(Valid());
-        return matchedInterval_.first;
+        return interval_.first;
     }
 
     size_t GetMatchedEnd() const
     {
         AGZ_ASSERT(Valid());
-        return matchedInterval_.second;
+        return interval_.second;
     }
 
     std::pair<size_t, size_t> GetMatchedInterval() const
@@ -112,7 +117,7 @@ public:
         return interval_;
     }
 
-    StringView<CS> operator()(size_t firstSavePoint, secondSavePoint) const
+    StringView<CS> operator()(size_t firstSavePoint, size_t secondSavePoint) const
     {
         AGZ_ASSERT(Valid());
         AGZ_ASSERT(firstSavePoint <= secondSavePoint);
@@ -123,22 +128,12 @@ public:
 
 private:
 
-    Match(const StringView<CS> &whole,
-        const Interval &interval,
-        std::vector<size_t> &&savePoints)
-        : whole_(whole),
-          interval_(interval),
-          savePoints_(std::move(savePoints))
-    {
-
-    }
-
     String<CS> whole_;
-    std::pair<size_t, size_t> matchedInterval_;
+    std::pair<size_t, size_t> interval_;
     std::vector<size_t> savePoints_;
 };
 
-template<typename CS, typename Eng = VMEngineImpl::VMEngine<CS>>
+template<typename CS, typename Eng = VMEngineImpl::Machine<CS>>
 class Regex
 {
 public:
@@ -147,11 +142,55 @@ public:
     using CodePoint = typename CS::CodePoint;
     using CodeUnit  = typename CS::CodeUnit;
     using Engine    = Eng;
+    using Result    = Match<CS>;
     using Self      = Regex<CS, Eng>;
+
+    Regex(const StringView<CS> &regex)
+        : engine_(regex)
+    {
+
+    }
+
+    Regex(const String<CS> &regex)
+        : Regex(regex.AsView())
+    {
+
+    }
+
+    Result Match(const String<CS> &dst) const
+    {
+        return this->Match(dst.AsView());
+    }
+
+    Result Search(const String<CS> &dst) const
+    {
+        return this->Search(dst.AsView());
+    }
+
+    Result Match(const StringView<CS> &dst) const
+    {
+        auto rt = engine_.Match(dst);
+        if(!rt.has_value())
+            return Result();
+        return Result(dst, { 0, dst.Length() }, std::move(rt.value()));
+    }
+
+    Result Search(const StringView<CS> &dst) const
+    {
+        auto rt = engine_.Search(dst);
+        if(!rt.has_value())
+            return Result();
+        return Result(dst, rt.value().first, std::move(rt.value().second));
+    }
 
 private:
 
     Engine engine_;
 };
+
+using Regex8  = Regex<UTF8<>>;
+using Regex16 = Regex<UTF16<>>;
+using Regex32 = Regex<UTF32<>>;
+using RegexW  = Regex<WUTF>;
 
 AGZ_NS_END(AGZ)
