@@ -133,9 +133,6 @@
     <ClInclude Include="..\Src\String\Charset\ASCII.h">
       <Filter>String\Charset</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\String\Charset\CharSet.h">
-      <Filter>String\Charset</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\String\Charset\UTF.h">
       <Filter>String\Charset</Filter>
     </ClInclude>
@@ -165,6 +162,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\String\Regex\VMEngine.h">
       <Filter>String\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Charset\Charset.h">
+      <Filter>String\Charset</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

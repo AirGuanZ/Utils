@@ -57,7 +57,7 @@
     <ClInclude Include="..\Src\Range\Transform.h" />
     <ClInclude Include="..\Src\Range\Each.h" />
     <ClInclude Include="..\Src\String\Charset\ASCII.h" />
-    <ClInclude Include="..\Src\String\Charset\CharSet.h" />
+    <ClInclude Include="..\Src\String\Charset\Charset.h" />
     <ClInclude Include="..\Src\String\Charset\UTF.h" />
     <ClInclude Include="..\Src\String\Charset\UTF16.h" />
     <ClInclude Include="..\Src\String\Charset\UTF32.h" />
