@@ -185,9 +185,13 @@ REQUIRE((Str8(u8"Mine cr aft ").Split()
 - Flexible submatches tracking
 
 `abc`: matches `abc`
+
 `abc[def]`: matches `abcd`/`abce`/`abcf`
+
 `abc?`: matches `ab`/`abc`
+
 `abc+`: matches concatenation of `ab` and one or more `c`
+
 `abc*`: matches concatenation of `ab` and zero or more `c`
 
 `&` defines a save point and can be used to indicate a location in matched strings.
