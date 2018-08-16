@@ -4,10 +4,6 @@
 #include <optional>
 #include <vector>
 
-// TODO
-#include <iostream>
-using namespace std;
-
 #include "../../Alloc/FixedSizedArena.h"
 #include "../../Misc/Common.h"
 
@@ -131,11 +127,20 @@ private:
         CP cp = Char();
 
         if(cp == '^')
+        {
+            Advance();
             return NewASTNode(ASTNode::Begin);
+        }
         if(cp == '$')
+        {
+            Advance();
             return NewASTNode(ASTNode::End);
+        }
         if(cp == '&')
+        {
+            Advance();
             return NewASTNode(ASTNode::Save);
+        }
 
         switch(cp)
         {
@@ -673,7 +678,8 @@ public:
             regex_ = String<CS>();
         }
         auto ret = Run<true, true>(dst);
-        return ret.has_value() ? std::make_optional(std::move(ret.value().second))
+        return ret.has_value() ? std::make_optional(
+                                    std::move(ret.value().second))
                                : std::nullopt;
     }
 
@@ -765,12 +771,14 @@ private:
     {
         AGZ_ASSERT(prog_.IsAvailable());
         
+        using namespace std;
+
         size_t saveAllocSize = SaveSlots::AllocSize(slotCount_);
         FixedSizedArena<> saveSlotsArena(
             saveAllocSize, 16 * saveAllocSize);
         
         prog_.ReinitLastSteps();
-        std::vector<Thread<CP>> rdyThds, newThds;
+        vector<Thread<CP>> rdyThds, newThds;
         
         CPR cpr = str.CodePoints();
         cpr_ = &cpr;
@@ -814,7 +822,7 @@ private:
                     auto oldCur = cur_;
                     ++cur_;
                     AddThread(newThds, cpIdx,
-                              pc + 1, std::move(th->saveSlots),
+                              pc + 1, move(th->saveSlots),
                               th->startIdx);
                     cur_ = oldCur;
                     break;
@@ -826,7 +834,7 @@ private:
                     auto oldCur = cur_;
                     ++cur_;
                     AddThread(newThds, cpIdx,
-                              pc + 1, std::move(th->saveSlots),
+                              pc + 1, move(th->saveSlots),
                               th->startIdx);
                     cur_ = oldCur;
                     break;
@@ -834,7 +842,7 @@ private:
                 case Inst<CP>::Match:
                     if constexpr(!AnchorEnd)
                     {
-                        matchedSaveSlots_.emplace(std::move(th->saveSlots));
+                        matchedSaveSlots_.emplace(move(th->saveSlots));
                         matchedStart_     = th->startIdx;
                         matchedEnd_       = cpr.CodeUnitIndex(cur_);
                         rdyThds.clear();
@@ -853,7 +861,7 @@ private:
         {
             if(th.pc->op == Inst<CP>::Match)
             {
-                matchedSaveSlots_.emplace(std::move(th.saveSlots));
+                matchedSaveSlots_.emplace(move(th.saveSlots));
                 matchedStart_ = th.startIdx;
                 matchedEnd_   = str.Length();
             }
@@ -861,13 +869,13 @@ private:
         
         if(matchedSaveSlots_)
         {
-            std::vector<size_t> slots(slotCount_);
+            vector<size_t> slots(slotCount_);
             for(size_t i = 0; i < slotCount_; ++i)
                 slots[i] = matchedSaveSlots_.value().Get(i);
-            return std::optional<std::pair<Interval, std::vector<size_t>>>
-                    (std::make_pair<Interval, std::vector<size_t>>(
-                        Interval{ matchedStart_, matchedEnd_ },
-                        std::move(slots)));
+            return make_optional(
+                        make_pair<Interval, vector<size_t>>(
+                            Interval{ matchedStart_, matchedEnd_ },
+                            move(slots)));
         }
         
         return { };

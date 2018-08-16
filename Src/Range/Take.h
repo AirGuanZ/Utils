@@ -21,11 +21,12 @@ namespace RangeAux
 
         using Iterator = GetIteratorType<R>;
 
-        TakeImpl(R range,
-                 typename std::iterator_traits<Iterator>::difference_type num)
+        TakeImpl(R range, size_t n)
             : range_(std::move(range))
         {
-            end_ = AdvanceTo(std::begin(range_), std::end(range_), num);
+            end_ = AdvanceTo(std::begin(range_), std::end(range_),
+                static_cast<typename std::iterator_traits<Iterator>
+                                                ::difference_type>(n));
         }
 
         Iterator begin() const

@@ -48,7 +48,7 @@ TEST_CASE("Buffer")
 
         auto buf0 = std::move(buf1);
 
-        REQUIRE(buf0(45, 46) == 45 * 46);
+        REQUIRE(buf0(45, 46)  == 45 * 46);
         REQUIRE(buf0(212, 13) == 212 * 13);
         REQUIRE(ApproxEq(buf2(212, 13), 212.0f * 13.0f, 1e-5f));
     }

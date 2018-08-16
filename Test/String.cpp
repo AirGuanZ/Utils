@@ -90,8 +90,33 @@ TEST_CASE("String")
     SECTION("Regex")
     {
         REQUIRE(Regex8(u8"abc").Match(u8"abc").Valid());
-        REQUIRE(!Regex8(u8"abc").Match(u8"ac").Valid());
+        REQUIRE(Regex8(u8"abc").Match(u8"ac").Valid() == false);
         REQUIRE(Regex8(u8"abc[def]").Match(u8"abcd").Valid());
         REQUIRE(Regex8(u8"abc*").Match(u8"abccc").Valid());
+        REQUIRE(Regex8(u8"abc*").Match(u8"ab").Valid());
+        REQUIRE(Regex8(u8"abc+").Match(u8"ab").Valid() == false);
+        REQUIRE(Regex8(u8"abc?").Match(u8"ab").Valid());
+        REQUIRE(Regex8(u8"ab[def]+").Match(u8"abdefdeffeddef").Valid());
+        
+        {
+            auto m = Regex8(u8"&abc&(def)+&xyz&").Match(u8"abcdefdefxyz");
+            REQUIRE((m && m(0, 1) == u8"abc" && m(1, 2) == u8"defdef" && m(2, 3) == u8"xyz"));
+        }
+
+        REQUIRE(Regex8(u8"b").Search(u8"abc").Valid());
+        REQUIRE(Regex8(u8"b+").Search(u8"abbbc").Valid());
+
+        {
+            auto m = Regex8(u8"&b+&").Search(u8"abbbc");
+            REQUIRE((m && m(0, 1) == u8"bbb"));
+        }
+
+        {
+            auto m = Regex8(u8"&abcde&$").Search(u8"minecraftabcde");
+            REQUIRE((m && m(0, 1) == u8"abcde"));
+        }
+
+        REQUIRE(Regex8(u8"mine").Search(u8"abcminecraft").Valid());
+        REQUIRE(Regex8(u8"^mine").Search(u8"abcminecraft").Valid() == false);
     }
 }
