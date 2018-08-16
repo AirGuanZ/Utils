@@ -182,7 +182,7 @@ REQUIRE((Str8(u8"Mine cr aft ").Split()
 ## Regex
 
 - Various char encoding
-- Flexible submatching tracking
+- Flexible submatches tracking
 
 `abc`: matches `abc`
 `abc[def]`: matches `abcd`/`abce`/`abcf`
