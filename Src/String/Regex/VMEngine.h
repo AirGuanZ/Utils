@@ -97,24 +97,27 @@ public:
 
 private:
 
-    using CP      = typename CS::CodePoint;
-    using It      = typename CS::Iterator;
+    using CP = typename CS::CodePoint;
+    using It = typename CS::Iterator;
 
     SmallObjArena<ASTNode>       astNodeArena_;
     SmallObjArena<AlterListNode> alterNodeArena_;
 
     It cur_, end_;
 
-    [[noreturn]] static void Error() { throw ArgumentException("Invalid regular expression"); }
-
-    bool End() const        { return cur_ == end_; }
-    CP   Char() const       { AGZ_ASSERT(!End()); return *cur_; }
-    CP   CurAndAdv()        { CP ret = Char(); Advance(); return ret; }
-    void ErrIfEnd() const   { if(End()) Error(); }
-    void Advance()          { AGZ_ASSERT(!End()); ++cur_; }
-    bool Match(CP c) const  { return !End() && Char() == c; }
+    bool End() const        { return cur_ == end_;                       }
+    CP   Char() const       { AGZ_ASSERT(!End()); return *cur_;          }
+    CP   CurAndAdv()        { CP ret = Char(); Advance(); return ret;    }
+    void ErrIfEnd() const   { if(End()) Error();                         }
+    void Advance()          { AGZ_ASSERT(!End()); ++cur_;                }
+    bool Match(CP c) const  { return !End() && Char() == c;              }
     bool AdvanceIf(CP c)    { return Match(c) ? Advance(), true : false; }
-    void AdvanceOrErr(CP c) { if(!AdvanceIf(c)) Error(); }
+    void AdvanceOrErr(CP c) { if(!AdvanceIf(c)) Error();                 }
+
+    [[noreturn]] static AGZ_FORCEINLINE void Error()
+    {
+        throw ArgumentException("Invalid regular expression");
+    }
 
     ASTNode *NewASTNode(ASTNode::Type type)
     {

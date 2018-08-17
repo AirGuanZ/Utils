@@ -15,10 +15,10 @@
 AGZ_NS_BEG(AGZ::StrImpl)
 
 // Charsets that can be used by c-style string and std::string
-// Code unit must be alias of char
 enum class NativeCharset
 {
-    UTF8
+    UTF8,  // for const char * / std::string
+    WUTF, // for const wchar_t * / std::wstring
 };
 
 // Determinating how many values can SSO buffer hold.
@@ -307,8 +307,9 @@ public:
 
     bool IsASCII() const;
 
-    Str ToUpper() const;
-    Str ToLower() const;
+    Str ToUpper()  const;
+    Str ToLower()  const;
+    Str SwapCase() const;
 
     std::vector<Self> Split()                    const;
     std::vector<Self> Split(const Self &spliter) const;
@@ -326,7 +327,8 @@ public:
     CharRange Chars() const &  { return CharRange(beg_, beg_ + len_); }
     CharRange Chars() const && { return CharRange(*str_, beg_, beg_ + len_); }
 
-    std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const;
+    std::string ToStdString(NativeCharset cs = NativeCharset::UTF8)  const;
+    std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const;
 
     Iterator begin() const;
     Iterator end()   const;
@@ -379,6 +381,9 @@ public:
 
     String(const char *cstr, NativeCharset cs = NativeCharset::UTF8);
     String(const std::string &cppStr, NativeCharset cs = NativeCharset::UTF8);
+
+    String(const wchar_t *cstr, NativeCharset cs = NativeCharset::WUTF);
+    String(const std::wstring &cppStr, NativeCharset cs = NativeCharset::WUTF);
 
     String(const Self &copyFrom);
     String(Self &&moveFrom) noexcept;
@@ -446,13 +451,16 @@ public:
     bool IsASCII()                                  const { return AsView().IsASCII();                       }
     Self ToUpper()                                  const { return AsView().ToUpper();                       }
     Self ToLower()                                  const { return AsView().ToLower();                       }
+    Self SwapCase()                                 const { return AsView().SwapCase();                      }
     std::vector<View> Split()                       const { return AsView().Split();                         }
     std::vector<View> Split(const View &spliter)    const { return AsView().Split(spliter);                  }
     std::vector<View> Split(const Self &spliter)    const { return AsView().Split(spliter);                  }
     template<typename R> Self Join(R &&strRange)    const { return AsView().Join(std::forward<R>(strRange)); }
     size_t Find(const View &dst, size_t begIdx = 0) const { return AsView().Find(dst, begIdx);               }
     size_t Find(const Self &dst, size_t begIdx = 0) const { return AsView().Find(dst, begIdx);               }
-    std::string ToStdString(NativeCharset cs = NativeCharset::UTF8) const { return AsView().ToStdString(cs); }
+
+    std::string ToStdString(NativeCharset cs   = NativeCharset::UTF8) const { return AsView().ToStdString(cs); }
+    std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const { return AsView().ToStdWString(cs); }
 
     Iterator begin() const;
     Iterator end()   const;
@@ -495,6 +503,14 @@ AGZ_WRAP_STR_COMP(String<CS>&,     std::string&,    lhs,                      St
 AGZ_WRAP_STR_COMP(std::string&,    String<CS>&,     String<CS>(lhs),          rhs)
 AGZ_WRAP_STR_COMP(StringView<CS>&, std::string&,    lhs,                      String<CS>(rhs))
 AGZ_WRAP_STR_COMP(std::string&,    StringView<CS>&, String<CS>(lhs),          rhs)
+AGZ_WRAP_STR_COMP(String<CS>&,     wchar_t*,        lhs,                      String<CS>(rhs))
+AGZ_WRAP_STR_COMP(wchar_t*,        String<CS>&,     String<CS>(lhs),          rhs)
+AGZ_WRAP_STR_COMP(StringView<CS>&, wchar_t*,        lhs,                      String<CS>(rhs).AsView())
+AGZ_WRAP_STR_COMP(wchar_t*,        StringView<CS>&, String<CS>(lhs).AsView(), rhs)
+AGZ_WRAP_STR_COMP(String<CS>&,     std::wstring&,   lhs,                      String<CS>(rhs))
+AGZ_WRAP_STR_COMP(std::wstring&,   String<CS>&,     String<CS>(lhs),          rhs)
+AGZ_WRAP_STR_COMP(StringView<CS>&, std::wstring&,   lhs,                      String<CS>(rhs))
+AGZ_WRAP_STR_COMP(std::wstring&,   StringView<CS>&, String<CS>(lhs),          rhs)
 
 #undef AGZ_WRAP_STR_COMP
 

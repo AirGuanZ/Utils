@@ -74,33 +74,34 @@ TEST_CASE("String")
         REQUIRE(Str8(u8"今天天气不错").Prefix(Str8(u8"今天").Length())       == u8"今天");
         REQUIRE(Str8(u8"今天天气不错abc").Suffix(Str8(u8"不错abc").Length()) == u8"不错abc");
 
-        REQUIRE(Str8(u8"Minecraft").StartsWith(u8"Minecra"));
-        REQUIRE(Str8(u8"Minecraft").EndsWith(u8"necraft"));
-        REQUIRE(Str8(u8"Minecraft").EndsWith(u8"Minecraft"));
+        REQUIRE(Str8(u8"Minecraft") .StartsWith(u8"Minecra"));
+        REQUIRE(Str8(u8"Minecraft") .EndsWith(u8"necraft"));
+        REQUIRE(Str8(u8"Minecraft") .EndsWith(u8"Minecraft"));
         REQUIRE(!Str8(u8"Minecraft").EndsWith(u8"Minecra"));
 
-        REQUIRE(Str8(u8"Z").IsDigit(36));
-        REQUIRE(!Str8(u8"0Z").IsDigit(36));
-        REQUIRE(!Str16(u8"仅").IsDigit(36));
-        REQUIRE(Str8(u8"0123456").IsDigits());
+        REQUIRE(Str8(u8"Z")        .IsDigit(36));
+        REQUIRE(!Str8(u8"0Z")      .IsDigit(36));
+        REQUIRE(!Str16(u8"仅")     .IsDigit(36));
+        REQUIRE(Str8(u8"0123456")  .IsDigits());
         REQUIRE(!Str8(u8"012a3456").IsDigits());
-        REQUIRE(Str8(u8"012a3456").IsDigits(16));
+        REQUIRE(Str8(u8"012a3456") .IsDigits(16));
 
-        REQUIRE(!Str8(u8"abcdefABCDEF").IsAlpha());
-        REQUIRE(!Str8(u8"。").IsAlpha());
-        REQUIRE(Str8(u8"X").IsAlphas());
-        REQUIRE(Str8(u8"abcdefABCDEF").IsAlphas());
+        REQUIRE(!Str8(u8"abcdefABCDEF") .IsAlpha());
+        REQUIRE(!Str8(u8"。")           .IsAlpha());
+        REQUIRE(Str8(u8"X")             .IsAlphas());
+        REQUIRE(Str8(u8"abcdefABCDEF")  .IsAlphas());
         REQUIRE(!Str8(u8"abcde!fABCDEF").IsAlphas());
 
-        REQUIRE(Str8(u8"MINE").IsUppers());
-        REQUIRE(Str8(u8"mine").IsLowers());
+        REQUIRE(Str8(u8"MINE") .IsUppers());
+        REQUIRE(Str8(u8"mine") .IsLowers());
         REQUIRE(!Str8(u8"mine").IsUppers());
         REQUIRE(!Str8(u8"MINE").IsLowers());
 
-        REQUIRE(Str8(u8"ABC").ToLower()   == u8"abc");
-        REQUIRE(Str8(u8"Ab仅C").ToLower() == u8"ab仅c");
-        REQUIRE(Str8(u8"abc").ToUpper()   == u8"ABC");
-        REQUIRE(Str8(u8"Ab仅c").ToUpper() == u8"AB仅C");
+        REQUIRE(Str8(u8"ABC")  .ToLower()  == u8"abc");
+        REQUIRE(Str8(u8"Ab仅C").ToLower()  == u8"ab仅c");
+        REQUIRE(Str8(u8"abc")  .ToUpper()  == u8"ABC");
+        REQUIRE(Str8(u8"Ab仅c").ToUpper()  == u8"AB仅C");
+        REQUIRE(Str8(u8"Ab仅c").SwapCase() == u8"aB仅C");
     }
 
     SECTION("Split")
@@ -133,9 +134,9 @@ TEST_CASE("String")
     SECTION("Chars")
     {
         REQUIRE((Str8(u8"abc").Chars() | Collect<vector<Str8>>())
-            == vector<Str8>{ u8"a", u8"b", u8"c" });
+             == vector<Str8>{ u8"a", u8"b", u8"c" });
         REQUIRE((Str8(u8"今天a天气!").Chars() | Collect<vector<Str8>>())
-            == vector<Str8>{ u8"今", u8"天", u8"a", u8"天", u8"气", u8"!" });
+             == vector<Str8>{ u8"今", u8"天", u8"a", u8"天", u8"气", u8"!" });
     }
 
     SECTION("Regex")
@@ -172,7 +173,7 @@ TEST_CASE("String")
         {
             auto m = Regex8("&[def]+&").Search("abcddeeffxyz");
             auto n = m;
-            REQUIRE((m && m(0, 1) == "ddeeff"));
+            REQUIRE((n && n(0, 1) == "ddeeff"));
         }
 
         REQUIRE(Regex8(u8"mine").Search(u8"abcminecraft"));

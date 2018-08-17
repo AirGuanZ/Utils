@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <cwchar>
 #include <type_traits>
 
 #include "../Alloc/Malloc.h"
@@ -744,6 +745,29 @@ String<CS> StringView<CS>::ToLower() const
 }
 
 template<typename CS>
+String<CS> StringView<CS>::SwapCase() const
+{
+    String<CS> ret = *this;
+    auto[b, e] = ret.GetMutableBeginAndEnd();
+    while(b < e)
+    {
+        if('A' <= *b && *b <= 'Z')
+        {
+            *b = *b + ('a' - 'A');
+            ++b;
+        }
+        else if('a' <= *b && *b <= 'z')
+        {
+            *b = *b - ('a' - 'A');
+            ++b;
+        }
+        else
+            b = CS::NextCodePoint(b);
+    }
+    return std::move(ret);
+}
+
+template<typename CS>
 std::vector<StringView<CS>> StringView<CS>::Split() const
 {
     std::vector<Self> ret;
@@ -838,10 +862,34 @@ std::string StringView<CS>::ToStdString(NativeCharset cs) const
             return CharsetConvertor::Convert<UTF8<>, CS>(*this)
                         .ToStdString(NativeCharset::UTF8);
         }
-    }
-    throw CharsetException("Unsupported charset: " +
+    default:
+        throw CharsetException("Unsupported charset: " +
             std::to_string(static_cast<
                 std::underlying_type_t<NativeCharset>>(cs)));
+    }
+}
+
+template<typename CS>
+std::wstring StringView<CS>::ToStdWString(NativeCharset cs) const
+{
+    switch(cs)
+    {
+    case NativeCharset::WUTF:
+        if constexpr(std::is_same_v<CS, WUTF>)
+        {
+            auto [d, l] = DataAndLength();
+            return std::wstring(d, l);
+        }
+        else
+        {
+            return CharsetConvertor::Convert<WUTF, CS>(*this)
+                        .ToStdWString(NativeCharset::WUTF);
+        }
+    default:
+        throw CharsetException("Unsupported charset: " +
+            std::to_string(static_cast<
+                std::underlying_type_t<NativeCharset>>(cs)));
+    }
 }
 
 template<typename CS>
@@ -1002,6 +1050,40 @@ String<CS>::String(const std::string &cppStr, NativeCharset cs)
     case NativeCharset::UTF8:
         *this = Self(CharsetConvertor::Convert<CS, UTF8<>>(
                         Str8(cppStr.c_str(), cppStr.length())));
+        break;
+    default:
+        throw CharsetException("Unsupported charset: " +
+            std::to_string(static_cast<
+                std::underlying_type_t<NativeCharset>>(cs)));
+    }
+}
+
+template<typename CS>
+String<CS>::String(const wchar_t *cstr, NativeCharset cs)
+    : storage_(0)
+{
+    switch(cs)
+    {
+    case NativeCharset::WUTF:
+        *this = Self(CharsetConvertor::Convert<CS, WUTF>(
+            WStr(cstr, std::wcslen(cstr))));
+        break;
+    default:
+        throw CharsetException("Unsupported charset: " +
+            std::to_string(static_cast<
+                std::underlying_type_t<NativeCharset>>(cs)));
+    }
+}
+
+template<typename CS>
+String<CS>::String(const std::wstring &cppStr, NativeCharset cs)
+    : storage_(0)
+{
+    switch(cs)
+    {
+    case NativeCharset::WUTF:
+        *this = Self(CharsetConvertor::Convert<CS, WUTF>(
+            WStr(cppStr.data(), cppStr.length())));
         break;
     default:
         throw CharsetException("Unsupported charset: " +
@@ -1187,7 +1269,8 @@ String<DCS> CharsetConvertor::Convert(const typename String<SCS>::View &src)
             typename SCS::CodePoint scp;
             size_t skip = SCS::CU2CP(beg, &scp);
             if(!skip)
-                throw CharsetException("Invalid " + SCS::Name() + " sequence");
+                throw CharsetException("Invalid " + SCS::Name()
+                                     + " sequence");
             beg += skip;
 
             size_t sgls = DCS::CP2CU(DCS::template From<SCS>(scp), sgl);
