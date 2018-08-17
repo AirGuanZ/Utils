@@ -268,7 +268,7 @@ CodePointRange<CS>::CodePointRange(const String<CS> &str, const CodeUnit *beg,
     AGZ_ASSERT(str.begin() <= beg && beg <= end && end <= str.end());
     auto base = str.begin();
     beg_ = str_.begin() + (beg - base);
-    end_ = str_.end()   + (end - base);
+    end_ = str_.begin() + (end - base);
 }
 
 template<typename CS>
@@ -284,17 +284,16 @@ typename CodePointRange<CS>::Iterator CodePointRange<CS>::end() const
 }
 
 template<typename CS>
-StringView<CS>::CharRange::Iterator::Iterator(const String<CS> &str, InIt it)
-    : str_(str), it_(it)
+StringView<CS>::CharRange::Iterator::Iterator(InIt it)
+    : it_(it)
 {
 
 }
 
 template<typename CS>
-StringView<CS> StringView<CS>::CharRange::Iterator::operator*() const
+String<CS> StringView<CS>::CharRange::Iterator::operator*() const
 {
-    auto [b, e] = CS::CodeUnitsFromCodePointIterator(it_);
-    return StringView<CS>(str_, b, e - b);
+    return String<CS>(*it_);
 }
 
 template<typename CS>
@@ -341,7 +340,6 @@ StringView<CS>::CharRange::Iterator::operator--(int)
 template<typename CS>
 bool StringView<CS>::CharRange::Iterator::operator==(const Self &rhs) const
 {
-    AGZ_ASSERT(&str_ == &rhs.str_);
     return it_ == rhs.it_;
 }
 
@@ -370,14 +368,14 @@ template<typename CS>
 typename StringView<CS>::CharRange::Iterator
 StringView<CS>::CharRange::begin() const
 {
-    return Iterator(CPR_.GetStr(), CPR_.begin());
+    return Iterator(CPR_.begin());
 }
 
 template<typename CS>
 typename StringView<CS>::CharRange::Iterator
 StringView<CS>::CharRange::end() const
 {
-    return Iterator(CPR_.GetStr(), CPR_.end());
+    return Iterator(CPR_.end());
 }
 
 template<typename CS>
@@ -841,7 +839,7 @@ std::string StringView<CS>::ToStdString(NativeCharset cs) const
                         .ToStdString(NativeCharset::UTF8);
         }
     }
-    throw CharsetException("Unknown charset " +
+    throw CharsetException("Unsupported charset: " +
             std::to_string(static_cast<
                 std::underlying_type_t<NativeCharset>>(cs)));
 }
@@ -930,6 +928,27 @@ String<CS>::String()
 }
 
 template<typename CS>
+String<CS>::String(CodePoint cp, size_t count)
+    : storage_(CS::CUInCP(cp) * count)
+{
+    if(!storage_.GetLength())
+        throw CharsetException("Invalid code point");
+    if(count)
+    {
+        auto data = storage_.GetMutableData();
+        size_t n = CS::CP2CU(cp, data);
+        if(!n)
+            throw CharsetException("Invalid code point");
+        auto odata = data;
+        while(--count > 0)
+        {
+            static_assert(std::is_trivially_copyable_v<CodeUnit>);
+            std::memcpy(data += n, odata, sizeof(CodeUnit) * n);
+        }
+    }
+}
+
+template<typename CS>
 String<CS>::String(const View &view)
     : String(view.AsString())
 {
@@ -968,14 +987,14 @@ String<CS>::String(const char *cstr, NativeCharset cs)
                         Str8(cstr, std::strlen(cstr))));
         break;
     default:
-        throw CharsetException("Unknown charset " +
+        throw CharsetException("Unsupported charset: " +
             std::to_string(static_cast<
                 std::underlying_type_t<NativeCharset>>(cs)));
     }
 }
 
 template<typename CS>
-String<CS>::String(const std::string & cppStr, NativeCharset cs)
+String<CS>::String(const std::string &cppStr, NativeCharset cs)
     : storage_(0)
 {
     switch(cs)
@@ -985,7 +1004,7 @@ String<CS>::String(const std::string & cppStr, NativeCharset cs)
                         Str8(cppStr.c_str(), cppStr.length())));
         break;
     default:
-        throw CharsetException("Unknown charset " +
+        throw CharsetException("Unsupported charset: " +
             std::to_string(static_cast<
                 std::underlying_type_t<NativeCharset>>(cs)));
     }
@@ -1001,6 +1020,14 @@ String<CS>::String(const Self &copyFrom)
 template<typename CS>
 String<CS>::String(Self &&moveFrom) noexcept
     : storage_(std::move(moveFrom.storage_))
+{
+
+}
+
+template<typename CS>
+template<typename OCS, std::enable_if_t<!std::is_same_v<CS, OCS>, int>>
+String<CS>::String(const StringView<OCS>& convertFrom)
+    : Self(CharsetConvertor::Convert<CS, OCS>(convertFrom))
 {
 
 }

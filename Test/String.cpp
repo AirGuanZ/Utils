@@ -18,6 +18,10 @@ TEST_CASE("String")
         REQUIRE(Str16(u8"今天mine天气craft不错").ToStdString() == u8"今天mine天气craft不错");
         REQUIRE(Str32(u8"今天mine天气craft不错").ToStdString() == u8"今天mine天气craft不错");
 
+        REQUIRE(Str8('a', 7) == "aaaaaaa");
+        REQUIRE(Str8(0x4ECA, 5) == u8"今今今今今");
+        REQUIRE(Str32(0x4ECA, 5) == u8"今今今今今");
+
         {
             Str8 a = u8"Minecraft";
             Str8 b = a;
@@ -124,6 +128,14 @@ TEST_CASE("String")
         REQUIRE(Str8(u8"Minecraft").Find(u8"Minecraft") == 0);
         REQUIRE(Str8(u8"Minecraft").Find(u8"eecraft")   == Str8::NPOS);
         REQUIRE(Str8(u8"Minecraft").Find(u8"er")        == Str8::NPOS);
+    }
+
+    SECTION("Chars")
+    {
+        REQUIRE((Str8(u8"abc").Chars() | Collect<vector<Str8>>())
+            == vector<Str8>{ u8"a", u8"b", u8"c" });
+        REQUIRE((Str8(u8"今天a天气!").Chars() | Collect<vector<Str8>>())
+            == vector<Str8>{ u8"今", u8"天", u8"a", u8"天", u8"气", u8"!" });
     }
 
     SECTION("Regex")

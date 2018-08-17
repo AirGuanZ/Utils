@@ -203,13 +203,12 @@ public:
 
         class Iterator
         {
-            const String<CS> &str_;
             InIt it_;
 
         public:
 
             using iterator_category = std::bidirectional_iterator_tag;
-            using value_type        = StringView<CS>;
+            using value_type        = String<CS>;
             using difference_type   =
                 typename std::iterator_traits<InIt>::difference_type;
             using pointer           = ValuePointer<value_type>;
@@ -217,7 +216,7 @@ public:
 
             using Self = Iterator;
 
-            Iterator(const String<CS> &str, InIt it);
+            explicit Iterator(InIt it);
 
             value_type operator*() const;
             pointer operator->() const;
@@ -231,7 +230,6 @@ public:
             bool operator!=(const Self &rhs) const;
         };
 
-        // FIXME
         CharRange(const CodeUnit *beg, const CodeUnit *end);
         CharRange(const String<CS> &str, const CodeUnit *beg,
                                          const CodeUnit *end);
@@ -373,6 +371,7 @@ public:
     static constexpr size_t NPOS = View::NPOS;
 
     String();
+    explicit String(CodePoint cp, size_t count = 1);
     String(const View &view);
     String(const CodeUnit *beg, size_t len);
     String(const CodeUnit *beg, const CodeUnit *end);
@@ -384,21 +383,27 @@ public:
     String(const Self &copyFrom);
     String(Self &&moveFrom) noexcept;
 
+    template<typename OCS, std::enable_if_t<!std::is_same_v<CS, OCS>, int> = 0>
+    explicit String(const StringView<OCS> &convertFrom);
+
+    template<typename OCS, std::enable_if_t<!std::is_same_v<CS, OCS>, int> = 0>
+    explicit String(const String<OCS> &convertFrom): Self(convertFrom.AsView()) {  }
+
     ~String() = default;
 
     Self &operator=(const Self &copyFrom);
     Self &operator=(Self &&moveFrom) noexcept;
 
-    static Self From(char v,               unsigned int base = 10);
-    static Self From(signed char v,        unsigned int base = 10);
-    static Self From(unsigned char v,      unsigned int base = 10);
-    static Self From(short v,              unsigned int base = 10);
-    static Self From(unsigned short v,     unsigned int base = 10);
-    static Self From(int v,                unsigned int base = 10);
-    static Self From(unsigned int v,       unsigned int base = 10);
-    static Self From(long v,               unsigned int base = 10);
-    static Self From(unsigned long v,      unsigned int base = 10);
-    static Self From(long long v,          unsigned int base = 10);
+    static Self From(char               v, unsigned int base = 10);
+    static Self From(signed char        v, unsigned int base = 10);
+    static Self From(unsigned char      v, unsigned int base = 10);
+    static Self From(short              v, unsigned int base = 10);
+    static Self From(unsigned short     v, unsigned int base = 10);
+    static Self From(int                v, unsigned int base = 10);
+    static Self From(unsigned int       v, unsigned int base = 10);
+    static Self From(long               v, unsigned int base = 10);
+    static Self From(unsigned long      v, unsigned int base = 10);
+    static Self From(long long          v, unsigned int base = 10);
     static Self From(unsigned long long v, unsigned int base = 10);
 
     template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
