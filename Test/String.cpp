@@ -151,6 +151,11 @@ TEST_CASE("String")
         REQUIRE(Regex8(u8"ab[def]+").Match(u8"abdefdeffeddef"));
         REQUIRE(Regex8(u8"今天天气不错").Search(u8"GoodMorning今天天气不错啊"));
         REQUIRE(Regex16(u8"今天(天气)+不错啊?\\?").Match(u8"今天天气天气天气天气不错?"));
+
+        REQUIRE(Regex8(u8".*").Match(u8"今天天气不错啊"));
+        REQUIRE(Regex8(u8"今天.*啊").Match(u8"今天天气不错啊"));
+
+        REQUIRE(Regex8(u8"今天{5}天气不错啊").Match(u8"今天天天天天天气不错啊"));
         
         {
             auto m = Regex8(u8"&abc&(def)+&xyz&").Match(u8"abcdefdefxyz");

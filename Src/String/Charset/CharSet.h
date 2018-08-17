@@ -125,7 +125,7 @@ public:
     }
 
     static std::pair<const CodeUnit*, const CodeUnit*>
-    CodeUnitsFromCodePointIterator(const typename Core::Iterator &it)
+        CodeUnitsFromCodePointIterator(const typename Core::Iterator &it)
     {
         return CharsetAux::CodeUnitsFromCodePointIteratorImpl<
                                     typename Core::Iterator>::Eval(it);

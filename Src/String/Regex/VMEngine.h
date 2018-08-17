@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <limits>
 #include <optional>
@@ -9,6 +9,19 @@
 
 // Regular expression matching by virtual machine
 // See https://swtch.com/~rsc/regexp/regexp2.html
+
+/*
+    ab：     连接
+    [ab]：   选择
+    a+：     一个或多个
+    a*：     零个或多个
+    a?：     零个或一个
+    ^：      开头
+    $：      结尾
+    &：      保存
+    .：      任意
+    a{m}：   重复m次
+*/
 
 AGZ_NS_BEG(AGZ::VMEngineImpl)
 
@@ -56,12 +69,18 @@ struct ASTNode
         Dot, Char,
         Save,
         Cat, Alter,
-        Star, Plus, Ques
+        Star, Plus, Ques,
+        Repeat,
     } type;
 
     union
     {
         char32_t codePoint;
+        struct
+        {
+            size_t repeatCount;
+            ASTNode *repeatContent;
+        };
         ASTNode *catDest[2];
         ASTNode *orDest[2];
         struct
@@ -154,6 +173,8 @@ private:
         case ']':
         case '(':
         case ')':
+        case '{':
+        case '}':
         case '+':
         case '*':
         case '?':
@@ -177,6 +198,8 @@ private:
             case ']':
             case '(':
             case ')':
+            case '{':
+            case '}':
             case '+':
             case '*':
             case '?':
@@ -263,9 +286,46 @@ private:
                 newNode->quesDest = last;
                 last = newNode;
             }
+            else if(AdvanceIf('{'))
+            {
+                ASTNode *newNode = NewASTNode(ASTNode::Repeat);
+                newNode->repeatCount = ParseSize_t();
+                newNode->repeatContent = last;
+                AdvanceOrErr('}');
+                last = newNode;
+            }
             else
                 return last;
         }
+    }
+
+    size_t ParseSize_t()
+    {
+        size_t ret = 0;
+        ErrIfEnd();
+
+        CP cp = Char();
+        Advance();
+        if(cp == '0')
+        {
+            CP next = End() ? '\0' : Char();
+            if('0' <= next && next <= '9')
+                Error();
+            return 0;
+        }
+        ret = cp - '0';
+
+        for(;;)
+        {
+            if(End()) break;
+            CP c = Char();
+            if(c < '0' || '9' < c)
+                break;
+            ret = 10 * ret + (c - '0');
+            Advance();
+        }
+
+        return ret;
     }
 
     ASTNode *ParseRegex()
@@ -464,6 +524,8 @@ private:
             return 1 + CountInst(n->plusDest);
         case ASTNode::Ques:
             return 1 + CountInst(n->quesDest);
+        case ASTNode::Repeat:
+            return n->repeatCount * CountInst(n->repeatContent);
         }
         Unreachable();
     }
@@ -503,6 +565,8 @@ private:
             return GeneratePlus(node);
         case ASTNode::Ques:
             return GenerateQues(node);
+        case ASTNode::Repeat:
+            return GenerateRepeat(node);
         }
         Unreachable();
     }
@@ -576,6 +640,23 @@ private:
         auto ret = Generate(node->quesDest);
         ret.push_back(&branch->branchDest[1]);
         return std::move(ret);
+    }
+
+    BP GenerateRepeat(ASTNode *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTNode::Repeat);
+
+        if(!node->repeatCount)
+            return { };
+            
+        BP bps = Generate(node->repeatContent);
+        for(size_t i = 1; i < node->repeatCount; ++i)
+        {
+            FillBP(bps, prog_->GetNextPtr());
+            bps = Generate(node->repeatContent);
+        }
+
+        return std::move(bps);
     }
 };
 
