@@ -743,31 +743,36 @@ private:
         case Inst<CP>::Begin:
             if(cpr_->begin() != cur_)
                 return;
-            return AddThread(thds, curStep,
-                             pc + 1, std::move(saves),
-                             startIdx);
+            AddThread(thds, curStep,
+                      pc + 1, std::move(saves),
+                      startIdx);
+            break;
         case Inst<CP>::End:
             if(cur_ != cpr_->end())
                 return;
-            return AddThread(thds, curStep,
-                             pc + 1, std::move(saves),
-                             startIdx);
+            AddThread(thds, curStep,
+                      pc + 1, std::move(saves),
+                      startIdx);
+            break;
         case Inst<CP>::Jump:
-            return AddThread(thds, curStep,
-                             pc->jumpDest, std::move(saves),
-                             startIdx);
+            AddThread(thds, curStep,
+                      pc->jumpDest, std::move(saves),
+                      startIdx);
+            break;
         case Inst<CP>::Branch:
             AddThread(thds, curStep,
                       pc->branchDest[0], SaveSlots(saves),
                       startIdx);
-            return AddThread(thds, curStep,
-                             pc->branchDest[1], std::move(saves),
-                             startIdx);
+            AddThread(thds, curStep,
+                      pc->branchDest[1], std::move(saves),
+                      startIdx);
+            break;
         case Inst<CP>::Save:
             saves.Set(pc->saveSlot, cpr_->CodeUnitIndex(cur_));
-            return AddThread(thds, curStep,
-                             pc + 1, std::move(saves),
-                             startIdx);
+            AddThread(thds, curStep,
+                      pc + 1, std::move(saves),
+                      startIdx);
+            break;
         case Inst<CP>::Alter:
             for(size_t i = 0; i < pc->alterCount; ++i)
             {
@@ -775,10 +780,10 @@ private:
                           pc->alterDest[i], SaveSlots(saves),
                           startIdx);
             }
-            return;
+            break;
         default:
             thds.push_back(Thread<CP>(pc, std::move(saves), startIdx));
-            return;
+            break;
         }
     }
     
@@ -806,8 +811,7 @@ private:
         if constexpr(AnchorBegin)
         {
             AddThread(rdyThds, 0, &prog_[0],
-                      SaveSlots(slotCount_,
-                                saveSlotsArena),
+                      SaveSlots(slotCount_, saveSlotsArena),
                       0);
         }
         
@@ -892,10 +896,8 @@ private:
             vector<size_t> slots(slotCount_);
             for(size_t i = 0; i < slotCount_; ++i)
                 slots[i] = matchedSaveSlots_.value().Get(i);
-            return make_optional(
-                        make_pair<Interval, vector<size_t>>(
-                            Interval{ matchedStart_, matchedEnd_ },
-                            move(slots)));
+            return make_pair(Interval{ matchedStart_, matchedEnd_ },
+                             move(slots));
         }
         
         return { };

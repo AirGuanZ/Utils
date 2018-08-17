@@ -51,6 +51,16 @@ public:
     {
         return cur - 1;
     }
+
+    static CodeUnit *NextCodePoint(CodeUnit *cur)
+    {
+        return cur + 1;
+    }
+
+    static CodeUnit *LastCodePoint(CodeUnit *cur)
+    {
+        return cur - 1;
+    }
 };
 
 template<typename T = char32_t>

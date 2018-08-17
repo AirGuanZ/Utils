@@ -57,18 +57,46 @@ TEST_CASE("String")
         REQUIRE(Math::ApproxEq(Str16("3.286").Parse<float>(), 3.286f, 1e-5));
     }
 
-    SECTION("Trim")
+    SECTION("Misc")
     {
         REQUIRE(Str8(u8"  Minecraft\n\t").Trim()      == u8"Minecraft");
         REQUIRE(Str8(u8"  Minecraft\n\t").TrimLeft()  == u8"Minecraft\n\t");
         REQUIRE(Str8(u8"  Minecraft\n\t").TrimRight() == u8"  Minecraft");
-    }
 
-    SECTION("Slice")
-    {
-        REQUIRE(Str8(u8"Minecraft").Slice(3)    == u8"ecraft");
+        REQUIRE(Str8(u8"Minecraft").Slice(3) == u8"ecraft");
         REQUIRE(Str8(u8"Minecraft").Slice(0, 3) == u8"Min");
         REQUIRE(Str8(u8"Minecraft").Slice(0, 6) == u8"Minecr");
+
+        REQUIRE(Str8(u8"今天天气不错").Prefix(Str8(u8"今天").Length())       == u8"今天");
+        REQUIRE(Str8(u8"今天天气不错abc").Suffix(Str8(u8"不错abc").Length()) == u8"不错abc");
+
+        REQUIRE(Str8(u8"Minecraft").StartsWith(u8"Minecra"));
+        REQUIRE(Str8(u8"Minecraft").EndsWith(u8"necraft"));
+        REQUIRE(Str8(u8"Minecraft").EndsWith(u8"Minecraft"));
+        REQUIRE(!Str8(u8"Minecraft").EndsWith(u8"Minecra"));
+
+        REQUIRE(Str8(u8"Z").IsDigit(36));
+        REQUIRE(!Str8(u8"0Z").IsDigit(36));
+        REQUIRE(!Str16(u8"仅").IsDigit(36));
+        REQUIRE(Str8(u8"0123456").IsDigits());
+        REQUIRE(!Str8(u8"012a3456").IsDigits());
+        REQUIRE(Str8(u8"012a3456").IsDigits(16));
+
+        REQUIRE(!Str8(u8"abcdefABCDEF").IsAlpha());
+        REQUIRE(!Str8(u8"。").IsAlpha());
+        REQUIRE(Str8(u8"X").IsAlphas());
+        REQUIRE(Str8(u8"abcdefABCDEF").IsAlphas());
+        REQUIRE(!Str8(u8"abcde!fABCDEF").IsAlphas());
+
+        REQUIRE(Str8(u8"MINE").IsUppers());
+        REQUIRE(Str8(u8"mine").IsLowers());
+        REQUIRE(!Str8(u8"mine").IsUppers());
+        REQUIRE(!Str8(u8"MINE").IsLowers());
+
+        REQUIRE(Str8(u8"ABC").ToLower()   == u8"abc");
+        REQUIRE(Str8(u8"Ab仅C").ToLower() == u8"ab仅c");
+        REQUIRE(Str8(u8"abc").ToUpper()   == u8"ABC");
+        REQUIRE(Str8(u8"Ab仅c").ToUpper() == u8"AB仅C");
     }
 
     SECTION("Split")
@@ -96,14 +124,6 @@ TEST_CASE("String")
         REQUIRE(Str8(u8"Minecraft").Find(u8"Minecraft") == 0);
         REQUIRE(Str8(u8"Minecraft").Find(u8"eecraft")   == Str8::NPOS);
         REQUIRE(Str8(u8"Minecraft").Find(u8"er")        == Str8::NPOS);
-    }
-
-    SECTION("Misc")
-    {
-        REQUIRE(Str8(u8"MINE").IsUppers());
-        REQUIRE(Str8(u8"mine").IsLowers());
-        REQUIRE(!Str8(u8"mine").IsUppers());
-        REQUIRE(!Str8(u8"MINE").IsLowers());
     }
 
     SECTION("Regex")

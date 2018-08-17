@@ -231,6 +231,7 @@ public:
             bool operator!=(const Self &rhs) const;
         };
 
+        // FIXME
         CharRange(const CodeUnit *beg, const CodeUnit *end);
         CharRange(const String<CS> &str, const CodeUnit *beg,
                                          const CodeUnit *end);
@@ -351,6 +352,8 @@ class String
     Storage<typename CS::CodeUnit> storage_;
 
     typename CS::CodeUnit *GetMutableData();
+    std::pair<typename CS::CodeUnit*, typename CS::CodeUnit*>
+        GetMutableBeginAndEnd();
 
     explicit String(size_t len);
 

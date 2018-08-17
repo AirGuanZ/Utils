@@ -64,6 +64,9 @@ public:
 
     static const CodeUnit *NextCodePoint(const CodeUnit *cur);
     static const CodeUnit *LastCodePoint(const CodeUnit *cur);
+
+    static CodeUnit *NextCodePoint(CodeUnit *cur);
+    static CodeUnit *LastCodePoint(CodeUnit *cur);
 };
 
 template<typename T = char>
@@ -205,6 +208,46 @@ UTF8Core<T>::NextCodePoint(const CodeUnit *cur)
 template<typename T>
 const typename UTF8Core<T>::CodeUnit *
 UTF8Core<T>::LastCodePoint(const CodeUnit *cur)
+{
+    while((*--cur) & 0b11000000 == 0b10000000)
+        ;
+    return cur;
+}
+
+template<typename T>
+typename UTF8Core<T>::CodeUnit *
+UTF8Core<T>::NextCodePoint(CodeUnit *cur)
+{
+    T fst = *cur;
+    if(!(fst & 0b10000000))
+        return cur + 1;
+    if((fst & 0b11100000) == 0b11000000)
+    {
+        if((*++cur & 0b11000000) != 0b10000000)
+            throw CharsetException("Advancing in invalid UTF-8 sequence");
+        return cur + 1;
+    }
+    if((fst & 0b11110000) == 0b11100000)
+    {
+        if((*++cur & 0b11000000) != 0b10000000 ||
+            (*++cur & 0b11000000) != 0b10000000)
+            throw CharsetException("Advancing in invalid UTF-8 sequence");
+        return cur + 1;
+    }
+    if((fst & 0b11111000) == 0b11110000)
+    {
+        if((*++cur & 0b11000000) != 0b10000000 ||
+            (*++cur & 0b11000000) != 0b10000000 ||
+            (*++cur & 0b11000000) != 0b10000000)
+            throw CharsetException("Advancing in invalid UTF-8 sequence");
+        return cur + 1;
+    }
+    throw CharsetException("Advancing in invalid UTF-8 sequence");
+}
+
+template<typename T>
+typename UTF8Core<T>::CodeUnit *
+UTF8Core<T>::LastCodePoint(CodeUnit *cur)
 {
     while((*--cur) & 0b11000000 == 0b10000000)
         ;

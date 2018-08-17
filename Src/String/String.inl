@@ -402,7 +402,8 @@ template<typename CS>
 StringView<CS>::StringView(const Str &str, const CodeUnit* beg, size_t len)
     : str_(&str), beg_(beg), len_(len)
 {
-    AGZ_ASSERT(beg_ >= str.Data() && beg_ + len_ <= str.Data() + str.Length());
+    AGZ_ASSERT(beg_ >= str.Data());
+    AGZ_ASSERT(beg_ + len_ <= str.Data() + str.Length());
 }
 
 template<typename CS>
@@ -555,16 +556,35 @@ bool StringView<CS>::EndsWith(const Self &suffix) const
                 (Suffix(suffix.Length()) == suffix);
 }
 
-template<typename T>
-static bool IsASCII(T v) { return 0 <= v && v < 128; }
+namespace
+{
+    template<typename T>
+    bool IsASCII(T v) { return 0 <= v && v < 128; }
+
+    template<typename T, std::enable_if_t<(sizeof(T) > 1), int> = 0>
+    bool IsIn256(T v) { return 0 <= v && v < 256; }
+
+    template<typename T, std::enable_if_t<(sizeof(T) > 1), int> = 0>
+    uint8_t ByteIden(T v)
+    {
+        return IsIn256(v) ?
+               StrAlgo::DIGIT_CHAR_VALUE_TABLE[static_cast<uint8_t>(v)]
+             : 255;
+    }
+
+    template<typename T, std::enable_if_t<(sizeof(T) == 1), int> = 0>
+    uint8_t ByteIden(T v)
+    {
+        return StrAlgo::DIGIT_CHAR_VALUE_TABLE[static_cast<uint8_t>(v)];
+    }
+}
 
 template<typename CS>
 bool StringView<CS>::IsDigit(unsigned int base) const
 {
     AGZ_ASSERT(base <= 36);
     auto [d, l] = DataAndLength();
-    return l == 1 && IsASCII(d[0]) &&
-           StrAlgo::DIGIT_CHAR_VALUE_TABLE[d[0]] < base;
+    return l == 1 && ByteIden(d[0]) < base;
 }
 
 template<typename CS>
@@ -574,7 +594,7 @@ bool StringView<CS>::IsDigits(unsigned int base) const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(!IsASCII(d[i]) || d[i] >= base)
+        if(ByteIden(d[i]) >= base)
             return false;
     }
     return true;
@@ -594,7 +614,8 @@ bool StringView<CS>::IsAlphas() const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(!(('a' <= d[i] && d[i] <= 'z') || ('A' <= d[i] && d[i] <= 'Z')))
+        if(!(('a' <= d[i] && d[i] <= 'z') ||
+             ('A' <= d[i] && d[i] <= 'Z')))
             return false;
     }
     return true;
@@ -604,8 +625,7 @@ template<typename CS>
 bool StringView<CS>::IsAlnum(unsigned int base) const
 {
     auto [d, l] = DataAndLength();
-    return l == 1 && IsASCII(d[0]) &&
-           StrAlgo::DIGIT_CHAR_VALUE_TABLE[d[0]] < 36;
+    return l == 1 && ByteIden(d[0]) < 36;
 }
 
 template<typename CS>
@@ -614,7 +634,7 @@ bool StringView<CS>::IsAlnums(unsigned int base) const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(!IsASCII(d[i]) || StrAlgo::DIGIT_CHAR_VALUE_TABLE[d[i]] >= 36)
+        if(ByteIden(d[i]) >= 36)
             return false;
     }
     return true;
@@ -662,8 +682,7 @@ template<typename CS>
 bool StringView<CS>::IsWhitespace() const
 {
     auto [d, l] = DataAndLength();
-    return l == 1 && IsASCII(d[0]) &&
-           StrAlgo::DIGIT_CHAR_VALUE_TABLE[d[0]] == 128;
+    return l == 1 && ByteIden(d[0]) == 128;
 }
 
 template<typename CS>
@@ -672,7 +691,7 @@ bool StringView<CS>::IsWhitespaces() const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(!IsASCII(d[i]) || StrAlgo::DIGIT_CHAR_VALUE_TABLE[d[i]] != 128)
+        if(ByteIden(d[i]) != 128)
             return false;
     }
     return true;
@@ -684,7 +703,7 @@ bool StringView<CS>::IsASCII() const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(!IsASCII(d[i]))
+        if(!StrImpl::IsASCII(d[i]))
             return false;
     }
     return true;
@@ -694,7 +713,7 @@ template<typename CS>
 String<CS> StringView<CS>::ToUpper() const
 {
     String<CS> ret = *this;
-    auto [b, e] = ret.BeginAndEnd();
+    auto [b, e] = ret.GetMutableBeginAndEnd();
     while(b < e)
     {
         if('a' <= *b && *b <= 'z')
@@ -712,7 +731,7 @@ template<typename CS>
 String<CS> StringView<CS>::ToLower() const
 {
     String<CS> ret = *this;
-    auto [b, e] = ret.BeginAndEnd();
+    auto [b, e] = ret.GetMutableBeginAndEnd();
     while(b < e)
     {
         if('A' <= *b && *b <= 'Z')
@@ -886,6 +905,14 @@ template<typename CS>
 typename CS::CodeUnit *String<CS>::GetMutableData()
 {
     return storage_.GetMutableData();
+}
+
+template<typename CS>
+std::pair<typename CS::CodeUnit*, typename CS::CodeUnit*>
+    String<CS>::GetMutableBeginAndEnd()
+{
+    auto b = storage_.GetMutableData();
+    return { b, b + Length() };
 }
 
 template<typename CS>
