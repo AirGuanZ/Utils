@@ -297,11 +297,15 @@ private:
             }
             else if(AdvanceIf('{'))
             {
+                SkipBlanks();
                 size_t firstNum = ParseSize_t();
+                SkipBlanks();
                 ASTNode *newNode;
 
                 if(AdvanceIf(','))
                 {
+                    SkipBlanks();
+
                     newNode = NewASTNode(ASTNode::RepeatRange);
                     newNode->repeatRange.min = firstNum;
                     newNode->repeatRange.max = ParseSize_t();
@@ -309,6 +313,8 @@ private:
                         newNode->repeatRange.min > newNode->repeatRange.max)
                         Error();
                     newNode->repeatRange.content = last;
+
+                    SkipBlanks();
                 }
                 else
                 {
@@ -324,6 +330,19 @@ private:
             }
             else
                 return last;
+        }
+    }
+
+    void SkipBlanks()
+    {
+        for(;;)
+        {
+            if(End())
+                break;
+            CP cp = Char();
+            if(cp != ' ' && cp != '\t')
+                break;
+            Advance();
         }
     }
 
