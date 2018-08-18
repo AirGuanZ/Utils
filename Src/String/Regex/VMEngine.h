@@ -21,6 +21,7 @@
     &：      保存
     .：      任意
     a{m}：   重复m次
+    a{m, n}：重复[m, n]次
 */
 
 AGZ_NS_BEG(AGZ::VMEngineImpl)
@@ -70,7 +71,7 @@ struct ASTNode
         Save,
         Cat, Alter,
         Star, Plus, Ques,
-        Repeat,
+        Repeat, RepeatRange,
     } type;
 
     union
@@ -81,6 +82,12 @@ struct ASTNode
             size_t repeatCount;
             ASTNode *repeatContent;
         };
+        struct
+        {
+            size_t min;
+            size_t max;
+            ASTNode *content;
+        } repeatRange;
         ASTNode *catDest[2];
         ASTNode *orDest[2];
         struct
@@ -229,6 +236,8 @@ private:
         if(AdvanceIf('('))
         {
             auto ret = ParseRegex();
+            if(!ret)
+                Error();
             AdvanceOrErr(')');
             return ret;
         }
@@ -288,9 +297,28 @@ private:
             }
             else if(AdvanceIf('{'))
             {
-                ASTNode *newNode = NewASTNode(ASTNode::Repeat);
-                newNode->repeatCount = ParseSize_t();
-                newNode->repeatContent = last;
+                size_t firstNum = ParseSize_t();
+                ASTNode *newNode;
+
+                if(AdvanceIf(','))
+                {
+                    newNode = NewASTNode(ASTNode::RepeatRange);
+                    newNode->repeatRange.min = firstNum;
+                    newNode->repeatRange.max = ParseSize_t();
+                    if(!newNode->repeatRange.min ||
+                        newNode->repeatRange.min > newNode->repeatRange.max)
+                        Error();
+                    newNode->repeatRange.content = last;
+                }
+                else
+                {
+                    newNode = NewASTNode(ASTNode::Repeat);
+                    newNode->repeatCount = firstNum;
+                    newNode->repeatContent = last;
+                    if(!newNode->repeatCount)
+                        Error();
+                }
+
                 AdvanceOrErr('}');
                 last = newNode;
             }
@@ -301,7 +329,6 @@ private:
 
     size_t ParseSize_t()
     {
-        size_t ret = 0;
         ErrIfEnd();
 
         CP cp = Char();
@@ -313,7 +340,9 @@ private:
                 Error();
             return 0;
         }
-        ret = cp - '0';
+        else if(cp < '0' || '9' < cp)
+            Error();
+        size_t ret = cp - '0';
 
         for(;;)
         {
@@ -403,7 +432,7 @@ public:
                     break;
                 }
             }
-            delete insts_;
+            delete[] insts_;
         }
     }
 
@@ -526,6 +555,9 @@ private:
             return 1 + CountInst(n->quesDest);
         case ASTNode::Repeat:
             return n->repeatCount * CountInst(n->repeatContent);
+        case ASTNode::RepeatRange:
+            return n->repeatRange.max * CountInst(n->repeatRange.content)
+                + (n->repeatRange.max == n->repeatRange.min ? 0 : 1);
         }
         Unreachable();
     }
@@ -567,6 +599,8 @@ private:
             return GenerateQues(node);
         case ASTNode::Repeat:
             return GenerateRepeat(node);
+        case ASTNode::RepeatRange:
+            return GenerateRepeatRange(node);
         }
         Unreachable();
     }
@@ -655,6 +689,44 @@ private:
             FillBP(bps, prog_->GetNextPtr());
             bps = Generate(node->repeatContent);
         }
+
+        return std::move(bps);
+    }
+
+    BP GenerateRepeatRange(ASTNode *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTNode::RepeatRange);
+
+        if(!node->repeatRange.max)
+            return { };
+
+        auto range = &node->repeatRange;
+        BP bps = Generate(range->content);
+        for(size_t i = 1; i < range->min; ++i)
+        {
+            FillBP(bps, prog_->GetNextPtr());
+            bps = Generate(range->content);
+        }
+
+        size_t remain = range->max - range->min;
+        if(!remain)
+            return std::move(bps);
+
+        FillBP(bps, prog_->GetNextPtr());
+        AGZ_ASSERT(bps.empty());
+
+        auto alter = prog_->Emit(MakeInst(I::Alter));
+        alter->alterCount = remain + 1;
+        alter->alterDest = new Inst<CP>*[remain + 1];
+
+        for(size_t i = 0; i < remain; ++i)
+        {
+            FillBP(bps, prog_->GetNextPtr());
+            alter->alterDest[i] = prog_->GetNextPtr();
+            bps = Generate(range->content);
+        }
+
+        bps.push_back(&alter->alterDest[remain]);
 
         return std::move(bps);
     }
