@@ -225,6 +225,6 @@ private:
 using Regex8  = Regex<UTF8<>>;
 using Regex16 = Regex<UTF16<>>;
 using Regex32 = Regex<UTF32<>>;
-using RegexW  = Regex<WUTF>;
+using WRegex  = Regex<WUTF>;
 
 AGZ_NS_END(AGZ)

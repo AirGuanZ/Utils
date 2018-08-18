@@ -11,17 +11,28 @@
 // See https://swtch.com/~rsc/regexp/regexp2.html
 
 /*
-    ab：     连接
-    [ab]：   选择
-    a+：     一个或多个
-    a*：     零个或多个
-    a?：     零个或一个
-    ^：      开头
-    $：      结尾
-    &：      保存
-    .：      任意
-    a{m}：   重复m次
-    a{m, n}：重复[m, n]次
+    ab：     concatenation
+    a|b：    alternative
+    [ab]：   character class
+    a+：     one or more
+    a*：     zero or more
+    a?：     zero or one
+    ^：      beginning
+    $：      end
+    &：      save point
+    .：      any character
+    a{m}：   m times (m > 0)
+    a{m, n}：m to n times (0 <= m, m <= n, 0 < n)
+
+Grammar:
+
+    Regex := Cat \| Cat \| ... \| Cat
+    Cat   := Fac Fac ... Fac
+    Fac   := Fac* | Fac+ | Fac? |
+             Fac{m} | Fac{m, n} |
+             Core
+    Core  := (Regex) | [Fac Fac ... Fac] |
+             Char | . | & | ^ | $
 */
 
 AGZ_NS_BEG(AGZ::VMEngineImpl)
@@ -69,7 +80,7 @@ struct ASTNode
         Begin, End,
         Dot, Char,
         Save,
-        Cat, Alter,
+        Cat, Alter, Or,
         Star, Plus, Ques,
         Repeat, RepeatRange,
     } type;
@@ -163,11 +174,13 @@ private:
             Advance();
             return NewASTNode(ASTNode::Begin);
         }
+
         if(cp == '$')
         {
             Advance();
             return NewASTNode(ASTNode::End);
         }
+
         if(cp == '&')
         {
             Advance();
@@ -185,6 +198,7 @@ private:
         case '+':
         case '*':
         case '?':
+        case '|':
             return nullptr;
         default:
             break;
@@ -210,6 +224,7 @@ private:
             case '+':
             case '*':
             case '?':
+            case '|':
             case '^':
             case '$':
             case '&':
@@ -262,7 +277,6 @@ private:
                 Error();
 
             AdvanceOrErr(']');
-
             return alterNode;
         }
 
@@ -309,8 +323,8 @@ private:
                     newNode = NewASTNode(ASTNode::RepeatRange);
                     newNode->repeatRange.min = firstNum;
                     newNode->repeatRange.max = ParseSize_t();
-                    if(!newNode->repeatRange.min ||
-                        newNode->repeatRange.min > newNode->repeatRange.max)
+                    if(!newNode->repeatRange.max ||
+                       newNode->repeatRange.min > newNode->repeatRange.max)
                         Error();
                     newNode->repeatRange.content = last;
 
@@ -321,8 +335,6 @@ private:
                     newNode = NewASTNode(ASTNode::Repeat);
                     newNode->repeatCount = firstNum;
                     newNode->repeatContent = last;
-                    if(!newNode->repeatCount)
-                        Error();
                 }
 
                 AdvanceOrErr('}');
@@ -376,7 +388,7 @@ private:
         return ret;
     }
 
-    ASTNode *ParseRegex()
+    ASTNode *ParseCat()
     {
         ASTNode *last = ParseFac();
         if(!last)
@@ -387,6 +399,24 @@ private:
             ASTNode *newNode = NewASTNode(ASTNode::Cat);
             newNode->catDest[0] = last;
             newNode->catDest[1] = right;
+            last = newNode;
+        }
+        return last;
+    }
+
+    ASTNode *ParseRegex()
+    {
+        ASTNode *last = ParseCat();
+        if(!last)
+            return nullptr;
+        while(AdvanceIf('|'))
+        {
+            ASTNode *right = ParseCat();
+            if(!right)
+                Error();
+            ASTNode *newNode = NewASTNode(ASTNode::Or);
+            newNode->orDest[0] = last;
+            newNode->orDest[1] = right;
             last = newNode;
         }
         return last;
@@ -566,6 +596,8 @@ private:
                 }
                 return ret + n->alterCount;
             }
+        case ASTNode::Or:
+            return 2 + CountInst(n->orDest[0]) + CountInst(n->orDest[1]);
         case ASTNode::Star:
             return 2 + CountInst(n->starDest);
         case ASTNode::Plus:
@@ -610,6 +642,8 @@ private:
         }
         case ASTNode::Alter:
             return GenerateAlter(node);
+        case ASTNode::Or:
+            return GenerateOr(node);
         case ASTNode::Star:
             return GenerateStar(node);
         case ASTNode::Plus:
@@ -652,6 +686,22 @@ private:
         }
 
         return std::move(ret);
+    }
+
+    BP GenerateOr(ASTNode *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTNode::Or);
+
+        auto branch = prog_->Emit(MakeInst(I::Branch));
+
+        branch->branchDest[0] = prog_->GetNextPtr();
+        auto bps = Generate(node->orDest[0]);
+        bps.push_back(&prog_->Emit(MakeInst(I::Jump))->jumpDest);
+
+        branch->branchDest[1] = prog_->GetNextPtr();
+        bps.splice(bps.end(), Generate(node->orDest[1]));
+
+        return std::move(bps);
     }
 
     BP GenerateStar(ASTNode *node)
@@ -720,8 +770,8 @@ private:
             return { };
 
         auto range = &node->repeatRange;
-        BP bps = Generate(range->content);
-        for(size_t i = 1; i < range->min; ++i)
+        BP bps;
+        for(size_t i = 0; i < range->min; ++i)
         {
             FillBP(bps, prog_->GetNextPtr());
             bps = Generate(range->content);

@@ -155,17 +155,19 @@ TEST_CASE("String")
         REQUIRE(Regex8(u8".*").Match(u8"今天天气不错啊"));
         REQUIRE(Regex8(u8"今天.*啊").Match(u8"今天天气不错啊"));
 
-        REQUIRE(Regex8(u8"今天{ 5 \t }天气不错啊").Match(u8"今天天天天天天气不错啊"));
-        REQUIRE(Regex8(u8"今天{ 3 , 5 }气不错啊").Match(u8"今天天天气不错啊"));
-        REQUIRE(Regex8(u8"今天{3, 5\t}气不错啊").Match(u8"今天天天天气不错啊"));
-        REQUIRE(Regex8(u8"今天{3,\t5}气不错啊").Match(u8"今天天天天天气不错啊"));
+        REQUIRE(Regex8(u8"今天{ 5 \t }天气不错啊").Match(L"今天天天天天天气不错啊"));
+        REQUIRE(WRegex(L"今天{ 3 , 5 }气不错啊").Match(u8"今天天天气不错啊"));
+        REQUIRE(Regex16(u8"今天{3, 5\t}气不错啊").Match(u8"今天天天天气不错啊"));
+        REQUIRE(Regex32(u8"今天{3,\t5}气不错啊").Match(u8"今天天天天天气不错啊"));
 
         REQUIRE(!Regex8(u8"今天{3, 5}气不错啊").Match(u8"今天天气不错啊"));
         REQUIRE(!Regex8(u8"今天{3, 5}气不错啊").Match(u8"今天天天天天天气不错啊"));
 
-        REQUIRE_THROWS(Regex8(u8"今天{0}天气不错啊").Match(u8"今气不错啊"));
         REQUIRE_THROWS(Regex8(u8"今天{2, 1}天气不错啊").Match(u8"今天气不错啊"));
-        
+        REQUIRE_THROWS(Regex8(u8"今天{0, 0}天气不错啊").Match(u8"今天气不错啊"));
+        REQUIRE_NOTHROW(Regex8(u8"今天{0}天气不错啊").Match(u8"今气不错啊"));
+        REQUIRE_NOTHROW(Regex8(u8"今天{0, 1}天气不错啊").Match(u8"今天气不错啊"));
+
         {
             auto m = Regex8(u8"&abc&(def)+&xyz&").Match(u8"abcdefdefxyz");
             REQUIRE((m && m(0, 1) == u8"abc" && m(1, 2) == u8"defdef" && m(2, 3) == u8"xyz"));
@@ -173,6 +175,10 @@ TEST_CASE("String")
 
         REQUIRE(Regex8(u8"b").Search(u8"abc"));
         REQUIRE(Regex16(u8"b+").Search(u8"abbbc"));
+
+        REQUIRE(Regex8("mine|craft").Match("mine"));
+        REQUIRE(Regex8("mine|craft").Match("craft"));
+        REQUIRE(!Regex8("mine|craft").Match("minecraft"));
 
         {
             auto m = Regex8(u8"&b+&").Search(u8"abbbc");
