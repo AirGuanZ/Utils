@@ -184,14 +184,14 @@ UTF8Core<T>::NextCodePoint(const CodeUnit *cur)
     if((fst & 0b11100000) == 0b11000000)
     {
         if((*++cur & 0b11000000) != 0b10000000)
-            throw CharsetException("Advancing in invalid UTF-8 sequence");
+            goto Error;
         return cur + 1;
     }
     if((fst & 0b11110000) == 0b11100000)
     {
         if((*++cur & 0b11000000) != 0b10000000 ||
            (*++cur & 0b11000000) != 0b10000000)
-            throw CharsetException("Advancing in invalid UTF-8 sequence");
+            goto Error;
         return cur + 1;
     }
     if((fst & 0b11111000) == 0b11110000)
@@ -199,9 +199,10 @@ UTF8Core<T>::NextCodePoint(const CodeUnit *cur)
         if((*++cur & 0b11000000) != 0b10000000 ||
            (*++cur & 0b11000000) != 0b10000000 ||
            (*++cur & 0b11000000) != 0b10000000)
-           throw CharsetException("Advancing in invalid UTF-8 sequence");
+            goto Error;
         return cur + 1;
     }
+Error:
     throw CharsetException("Advancing in invalid UTF-8 sequence");
 }
 
@@ -224,14 +225,14 @@ UTF8Core<T>::NextCodePoint(CodeUnit *cur)
     if((fst & 0b11100000) == 0b11000000)
     {
         if((*++cur & 0b11000000) != 0b10000000)
-            throw CharsetException("Advancing in invalid UTF-8 sequence");
+            goto Error;
         return cur + 1;
     }
     if((fst & 0b11110000) == 0b11100000)
     {
         if((*++cur & 0b11000000) != 0b10000000 ||
             (*++cur & 0b11000000) != 0b10000000)
-            throw CharsetException("Advancing in invalid UTF-8 sequence");
+            goto Error;
         return cur + 1;
     }
     if((fst & 0b11111000) == 0b11110000)
@@ -239,9 +240,11 @@ UTF8Core<T>::NextCodePoint(CodeUnit *cur)
         if((*++cur & 0b11000000) != 0b10000000 ||
             (*++cur & 0b11000000) != 0b10000000 ||
             (*++cur & 0b11000000) != 0b10000000)
-            throw CharsetException("Advancing in invalid UTF-8 sequence");
+            goto Error;
         return cur + 1;
     }
+
+Error:
     throw CharsetException("Advancing in invalid UTF-8 sequence");
 }
 

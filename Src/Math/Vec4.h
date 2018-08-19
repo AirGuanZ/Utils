@@ -28,19 +28,19 @@ public:
     using Component = T;
     using Self = Vec4<T>;
 
-    Vec4() : Vec4(T(0)) { }
+    constexpr Vec4() : Vec4(T(0)) { }
 
-    explicit Vec4(Uninitialized_t) { }
+    explicit constexpr Vec4(Uninitialized_t) { }
 
-    explicit Vec4(T value) : x(value), y(value), z(value), w(value) { }
+    explicit constexpr Vec4(T value) : x(value), y(value), z(value), w(value) { }
+
+    constexpr Vec4(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) { }
 
     explicit Vec4(const T *data)
     {
         static_assert(std::is_trivially_copyable_v<T>);
         std::memcpy(&x, data, sizeof(Data));
     }
-
-    Vec4(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) { }
 
     Vec4(const Self &other) : x(other.x), y(other.y), z(other.z), w(other.w) { }
 

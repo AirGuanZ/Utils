@@ -27,13 +27,13 @@ public:
     using Component = T;
     using Self = Vec3<T>;
 
-    Vec3() : Vec3(T(0)) { }
+    constexpr Vec3() : Vec3(T(0)) { }
 
-    explicit Vec3(Uninitialized_t) { }
+    explicit constexpr Vec3(Uninitialized_t) { }
 
-    explicit Vec3(T value) : x(value), y(value), z(value) { }
+    explicit constexpr Vec3(T value) : x(value), y(value), z(value) { }
 
-    Vec3(T x, T y, T z) : x(x), y(y), z(z) { }
+    constexpr Vec3(T x, T y, T z) : x(x), y(y), z(z) { }
 
     Vec3(const Self &other) : x(other.x), y(other.y), z(other.z) { }
 

@@ -9,9 +9,9 @@ struct AngleTemplate
 {
     T value;
 
-    AngleTemplate() : value(T(0.0)) { }
-    explicit AngleTemplate(T v) : value(v) { }
-    explicit AngleTemplate(Uninitialized_t) { }
+    constexpr AngleTemplate() : value(T(0.0)) { }
+    explicit constexpr AngleTemplate(T v) : value(v) { }
+    explicit constexpr AngleTemplate(Uninitialized_t) { }
 };
 
 template<typename T>

@@ -25,13 +25,13 @@ public:
     using Component = T;
     using Self = Vec2<T>;
 
-    Vec2() : Vec2(T(0)) { }
+    constexpr Vec2() : Vec2(T(0)) { }
 
-    explicit Vec2(Uninitialized_t) { }
+    explicit constexpr Vec2(Uninitialized_t) { }
 
-    explicit Vec2(T value) : x(value), y(value) { }
+    explicit constexpr Vec2(T value) : x(value), y(value) { }
 
-    Vec2(T x, T y) : x(x), y(y) { }
+    constexpr Vec2(T x, T y) : x(x), y(y) { }
 
     Vec2(const Self &other) : x(other.x), y(other.y) { }
 

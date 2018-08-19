@@ -13,7 +13,7 @@
 /*
     ab：     concatenation
     a|b：    alternative
-    [ab]：   character class
+    [abc]：  alternatives
     a+：     one or more
     a*：     zero or more
     a?：     zero or one
@@ -32,7 +32,7 @@ Grammar:
              Fac{m} | Fac{m, n} |
              Core
     Core  := (Regex) | [Fac Fac ... Fac] |
-             Char | . | & | ^ | $
+             Character | . | & | ^ | $
 */
 
 AGZ_NS_BEG(AGZ::VMEngineImpl)
@@ -1125,7 +1125,7 @@ private:
                              move(slots));
         }
         
-        return { };
+        return std::nullopt;
     }
 };
 

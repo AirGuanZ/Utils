@@ -21,21 +21,22 @@ using Color4d = Color4<double>;
 #define COLOR_CONST(N, R, G, B, A) \
     namespace Aux \
     { \
-        struct Color##N##_t \
+        struct Color_##N##_t \
         { \
-            AGZ_INLINE operator Color3f() const \
+            constexpr Color_##N##_t() = default; \
+            constexpr operator Color3f() const \
                 { return Color3f(float(R),  float(G),  float(B)); } \
-            AGZ_INLINE operator Color3d() const \
+            constexpr operator Color3d() const \
                 { return Color3d(double(R), double(G), double(B)); } \
-            AGZ_INLINE operator Color4f() const \
+            constexpr operator Color4f() const \
                 { return Color4f(float(R),  float(G), \
                                  float(B),  float(A)); } \
-            AGZ_INLINE operator Color4d() const \
+            constexpr operator Color4d() const \
                 { return Color4d(double(R), double(G), \
                                  double(B), double(A)); } \
         }; \
     } \
-    inline Aux::Color##N##_t N
+    inline constexpr Aux::Color_##N##_t N
 
 namespace COLOR
 {
