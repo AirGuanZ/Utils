@@ -7,22 +7,28 @@
 #include "../../Alloc/FixedSizedArena.h"
 #include "../../Misc/Common.h"
 
-// Regular expression matching by virtual machine
+// Regular expression matching with virtual machine
 // See https://swtch.com/~rsc/regexp/regexp2.html
 
 /*
-    ab：     concatenation
-    a|b：    alternative
-    [abc]：  alternatives
-    a+：     one or more
-    a*：     zero or more
-    a?：     zero or one
-    ^：      beginning
-    $：      end
-    &：      save point
-    .：      any character
-    a{m}：   m times (m > 0)
-    a{m, n}：m to n times (0 <= m, m <= n, 0 < n)
+    ab      concatenation
+    a|b     alternative
+    [abc]   alternatives
+    a+      one or more
+    a*      zero or more
+    a?      zero or one
+    ^       beginning
+    $       end
+    &       save point
+    .       any character
+    a{m}    m times (m > 0)
+    a{m, n} m to n times (0 <= m, m <= n, 0 < n)
+    <az>    character in [a, z]
+    
+    <d>     digit 0-9
+    <c>     a-z and A-Z
+    <w>     alnum and _
+    <s>     whitespace
 
 Grammar:
 
@@ -32,10 +38,19 @@ Grammar:
              Fac{m} | Fac{m, n} |
              Core
     Core  := (Regex) | [Fac Fac ... Fac] |
-             Character | . | & | ^ | $
+             Character | . | & | ^ | $ |
+             <Character Character>
 */
 
 AGZ_NS_BEG(AGZ::VMEngineImpl)
+
+using std::list;
+using std::move;
+using std::nullopt;
+using std::numeric_limits;
+using std::optional;
+using std::pair;
+using std::vector;
 
 template<typename CP>
 struct Inst
@@ -43,7 +58,8 @@ struct Inst
     enum Type
     {
         Begin, End,
-        Dot, Char,
+        Dot, Char, CharRange,
+        Digit, Alpha, WordChar, Whitespace, // Special character classes
         Save,
         Alter, Jump, Branch,
         Match
@@ -52,6 +68,7 @@ struct Inst
     union
     {
         CP codePoint;
+        char32_t charRange[2];
         Inst<CP> *jumpDest;
         Inst<CP> *branchDest[2];
         struct
@@ -78,7 +95,8 @@ struct ASTNode
     enum Type
     {
         Begin, End,
-        Dot, Char,
+        Dot, Char, CharRange,
+        Digit, Alpha, WordChar, Whitespace,
         Save,
         Cat, Alter, Or,
         Star, Plus, Ques,
@@ -88,6 +106,7 @@ struct ASTNode
     union
     {
         char32_t codePoint;
+        char32_t charRange[2];
         struct
         {
             size_t repeatCount;
@@ -199,6 +218,8 @@ private:
         case '*':
         case '?':
         case '|':
+        case '<':
+        case '>':
             return nullptr;
         default:
             break;
@@ -211,10 +232,14 @@ private:
             CP next = CurAndAdv();
             switch(cp)
             {
+            case 'a': cp = '\a'; break;
             case 'b': cp = '\b'; break;
+            case 'f': cp = '\f'; break;
             case 'n': cp = '\n'; break;
-            case 't': cp = '\t'; break;
             case 'r': cp = '\r'; break;
+            case 't': cp = '\t'; break;
+            case 'v': cp = '\v'; break;
+            case '0': cp = '\0'; break;
             case '[':
             case ']':
             case '(':
@@ -225,6 +250,8 @@ private:
             case '*':
             case '?':
             case '|':
+            case '<':
+            case '>':
             case '^':
             case '$':
             case '&':
@@ -278,6 +305,41 @@ private:
 
             AdvanceOrErr(']');
             return alterNode;
+        }
+        
+        if(AdvanceIf('<'))
+        {
+            
+            ErrIfEnd();
+            auto fstChNode = ParseChar();
+            if(!fstChNode)
+                Error();
+            
+            ErrIfEnd();
+            auto sndChNode = ParseChar();
+            if(!sndChNode)
+            {
+                AdvanceOrErr('>');
+                switch(fstChNode->codePoint)
+                {
+                case 'd': return NewASTNode(ASTNode::Digit);
+                case 'c': return NewASTNode(ASTNode::Alpha);
+                case 'w': return NewASTNode(ASTNode::WordChar);
+                case 's': return NewASTNode(ASTNode::Whitespace);
+                default:
+                    Error();
+                }
+            }
+            
+            if(fstChNode->codePoint > sndChNode->codePoint)
+                Error();
+            
+            AdvanceOrErr('>');
+            
+            ASTNode *ret = NewASTNode(ASTNode::CharRange);
+            ret->charRange[0] = fstChNode->codePoint;
+            ret->charRange[1] = sndChNode->codePoint;
+            return ret;
         }
 
         return ParseChar();
@@ -519,7 +581,7 @@ public:
     void ReinitLastSteps()
     {
         for(size_t i = 0; i < instCount_; ++i)
-            insts_[i].lastStep = std::numeric_limits<size_t>::max();
+            insts_[i].lastStep = numeric_limits<size_t>::max();
     }
 
 private:
@@ -535,7 +597,7 @@ class Compiler
 public:
 
     using CP = typename CS::CodePoint;
-    using BP = std::list<Inst<CP>**>;
+    using BP = list<Inst<CP>**>;
 
     Program<CP> Compile(const StringView<CS> &regex,
                         size_t *saveSlotCount)
@@ -554,7 +616,7 @@ public:
 
         *saveSlotCount = saveSlotCount_;
 
-        return std::move(ret);
+        return move(ret);
     }
 
 private:
@@ -581,6 +643,11 @@ private:
         case ASTNode::End:
         case ASTNode::Dot:
         case ASTNode::Char:
+        case ASTNode::CharRange:
+        case ASTNode::Digit:
+        case ASTNode::Alpha:
+        case ASTNode::WordChar:
+        case ASTNode::Whitespace:
         case ASTNode::Save:
             return 1;
         case ASTNode::Cat:
@@ -631,6 +698,20 @@ private:
         case ASTNode::Char:
             prog_->Emit(MakeInst(I::Char))->codePoint = node->codePoint;
             return { };
+        case ASTNode::CharRange:
+            return GenerateCharRange(node);
+        case ASTNode::Digit:
+            prog_->Emit(MakeInst(I::Digit));
+            return { };
+        case ASTNode::Alpha:
+            prog_->Emit(MakeInst(I::Alpha));
+            return { };
+        case ASTNode::WordChar:
+            prog_->Emit(MakeInst(I::WordChar));
+            return { };
+        case ASTNode::Whitespace:
+            prog_->Emit(MakeInst(I::Whitespace));
+            return { };
         case ASTNode::Save:
             prog_->Emit(MakeInst(I::Save))->saveSlot = saveSlotCount_++;
             return { };
@@ -656,6 +737,17 @@ private:
             return GenerateRepeatRange(node);
         }
         Unreachable();
+    }
+    
+    BP GenerateCharRange(ASTNode *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTNode::CharRange);
+        
+        auto cr = prog_->Emit(MakeInst(I::CharRange));
+        cr->charRange[0] = node->charRange[0];
+        cr->charRange[1] = node->charRange[1];
+        
+        return { };
     }
 
     BP GenerateAlter(ASTNode *node)
@@ -685,7 +777,7 @@ private:
             ret.splice(ret.end(), Generate(alterDestNode->dest));
         }
 
-        return std::move(ret);
+        return move(ret);
     }
 
     BP GenerateOr(ASTNode *node)
@@ -701,7 +793,7 @@ private:
         branch->branchDest[1] = prog_->GetNextPtr();
         bps.splice(bps.end(), Generate(node->orDest[1]));
 
-        return std::move(bps);
+        return move(bps);
     }
 
     BP GenerateStar(ASTNode *node)
@@ -742,7 +834,7 @@ private:
         branch->branchDest[0] = prog_->GetNextPtr();
         auto ret = Generate(node->quesDest);
         ret.push_back(&branch->branchDest[1]);
-        return std::move(ret);
+        return move(ret);
     }
 
     BP GenerateRepeat(ASTNode *node)
@@ -759,7 +851,7 @@ private:
             bps = Generate(node->repeatContent);
         }
 
-        return std::move(bps);
+        return move(bps);
     }
 
     BP GenerateRepeatRange(ASTNode *node)
@@ -779,7 +871,7 @@ private:
 
         size_t remain = range->max - range->min;
         if(!remain)
-            return std::move(bps);
+            return move(bps);
 
         FillBP(bps, prog_->GetNextPtr());
         AGZ_ASSERT(bps.empty());
@@ -797,7 +889,7 @@ private:
 
         bps.push_back(&alter->alterDest[remain]);
 
-        return std::move(bps);
+        return move(bps);
     }
 };
 
@@ -830,7 +922,7 @@ public:
         storage_ = arena_.Malloc<SaveSlotsStorage>();
         storage_->refs = 1;
         for(size_t i = 0; i < slotCount_; ++i)
-            storage_->slots[i] = std::numeric_limits<size_t>::max();
+            storage_->slots[i] = numeric_limits<size_t>::max();
     }
 
     SaveSlots(const Self &copyFrom)
@@ -884,7 +976,7 @@ template<typename CP>
 struct Thread
 {
     Thread(Inst<CP> *pc, SaveSlots &&saveSlots, size_t startIdx)
-        : pc(pc), saveSlots(std::move(saveSlots)), startIdx(startIdx)
+        : pc(pc), saveSlots(move(saveSlots)), startIdx(startIdx)
     {
 
     }
@@ -903,7 +995,7 @@ public:
     using CU = typename CS::CodeUnit;
     using CP = typename CS::CodePoint;
 
-    using Interval = std::pair<size_t, size_t>;
+    using Interval = pair<size_t, size_t>;
 
     explicit Machine(const StringView<CS> &regex)
         : slotCount_(0), regex_(regex),
@@ -912,7 +1004,7 @@ public:
         
     }
 
-    std::optional<std::vector<size_t>>
+    optional<vector<size_t>>
         Match(const StringView<CS> &dst) const
     {
         if(!prog_.IsAvailable())
@@ -921,13 +1013,12 @@ public:
             regex_ = String<CS>();
         }
         auto ret = Run<true, true>(dst);
-        return ret.has_value() ? std::make_optional(
-                                    std::move(ret.value().second))
-                               : std::nullopt;
+        return ret.has_value() ? move(ret.value().second)
+                               : nullopt;
     }
 
-    std::optional<std::pair<std::pair<size_t, size_t>,
-        std::vector<size_t>>>
+    optional<pair<pair<size_t, size_t>,
+        vector<size_t>>>
         Search(const StringView<CS> &dst) const
     {
         if(!prog_.IsAvailable())
@@ -951,14 +1042,14 @@ private:
     mutable It cur_;
     
     mutable size_t matchedStart_, matchedEnd_;
-    mutable std::optional<SaveSlots> matchedSaveSlots_;
+    mutable optional<SaveSlots> matchedSaveSlots_;
     
     void SetMatched(SaveSlots &&saves) const
     {
-        matchedSaveSlots_.emplace(std::move(saves));
+        matchedSaveSlots_.emplace(move(saves));
     }
 
-    void AddThread(std::vector<Thread<CP>> &thds, size_t curStep,
+    void AddThread(vector<Thread<CP>> &thds, size_t curStep,
                    Inst<CP> *pc, SaveSlots &&saves, size_t startIdx) const
     {
         if(pc->lastStep == curStep)
@@ -969,19 +1060,19 @@ private:
             if(cpr_->begin() != cur_)
                 return;
             AddThread(thds, curStep,
-                      pc + 1, std::move(saves),
+                      pc + 1, move(saves),
                       startIdx);
             break;
         case Inst<CP>::End:
             if(cur_ != cpr_->end())
                 return;
             AddThread(thds, curStep,
-                      pc + 1, std::move(saves),
+                      pc + 1, move(saves),
                       startIdx);
             break;
         case Inst<CP>::Jump:
             AddThread(thds, curStep,
-                      pc->jumpDest, std::move(saves),
+                      pc->jumpDest, move(saves),
                       startIdx);
             break;
         case Inst<CP>::Branch:
@@ -989,13 +1080,13 @@ private:
                       pc->branchDest[0], SaveSlots(saves),
                       startIdx);
             AddThread(thds, curStep,
-                      pc->branchDest[1], std::move(saves),
+                      pc->branchDest[1], move(saves),
                       startIdx);
             break;
         case Inst<CP>::Save:
             saves.Set(pc->saveSlot, cpr_->CodeUnitIndex(cur_));
             AddThread(thds, curStep,
-                      pc + 1, std::move(saves),
+                      pc + 1, move(saves),
                       startIdx);
             break;
         case Inst<CP>::Alter:
@@ -1007,13 +1098,24 @@ private:
             }
             break;
         default:
-            thds.push_back(Thread<CP>(pc, std::move(saves), startIdx));
+            thds.push_back(Thread<CP>(pc, move(saves), startIdx));
             break;
         }
     }
     
+    void AddThreadWithPC(vector<Thread<CP>> &thds,
+                         size_t cpIdx, Inst<CP> *pc, Thread<CP> *oriTh)
+    {
+        auto oldCur = cur_;
+        ++cur_;
+        AddThread(thds, cpIdx,
+                  pc, move(oriTh->saveSlots),
+                  oriTh->startIdx);
+        cur_ = oldCur;
+    }
+    
     template<bool AnchorBegin, bool AnchorEnd>
-    std::optional<std::pair<Interval, std::vector<size_t>>>
+    optional<pair<Interval, vector<size_t>>>
         Run(const StringView<CS> &str) const
     {
         AGZ_ASSERT(prog_.IsAvailable());
@@ -1066,7 +1168,7 @@ private:
                 switch(pc->op)
                 {
                 case Inst<CP>::Dot:
-                {
+                /*{
                     auto oldCur = cur_;
                     ++cur_;
                     AddThread(newThds, cpIdx,
@@ -1074,19 +1176,34 @@ private:
                               th->startIdx);
                     cur_ = oldCur;
                     break;
-                }
+                }*/
+                    AddThreadWithPC(newThds, cpIdx, pc + 1, th);
+                    break;
                 case Inst<CP>::Char:
-                    if(pc->codePoint != cp)
-                        break;
-                {
-                    auto oldCur = cur_;
-                    ++cur_;
-                    AddThread(newThds, cpIdx,
-                              pc + 1, move(th->saveSlots),
-                              th->startIdx);
-                    cur_ = oldCur;
+                    if(pc->codePoint == cp)
+                        AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
-                }
+                case Inst<CP>::CharRange:
+                    if(pc->charRange[0] <= cp || cp <= pc->charRange[1])
+                        AddThreadWithPC(newThds, cpIdx, pc + 1, th);
+                    break;
+                case Inst<CP>::Digit:
+                    if('0' <= cp && cp <= '9')
+                        AddThreadWithPC(newThds, cpIdx, pc + 1, th);
+                    break;
+                case Inst<CP>::Alpha:
+                    if(('a' <= cp && cp <= 'z') || ('A' <= cp && cp <= 'Z'))
+                        AddThreadWithPC(newThds, cpIdx, pc + 1, th);
+                    break;
+                case Inst<CP>::WordChar:
+                    if(('a' <= cp && cp <= 'z') || ('A' <= cp && cp <= 'Z') ||
+                       ('0' <= cp && cp <= '0') || cp == '_')
+                        AddThreadWithPC(newThds, cpIdx, pc + 1, th);
+                    break;
+                case Inst<CP>::Whitespace:
+                    if(9 <= cp && cp <= 13)
+                        AddThreadWithPC(newThds, cpIdx, pc + 1, th);
+                    break;
                 case Inst<CP>::Match:
                     if constexpr(!AnchorEnd)
                     {
@@ -1125,7 +1242,7 @@ private:
                              move(slots));
         }
         
-        return std::nullopt;
+        return nullopt;
     }
 };
 
