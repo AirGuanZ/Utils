@@ -4,7 +4,6 @@
 #include <utility>
 #include <vector>
 
-#include "../../Buffer/COWObject.h"
 #include "../../Misc/Common.h"
 #include "../String.h"
 #include "VMEngine.h"
@@ -147,14 +146,13 @@ public:
     using CodePoint = typename CS::CodePoint;
     using CodeUnit  = typename CS::CodeUnit;
     using Engine    = Eng;
-    using EngObj    = COWObject<Engine>;
     using Result    = Match<CS>;
     using Self      = Regex<CS, Eng>;
 
     Regex() = default;
 
     Regex(const StringView<CS> &regex)
-        : engine_(regex)
+        : engine_(std::make_shared<Engine>(regex))
     {
 
     }
@@ -219,7 +217,7 @@ public:
 
 private:
 
-    EngObj engine_;
+    std::shared_ptr<Engine> engine_;
 };
 
 using Regex8  = Regex<UTF8<>>;

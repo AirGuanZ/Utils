@@ -409,10 +409,8 @@ private:
 
     void SkipBlanks()
     {
-        for(;;)
+        while(!End())
         {
-            if(End())
-                break;
             CP cp = Char();
             if(cp != ' ' && cp != '\t')
                 break;
@@ -1013,7 +1011,7 @@ public:
             regex_ = String<CS>();
         }
         auto ret = Run<true, true>(dst);
-        return ret.has_value() ? move(ret.value().second)
+        return ret.has_value() ? make_optional(move(ret.value().second))
                                : nullopt;
     }
 
@@ -1104,7 +1102,8 @@ private:
     }
     
     void AddThreadWithPC(vector<Thread<CP>> &thds,
-                         size_t cpIdx, Inst<CP> *pc, Thread<CP> *oriTh)
+                         size_t cpIdx, Inst<CP> *pc,
+                         Thread<CP> *oriTh) const
     {
         auto oldCur = cur_;
         ++cur_;
@@ -1184,7 +1183,7 @@ private:
                         AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
                 case Inst<CP>::CharRange:
-                    if(pc->charRange[0] <= cp || cp <= pc->charRange[1])
+                    if(pc->charRange[0] <= cp && cp <= pc->charRange[1])
                         AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
                 case Inst<CP>::Digit:
@@ -1197,11 +1196,11 @@ private:
                     break;
                 case Inst<CP>::WordChar:
                     if(('a' <= cp && cp <= 'z') || ('A' <= cp && cp <= 'Z') ||
-                       ('0' <= cp && cp <= '0') || cp == '_')
+                       ('0' <= cp && cp <= '9') || cp == '_')
                         AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
                 case Inst<CP>::Whitespace:
-                    if(9 <= cp && cp <= 13)
+                    if((9 <= cp && cp <= 13) || cp == 32)
                         AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
                 case Inst<CP>::Match:

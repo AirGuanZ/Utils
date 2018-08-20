@@ -180,6 +180,17 @@ TEST_CASE("String")
         REQUIRE(Regex8("mine|craft").Match("craft"));
         REQUIRE(!Regex8("mine|craft").Match("minecraft"));
 
+        REQUIRE(Regex8("<az>+").Match("minecraft"));
+        REQUIRE(Regex8("<d>+").Match("123456"));
+        REQUIRE(!Regex8("<d>+").Match("12a3456"));
+        REQUIRE(Regex8("<w>+").Match("variableName"));
+        REQUIRE(Regex8("<w>+").Match("variable_name"));
+        REQUIRE(Regex8("<w>+").Match("0_variable_name_1"));
+        REQUIRE(!Regex8("<w>+").Match("0_va riable_name_1"));
+        REQUIRE(Regex8("<s>+").Match("\n  \t \r "));
+        REQUIRE(!Regex8("<s>+").Match("\n  !\t \r "));
+        REQUIRE(!Regex8("<az>+").Match("Minecraft"));
+
         {
             auto m = Regex8(u8"&b+&").Search(u8"abbbc");
             REQUIRE((m && m(0, 1) == u8"bbb"));
