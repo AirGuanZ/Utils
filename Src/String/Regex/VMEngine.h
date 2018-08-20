@@ -906,8 +906,8 @@ public:
     using Interval = std::pair<size_t, size_t>;
 
     explicit Machine(const StringView<CS> &regex)
-        : regex_(regex),
-          slotCount_(0), cpr_(nullptr), matchedStart_(0), matchedEnd_(0)
+        : slotCount_(0), regex_(regex),
+          cpr_(nullptr), matchedStart_(0), matchedEnd_(0)
     {
         
     }

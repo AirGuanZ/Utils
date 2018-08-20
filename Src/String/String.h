@@ -17,7 +17,7 @@ AGZ_NS_BEG(AGZ::StrImpl)
 // Charsets that can be used by c-style string and std::string
 enum class NativeCharset
 {
-    UTF8,  // for const char * / std::string
+    UTF8, // for const char * / std::string
     WUTF, // for const wchar_t * / std::wstring
 };
 
