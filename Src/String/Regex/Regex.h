@@ -189,12 +189,12 @@ public:
 
     ~Regex() = default;
 
-    Result Match(const String<CS> &dst) const
+    AGZ_FORCEINLINE Result Match(const String<CS> &dst) const
     {
         return this->Match(dst.AsView());
     }
 
-    Result Search(const String<CS> &dst) const
+    AGZ_FORCEINLINE Result Search(const String<CS> &dst) const
     {
         return this->Search(dst.AsView());
     }

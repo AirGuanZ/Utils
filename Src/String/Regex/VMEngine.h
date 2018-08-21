@@ -6,6 +6,8 @@
 
 #include "../../Alloc/FixedSizedArena.h"
 #include "../../Misc/Common.h"
+#include "../StrAlgo.h"
+#include "../String.h"
 
 // Regular expression matching with virtual machine
 // See https://swtch.com/~rsc/regexp/regexp2.html
@@ -29,6 +31,7 @@
     <c>     a-z and A-Z
     <w>     alnum and _
     <s>     whitespace
+    <h>     hexdigit 0-9 a-z A-Z
 
 Grammar:
 
@@ -43,6 +46,8 @@ Grammar:
 */
 
 AGZ_NS_BEG(AGZ::VMEngineImpl)
+
+using namespace AGZ::StrImpl::StrAlgo;
 
 using std::list;
 using std::move;
@@ -59,7 +64,10 @@ struct Inst
     {
         Begin, End,
         Dot, Char, CharRange,
-        Digit, Alpha, WordChar, Whitespace, // Special character classes
+        
+        // Special character classes
+        Digit, Alpha, WordChar, Whitespace, HexDigit,
+        
         Save,
         Alter, Jump, Branch,
         Match
@@ -96,7 +104,7 @@ struct ASTNode
     {
         Begin, End,
         Dot, Char, CharRange,
-        Digit, Alpha, WordChar, Whitespace,
+        Digit, Alpha, WordChar, Whitespace, HexDigit,
         Save,
         Cat, Alter, Or,
         Star, Plus, Ques,
@@ -326,6 +334,7 @@ private:
                 case 'c': return NewASTNode(ASTNode::Alpha);
                 case 'w': return NewASTNode(ASTNode::WordChar);
                 case 's': return NewASTNode(ASTNode::Whitespace);
+                case 'h': return NewASTNode(ASTNode::HexDigit);
                 default:
                     Error();
                 }
@@ -646,6 +655,7 @@ private:
         case ASTNode::Alpha:
         case ASTNode::WordChar:
         case ASTNode::Whitespace:
+        case ASTNode::HexDigit:
         case ASTNode::Save:
             return 1;
         case ASTNode::Cat:
@@ -709,6 +719,9 @@ private:
             return { };
         case ASTNode::Whitespace:
             prog_->Emit(MakeInst(I::Whitespace));
+            return { };
+        case ASTNode::HexDigit:
+            prog_->Emit(MakeInst(I::HexDigit));
             return { };
         case ASTNode::Save:
             prog_->Emit(MakeInst(I::Save))->saveSlot = saveSlotCount_++;
@@ -1167,15 +1180,6 @@ private:
                 switch(pc->op)
                 {
                 case Inst<CP>::Dot:
-                /*{
-                    auto oldCur = cur_;
-                    ++cur_;
-                    AddThread(newThds, cpIdx,
-                              pc + 1, move(th->saveSlots),
-                              th->startIdx);
-                    cur_ = oldCur;
-                    break;
-                }*/
                     AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
                 case Inst<CP>::Char:
@@ -1187,20 +1191,23 @@ private:
                         AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
                 case Inst<CP>::Digit:
-                    if('0' <= cp && cp <= '9')
+                    if(IsUnicodeDigit(cp))
                         AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
                 case Inst<CP>::Alpha:
-                    if(('a' <= cp && cp <= 'z') || ('A' <= cp && cp <= 'Z'))
+                    if(IsUnicodeAlpha(cp))
                         AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
                 case Inst<CP>::WordChar:
-                    if(('a' <= cp && cp <= 'z') || ('A' <= cp && cp <= 'Z') ||
-                       ('0' <= cp && cp <= '9') || cp == '_')
+                    if(IsUnicodeAlnum(cp) || cp == '_')
                         AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
                 case Inst<CP>::Whitespace:
-                    if((9 <= cp && cp <= 13) || cp == 32)
+                    if(IsUnicodeWhitespace(cp))
+                        AddThreadWithPC(newThds, cpIdx, pc + 1, th);
+                    break;
+                case Inst<CP>::HexDigit:
+                    if(IsUnicodeHexDigit(cp))
                         AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
                 case Inst<CP>::Match:

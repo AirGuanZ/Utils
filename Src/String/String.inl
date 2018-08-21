@@ -7,7 +7,6 @@
 
 #include "../Alloc/Malloc.h"
 #include "StrAlgo.inl"
-#include "String.h"
 
 AGZ_NS_BEG(AGZ::StrImpl)
 
@@ -558,21 +557,23 @@ bool StringView<CS>::EndsWith(const Self &suffix) const
 namespace
 {
     template<typename T>
-    bool IsASCII(T v) { return 0 <= v && v < 128; }
+    AGZ_FORCEINLINE bool IsASCII(T v)
+    { return static_cast<uint8_t>(v) < 128; }
 
     template<typename T, std::enable_if_t<(sizeof(T) > 1), int> = 0>
-    bool IsIn256(T v) { return 0 <= v && v < 256; }
+    AGZ_FORCEINLINE bool In256(T v)
+    { return static_cast<std::make_unsigned_t<T>>(v) < 256; }
 
     template<typename T, std::enable_if_t<(sizeof(T) > 1), int> = 0>
-    uint8_t ByteIden(T v)
+    AGZ_FORCEINLINE uint8_t ByteIden(T v)
     {
-        return IsIn256(v) ?
+        return In256(v) ?
                StrAlgo::DIGIT_CHAR_VALUE_TABLE[static_cast<uint8_t>(v)]
              : 255;
     }
 
     template<typename T, std::enable_if_t<(sizeof(T) == 1), int> = 0>
-    uint8_t ByteIden(T v)
+    AGZ_FORCEINLINE uint8_t ByteIden(T v)
     {
         return StrAlgo::DIGIT_CHAR_VALUE_TABLE[static_cast<uint8_t>(v)];
     }

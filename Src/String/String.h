@@ -332,6 +332,11 @@ public:
 
     Iterator begin() const;
     Iterator end()   const;
+    
+    template<typename Regex>
+    auto Match(const Regex &regex) const { return regex.Match(*this); }
+    template<typename Regex>
+    auto Search(const Regex &regex) const { return regex.Search(*this); }
 
     Str operator+(const Self &rhs) const;
 
@@ -472,6 +477,11 @@ public:
     CharRange Chars() const && { return CharRange(*this, begin(), end()); }
 
     std::pair<const CodeUnit*, const CodeUnit*> BeginAndEnd() const { return storage_.BeginAndEnd(); }
+    
+    template<typename Regex>
+    auto Match(const Regex &regex) const { return regex.Match(*this); }
+    template<typename Regex>
+    auto Search(const Regex &regex) const { return regex.Search(*this); }
 };
 
 template<typename CS>
