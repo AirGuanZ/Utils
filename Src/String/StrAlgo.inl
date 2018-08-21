@@ -10,13 +10,25 @@ AGZ_NS_BEG(AGZ::StrImpl::StrAlgo)
 // Boyer–Moore–Horspool algorithm.
 // See https://en.wikipedia.org/wiki/Boyer–Moore–Horspool_algorithm
 template<size_t AlignBytes>
-const unsigned char *BoyerMooreHorspool(const unsigned char *beg, const unsigned char *end,
-                                        const unsigned char *pbeg, const unsigned char *pend)
+const unsigned char *BoyerMooreHorspool(const unsigned char *beg,
+                                        const unsigned char *end,
+                                        const unsigned char *pbeg,
+                                        const unsigned char *pend)
 {
     AGZ_ASSERT(beg <= end && pbeg <= pend);
 
     // Align to AlignByte + alignOffset:
     //     ALIGN_TO(p - alignOffset, AlignByte) + alignOffset
+    //
+    // alignOffset and alignFactor are meaningful only when
+    // the value of beg is not aligned as AlignBytes.
+    // If this requirement can be guaranteed, this two variables
+    // must be 0 and can be deleted from this code.
+    //
+    // Believe that the compiler will do sufficient constant propagation
+    // when AlignBytes == 0
+    //
+    // :)
     size_t alignOffset = reinterpret_cast<size_t>(beg) & (AlignBytes - 1);
     size_t alignFactor = (AlignBytes - 1) - alignOffset;
     size_t len = end - beg, pLen = pend - pbeg;
@@ -117,10 +129,14 @@ template<typename T, typename CS,
         {
             static const char chs[36] =
             {
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-                'U', 'V', 'W', 'X', 'Y', 'Z'
+                '0', '1', '2', '3', '4',
+                '5', '6', '7', '8', '9',
+                'A', 'B', 'C', 'D', 'E',
+                'F', 'G', 'H', 'I', 'J',
+                'K', 'L', 'M', 'N', 'O',
+                'P', 'Q', 'R', 'S', 'T',
+                'U', 'V', 'W', 'X', 'Y',
+                'Z'
             };
             auto d = v % base;
             v      = v / base;
@@ -158,6 +174,8 @@ inline const unsigned char DIGIT_CHAR_VALUE_TABLE[256] =
     23,  24,  25,  26,  27,  28,  29,  30,  31,  32,
     33,  34,  35,  255, 255, 255, 255, 255,
 
+    // There are 128 redundant values to enable indexing
+    // this table directly with any integral type with 1 byte size
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255,

@@ -31,7 +31,7 @@
     <c>     a-z and A-Z
     <w>     alnum and _
     <s>     whitespace
-    <h>     hexdigit 0-9 a-z A-Z
+    <h>     hexdigit 0-9 a-f A-F
 
 Grammar:
 
