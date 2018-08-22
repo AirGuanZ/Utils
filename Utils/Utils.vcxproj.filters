@@ -31,6 +31,9 @@
     <Filter Include="String\String">
       <UniqueIdentifier>{8557d3fb-575a-44f3-9f08-42b95d3c5a53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{0a1225e9-3f29-40ee-8c81-1667d139a90c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Math\Scalar.h">
@@ -183,6 +186,27 @@
     </ClInclude>
     <ClInclude Include="..\Src\Misc\Config.h">
       <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Alloc.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Buffer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Math.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\FileSys.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Misc.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Range.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\String.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,8 @@
 #include <algorithm>
 #include <string>
 
-#include <Utils.h>
+#include <Utils/Buffer.h>
+#include <Utils/Math.h>
 
 #include "Catch.hpp"
 

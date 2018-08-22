@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include <Utils.h>
+#include <Utils/Math.h>
 
 #include "Catch.hpp"
 

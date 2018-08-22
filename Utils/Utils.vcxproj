@@ -70,6 +70,13 @@
     <ClInclude Include="..\Src\String\String\StrAlgo.h" />
     <ClInclude Include="..\Src\String\String\String.h" />
     <ClInclude Include="..\Src\Utils.h" />
+    <ClInclude Include="..\Src\Utils\Alloc.h" />
+    <ClInclude Include="..\Src\Utils\Buffer.h" />
+    <ClInclude Include="..\Src\Utils\FileSys.h" />
+    <ClInclude Include="..\Src\Utils\Math.h" />
+    <ClInclude Include="..\Src\Utils\Misc.h" />
+    <ClInclude Include="..\Src\Utils\Range.h" />
+    <ClInclude Include="..\Src\Utils\String.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec2.inl" />
