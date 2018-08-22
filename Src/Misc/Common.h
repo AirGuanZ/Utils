@@ -2,8 +2,6 @@
 
 #include <stdexcept>
 
-#include "Config.h"
-
 #ifdef _MSC_VER
 
 #define AGZ_INLINE inline

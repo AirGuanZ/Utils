@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "../../Misc/Common.h"
+#include "../../Misc/Config.h"
 #include "../../Range/Iterator.h"
 #include "../Charset/ASCII.h"
 #include "../Charset/UTF.h"
@@ -19,28 +20,6 @@ enum class NativeCharset
 {
     UTF8, // for const char * / std::string
     WUTF, // for const wchar_t * / std::wstring
-};
-
-// Determinating how many values can SSO buffer hold.
-template<size_t>
-struct SmallBufSizeSelector;
-
-template<>
-struct SmallBufSizeSelector<1>
-{
-    static constexpr size_t Value = 31;
-};
-
-template<>
-struct SmallBufSizeSelector<2>
-{
-    static constexpr size_t Value = 15;
-};
-
-template<>
-struct SmallBufSizeSelector<4>
-{
-    static constexpr size_t Value = 7;
 };
 
 // Reference counted value container
@@ -81,8 +60,7 @@ public:
 template<typename CU>
 class Storage
 {
-    static constexpr size_t SMALL_BUF_SIZE =
-        SmallBufSizeSelector<sizeof(CU)>::Value;
+    static constexpr size_t SMALL_BUF_SIZE = 31 / sizeof(CU);
 
     using LargeBuf = RefCountedBuf<CU>;
 

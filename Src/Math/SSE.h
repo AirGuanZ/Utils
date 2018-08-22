@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Misc/Common.h"
+#include "../Misc/Config.h"
 
 #ifdef AGZ_USE_SSE2
 

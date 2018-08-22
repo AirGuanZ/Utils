@@ -47,9 +47,10 @@ Grammar:
 
 AGZ_NS_BEG(AGZ::VMEngineImpl)
 
-using namespace AGZ::StrImpl::StrAlgo;
+using namespace StrImpl::StrAlgo;
 
 using std::list;
+using std::make_optional;
 using std::move;
 using std::nullopt;
 using std::numeric_limits;
@@ -1132,8 +1133,6 @@ private:
         Run(const StringView<CS> &str) const
     {
         AGZ_ASSERT(prog_.IsAvailable());
-        
-        using namespace std;
 
         size_t saveAllocSize = SaveSlots::AllocSize(slotCount_);
         FixedSizedArena<> saveSlotsArena(
