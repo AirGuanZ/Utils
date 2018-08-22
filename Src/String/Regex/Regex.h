@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "../../Misc/Common.h"
-#include "../String.h"
+#include "../String/String.h"
 #include "VMEngine.h"
 
 // Regular expression

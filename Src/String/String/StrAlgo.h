@@ -5,6 +5,8 @@
 #include <type_traits>
 #include <vector>
 
+#include "String.h"
+
 AGZ_NS_BEG(AGZ::StrImpl::StrAlgo)
 
 // Boyer–Moore–Horspool algorithm.
@@ -199,7 +201,7 @@ AGZ_FORCEINLINE unsigned char DTV(char32_t ucp)
 
 AGZ_FORCEINLINE bool IsUnicodeDigit(char32_t ucp)
 {
-    return '0' <= cp && cp <= '9';
+    return '0' <= ucp && ucp <= '9';
 }
 
 AGZ_FORCEINLINE bool IsUnicodeHexDigit(char32_t ucp)

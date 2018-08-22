@@ -25,6 +25,12 @@
     <Filter Include="String\Regex">
       <UniqueIdentifier>{90cdbbff-e04e-48e3-a5b6-07094d331477}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FileSys">
+      <UniqueIdentifier>{8a4777f6-1f7e-4568-a06c-66e6e57eced9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="String\String">
+      <UniqueIdentifier>{8557d3fb-575a-44f3-9f08-42b95d3c5a53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Math\Scalar.h">
@@ -127,9 +133,6 @@
     <ClInclude Include="..\Src\Range\Any.h">
       <Filter>Range</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\String\String.h">
-      <Filter>String</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\String\Charset\ASCII.h">
       <Filter>String\Charset</Filter>
     </ClInclude>
@@ -166,6 +169,21 @@
     <ClInclude Include="..\Src\String\Charset\Charset.h">
       <Filter>String\Charset</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\FileSys\Path.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\String.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\String\StrAlgo.h">
+      <Filter>String\String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\String\String.h">
+      <Filter>String\String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Misc\Config.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">
@@ -177,11 +195,8 @@
     <None Include="..\Src\Math\SwizzleVec2.inl">
       <Filter>Math</Filter>
     </None>
-    <None Include="..\Src\String\String.inl">
-      <Filter>String</Filter>
-    </None>
-    <None Include="..\Src\String\StrAlgo.inl">
-      <Filter>String</Filter>
+    <None Include="..\Src\String\String\String.inl">
+      <Filter>String\String</Filter>
     </None>
   </ItemGroup>
 </Project>

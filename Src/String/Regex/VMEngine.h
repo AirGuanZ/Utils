@@ -6,8 +6,8 @@
 
 #include "../../Alloc/FixedSizedArena.h"
 #include "../../Misc/Common.h"
-#include "../StrAlgo.h"
-#include "../String.h"
+#include "../String/StrAlgo.h"
+#include "../String/String.h"
 
 // Regular expression matching with virtual machine
 // See https://swtch.com/~rsc/regexp/regexp2.html
@@ -257,6 +257,7 @@ private:
             case '+':
             case '*':
             case '?':
+            case '.':
             case '|':
             case '<':
             case '>':

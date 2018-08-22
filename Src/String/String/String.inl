@@ -5,8 +5,9 @@
 #include <cwchar>
 #include <type_traits>
 
-#include "../Alloc/Malloc.h"
-#include "StrAlgo.inl"
+#include "../../Alloc/Malloc.h"
+#include "StrAlgo.h"
+#include "String.h"
 
 AGZ_NS_BEG(AGZ::StrImpl)
 

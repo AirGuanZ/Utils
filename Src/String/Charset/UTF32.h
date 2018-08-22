@@ -20,10 +20,7 @@ public:
 
     static constexpr size_t MaxCUInCP = 1;
 
-    static size_t CUInCP(CodePoint cp)
-    {
-        return 1;
-    }
+    static size_t CUInCP(CodePoint) { return 1; }
 
     static size_t CP2CU(CodePoint cp, CodeUnit *cu)
     {

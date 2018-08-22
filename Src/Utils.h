@@ -8,6 +8,8 @@
 #include "Buffer/Buffer2D.h"
 #include "Buffer/COWObject.h"
 
+#include "FileSys/Path.h"
+
 #include "Math/Angle.h"
 #include "Math/Color.h"
 #include "Math/Mat4.h"
@@ -40,5 +42,4 @@
 #include "Range/Take.h"
 #include "Range/Transform.h"
 
-#include "String/Regex/Regex.h"
 #include "String/String.h"
