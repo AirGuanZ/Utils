@@ -215,6 +215,12 @@ private:
             return NewASTNode(ASTNode::Save);
         }
 
+        if(cp == '.')
+        {
+            Advance();
+            return NewASTNode(ASTNode::Dot);
+        }
+
         switch(cp)
         {
         case '[':
@@ -272,14 +278,8 @@ private:
             }
         }
 
-        ASTNode *ret = astNodeArena_.Malloc();
-        if(cp == '.')
-            ret->type = ASTNode::Dot;
-        else
-        {
-            ret->type = ASTNode::Char;
-            ret->codePoint = cp;
-        }
+        ASTNode *ret = NewASTNode(ASTNode::Char);
+        ret->codePoint = cp;
         return ret;
     }
 
