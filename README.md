@@ -184,17 +184,39 @@ REQUIRE((Str8(u8"Mine cr aft ").Split()
 - Various char encoding
 - Flexible submatches tracking
 
-`abc`: matches `abc`
+`ab`: concatenation
 
-`abc[def]`: matches `abcd`/`abce`/`abcf`
+`a|b`: alternative
 
-`abc?`: matches `ab`/`abc`
+`[abc]`: alternatives
 
-`abc+`: matches concatenation of `ab` and one or more `c`
+`a+`: one or more
 
-`abc*`: matches concatenation of `ab` and zero or more `c`
+`a?`: zero or one
 
-`&` defines a save point and can be used to indicate a location in matched strings.
+`a*`: zero or more
+
+`^`, `$`: begin/end
+
+`&`: save point
+
+`.`: any character
+
+`a{m}`: m times
+
+`a{m, n}`: m to n times
+
+`<aq>`: character from a to q
+
+`<d>`: digit 0-9
+
+`<c>`: a-z A-Z
+
+`<w>`: alnum and _
+
+`<s>`: whitespace
+
+`<h>`: hex digit 0-9 a-f A-F
 
 ```cpp
 REQUIRE(Regex8("abc(def)+").Match("abcdefdefdef"));
