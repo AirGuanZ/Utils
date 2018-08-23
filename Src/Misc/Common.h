@@ -41,9 +41,20 @@
 
 #endif
 
+#ifdef _WIN32
+
+#define AGZ_OS_WIN32
+
+#elif defined(__linux)
+
+// IMPROVE
+#define AGZ_OS_LINUX
+
+#endif
+
 AGZ_NS_BEG(AGZ)
 
-[[noreturn]]AGZ_FORCEINLINE void Unreachable()
+[[noreturn]] AGZ_FORCEINLINE void Unreachable()
 {
 #ifdef _MSC_VER
     __assume(0);
@@ -89,6 +100,12 @@ class ArgumentException : public Exception
 {
 public:
     explicit ArgumentException(const std::string &err) : Exception(err) { }
+};
+
+class OSException : public Exception
+{
+public:
+    explicit OSException(const std::string &err) : Exception(err) { }
 };
 
 template<typename T>

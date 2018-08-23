@@ -511,7 +511,9 @@ public:
 
     String<CS> Get() const;
 
-    void Clear();
+    bool Empty() const { return strs_.empty(); }
+
+    void Clear() { strs_.clear(); }
 };
 
 class CharsetConvertor

@@ -5,5 +5,6 @@
 #include "Utils/FileSys.h"
 #include "Utils/Math.h"
 #include "Utils/Misc.h"
+#include "Utils/Platform.h"
 #include "Utils/Range.h"
 #include "Utils/String.h"

@@ -1249,12 +1249,6 @@ String<CS> StringBuilder<CS>::Get() const
     return std::move(ret);
 }
 
-template<typename CS>
-void StringBuilder<CS>::Clear()
-{
-    strs_.clear();
-}
-
 template<typename DCS, typename SCS>
 String<DCS> CharsetConvertor::Convert(const typename String<SCS>::View &src)
 {
