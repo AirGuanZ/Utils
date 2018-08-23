@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include "../Misc/Common.h"
 
 AGZ_NS_BEG(AGZ::Endian)
@@ -89,19 +87,19 @@ namespace Impl
 }
 
 template<typename T>
-inline T Big2Little(T val)
+T Big2Little(T val)
 {
     return Impl::Big2LittleImpl<T, sizeof(T)>::Convert(val);
 }
 
 template<typename T>
-inline T Little2Big(T val)
+T Little2Big(T val)
 {
     return Impl::Little2BigImpl<T, sizeof(T)>::Convert(val);
 }
 
 template<typename T>
-inline T Native2Big(T val)
+T Native2Big(T val)
 {
     if constexpr(IS_BIG_ENDIAN)
         return val;
@@ -110,7 +108,7 @@ inline T Native2Big(T val)
 }
 
 template<typename T>
-inline T Native2Little(T val)
+T Native2Little(T val)
 {
     if constexpr(IS_LITTLE_ENDIAN)
         return val;

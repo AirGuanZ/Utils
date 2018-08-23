@@ -8,15 +8,11 @@
 #define AGZ_FORCEINLINE __forceinline
 
 #elif defined __GNUC__
-
-#define AGZ_INLINE inline
-#define AZG_FORCEINLINE __attribute__((always_inline))
-
+    #define AGZ_INLINE inline
+    #define AZG_FORCEINLINE __attribute__((always_inline))
 #else
-
-#define AGZ_INLINE inline
-#define AGZ_FORCEINLINE inline
-
+    #define AGZ_INLINE inline
+    #define AGZ_FORCEINLINE inline
 #endif
 
 #define AGZ_NS_BEG(N) namespace N {
@@ -26,30 +22,20 @@
 #define AGZ_ASSERT(X) assert(X)
 
 #ifndef __BYTE_ORDER__
-
-#ifdef _MSC_VER
-
-// Platform supporting MSVC must use little endian
-#define AGZ_LITTLE_ENDIAN
-
-#else
-
-// #define AGZ_BIG_ENDIAN
-#define AGZ_LITTLE_ENDIAN
-
-#endif
-
+    #ifdef _MSC_VER
+        // Platform supporting MSVC must use little endian
+        #define AGZ_LITTLE_ENDIAN
+    #else
+        // #define AGZ_BIG_ENDIAN
+        #define AGZ_LITTLE_ENDIAN
+    #endif
 #endif
 
 #ifdef _WIN32
-
-#define AGZ_OS_WIN32
-
+    #define AGZ_OS_WIN32
 #elif defined(__linux)
-
-// IMPROVE
-#define AGZ_OS_LINUX
-
+    // IMPROVE
+    #define AGZ_OS_LINUX
 #endif
 
 AGZ_NS_BEG(AGZ)

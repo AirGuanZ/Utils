@@ -104,6 +104,16 @@ public:
 
     bool HasFilename() const { return !filename_.Empty(); }
 
+    StrView GetFilename() const
+    {
+        AGZ_ASSERT(HasFilename());
+        return filename_;
+    }
+
+    void SetFilename(const StrView &filename) { filename_ = filename; }
+
+    void SetFilename(const Str &filename = Str()) { filename_ = filename; }
+
 private:
 
     std::vector<Str> dirs_;

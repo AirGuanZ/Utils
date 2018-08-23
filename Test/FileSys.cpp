@@ -16,6 +16,10 @@ TEST_CASE("FileSys")
 
         REQUIRE(WPath(L"A/B/C").HasFilename());
         REQUIRE(!WPath(L"A/B/C/").HasFilename());
+        REQUIRE(!WPath(L"A/B/C/D\\", WPath::Windows).HasFilename());
         REQUIRE(!WPath(L"A/B/C", false).HasFilename());
+
+        REQUIRE(WPath(L"A/B/C").GetFilename() == L"C");
+        REQUIRE(WPath(L"A/B/C\\D", WPath::Windows).GetFilename() == L"D");
     }
 }
