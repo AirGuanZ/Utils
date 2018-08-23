@@ -814,6 +814,60 @@ StringView<CS>::Split(const Self &spliter) const
 }
 
 template<typename CS>
+size_t UniStrLen(const String<CS> &s) { return s.Length(); }
+template<typename CS>
+size_t UniStrLen(const StringView<CS> &s) { return s.Length(); }
+template<typename CS>
+size_t UniStrLen(const char *s) { return std::strlen(s); }
+template<typename CS>
+size_t UniStrLen(const std::string &s) { return s.length(); }
+
+template<typename CS>
+template<typename C, typename V>
+std::vector<StringView<CS>> StringView<CS>::Split(const C &spliters) const
+{
+    // IMPROVE
+
+    static_assert(std::is_same_v<V, void>);
+    std::vector<Self> ret;
+    size_t segBeg = 0;
+
+    while(segBeg < len_)
+    {
+        size_t fi = NPOS, slen = 0;
+
+        for(auto &s : spliters)
+        {
+            size_t fi2;
+            if constexpr(std::is_same_v<remove_rcv_t<decltype(s)>, Self> ||
+                         std::is_same_v<remove_rcv_t<decltype(s)>, Str>)
+                fi2 = Find(s, segBeg);
+            else
+                fi2 = Find(Str(s), segBeg);
+
+            if(fi2 != NPOS && (fi == NPOS || fi2 < fi))
+            {
+                fi = fi2;
+                slen = UniStrLen(s);
+            }
+        }
+
+        if(fi == NPOS)
+        {
+            ret.emplace_back(*str_, segBeg, len_);
+            return std::move(ret);
+        }
+
+        if(fi != segBeg)
+            ret.emplace_back(*str_, segBeg, fi);
+
+        segBeg = fi + slen;
+    }
+
+    return std::move(ret);
+}
+
+template<typename CS>
 template<typename R>
 String<CS> StringView<CS>::Join(R &&strRange) const
 {

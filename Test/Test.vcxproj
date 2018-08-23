@@ -20,10 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Buffer.cpp" />
-    <ClCompile Include="Endian.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Misc.cpp" />
+    <ClCompile Include="FileSys.cpp" />
     <ClCompile Include="Range.cpp" />
     <ClCompile Include="String.cpp" />
   </ItemGroup>

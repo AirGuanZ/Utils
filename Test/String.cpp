@@ -116,6 +116,10 @@ TEST_CASE("String")
                 | Map([](const Str8::View &v) { return v.AsString(); })
                 | Collect<vector<Str8>>())
              == vector<Str8>{ u8"Min", u8"cr", u8"aft" });
+        REQUIRE((Str8("a/b\\/c\\d/").Split(vector<Str8>{ "\\", "/" })
+                | Map([](const Str8::View &v) { return v.AsString(); })
+                | Collect<vector<Str8>>())
+             == vector<Str8>{ "a", "b", "c", "d" });
     }
 
     SECTION("Join")
