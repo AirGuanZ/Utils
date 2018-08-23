@@ -31,7 +31,7 @@ AGZ_NS_BEG(AGZ)
     }
     AGZ_FORCEINLINE void aligned_free(void *ptr)
     {
-        std::aligned_free(ptr);
+        std::free(ptr);
     }
 #endif
 
@@ -39,8 +39,7 @@ AGZ_NS_BEG(AGZ)
 template<typename D, typename F, typename...Args>
 AGZ_FORCEINLINE D *alloc_throw(F &&alloc_func, Args&&...args)
 {
-    auto ret = std::invoke(std::forward<F>(alloc_func),
-                           std::forward<Args>(args)...);
+    auto ret = alloc_func(std::forward<Args>(args)...);
     if(!ret)
         throw std::bad_alloc();
     return static_cast<D*>(ret);

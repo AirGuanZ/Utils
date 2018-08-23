@@ -1,5 +1,5 @@
 #define CATCH_CONFIG_RUNNER
-#include "catch.hpp"
+#include "Catch.hpp"
 
 #if defined(_WIN32) && defined(_DEBUG)
 #include <crtdbg.h>

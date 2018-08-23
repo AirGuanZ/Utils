@@ -9,7 +9,7 @@
 
 #elif defined __GNUC__
     #define AGZ_INLINE inline
-    #define AZG_FORCEINLINE __attribute__((always_inline))
+    #define AGZ_FORCEINLINE inline __attribute__((always_inline))
 #else
     #define AGZ_INLINE inline
     #define AGZ_FORCEINLINE inline

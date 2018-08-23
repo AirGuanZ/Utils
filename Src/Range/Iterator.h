@@ -42,21 +42,13 @@ I AdvanceTo(const I &cur, const I &end,
     return ret;
 }
 
-template<typename R, typename T = void>
-struct GetIteratorImpl { };
 template<typename R>
-struct GetIteratorImpl<R, std::void_t<typename R::Iterator>>
-{
-    using Type = typename R::Iterator;
-};
+typename R::Iterator GetIteratorImpl();
 template<typename R>
-struct GetIteratorImpl<R, std::void_t<typename R::const_iterator>>
-{
-    using Type = typename R::const_iterator;
-};
+typename R::const_iterator GetIteratorImpl();
 
 template<typename R>
-using GetIteratorType = typename GetIteratorImpl<R>::Type;
+using GetIteratorType = decltype(GetIteratorImpl<R>());
 
 template<typename T>
 class ValuePointer

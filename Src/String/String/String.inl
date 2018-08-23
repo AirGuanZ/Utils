@@ -823,12 +823,11 @@ template<typename CS>
 size_t UniStrLen(const std::string &s) { return s.length(); }
 
 template<typename CS>
-template<typename C, typename V>
+template<typename C, std::enable_if_t<!std::is_array_v<C>, int>, typename V>
 std::vector<StringView<CS>> StringView<CS>::Split(const C &spliters) const
 {
     // IMPROVE
 
-    static_assert(std::is_same_v<V, void>);
     std::vector<Self> ret;
     size_t segBeg = 0;
 
@@ -843,7 +842,7 @@ std::vector<StringView<CS>> StringView<CS>::Split(const C &spliters) const
                          std::is_same_v<remove_rcv_t<decltype(s)>, Str>)
                 fi2 = Find(s, segBeg);
             else
-                fi2 = Find(Str(s), segBeg);
+                fi2 = Find(String<CS>(s), segBeg);
 
             if(fi2 != NPOS && (fi == NPOS || fi2 < fi))
             {

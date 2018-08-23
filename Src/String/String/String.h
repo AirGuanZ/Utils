@@ -296,8 +296,8 @@ public:
     std::vector<Self> Split(const Self &spliter) const;
     std::vector<Self> Split(const Str &spliter)  const { return Split(spliter.AsView()); }
 
-    template<typename C, typename = std::void_t<decltype(std::declval<C>().begin()),
-                                                decltype(std::declval<C>().end())>>
+    template<typename C, std::enable_if_t<!std::is_array_v<C>, int> = 0,
+                         typename = std::void_t<decltype(std::declval<C>().begin())>>
     std::vector<Self> Split(const C &spliters) const;
 
     template<typename R>
@@ -440,8 +440,8 @@ public:
     std::vector<View> Split()                       const { return AsView().Split();                         }
     std::vector<View> Split(const View &spliter)    const { return AsView().Split(spliter);                  }
     std::vector<View> Split(const Self &spliter)    const { return AsView().Split(spliter);                  }
-    template<typename C, typename = std::void_t<decltype(std::declval<C>().begin()),
-                                                decltype(std::declval<C>().end())>>
+    template<typename C, std::enable_if_t<!std::is_array_v<C>, int> = 0,
+                         typename = std::void_t<decltype(std::declval<C>().begin())>>
     std::vector<View> Split(const C &spliters)      const { return AsView().template Split<C>(spliters);     }
     template<typename R> Self Join(R &&strRange)    const { return AsView().Join(std::forward<R>(strRange)); }
     size_t Find(const View &dst, size_t begIdx = 0) const { return AsView().Find(dst, begIdx);               }

@@ -210,7 +210,7 @@ template<typename T>
 const typename UTF8Core<T>::CodeUnit *
 UTF8Core<T>::LastCodePoint(const CodeUnit *cur)
 {
-    while((*--cur) & 0b11000000 == 0b10000000)
+    while(((*--cur) & 0b11000000) == 0b10000000)
         ;
     return cur;
 }
@@ -252,7 +252,7 @@ template<typename T>
 typename UTF8Core<T>::CodeUnit *
 UTF8Core<T>::LastCodePoint(CodeUnit *cur)
 {
-    while((*--cur) & 0b11000000 == 0b10000000)
+    while(((*--cur) & 0b11000000) == 0b10000000)
         ;
     return cur;
 }

@@ -1,5 +1,3 @@
-#pragma once
-
 #include <type_traits>
 #include <Utils/Misc.h>
 

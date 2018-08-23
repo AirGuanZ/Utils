@@ -1,5 +1,3 @@
-#pragma once
-
 #include <Utils/FileSys.h>
 
 #include "Catch.hpp"

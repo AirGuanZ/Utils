@@ -240,7 +240,7 @@ public:
         AGZ_ASSERT(IsAvailable());
         return Buffer<N>::FromFn(s_, [&](size_t i)
         {
-            return f((*this)(i), buf);
+            return f((*this)(i));
         });
     }
 
