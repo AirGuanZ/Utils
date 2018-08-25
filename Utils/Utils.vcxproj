@@ -41,6 +41,7 @@
     <ClInclude Include="..\Src\Misc\Config.h" />
     <ClInclude Include="..\Src\Misc\Endian.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
+    <ClInclude Include="..\Src\Platform\Platform.h" />
     <ClInclude Include="..\Src\Range\Aggregate.h" />
     <ClInclude Include="..\Src\Range\All.h" />
     <ClInclude Include="..\Src\Range\Any.h" />
@@ -75,6 +76,7 @@
     <ClInclude Include="..\Src\Utils\FileSys.h" />
     <ClInclude Include="..\Src\Utils\Math.h" />
     <ClInclude Include="..\Src\Utils\Misc.h" />
+    <ClInclude Include="..\Src\Utils\Platform.h" />
     <ClInclude Include="..\Src\Utils\Range.h" />
     <ClInclude Include="..\Src\Utils\String.h" />
   </ItemGroup>

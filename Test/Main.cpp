@@ -1,3 +1,5 @@
+#include <locale>
+
 #define CATCH_CONFIG_RUNNER
 #include "Catch.hpp"
 
@@ -12,5 +14,11 @@ int main(int argc, char* argv[])
                   | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
+    std::locale::global(std::locale(""));
+
     return Catch::Session().run(argc, argv);
 }
+
+#define AGZ_PLATFORM_IMPL
+
+#include <Utils/Platform.h>

@@ -34,6 +34,9 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{0a1225e9-3f29-40ee-8c81-1667d139a90c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{b013233a-e993-4caf-9917-44ae48e928a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Math\Scalar.h">
@@ -207,6 +210,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\FileSys\Path.h">
       <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Platform\Platform.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Platform.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
