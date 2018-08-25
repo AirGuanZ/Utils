@@ -6,6 +6,7 @@
 
 #include "../../Misc/Common.h"
 #include "../String/String.h"
+#include "VMEngEx.h"
 #include "VMEngine.h"
 
 // Regular expression

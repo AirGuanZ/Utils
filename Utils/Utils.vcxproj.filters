@@ -217,6 +217,9 @@
     <ClInclude Include="..\Src\Utils\Platform.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\String\Regex\VMEngEx.h">
+      <Filter>String\Regex</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">

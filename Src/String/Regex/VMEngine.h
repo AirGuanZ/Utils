@@ -26,7 +26,7 @@
     a{m}    m times (m > 0)
     a{m, n} m to n times (0 <= m, m <= n, 0 < n)
     <az>    character in [a, z]
-    <$az>   character not in [a, z]
+    <^az>   character not in [a, z]
     
     <d>     digit 0-9
     <c>     a-z and A-Z
