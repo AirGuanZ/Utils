@@ -19,5 +19,8 @@ TEST_CASE("FileSys")
 
         REQUIRE(WPath(L"A/B/C").GetFilename() == L"C");
         REQUIRE(WPath(L"A/B/C\\D", WPath::Windows).GetFilename() == L"D");
+
+        REQUIRE(WPath(L"abc.txt").GetExtension() == L"txt");
+        REQUIRE(WPath(L"abc.txt.").GetExtension().Empty());
     }
 }

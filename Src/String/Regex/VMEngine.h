@@ -26,6 +26,7 @@
     a{m}    m times (m > 0)
     a{m, n} m to n times (0 <= m, m <= n, 0 < n)
     <az>    character in [a, z]
+    <$az>   character not in [a, z]
     
     <d>     digit 0-9
     <c>     a-z and A-Z
@@ -64,7 +65,7 @@ struct Inst
     enum Type
     {
         Begin, End,
-        Dot, Char, CharRange,
+        Dot, Char, CharRange, NotCharRange,
         
         // Special character classes
         Digit, Alpha, WordChar, Whitespace, HexDigit,
@@ -104,7 +105,7 @@ struct ASTNode
     enum Type
     {
         Begin, End,
-        Dot, Char, CharRange,
+        Dot, Char, CharRange, NotCharRange,
         Digit, Alpha, WordChar, Whitespace, HexDigit,
         Save,
         Cat, Alter, Or,
@@ -321,6 +322,10 @@ private:
         {
             
             ErrIfEnd();
+
+            // NotCharRange
+            bool notChar = AdvanceIf('^');
+
             auto fstChNode = ParseChar();
             if(!fstChNode)
                 Error();
@@ -347,7 +352,8 @@ private:
             
             AdvanceOrErr('>');
             
-            ASTNode *ret = NewASTNode(ASTNode::CharRange);
+            ASTNode *ret = NewASTNode(notChar ? ASTNode::NotCharRange
+                                              : ASTNode::CharRange);
             ret->charRange[0] = fstChNode->codePoint;
             ret->charRange[1] = sndChNode->codePoint;
             return ret;
@@ -653,6 +659,7 @@ private:
         case ASTNode::Dot:
         case ASTNode::Char:
         case ASTNode::CharRange:
+        case ASTNode::NotCharRange:
         case ASTNode::Digit:
         case ASTNode::Alpha:
         case ASTNode::WordChar:
@@ -710,6 +717,8 @@ private:
             return { };
         case ASTNode::CharRange:
             return GenerateCharRange(node);
+        case ASTNode::NotCharRange:
+            return GenerateNotCharRange(node);
         case ASTNode::Digit:
             prog_->Emit(MakeInst(I::Digit));
             return { };
@@ -761,6 +770,17 @@ private:
         cr->charRange[1] = node->charRange[1];
         
         return { };
+    }
+
+    BP GenerateNotCharRange(ASTNode *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTNode::NotCharRange);
+
+        auto cr = prog_->Emit(MakeInst(I::NotCharRange));
+        cr->charRange[0] = node->charRange[0];
+        cr->charRange[1] = node->charRange[1];
+
+        return {};
     }
 
     BP GenerateAlter(ASTNode *node)
@@ -1024,6 +1044,7 @@ public:
         {
             prog_ = Compiler<CS>().Compile(regex_, &slotCount_);
             regex_ = String<CS>();
+            AGZ_ASSERT(prog_.IsAvailable());
         }
         auto ret = Run<true, true>(dst);
         return ret.has_value() ? make_optional(move(ret.value().second))
@@ -1038,6 +1059,7 @@ public:
         {
             prog_ = Compiler<CS>().Compile(regex_, &slotCount_);
             regex_ = String<CS>();
+            AGZ_ASSERT(prog_.IsAvailable());
         }
         return Run<false, false>(dst);
     }
@@ -1146,6 +1168,8 @@ private:
         CPR cpr = str.CodePoints();
         cpr_ = &cpr;
         cur_ = cpr.begin();
+
+        matchedSaveSlots_.reset();
         
         if constexpr(AnchorBegin)
         {
@@ -1188,6 +1212,10 @@ private:
                     break;
                 case Inst<CP>::CharRange:
                     if(pc->charRange[0] <= cp && cp <= pc->charRange[1])
+                        AddThreadWithPC(newThds, cpIdx, pc + 1, th);
+                    break;
+                case Inst<CP>::NotCharRange:
+                    if(cp < pc->charRange[0] || cp > pc->charRange[1])
                         AddThreadWithPC(newThds, cpIdx, pc + 1, th);
                     break;
                 case Inst<CP>::Digit:

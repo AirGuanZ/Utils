@@ -16,6 +16,7 @@ public:
     using Charset = CS;
     using Str     = String<CS>;
     using StrView = StringView<CS>;
+    using Regexp  = Regex<CS>;
     using Self    = Path<CS>;
 
     enum SeperatorStyle
@@ -114,7 +115,35 @@ public:
 
     void SetFilename(const Str &filename = Str()) { filename_ = filename; }
 
+    Str GetExtension() const
+    {
+        AGZ_ASSERT(HasFilename());
+        auto m = ExtRegex().Match(filename_);
+        return m ? Str(m(1, 2)) : Str();
+    }
+
+    void SetExtension(const Str &ext)
+    {
+        SetExtension(ext.AsView());
+    }
+
+    void SetExtension(const StrView &ext)
+    {
+        AGZ_ASSERT(HasFilename());
+        auto m = ExtRegex().Match(filename_);
+        if(m)
+            filename_ = m(0, 1) + ext;
+        else
+            filename_ += "." + ext;
+    }
+
 private:
+
+    const Regexp &ExtRegex() const
+    {
+        static const Regexp regex("&.*\\.&<^\\.\\.>+&");
+        return regex;
+    }
 
     std::vector<Str> dirs_;
     Str filename_;
