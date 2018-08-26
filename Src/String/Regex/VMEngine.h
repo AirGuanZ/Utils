@@ -448,7 +448,7 @@ private:
                 Error();
             return 0;
         }
-        else if(cp < '0' || '9' < cp)
+        if(cp < '0' || '9' < cp)
             Error();
         size_t ret = cp - '0';
 

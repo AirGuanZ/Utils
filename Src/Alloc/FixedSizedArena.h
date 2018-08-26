@@ -33,11 +33,11 @@ public:
 
     }
 
-    FixedSizedArena(size_t nodeSize, size_t chunkSize)
-        : nodeSize_(nodeSize), chunkSize_(chunkSize),
+    FixedSizedArena(size_t nodeSize, size_t chunkByteSize)
+        : nodeSize_(nodeSize), chunkSize_(chunkByteSize),
           freeNodes_(nullptr), chunkEntry_(nullptr)
     {
-        if(nodeSize < sizeof(Node*) || nodeSize + sizeof(Chunk*) > chunkSize)
+        if(nodeSize < sizeof(Node*) || nodeSize + sizeof(Chunk*) > chunkByteSize)
         {
             throw ArgumentException(
                 "Invalid size arguments for FixedSizedArena");

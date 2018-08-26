@@ -565,4 +565,7 @@ using StringBuilder = StrImpl::StringBuilder<CS>;
 template<typename CS>
 using CodePointRange = StrImpl::CodePointRange<CS>;
 
+template<typename CS>
+using CharRange = typename StrImpl::StringView<CS>::CharRange;
+
 AGZ_NS_END(AGZ)
