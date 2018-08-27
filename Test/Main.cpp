@@ -20,5 +20,4 @@ int main(int argc, char* argv[])
 }
 
 #define AGZ_PLATFORM_IMPL
-
 #include <Utils/Platform.h>

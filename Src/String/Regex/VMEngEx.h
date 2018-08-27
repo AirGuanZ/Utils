@@ -59,40 +59,41 @@ using namespace StrImpl::StrAlgo;
 
 enum class InstType : uint32_t
 {
-    Begin,                            // String beginning
-    End,                              // String end
+    Begin,              // String beginning
+    End,                // String end
 
-    Save,                             // Create a save point
+    Save,               // Create a save point
 
-    Alter,                            // Multi-threaded branch
-    Jump,                             // Unconditioned jump
-    Branch,                           // Split to two threads
+    Alter,              // Multi-threaded branch
+    Jump,               // Unconditioned jump
+    Branch,             // Split to two threads
 
-    Match,                            // Succeed
+    Match,              // Succeed
 
-    CharSingle = 7,                   // Specified character
-    CharAny,                          // Any character
-    CharRange,                        // Character range
-    CharDecDigit,                     // Decimal digit
-    CharHexDigit,                     // Hexadecimal digit
-    CharAlpha,                        // Alpha character
-    CharWord,                         // Word(Alpha/digit/underscore) character
-    CharWhitespace,                   // Whitespace character
+    CharSingle,         // Specified character
+    CharAny,            // Any character
+    CharRange,          // Character range
+    CharDecDigit,       // Decimal digit
+    CharHexDigit,       // Hexadecimal digit
+    CharAlpha,          // Alpha character
+    CharWord,           // Word(Alpha/digit/underscore) character
+    CharWhitespace,     // Whitespace character
 
-    CharExprSingle = 32 | CharSingle, // Single character -> bool
-    CharExprAny,                      // Any character    -> true
-    CharExprRange,                    // Character range  -> bool
-    CharExprDecDigit,                 
-    CharExprHexDigit,                 
-    CharExprAlpha,                    
-    CharExprWordChar,                 
-    CharExprWhitespace,               
+    CharExprSingle,     // Single character -> bool
+    CharExprAny,        // Any character    -> true
+    CharExprRange,      // Character range  -> bool
 
-    CharExprAnd,                      // bool, bool       -> bool
-    CharExprOr,                       // bool, bool       -> bool
-    CharExprNot,                      // bool             -> bool
+    CharExprDecDigit,   
+    CharExprHexDigit,   
+    CharExprAlpha,      
+    CharExprWordChar,   
+    CharExprWhitespace, 
 
-    CharExprEnd,                      // End of bool expression
+    CharExprAnd,        // bool, bool       -> bool
+    CharExprOr,         // bool, bool       -> bool
+    CharExprNot,        // bool             -> bool
+
+    CharExprEnd,        // End of bool expression
 };
 
 constexpr InstType Char2Expr(InstType type)
@@ -156,20 +157,11 @@ enum class ASTType
     CharWordChar,
     CharWhitespace,
 
-    CharExprSingle,
-    CharExprAny,
-    CharExprClass,
-    CharExprDecDigit,
-    CharExprHexDigit,
-    CharExprAlpha,
-    CharExprWordChar,
-    CharExprWhitespace,
+    CharExpr,
 
     CharExprAnd,
     CharExprOr,
     CharExprNot,
-
-    CharExprEnd,
 };
 
 template<typename CP>
@@ -201,9 +193,8 @@ struct ASTNode
 
         struct { CP codePoint;                            } dataCharSingle;
         struct { ClassMemNode<CP> *mems; uint32_t memCnt; } dataCharClass;
-        struct { CP codePoint;                            } dataCharExprSingle;
-        struct { ClassMemNode<CP> *mems; uint32_t memCnt; } dataCharExprClass;
 
+        struct { Self *expr;                              } dataCharExpr;
         struct { Self *left, *right;                      } dataCharExprOr;
         struct { Self *left, *right;                      } dataCharExprAnd;
         struct { Self *dest;                              } dataCharExprNot;
@@ -350,11 +341,12 @@ class Parser
 public:
 
     using CP = typename CS::CodePoint;
-    using Node = ASTNode<CS>;
+    using Node = ASTNode<CP>;
 
     Parser()
         : astNodeArena_(32)
     {
+
     }
 
     Node *Parse(const StringView<CS> &src)
@@ -452,27 +444,36 @@ private:
 
     Node *ParseFacStar(Node *last)
     {
+        AGZ_ASSERT(Match('*'));
+        Advance();
         Node *newLast = NewNode(ASTType::Star);
-        newLast->dataStar = last;
+        newLast->dataStar.dest = last;
         return ParseFacRest(newLast);
     }
 
     Node *ParseFacPlus(Node *last)
     {
+        AGZ_ASSERT(Match('+'));
+        Advance();
         Node *newLast = NewNode(ASTType::Plus);
-        newLast->dataPlus = last;
+        newLast->dataPlus.dest = last;
         return ParseFacRest(newLast);
     }
 
     Node *ParseFacQues(Node *last)
     {
+        AGZ_ASSERT(Match('?'));
+        Advance();
         Node *newLast = NewNode(ASTType::Ques);
-        newLast->dataQues = last;
+        newLast->dataQues.dest = last;
         return ParseFacRest(newLast);
     }
 
     Node *ParseFacRepeat(Node *last)
     {
+        AGZ_ASSERT(Match('{'));
+        Advance();
+
         SkipBlanks();
         uint32_t fstNum = ParseUInt();
         SkipBlanks();
@@ -521,7 +522,8 @@ private:
         if(AdvanceIf('@'))
         {
             AdvanceOrErr('{');
-            auto ret = ParseCharExpr();
+            auto ret = NewNode(ASTType::CharExpr);
+            ret->dataCharExpr.expr = ParseCharExpr();
             AdvanceOrErr('}');
             return ret;
         }
@@ -536,7 +538,7 @@ private:
     */
     Node *ParseCharClass()
     {
-        AGZ_ASSERT(!End() && Cur() == '[');
+        AGZ_ASSERT(Match('['));
         Advance();
 
         enum
@@ -546,7 +548,7 @@ private:
             WaitingForSecond
         } state = WaitingForFirst;
 
-        CP fst, snd;
+        CP fst;
         Node *ret = NewNode(ASTType::CharClass);
         ret->dataCharClass.memCnt = 0;
         ret->dataCharClass.mems   = nullptr;
@@ -742,15 +744,90 @@ private:
 
     Node *ParseChar()
     {
-        // TODO
-        return nullptr;
+        if(End())
+            return nullptr;
+
+        CP cp = Cur();
+        if(cp == '^')
+        {
+            Advance();
+            return NewNode(ASTType::Begin);
+        }
+        if(cp == '$')
+        {
+            Advance();
+            return NewNode(ASTType::End);
+        }
+        if(cp == '&')
+        {
+            Advance();
+            return NewNode(ASTType::Save);
+        }
+        if(cp == '.')
+        {
+            Advance();
+            return NewNode(ASTType::CharAny);
+        }
+
+        switch(cp)
+        {
+        case '[':
+        case ']':
+        case '(':
+        case ')':
+        case '{':
+        case '}':
+        case '+':
+        case '*':
+        case '?':
+        case '|':
+        case '@':
+            return nullptr;
+        default:
+            break;
+        }
+
+        Advance();
+        if(cp == '\\')
+        {
+            auto native = NativeEscapeChar();
+            if(native.has_value())
+                cp = native.value();
+            else
+            {
+                ErrIfEnd();
+                cp = Cur();
+                switch(cp)
+                {
+                case '[':
+                case ']':
+                case '(':
+                case ')':
+                case '{':
+                case '}':
+                case '+':
+                case '*':
+                case '?':
+                case '|':
+                case '@':
+                    Advance();
+                    break;
+                default:
+                    Error();
+                }
+            }
+        }
+
+        auto ret = NewNode(ASTType::CharSingle);
+        ret->dataCharSingle.codePoint = cp;
+        return ret;
     }
 
     void SkipBlanks()
     {
         while(!End())
         {
-            if(StrImpl::StrAlgo::IsUnicodeWhitespace(Cur()))
+            if(!StrImpl::StrAlgo::IsUnicodeWhitespace(Cur()))
                 break;
             Advance();
         }

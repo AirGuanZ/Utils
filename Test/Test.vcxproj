@@ -26,6 +26,7 @@
     <ClCompile Include="FileSys.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="Range.cpp" />
+    <ClCompile Include="VMEngEx.cpp" />
     <ClCompile Include="String.cpp" />
   </ItemGroup>
   <ItemGroup>
