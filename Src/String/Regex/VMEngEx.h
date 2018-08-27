@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <type_traits>
 
 #include "../Alloc/FixedSizedArena.h"
@@ -182,24 +183,30 @@ struct ClassMemNode
 template<typename CP>
 struct ASTNode
 {
+    using Self = ASTNode<CP>;
+
     ASTType type;
 
     union
     {
         struct { size_t slot;                             } dataSave;
 
-        struct { ASTNode *dest[2];                        } dataCat;
-        struct { ASTNode *dest[2];                        } dataOr;
+        struct { Self *dest[2];                           } dataCat;
+        struct { Self *dest[2];                           } dataOr;
 
-        struct { ASTNode *dest;                           } dataStar;
-        struct { ASTNode *dest;                           } dataPlus;
-        struct { ASTNode *dest;                           } dataQues;
-        struct { ASTNode *dest; uint32_t fst, lst;        } dataRepeat;
+        struct { Self *dest;                              } dataStar;
+        struct { Self *dest;                              } dataPlus;
+        struct { Self *dest;                              } dataQues;
+        struct { Self *dest; uint32_t fst, lst;           } dataRepeat;
 
         struct { CP codePoint;                            } dataCharSingle;
         struct { ClassMemNode<CP> *mems; uint32_t memCnt; } dataCharClass;
         struct { CP codePoint;                            } dataCharExprSingle;
         struct { ClassMemNode<CP> *mems; uint32_t memCnt; } dataCharExprClass;
+
+        struct { Self *left, *right;                      } dataCharExprOr;
+        struct { Self *left, *right;                      } dataCharExprAnd;
+        struct { Self *dest;                              } dataCharExprNot;
     };
 };
 
@@ -367,18 +374,6 @@ public:
 private:
 
     /*
-        Class    := [ClassMem ClassMem ... ClassMem]
-        ClassMem := Char-Char
-                    Char
-        CharExpr := AndExpr | AndExpr | ... | AndExpr
-        AndExpr  := FacExpr & FacExpr & ... & FacExpr
-        FacExpr  := Char
-                    Class
-                    !FacExpr
-                    (CharExpr)
-    */
-
-    /*
         Regex := Cat | Cat | ... | Cat
     */
     Node *ParseRegex()
@@ -524,11 +519,21 @@ private:
             return ParseCharClass();
 
         if(AdvanceIf('@'))
-            return ParseCharExpr();
+        {
+            AdvanceOrErr('{');
+            auto ret = ParseCharExpr();
+            AdvanceOrErr('}');
+            return ret;
+        }
 
         return ParseChar();
     }
 
+    /*
+        Class    := [ClassMem ClassMem ... ClassMem]
+        ClassMem := Char-Char
+                    Char
+    */
     Node *ParseCharClass()
     {
         AGZ_ASSERT(!End() && Cur() == '[');
@@ -597,16 +602,142 @@ private:
         return ret;
     }
 
-    CP NextClassChar()
+    /*
+        转义字符被分为以下两类：
+            在当前regex context下由regex语法带来的转义，比如()这种，称为SyntaxEscape
+                SyntaxEscape又分了两类环境：
+                    NormalSyntaxEscape：一般的语法转义，在CharClass以外的环境中生效
+                    ClassSyntaxEscape：在CharClass中的语法转义
+            由于字符本身特性而无法好好写成字面量的转义，比如\a、\n这种，称为NativeEscape
+                NativeEscape在任何地方都有效
+    */
+    std::optional<CP> NativeEscapeChar()
     {
-        // TODO
-        return 0;
+        if(End())
+            return std::nullopt;
+
+        CP cp;
+        switch(Cur())
+        {
+        case 'a': cp = '\a'; break;
+        case 'b': cp = '\b'; break;
+        case 'f': cp = '\f'; break;
+        case 'n': cp = '\n'; break;
+        case 'r': cp = '\r'; break;
+        case 't': cp = '\t'; break;
+        case 'v': cp = '\v'; break;
+        case '0': cp = '\0'; break;
+        case '\\': cp = '\\'; break;
+        default:
+            return std::nullopt;
+        }
+
+        Advance();
+        return std::make_optional(cp);
     }
 
+    CP NextClassChar()
+    {
+        if(Match(']'))
+            Error();
+
+        CP cp = Cur();
+        Advance();
+
+        if(cp == '\\')
+        {
+            ErrIfEnd();
+            auto nativeEscape = NativeEscapeChar();
+            if(nativeEscape.has_value())
+                cp = nativeEscape.value();
+            else
+            {
+                CP ncp = Cur();
+                switch(ncp)
+                {
+                case '[':
+                case ']':
+                case '-':
+                    cp = ncp;
+                default:
+                    Error();
+                }
+            }
+        }
+
+        return cp;
+    }
+
+    /*
+        CharExpr := AndExpr | AndExpr | ... | AndExpr
+    */
     Node *ParseCharExpr()
     {
-        // TODO
-        return nullptr;
+        Node *last = ParseAndExpr();
+        if(!last)
+            Error();
+
+        while(AdvanceIf('|'))
+        {
+            Node *right = ParseAndExpr();
+            Node *newNode = NewNode(ASTType::CharExprOr);
+            newNode->dataCharExprOr.left  = last;
+            newNode->dataCharExprOr.right = right;
+            last = newNode;
+        }
+
+        return last;
+    }
+
+    /*
+        AndExpr  := FacExpr & FacExpr & ... & FacExpr
+        FacExpr  := Char
+                    Class
+                    !FacExpr
+                    (CharExpr)
+    */
+    Node *ParseAndExpr()
+    {
+        Node *last = ParseFacExpr();
+        if(!last)
+            Error();
+
+        while(AdvanceIf('&'))
+        {
+            Node *right = ParseFacExpr();
+            Node *newNode = NewNode(ASTType::CharExprAnd);
+            newNode->dataCharExprAnd.left = last;
+            newNode->dataCharExprAnd.right = right;
+            last = newNode;
+        }
+
+        return last;
+    }
+
+    Node *ParseFacExpr()
+    {
+        if(AdvanceIf('!'))
+        {
+            Node *sub = ParseFacExpr();
+            Node *ret = NewNode(ASTType::CharExprNot);
+            ret->dataCharExprNot.dest = sub;
+            return ret;
+        }
+
+        if(AdvanceIf('('))
+        {
+            Node *ret = ParseCharExpr();
+            AdvanceOrErr(')');
+            return ret;
+        }
+
+        if(Match('['))
+            return ParseCharClass();
+
+        Node *ret = ParseChar();
+        if(!ret)
+            Error();
+        return ret;
     }
 
     Node *ParseChar()
