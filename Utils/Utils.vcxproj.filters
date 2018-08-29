@@ -37,6 +37,9 @@
     <Filter Include="Platform">
       <UniqueIdentifier>{b013233a-e993-4caf-9917-44ae48e928a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="String\Regex\VMEngEx">
+      <UniqueIdentifier>{d3c50a4f-5d0f-4fe9-9a6e-3a5b0aa8ebab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Math\Scalar.h">
@@ -219,6 +222,15 @@
     </ClInclude>
     <ClInclude Include="..\Src\String\Regex\VMEngEx.h">
       <Filter>String\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Regex\VMEngEx\Inst.h">
+      <Filter>String\Regex\VMEngEx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Regex\VMEngEx\Syntax.h">
+      <Filter>String\Regex\VMEngEx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\String\Regex\VMEngEx\Backend.h">
+      <Filter>String\Regex\VMEngEx</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

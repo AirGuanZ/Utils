@@ -7,7 +7,7 @@
 
 #include "String.h"
 
-AGZ_NS_BEG(AGZ::StrImpl::StrAlgo)
+AGZ_NS_BEG(AGZ::StrAlgo)
 
 // Boyer–Moore–Horspool algorithm.
 // See https://en.wikipedia.org/wiki/Boyer–Moore–Horspool_algorithm
@@ -274,4 +274,4 @@ template<typename T, typename CS,
     return Str2IntImpl<T, CS>::Convert(str, base);
 }
 
-AGZ_NS_END(AGZ::StrImpl::StrAlgo)
+AGZ_NS_END(AGZ::StrAlgo)

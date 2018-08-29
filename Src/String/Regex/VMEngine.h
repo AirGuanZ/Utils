@@ -48,7 +48,7 @@ Grammar:
 
 AGZ_NS_BEG(AGZ::VMEngineImpl)
 
-using namespace StrImpl::StrAlgo;
+using namespace StrAlgo;
 
 using std::list;
 using std::make_optional;

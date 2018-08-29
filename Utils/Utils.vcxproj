@@ -67,6 +67,9 @@
     <ClInclude Include="..\Src\String\Charset\UTF8.h" />
     <ClInclude Include="..\Src\String\Regex\Regex.h" />
     <ClInclude Include="..\Src\String\Regex\VMEngEx.h" />
+    <ClInclude Include="..\Src\String\Regex\VMEngEx\Backend.h" />
+    <ClInclude Include="..\Src\String\Regex\VMEngEx\Inst.h" />
+    <ClInclude Include="..\Src\String\Regex\VMEngEx\Syntax.h" />
     <ClInclude Include="..\Src\String\Regex\VMEngine.h" />
     <ClInclude Include="..\Src\String\String.h" />
     <ClInclude Include="..\Src\String\String\StrAlgo.h" />
