@@ -308,6 +308,13 @@ public:
         return ret;
     }
 
+    uint32_t GetInstIndex(const Inst<CP> *inst) const
+    {
+        AGZ_ASSERT(Available() && inst);
+        AGZ_ASSERT(inst - insts_ < instCount_);
+        return inst - insts_;
+    }
+
     uint32_t *EmitRelativeOffset(uint32_t value = 0)
     {
         AGZ_ASSERT(Available());
@@ -810,8 +817,22 @@ private:
                 case '?':
                 case '|':
                 case '@':
+                case '^':
+                case '$':
+                case '&':
+                case '.':
                     Advance();
                     break;
+                case 'd':
+                    return NewNode(ASTType::CharDecDigit);
+                case 'c':
+                    return NewNode(ASTType::CharAlpha);
+                case 'w':
+                    return NewNode(ASTType::CharWordChar);
+                case 's':
+                    return NewNode(ASTType::CharWhitespace);
+                case 'h':
+                    return NewNode(ASTType::CharHexDigit);
                 default:
                     Error();
                 }
@@ -922,6 +943,78 @@ private:
     SmallObjArena<Node> astNodeArena_;
     SmallObjArena<ClassMemNode<CP>> classMemNodeArena_;
     typename CodePointRange<CS>::Iterator cur_, end_;
+};
+
+template<typename CS>
+class Backend
+{
+    using I = Inst<typename CS::CodePoint>;
+    using Node = ASTNode<typename CS::CodePoint>;
+
+    struct BPUnit
+    {
+        uint32_t srcPos;
+        int32_t *relOffset;
+    };
+
+    using BP = std::list<BPUnit>;
+
+public:
+
+    using CP = typename CS::CodePoint;
+
+    Program<CP> Generate(const ASTNode<CP> *ast, size_t *saveSlotCount)
+    {
+        AGZ_ASSERT(ast && saveSlotCount);
+        AGZ_ASSERT(!prog_ && !saveSlotCount_);
+        AGZ_ASSERT(!inCharExpr_ && canSave_);
+
+        Program<CP> prog(CountInst(ast) + 1);
+        prog_ = &prog;
+
+        auto bps = GenerateImpl(ast);
+        auto match = prog_->Emit(NewInst(InstType::Match));
+        FillBP(bps, prog_->GetInstIndex(match));
+
+        *saveSlotCount = saveSlotCount_;
+        return std::move(prog);
+    }
+
+private:
+
+    Program<CP> *prog_    = nullptr;
+    size_t saveSlotCount_ = 0;
+    bool inCharExpr_      = false;
+    bool canSave_         = true;
+
+    static I NewInst(InstType type)
+    {
+        I ret;
+        ret.type = type;
+        return ret;
+    }
+
+    static void FillBP(BP &bps, uint32_t dstPos)
+    {
+        for(auto &unit : bps)
+        {
+            *unit.relOffset = static_cast<int32_t>(dstPos)
+                            - static_cast<int32_t>(unit.srcPos);
+        }
+        bps.clear();
+    }
+
+    static uint32_t CountInst(const Node *node)
+    {
+        AGZ_ASSERT(node);
+        // TODO
+        return 0;
+    }
+
+    void GenerateImpl(const Node *node)
+    {
+        AGZ_ASSERT(node);
+    }
 };
 
 AGZ_NS_END(AGZ::VMEngExImpl)
