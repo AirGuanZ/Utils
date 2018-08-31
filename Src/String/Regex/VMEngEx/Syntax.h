@@ -32,24 +32,24 @@
     Regex    := Cat | Cat | ... | Cat
     Cat      := Fac Fac ... Fac
     Fac      := Fac*
-    Fac+
-    Fac?
-    Fac{m}
-    Fac{m, n}
-    Core
+                Fac+
+                Fac?
+                Fac{m}
+                Fac{m, n}
+                Core
     Core     := (Regex)
-    Class
-    Char
-    @{CharExpr}
+                Class
+                Char
+                @{CharExpr}
     Class    := [ClassMem ClassMem ... ClassMem]
     ClassMem := Char-Char
-    Char
+                Char
     CharExpr := AndExpr | AndExpr | ... | AndExpr
     AndExpr  := FacExpr & FacExpr & ... & FacExpr
     FacExpr  := Char
-    Class
-    !FacExpr
-    (CharExpr)
+                Class
+                !FacExpr
+                (CharExpr)
 */
 
 AGZ_NS_BEG(AGZ::VMEngExImpl)
@@ -102,23 +102,23 @@ struct ASTNode
 
     union
     {
-        struct { size_t slot; } dataSave;
+        struct { size_t slot;                             } dataSave;
 
-        struct { Self *dest[2]; } dataCat;
-        struct { Self *dest[2]; } dataOr;
+        struct { Self *dest[2];                           } dataCat;
+        struct { Self *dest[2];                           } dataOr;
 
-        struct { Self *dest; } dataStar;
-        struct { Self *dest; } dataPlus;
-        struct { Self *dest; } dataQues;
-        struct { Self *dest; uint32_t fst, lst; } dataRepeat;
+        struct { Self *dest;                              } dataStar;
+        struct { Self *dest;                              } dataPlus;
+        struct { Self *dest;                              } dataQues;
+        struct { Self *dest; uint32_t fst, lst;           } dataRepeat;
 
-        struct { CP codePoint; } dataCharSingle;
+        struct { CP codePoint;                            } dataCharSingle;
         struct { ClassMemNode<CP> *mems; uint32_t memCnt; } dataCharClass;
 
         struct { Self *expr; } dataCharExpr;
-        struct { Self *left, *right; } dataCharExprOr;
-        struct { Self *left, *right; } dataCharExprAnd;
-        struct { Self *dest; } dataCharExprNot;
+        struct { Self *left, *right;                      } dataCharExprOr;
+        struct { Self *left, *right;                      } dataCharExprAnd;
+        struct { Self *dest;                              } dataCharExprNot;
     };
 };
 

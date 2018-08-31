@@ -62,13 +62,13 @@ union Inst
 
         union
         {
-            struct { CP codePoint; } dataChar;
-            struct { CP fst, lst; } dataCharRange;
-            struct { CP codePoint; } dataCharExprSingle;
-            struct { CP fst, lst; } dataCharExprRange;
-            struct { uint32_t slot; } dataSave;
-            struct { uint32_t count; } dataAlter;
-            struct { int32_t offset; } dataJump;
+            struct { CP codePoint;      } dataChar;
+            struct { CP fst, lst;       } dataCharRange;
+            struct { CP codePoint;      } dataCharExprSingle;
+            struct { CP fst, lst;       } dataCharExprRange;
+            struct { uint32_t slot;     } dataSave;
+            struct { uint32_t count;    } dataAlter;
+            struct { int32_t offset;    } dataJump;
             struct { int32_t fstOffset; } dataBranch;
         };
 
@@ -78,7 +78,7 @@ union Inst
     int32_t instArrUnit[4];
 };
 
-static_assert(sizeof(Inst<char>) == 4 * sizeof(int32_t));
+static_assert(sizeof(Inst<char>)     == 4 * sizeof(int32_t));
 static_assert(sizeof(Inst<char16_t>) == 4 * sizeof(int32_t));
 static_assert(sizeof(Inst<char32_t>) == 4 * sizeof(int32_t));
 

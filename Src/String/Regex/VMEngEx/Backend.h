@@ -9,6 +9,33 @@
 
 AGZ_NS_BEG(AGZ::VMEngExImpl)
 
+/*
+    A|B|C|D => Alter(L0, L1, L2, L3)
+               L0 Inst(A) -> Out
+                  Jump(Out)
+               L1 Inst(B) -> Out
+                  Jump(Out)
+               L2 Inst(C) -> Out
+                  Jump(Out)
+               L3 Inst(D) -> Out
+
+    A B C =>    Inst(A) -> L0
+             L0 Inst(B) -> L1
+             L1 Inst(C) -> Out
+
+    A* => L0 Branch(L1, Out)
+          L1 Inst(A) -> L0
+             Jump(L0)
+
+    A+ => L0 Inst(A) -> L1
+          L1 Branch(L0, Out)
+
+    A? =>    Branch(L0, Out)
+          L0 Inst(A) -> Out
+
+    
+*/
+
 template<typename CP>
 class Program
 {
