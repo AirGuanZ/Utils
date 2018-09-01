@@ -33,7 +33,44 @@ AGZ_NS_BEG(AGZ::VMEngExImpl)
     A? =>    Branch(L0, Out)
           L0 Inst(A) -> Out
 
-    
+    A{m} =>         Inst(A) -> L0
+            L0      Inst(A) -> L1
+            L1      Inst(A) -> L2
+                    ...
+            L_{m-2} Inst(A) -> Out
+
+    A{m, n} =>         Inst(A{m}) -> L0
+               L0      Alter(L1, L2, ..., L_{n - m}, Out)
+               L1      Inst(A) -> L2
+               L2      Inst(A) -> L3
+                       ...
+               L_{n-m} Inst(A) -> Out
+
+    (A) => Inst(A) -> Out
+
+    [ABC] => if in expr then
+                 Inst(A|B|C)
+             else
+                 Inst(@{A|B|C})
+
+    A|B|C|D => Inst(A)
+               if_true_set_true_and_jump(Out)
+               Inst(B)
+               if_true_set_true_and_jump(Out)
+               Inst(C)
+               if_true_set_true_and_jump(Out)
+               Inst(D)
+               if_true_set_true_and_jump(Out)
+               set_false
+
+    A&B&C&D => Inst(A)
+               if_false_set_false_and_jump(Out)
+               ...
+               Inst(D)
+               if_false_set_false_and_jump(Out)
+               set_true
+
+    !A => bool_not
 */
 
 template<typename CP>
