@@ -38,11 +38,13 @@ enum class InstType : uint32_t
     CharExprWordChar,
     CharExprWhitespace,
 
-    CharExprAnd,        // bool, bool       -> bool
-    CharExprOr,         // bool, bool       -> bool
-    CharExprNot,        // bool             -> bool
+    CharExprITSTAJ,     // If true  then set true  and jump
+    CharExprIFSFAJ,     // If false then set false and jump
+    CharExprSetTrue,
+    CharExprSetFalse,
+    CharExprNot,        // v -> !v
 
-    CharExprEnd,        // End of bool expression
+    CharExprEnd,        // If true then continue else exit_thread
 };
 
 constexpr InstType Char2Expr(InstType type)
@@ -70,6 +72,8 @@ union Inst
             struct { uint32_t count;    } dataAlter;
             struct { int32_t offset;    } dataJump;
             struct { int32_t fstOffset; } dataBranch;
+            struct { int32_t offset;    } dataITSTAJ;
+            struct { int32_t offset;    } dataIFSFAJ;
         };
 
         uint32_t lastStep;
