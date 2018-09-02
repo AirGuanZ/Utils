@@ -153,7 +153,7 @@ public:
 private:
 
     /*
-    Regex := Cat | Cat | ... | Cat
+        Regex := Cat | Cat | ... | Cat
     */
     Node *ParseRegex()
     {
@@ -176,7 +176,7 @@ private:
     }
 
     /*
-    Cat := Fac Fac ... Fac
+        Cat := Fac Fac ... Fac
     */
     Node *ParseCat()
     {
@@ -197,12 +197,12 @@ private:
     }
 
     /*
-    Fac := Fac*
-    Fac+
-    Fac?
-    Fac{m}
-    Fac{m, n}
-    Core
+        Fac := Fac*
+        Fac+
+        Fac?
+        Fac{m}
+        Fac{m, n}
+        Core
     */
     Node *ParseFac()
     {
@@ -287,10 +287,10 @@ private:
     }
 
     /*
-    Core := (Regex)
-    Class
-    Char
-    @{CharExpr}
+        Core := (Regex)
+        Class
+        Char
+        @{CharExpr}
     */
     Node *ParseCore()
     {
@@ -319,9 +319,9 @@ private:
     }
 
     /*
-    Class    := [ClassMem ClassMem ... ClassMem]
-    ClassMem := Char-Char
-    Char
+        Class    := [ClassMem ClassMem ... ClassMem]
+        ClassMem := Char-Char
+        Char
     */
     Node *ParseCharClass()
     {
@@ -392,13 +392,13 @@ private:
     }
 
     /*
-    转义字符被分为以下两类：
-    在当前regex context下由regex语法带来的转义，比如()这种，称为SyntaxEscape
-    SyntaxEscape又分了两类环境：
-    NormalSyntaxEscape：一般的语法转义，在CharClass以外的环境中生效
-    ClassSyntaxEscape：在CharClass中的语法转义
-    由于字符本身特性而无法好好写成字面量的转义，比如\a、\n这种，称为NativeEscape
-    NativeEscape在任何地方都有效
+        转义字符被分为以下两类：
+        在当前regex context下由regex语法带来的转义，比如()这种，称为SyntaxEscape
+        SyntaxEscape又分了两类环境：
+        NormalSyntaxEscape：一般的语法转义，在CharClass以外的环境中生效
+        ClassSyntaxEscape：在CharClass中的语法转义
+        由于字符本身特性而无法好好写成字面量的转义，比如\a、\n这种，称为NativeEscape
+        NativeEscape在任何地方都有效
     */
     std::optional<CP> NativeEscapeChar()
     {
@@ -458,7 +458,7 @@ private:
     }
 
     /*
-    CharExpr := AndExpr | AndExpr | ... | AndExpr
+        CharExpr := AndExpr | AndExpr | ... | AndExpr
     */
     Node *ParseCharExpr()
     {
@@ -479,11 +479,11 @@ private:
     }
 
     /*
-    AndExpr  := FacExpr & FacExpr & ... & FacExpr
-    FacExpr  := Char
-    Class
-    !FacExpr
-    (CharExpr)
+        AndExpr  := FacExpr & FacExpr & ... & FacExpr
+        FacExpr  := Char
+        Class
+        !FacExpr
+        (CharExpr)
     */
     Node *ParseAndExpr()
     {
