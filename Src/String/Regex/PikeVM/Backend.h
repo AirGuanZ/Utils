@@ -426,31 +426,25 @@ private:
         case ASTType::CharSingle:
             return GenerateCharSingleImpl(node);
         case ASTType::CharAny:
-            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprAny
-                                            : InstType::CharAny));
-            return { };
+            return EmitParamlessInst(inCharExpr_ ? InstType::CharExprAny
+                                                 : InstType::CharAny);
         case ASTType::CharClass:
             return GenerateCharClassImpl(node);
         case ASTType::CharDecDigit:
-            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprDecDigit
-                                            : InstType::CharDecDigit));
-            return { };
+            return EmitParamlessInst(inCharExpr_ ? InstType::CharExprDecDigit
+                                                 : InstType::CharDecDigit);
         case ASTType::CharHexDigit:
-            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprHexDigit
-                                            : InstType::CharHexDigit));
-            return { };
+            return EmitParamlessInst(inCharExpr_ ? InstType::CharExprHexDigit
+                                                 : InstType::CharHexDigit);
         case ASTType::CharAlpha:
-            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprAlpha
-                                            : InstType::CharAlpha));
-            return { };
+            return EmitParamlessInst(inCharExpr_ ? InstType::CharExprAlpha
+                                                 : InstType::CharAlpha);
         case ASTType::CharWordChar:
-            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprWordChar
-                                            : InstType::CharWordChar));
-            return { };
+            return EmitParamlessInst(inCharExpr_ ? InstType::CharExprWordChar
+                                                 : InstType::CharWordChar);
         case ASTType::CharWhitespace:
-            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprWhitespace
-                                            : InstType::CharWhitespace));
-            return { };
+            return EmitParamlessInst(inCharExpr_ ? InstType::CharExprWhitespace
+                                                 : InstType::CharWhitespace);
         case ASTType::CharExpr:
             return GenerateCharExprImpl(node);
         case ASTType::CharExprAnd:

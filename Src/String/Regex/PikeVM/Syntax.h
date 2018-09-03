@@ -452,6 +452,7 @@ private:
                 case ']':
                 case '-':
                     cp = ncp;
+                    break;
                 default:
                     Error();
                 }

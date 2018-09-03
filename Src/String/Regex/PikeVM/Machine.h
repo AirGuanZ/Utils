@@ -179,6 +179,7 @@ private:
     {
         if(pc->lastStep == state.cpIdx)
             return;
+            
         switch(pc->type)
         {
         case InstType::Begin:
@@ -188,6 +189,7 @@ private:
                 state, thds,
                 pc + 1, cp, std::move(saves), reg, startIdx);
             break;
+
         case InstType::End:
             if(state.cpr->end() != state.cur)
                 return;
@@ -195,6 +197,7 @@ private:
                 state, thds,
                 pc + 1, cp, std::move(saves), reg, startIdx);
             break;
+
         case InstType::Save:
             saves.Set(pc->dataSave.slot,
                       state.cpr->CodeUnitIndex(state.cur));
@@ -202,6 +205,7 @@ private:
                 state, thds,
                 pc + 1, cp, std::move(saves), reg, startIdx);
             break;
+
         case InstType::Alter:
         {
             auto alterDests = prog_.GetRelativeOffsetArray(
@@ -215,12 +219,14 @@ private:
             }
             break;
         }
+
         case InstType::Jump:
             AddThread(
                 state, thds,
                 pc + pc->dataJump.offset, cp,
                 std::move(saves), reg, startIdx);
             break;
+
         case InstType::Branch:
             AddThread(
                 state, thds,
@@ -231,6 +237,7 @@ private:
                 pc + pc->dataBranch.dest[1], cp,
                 std::move(saves), reg, startIdx);
             break;
+
         case InstType::CharExprSingle:
             AddThread(
                 state, thds,
@@ -239,12 +246,14 @@ private:
                 cp == pc->dataCharExprSingle.codePoint,
                 startIdx);
             break;
+
         case InstType::CharExprAny:
             AddThread(
                 state, thds,
                 pc + 1, cp,
                 std::move(saves), true, startIdx);
             break;
+
         case InstType::CharExprRange:
             AddThread(
                 state, thds,
@@ -254,6 +263,7 @@ private:
                 cp <= pc->dataCharExprRange.lst,
                 startIdx);
             break;
+
         case InstType::CharExprDecDigit:
             AddThread(
                 state, thds,
@@ -262,6 +272,7 @@ private:
                 StrAlgo::IsUnicodeDigit(cp),
                 startIdx);
             break;
+
         case InstType::CharExprHexDigit:
             AddThread(
                 state, thds,
@@ -270,6 +281,7 @@ private:
                 StrAlgo::IsUnicodeHexDigit(cp),
                 startIdx);
             break;
+
         case InstType::CharExprAlpha:
             AddThread(
                 state, thds,
@@ -278,6 +290,7 @@ private:
                 StrAlgo::IsUnicodeAlpha(cp),
                 startIdx);
             break;
+
         case InstType::CharExprWordChar:
             AddThread(
                 state, thds,
@@ -286,6 +299,7 @@ private:
                 StrAlgo::IsUnicodeAlnum(cp) || cp == '_',
                 startIdx);
             break;
+
         case InstType::CharExprWhitespace:
             AddThread(
                 state, thds,
@@ -294,6 +308,7 @@ private:
                 StrAlgo::IsUnicodeWhitespace(cp),
                 startIdx);
             break;
+            
         case InstType::CharExprITSTAJ:
             AddThread(
                 state, thds,
@@ -302,6 +317,7 @@ private:
                 reg,
                 startIdx);
             break;
+
         case InstType::CharExprIFSFAJ:
             AddThread(
                 state, thds,
@@ -310,6 +326,7 @@ private:
                 reg,
                 startIdx);
             break;
+
         case InstType::CharExprSetTrue:
             AddThread(
                 state, thds,
@@ -318,6 +335,7 @@ private:
                 true,
                 startIdx);
             break;
+
         case InstType::CharExprSetFalse:
             AddThread(
                 state, thds,
@@ -326,6 +344,7 @@ private:
                 false,
                 startIdx);
             break;
+
         case InstType::CharExprNot:
             AddThread(
                 state, thds,
@@ -334,6 +353,7 @@ private:
                 !reg,
                 startIdx);
             break;
+
         default:
             thds.push_back(Thread<CP>(
                 pc, std::move(saves), reg, startIdx));
@@ -436,30 +456,37 @@ private:
                     if(pc->dataCharSingle.codePoint == cp)
                         STEP_TO_NEXT_PC();
                     break;
+
                 case InstType::CharAny:
                     STEP_TO_NEXT_PC();
                     break;
+
                 case InstType::CharRange:
                     if(pc->dataCharRange.fst <= cp &&
                        cp <= pc->dataCharRange.lst)
                         STEP_TO_NEXT_PC();
                     break;
+
                 case InstType::CharDecDigit:
                     if(StrAlgo::IsUnicodeDigit(cp))
                         STEP_TO_NEXT_PC();
                     break;
+
                 case InstType::CharHexDigit:
                     if(StrAlgo::IsUnicodeHexDigit(cp))
                         STEP_TO_NEXT_PC();
                     break;
+
                 case InstType::CharAlpha:
                     if(StrAlgo::IsUnicodeAlpha(cp))
                         STEP_TO_NEXT_PC();
                     break;
+
                 case InstType::CharWordChar:
                     if(StrAlgo::IsUnicodeAlnum(cp) || cp == '_')
                         STEP_TO_NEXT_PC();
                     break;
+
                 case InstType::CharWhitespace:
                     if(StrAlgo::IsUnicodeWhitespace(cp))
                         STEP_TO_NEXT_PC();
@@ -469,6 +496,7 @@ private:
                     if(th->charExprReg)
                         STEP_TO_NEXT_PC();
                     break;
+
                 case InstType::Match:
                     if constexpr(!AnchorEnd)
                     {
@@ -479,6 +507,7 @@ private:
                         rdyThds.clear();
                     }
                     break;
+
                 default:
                     Unreachable();
                 }
