@@ -366,7 +366,7 @@ private:
                     n->fst = fst;
 
                     ret->dataCharClass.mems = n;
-                    ++ret->dataCharClass.mems;
+                    ++ret->dataCharClass.memCnt;
                 }
                 break;
 
@@ -381,7 +381,7 @@ private:
                 n->snd = NextClassChar();
 
                 ret->dataCharClass.mems = n;
-                ++ret->dataCharClass.mems;
+                ++ret->dataCharClass.memCnt;
             }
             break;
             }
@@ -569,6 +569,7 @@ private:
         case '?':
         case '|':
         case '@':
+        case '!':
             return nullptr;
         default:
             break;
@@ -596,6 +597,7 @@ private:
                 case '*':
                 case '?':
                 case '|':
+                case '!':
                 case '@':
                 case '^':
                 case '$':
@@ -673,7 +675,7 @@ private:
 
     [[noreturn]] static AGZ_FORCEINLINE void Error()
     {
-        throw ArgumentException("Syntax error in regular expression");
+        throw ArgumentException("Ill-formed regular expression");
     }
 
     CP Cur() const

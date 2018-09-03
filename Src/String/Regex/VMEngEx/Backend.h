@@ -10,14 +10,10 @@
 AGZ_NS_BEG(AGZ::VMEngExImpl)
 
 /*
-    A|B|C|D => Alter(L0, L1, L2, L3)
-               L0 Inst(A) -> Out
-                  Jump(Out)
-               L1 Inst(B) -> Out
-                  Jump(Out)
-               L2 Inst(C) -> Out
-                  Jump(Out)
-               L3 Inst(D) -> Out
+    A|B =>    Branch(L0, L1)
+           L0 Inst(A) -> Out
+              Jump(Out)
+           L1 Inst(B) -> Out
 
     A B C =>    Inst(A) -> L0
              L0 Inst(B) -> L1
@@ -70,7 +66,8 @@ AGZ_NS_BEG(AGZ::VMEngExImpl)
                if_false_set_false_and_jump(Out)
                set_true
 
-    !A => bool_not
+    !A => Inst(A)
+          bool_not
 */
 
 template<typename CP>
@@ -144,12 +141,17 @@ public:
         Release();
     }
 
-    Program(const Self &) = delete;
+    Program(const Self &)         = delete;
     Self &operator=(const Self &) = delete;
 
     bool Available() const
     {
         return insts_ != nullptr;
+    }
+
+    bool Full() const
+    {
+        return Size() == Capacity();
     }
 
     uint32_t Capacity() const
@@ -183,11 +185,12 @@ public:
     uint32_t GetInstIndex(const Inst<CP> *inst) const
     {
         AGZ_ASSERT(Available() && inst);
-        AGZ_ASSERT(inst - insts_ < instCount_);
+        AGZ_ASSERT(inst >= &insts_[0]);
+        AGZ_ASSERT(static_cast<uint32_t>(inst - &insts_[0]) < instCount_);
         return inst - insts_;
     }
 
-    uint32_t *EmitRelativeOffset(uint32_t value = 0)
+    int32_t *EmitRelativeOffset(int32_t value = 0)
     {
         AGZ_ASSERT(Available());
         auto ret = &insts_[instCount_].instArrUnit[relativeOffsetCount_];
@@ -207,10 +210,22 @@ public:
         return insts_[idx];
     }
 
-    const uint32_t *GetRelativeOffsetArray(size_t instIdx) const
+    const int32_t *GetRelativeOffsetArray(size_t instIdx) const
     {
         AGZ_ASSERT(instIdx + 1 < instCount_);
         return &insts_[instIdx + 1].instArrUnit[0];
+    }
+
+    int32_t *GetRelativeOffsetArray(size_t instIdx)
+    {
+        AGZ_ASSERT(instIdx + 1 < instCount_);
+        return &insts_[instIdx + 1].instArrUnit[0];
+    }
+
+    uint32_t GetNextInstIndex() const
+    {
+        AGZ_ASSERT(Available() && Size() < Capacity());
+        return Size();
     }
 };
 
@@ -245,6 +260,8 @@ public:
         auto match = prog_->Emit(NewInst(InstType::Match));
         FillBP(bps, prog_->GetInstIndex(match));
 
+        AGZ_ASSERT(prog_->Full());
+
         *saveSlotCount = saveSlotCount_;
         return std::move(prog);
     }
@@ -256,6 +273,23 @@ private:
     bool inCharExpr_ = false;
     bool canSave_ = true;
 
+    [[noreturn]] static void Error()
+    {
+        throw ArgumentException("Ill-formed regular expression");
+    }
+
+    bool DisableSaving()
+    {
+        bool ret = canSave_;
+        canSave_ = false;
+        return ret;
+    }
+
+    void SetSaving(bool canSave)
+    {
+        canSave_ = canSave;
+    }
+
     static I NewInst(InstType type)
     {
         I ret;
@@ -266,24 +300,480 @@ private:
     static void FillBP(BP &bps, uint32_t dstPos)
     {
         for(auto &unit : bps)
-        {
-            *unit.relOffset = static_cast<int32_t>(dstPos)
-                - static_cast<int32_t>(unit.srcPos);
-        }
+            *unit.relOffset = ComputeOffset(unit.srcPos, dstPos);
         bps.clear();
     }
 
-    static uint32_t CountInst(const Node *node)
+    static int32_t ComputeOffset(uint32_t src, uint32_t dst)
     {
-        AGZ_ASSERT(node);
-        // TODO
-        return 0;
+        return static_cast<int32_t>(dst) - static_cast<int32_t>(src);
     }
 
-    void GenerateImpl(const Node *node)
+    static uint32_t AlterSize(uint32_t alterDestCount)
+    {
+        return 1 + alterDestCount / 3 + (alterDestCount % 3 != 0);
+    }
+
+    static uint32_t CountInst(const Node *node, bool inExpr = false)
     {
         AGZ_ASSERT(node);
-        // TODO
+        switch(node->type)
+        {
+        case ASTType::Begin:
+        case ASTType::End:
+        case ASTType::Save:
+        case ASTType::CharSingle:
+        case ASTType::CharAny:
+        case ASTType::CharDecDigit:
+        case ASTType::CharHexDigit:
+        case ASTType::CharAlpha:
+        case ASTType::CharWordChar:
+        case ASTType::CharWhitespace:
+            return 1;
+        case ASTType::Cat:
+            return CountInst(node->dataCat.dest[0], inExpr)
+                 + CountInst(node->dataCat.dest[1], inExpr);
+        case ASTType::Or:
+            return CountInst(node->dataOr.dest[0], inExpr)
+                 + CountInst(node->dataOr.dest[1], inExpr)
+                 + 2;
+        case ASTType::Star:
+            return CountInst(node->dataStar.dest, inExpr) + 2;
+        case ASTType::Plus:
+            return CountInst(node->dataPlus.dest, inExpr) + 1;
+        case ASTType::Ques:
+            return CountInst(node->dataQues.dest, inExpr) + 1;
+        case ASTType::Repeat:
+            if(node->dataRepeat.lst > node->dataRepeat.fst)
+                return node->dataRepeat.lst
+                     * CountInst(node->dataRepeat.dest, inExpr)
+                     + AlterSize(node->dataRepeat.lst
+                               - node->dataRepeat.fst + 1);
+            return node->dataRepeat.fst
+                 * CountInst(node->dataRepeat.dest, inExpr);
+        case ASTType::CharClass:
+            if(inExpr)
+                return node->dataCharClass.memCnt * 2 + 1;
+            return node->dataCharClass.memCnt * 2 + 2;
+        case ASTType::CharExpr:
+            return CountInst(node->dataCharExpr.expr, true) + 1;
+        case ASTType::CharExprAnd:
+            return CountInst(node->dataCharExprAnd.left, inExpr)
+                 + CountInst(node->dataCharExprAnd.right, inExpr)
+                 + 3;
+        case ASTType::CharExprOr:
+            return CountInst(node->dataCharExprOr.left, inExpr)
+                 + CountInst(node->dataCharExprOr.right, inExpr)
+                 + 3;
+        case ASTType::CharExprNot:
+            return CountInst(node->dataCharExprNot.dest, inExpr) + 1;
+        default:
+            Unreachable();
+        }
+    }
+
+    BP EmitParamlessInst(InstType type)
+    {
+        prog_->Emit(NewInst(type));
+        return { };
+    }
+
+    [[nodiscard]] BP GenerateImpl(const Node *node)
+    {
+        AGZ_ASSERT(node);
+        switch(node->type)
+        {
+        case ASTType::Begin:
+            return EmitParamlessInst(InstType::Begin);
+        case ASTType::End:
+            return EmitParamlessInst(InstType::End);
+        case ASTType::Save:
+            if(canSave_)
+            {
+                ++saveSlotCount_;
+                return EmitParamlessInst(InstType::Save);
+            }
+            Error();
+        case ASTType::Cat:
+            return GenerateCatImpl(node);
+        case ASTType::Or:
+            return GenerateOrImpl(node);
+        case ASTType::Star:
+            return GenerateStarImpl(node);
+        case ASTType::Plus:
+            return GeneratePlusImpl(node);
+        case ASTType::Ques:
+            return GenerateQuesImpl(node);
+        case ASTType::Repeat:
+            return GenerateRepeatImpl(node);
+        case ASTType::CharSingle:
+            return GenerateCharSingleImpl(node);
+        case ASTType::CharAny:
+            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprAny
+                                            : InstType::CharAny));
+            return { };
+        case ASTType::CharClass:
+            return GenerateCharClassImpl(node);
+        case ASTType::CharDecDigit:
+            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprDecDigit
+                                            : InstType::CharDecDigit));
+            return { };
+        case ASTType::CharHexDigit:
+            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprHexDigit
+                                            : InstType::CharHexDigit));
+            return { };
+        case ASTType::CharAlpha:
+            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprAlpha
+                                            : InstType::CharAlpha));
+            return { };
+        case ASTType::CharWordChar:
+            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprWordChar
+                                            : InstType::CharWordChar));
+            return { };
+        case ASTType::CharWhitespace:
+            prog_->Emit(NewInst(inCharExpr_ ? InstType::CharExprWhitespace
+                                            : InstType::CharWhitespace));
+            return { };
+        case ASTType::CharExpr:
+            return GenerateCharExprImpl(node);
+        case ASTType::CharExprAnd:
+            return GenerateCharExprAndImpl(node);
+        case ASTType::CharExprOr:
+            return GenerateCharExprOrImpl(node);
+        case ASTType::CharExprNot:
+            return GenerateCharExprNotImpl(node);
+        default:
+            Unreachable();
+        }
+    }
+
+    /*
+        A B C
+               Inst(A) -> L0
+            L0 Inst(B) -> L1
+            L1 Inst(C) -> Out
+    */
+    BP GenerateCatImpl(const Node *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTType::Cat);
+        auto bps = GenerateImpl(node->dataCat.dest[0]);
+        FillBP(bps, prog_->GetNextInstIndex());
+        return GenerateImpl(node->dataCat.dest[1]);
+    }
+
+    /*
+        A|B
+               Branch(L0, L1)
+            L0 Inst(A) -> Out
+               Jump(Out)
+            L1 Inst(B) -> Out
+    */
+    BP GenerateOrImpl(const Node *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTType::Or);
+        auto branch = prog_->Emit(NewInst(InstType::Branch));
+
+        branch->dataBranch.dest[0] = ComputeOffset(
+            prog_->GetInstIndex(branch), prog_->GetNextInstIndex());
+        auto ret = GenerateImpl(node->dataOr.dest[0]);
+
+        auto jump = prog_->Emit(NewInst(InstType::Jump));
+        ret.push_back({ prog_->GetInstIndex(jump), &jump->dataJump.offset });
+
+        branch->dataBranch.dest[1] = ComputeOffset(
+            prog_->GetInstIndex(branch), prog_->GetNextInstIndex());
+        ret.splice(ret.end(), GenerateImpl(node->dataOr.dest[1]));
+
+        return std::move(ret);
+    }
+
+    /*
+        A*
+            L0 Branch(L1, Out)
+            L1 Inst(A) -> L0
+               Jump(L0)
+    */
+    BP GenerateStarImpl(const Node *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTType::Star);
+
+        auto branch = prog_->Emit(NewInst(InstType::Branch));
+        branch->dataBranch.dest[0] = ComputeOffset(
+            prog_->GetInstIndex(branch), prog_->GetNextInstIndex());
+
+        auto oldCanSave = DisableSaving();
+        auto bps = GenerateImpl(node->dataStar.dest);
+        SetSaving(oldCanSave);
+        FillBP(bps, prog_->GetInstIndex(branch));
+
+        auto jump = prog_->Emit(NewInst(InstType::Jump));
+        jump->dataJump.offset = ComputeOffset(
+            prog_->GetInstIndex(jump), prog_->GetInstIndex(branch));
+
+        return { { prog_->GetInstIndex(branch),
+                   &branch->dataBranch.dest[1] } };
+    }
+
+    /*
+        A+
+            L0 Inst(A) -> L1
+            L1 Branch(L0, Out)
+    */
+    BP GeneratePlusImpl(const Node *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTType::Plus);
+
+        auto begin = prog_->GetNextInstIndex();
+
+        auto oldCanSave = DisableSaving();
+        auto bps = GenerateImpl(node->dataPlus.dest);
+        SetSaving(oldCanSave);
+
+        FillBP(bps, prog_->GetNextInstIndex());
+
+        auto branch = prog_->Emit(NewInst(InstType::Branch));
+        branch->dataBranch.dest[0] = ComputeOffset(
+            prog_->GetInstIndex(branch), begin);
+
+        return { { prog_->GetInstIndex(branch),
+                   &branch->dataBranch.dest[1] } };
+    }
+
+    /*
+        A?
+               Branch(L0, Out)
+            L0 Inst(A) -> Out
+    */
+    BP GenerateQuesImpl(const Node *node)
+    {
+        auto branch = prog_->Emit(NewInst(InstType::Branch));
+        branch->dataBranch.dest[0] = ComputeOffset(
+            prog_->GetInstIndex(branch), prog_->GetNextInstIndex());
+
+        auto oldCanSave = DisableSaving();
+        auto ret = GenerateImpl(node->dataQues.dest);
+        SetSaving(oldCanSave);
+
+        ret.push_back({ prog_->GetInstIndex(branch),
+                        &branch->dataBranch.dest[1] });
+        return std::move(ret);
+    }
+
+    /*
+        A{m}
+                    Inst(A) -> L0
+            L0      Inst(A) -> L1
+            L1      Inst(A) -> L2
+                    ...
+            L_{m-2} Inst(A) -> Out
+
+        A{m, n}
+                    Inst(A{m}) -> L0
+            L0      Alter(L1, L2, ..., L_{n - m}, Out)
+            L1      Inst(A) -> L2
+            L2      Inst(A) -> L3
+                    ...
+            L_{n-m} Inst(A) -> Out
+    */
+    BP GenerateRepeatImpl(const Node *node)
+    {
+        BP bps;
+        auto oldCanSave = DisableSaving();
+
+        for(uint32_t i = 0; i < node->dataRepeat.fst; ++i)
+        {
+            FillBP(bps, prog_->GetNextInstIndex());
+            bps = GenerateImpl(node->dataRepeat.dest);
+        }
+
+        if(node->dataRepeat.lst > node->dataRepeat.fst)
+        {
+            uint32_t num = node->dataRepeat.lst - node->dataRepeat.fst;
+            AGZ_ASSERT(num > 0);
+
+            FillBP(bps, prog_->GetNextInstIndex());
+
+            auto alter = prog_->Emit(NewInst(InstType::Alter));
+            auto alterIdx = prog_->GetInstIndex(alter);
+            for(uint32_t i = 0; i < num + 1; ++i)
+                prog_->EmitRelativeOffset();
+            auto alterDests = prog_->GetRelativeOffsetArray(
+                prog_->GetInstIndex(alter));
+
+            AGZ_ASSERT(bps.empty());
+            for(uint32_t i = 0; i < num; ++i)
+            {
+                alterDests[i] = ComputeOffset(
+                    alterIdx, prog_->GetNextInstIndex());
+                FillBP(bps, prog_->GetNextInstIndex());
+                bps = GenerateImpl(node->dataRepeat.dest);
+            }
+
+            bps.push_back({ alterIdx, &alterDests[num] });
+        }
+
+        SetSaving(oldCanSave);
+        return std::move(bps);
+    }
+
+    BP GenerateCharSingleImpl(const Node *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTType::CharSingle);
+
+        if(inCharExpr_)
+        {
+            prog_->Emit(NewInst(InstType::CharExprSingle))
+                ->dataCharExprSingle.codePoint
+                    = node->dataCharSingle.codePoint;
+        }
+        else
+        {
+            prog_->Emit(NewInst(InstType::CharSingle))
+                ->dataCharSingle.codePoint
+                    = node->dataCharSingle.codePoint;
+        }
+        return { };
+    }
+
+    /*
+        [ABC]
+            if in expr then
+                Inst(A|B|C)
+            else
+                Inst(@{A|B|C})
+
+        A|B|C|D
+            Inst(A)
+            if_true_set_true_and_jump(Out)
+            Inst(B)
+            if_true_set_true_and_jump(Out)
+            Inst(C)
+            if_true_set_true_and_jump(Out)
+            Inst(D)
+            if_true_set_true_and_jump(Out)
+            set_false
+    */
+    BP GenerateCharClassImpl(const Node *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTType::CharClass);
+
+        if(!node->dataCharClass.memCnt)
+            Error();
+
+        BP bps;
+        for(auto mem = node->dataCharClass.mems;
+            mem; mem = mem->next)
+        {
+            if(mem->isRange)
+            {
+                auto range = prog_->Emit(NewInst(InstType::CharExprRange));
+                range->dataCharExprRange.fst = mem->fst;
+                range->dataCharExprRange.lst = mem->snd;
+            }
+            else
+            {
+                auto single = prog_->Emit(NewInst(InstType::CharExprSingle));
+                single->dataCharExprSingle.codePoint = mem->fst;
+            }
+
+            auto ITSTAJ = prog_->Emit(NewInst(InstType::CharExprITSTAJ));
+            bps.push_back({ prog_->GetInstIndex(ITSTAJ),
+                            &ITSTAJ->dataITSTAJ.offset });
+        }
+
+        prog_->Emit(NewInst(InstType::CharExprSetFalse));
+
+        if(!inCharExpr_)
+        {
+            FillBP(bps, prog_->GetNextInstIndex());
+            prog_->Emit(NewInst(InstType::CharExprEnd));
+        }
+
+        return std::move(bps);
+    }
+
+    BP GenerateCharExprImpl(const Node *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTType::CharExpr);
+
+        if(inCharExpr_)
+            Error();
+        inCharExpr_ = true;
+
+        auto bps = GenerateImpl(node->dataCharExpr.expr);
+        auto endExpr = prog_->Emit(NewInst(InstType::CharExprEnd));
+        FillBP(bps, prog_->GetInstIndex(endExpr));
+
+        inCharExpr_ = false;
+        return { };
+    }
+
+    /*
+        A&B
+            Inst(A)
+            if_false_set_false_and_jump(Out)
+            Inst(B)
+            if_false_set_false_and_jump(Out)
+            set_true
+    */
+    BP GenerateCharExprAndImpl(const Node *node)
+    {
+        BP ret;
+
+        auto bps = GenerateImpl(node->dataCharExprAnd.left);
+        FillBP(bps, prog_->GetNextInstIndex());
+        auto IFSFAJ = prog_->Emit(NewInst(InstType::CharExprIFSFAJ));
+        ret.push_back({ prog_->GetInstIndex(IFSFAJ),
+                        &IFSFAJ->dataIFSFAJ.offset });
+
+        bps = GenerateImpl(node->dataCharExprAnd.right);
+        FillBP(bps, prog_->GetNextInstIndex());
+        IFSFAJ = prog_->Emit(NewInst(InstType::CharExprIFSFAJ));
+        ret.push_back({ prog_->GetInstIndex(IFSFAJ),
+                        &IFSFAJ->dataIFSFAJ.offset });
+
+        prog_->Emit(NewInst(InstType::CharExprSetTrue));
+
+        return std::move(ret);
+    }
+
+    /*
+        A|B
+            Inst(A)
+            if_true_set_true_and_jump(Out)
+            Inst(B)
+            if_true_set_true_and_jump(Out)
+            set_false
+    */
+    BP GenerateCharExprOrImpl(const Node *node)
+    {
+        BP ret;
+
+        auto bps = GenerateImpl(node->dataCharExprOr.left);
+        FillBP(bps, prog_->GetNextInstIndex());
+        auto ITSTAJ = prog_->Emit(NewInst(InstType::CharExprITSTAJ));
+        ret.push_back({ prog_->GetInstIndex(ITSTAJ),
+                        &ITSTAJ->dataIFSFAJ.offset });
+
+        bps = GenerateImpl(node->dataCharExprOr.right);
+        FillBP(bps, prog_->GetNextInstIndex());
+        ITSTAJ = prog_->Emit(NewInst(InstType::CharExprITSTAJ));
+        ret.push_back({ prog_->GetInstIndex(ITSTAJ),
+                        &ITSTAJ->dataIFSFAJ.offset });
+
+        prog_->Emit(NewInst(InstType::CharExprSetFalse));
+
+        return std::move(ret);
+    }
+
+    BP GenerateCharExprNotImpl(const Node *node)
+    {
+        AGZ_ASSERT(node && node->type == ASTType::CharExprNot);
+
+        auto bps = GenerateImpl(node->dataCharExprNot.dest);
+        FillBP(bps, prog_->GetNextInstIndex());
+
+        return EmitParamlessInst(InstType::CharExprNot);
     }
 };
 

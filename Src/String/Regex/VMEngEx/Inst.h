@@ -25,7 +25,7 @@ enum class InstType : uint32_t
     CharDecDigit,       // Decimal digit
     CharHexDigit,       // Hexadecimal digit
     CharAlpha,          // Alpha character
-    CharWord,           // Word(Alpha/digit/underscore) character
+    CharWordChar,       // Word(Alpha/digit/underscore) character
     CharWhitespace,     // Whitespace character
 
     CharExprSingle,     // Single character -> bool
@@ -64,14 +64,14 @@ union Inst
 
         union
         {
-            struct { CP codePoint;      } dataChar;
+            struct { CP codePoint;      } dataCharSingle;
             struct { CP fst, lst;       } dataCharRange;
             struct { CP codePoint;      } dataCharExprSingle;
             struct { CP fst, lst;       } dataCharExprRange;
             struct { uint32_t slot;     } dataSave;
             struct { uint32_t count;    } dataAlter;
             struct { int32_t offset;    } dataJump;
-            struct { int32_t fstOffset; } dataBranch;
+            struct { int32_t dest[2];   } dataBranch;
             struct { int32_t offset;    } dataITSTAJ;
             struct { int32_t offset;    } dataIFSFAJ;
         };
