@@ -218,18 +218,22 @@ REQUIRE((Str8(u8"Mine cr aft ").Split()
 
 ```cpp
 // Example of basic usage
-// Regex<...>::Match/Search returns a Result object which can be implicitly converted to  a boolean value indicating whether the match/search succeeds
+//     Regex<...>::Match/Search returns a Result object
+// which can be implicitly converted to a boolean value
+// indicating whether the match/search succeeds
 REQUIRE(Regex8(u8"今天天气不错minecraft").Match(u8"今天天气不错minecraft"));
 REQUIRE(Regex8(u8"不错mine").Search(u8"今天天气不错minecraft"));
 
 // Example of boolean expression
-// Matches a non-empty string with each character satisfying one of the following:
+//     Matches a non-empty string with each character
+// satisfying one of the following:
 // 1. in { +, *, ? }
 // 2. in { c, d, e, ..., m, n } \ { h, k }
 REQUIRE(Regex8("@{[+*?]|[c-n]&![hk]}+").Match("cde+fm?n"));
 
 // Example of submatches tracking
-// Each '&' defines a save point and can store a location in matched strings. We can also use two save points to slice the matched strings.
+//     Each '&' defines a save point and can store a location in matched strings.
+// We can also use two save points to slice the matched strings.
 auto result = Regex8("&abc&([def]|\\d)+&abc").Match("abcddee0099ff44abc");
 REQUIRE(result);
 REQUIRE(result(0, 1) == "abc");
