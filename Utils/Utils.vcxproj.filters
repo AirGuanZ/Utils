@@ -40,6 +40,9 @@
     <Filter Include="String\Regex\PikeVM">
       <UniqueIdentifier>{d3c50a4f-5d0f-4fe9-9a6e-3a5b0aa8ebab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{c1ae0090-5471-4554-a3d3-52f330293e4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Math\Scalar.h">
@@ -234,6 +237,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\String\Regex\PikeVM.h">
       <Filter>String\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Texture\TexData2D.h">
+      <Filter>Texture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -128,7 +128,8 @@ public:
         if(!prog_.Available())
             Compile();
         auto ret = Run<true, true>(dst);
-        return ret.has_value() ? make_optional(move(ret.value().second))
+        return ret.has_value() ? std::make_optional(
+                                    std::move(ret.value().second))
                                : std::nullopt;
     }
 
@@ -179,7 +180,7 @@ private:
     {
         if(pc->lastStep == state.cpIdx)
             return;
-            
+
         switch(pc->type)
         {
         case InstType::Begin:

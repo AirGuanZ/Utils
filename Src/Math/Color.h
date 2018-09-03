@@ -14,11 +14,13 @@ using Color4 = Vec4<T>;
 
 using Color3f = Color3<float>;
 using Color3d = Color3<double>;
+using Color3b = Color3<uint8_t>;
 
 using Color4f = Color4<float>;
 using Color4d = Color4<double>;
+using Color4b = Color4<uint8_t>;
 
-#define COLOR_CONST(N, R, G, B, A) \
+#define COLOR_CONST(N, R, G, B, A, RB, GB, BB, AB) \
     namespace Aux \
     { \
         struct Color_##N##_t \
@@ -28,24 +30,28 @@ using Color4d = Color4<double>;
                 { return Color3f(float(R),  float(G),  float(B)); } \
             constexpr operator Color3d() const \
                 { return Color3d(double(R), double(G), double(B)); } \
+            constexpr operator Color3b() const \
+                { return Color3b(RB, GB, BB); } \
             constexpr operator Color4f() const \
                 { return Color4f(float(R),  float(G), \
                                  float(B),  float(A)); } \
             constexpr operator Color4d() const \
                 { return Color4d(double(R), double(G), \
                                  double(B), double(A)); } \
+            constexpr operator Color4b() const \
+                { return Color4b(RB, GB, BB, AB); } \
         }; \
     } \
     inline constexpr Aux::Color_##N##_t N
 
 namespace COLOR
 {
-    COLOR_CONST(VOID,  0.0, 0.0, 0.0, 0.0);
-    COLOR_CONST(BLACK, 0.0, 0.0, 0.0, 1.0);
-    COLOR_CONST(WHITE, 1.0, 1.0, 1.0, 1.0);
-    COLOR_CONST(RED,   1.0, 0.0, 0.0, 1.0);
-    COLOR_CONST(GREEN, 0.0, 1.0, 0.0, 1.0);
-    COLOR_CONST(BLUE,  0.0, 0.0, 1.0, 1.0);
+    COLOR_CONST(VOID,  0.0, 0.0, 0.0, 0.0, 0,   0,   0,   0);
+    COLOR_CONST(BLACK, 0.0, 0.0, 0.0, 1.0, 0,   0,   0,   255);
+    COLOR_CONST(WHITE, 1.0, 1.0, 1.0, 1.0, 255, 255, 255, 255);
+    COLOR_CONST(RED,   1.0, 0.0, 0.0, 1.0, 255, 0,   0,   255);
+    COLOR_CONST(GREEN, 0.0, 1.0, 0.0, 1.0, 0,   255, 0,   255);
+    COLOR_CONST(BLUE,  0.0, 0.0, 1.0, 1.0, 0,   0,   255, 255);
 }
 
 #undef COLOR_CONST

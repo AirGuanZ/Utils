@@ -75,6 +75,7 @@
     <ClInclude Include="..\Src\String\String.h" />
     <ClInclude Include="..\Src\String\String\StrAlgo.h" />
     <ClInclude Include="..\Src\String\String\String.h" />
+    <ClInclude Include="..\Src\Texture\TexData2D.h" />
     <ClInclude Include="..\Src\Utils.h" />
     <ClInclude Include="..\Src\Utils\Alloc.h" />
     <ClInclude Include="..\Src\Utils\Buffer.h" />
