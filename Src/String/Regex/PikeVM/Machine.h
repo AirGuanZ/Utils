@@ -158,6 +158,8 @@ private:
         size_t matchedStart;
         size_t matchedEnd;
         std::optional<SaveSlots> matchedSaveSlots;
+
+        uint32_t cpIdx;
     };
 
     void Compile() const
@@ -171,12 +173,11 @@ private:
     void AddThread(
         MatchState &state,
         std::vector<Thread<CP>> &thds,
-        size_t curStep,
         Inst<CP> *pc, CP cp,
         SaveSlots &&saves, bool reg,
         size_t startIdx) const
     {
-        if(pc->lastStep == curStep)
+        if(pc->lastStep == state.cpIdx)
             return;
         switch(pc->type)
         {
@@ -184,21 +185,21 @@ private:
             if(state.cpr->begin() != state.cur)
                 return;
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp, std::move(saves), reg, startIdx);
             break;
         case InstType::End:
             if(state.cpr->end() != state.cur)
                 return;
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp, std::move(saves), reg, startIdx);
             break;
         case InstType::Save:
             saves.Set(pc->dataSave.slot,
                       state.cpr->CodeUnitIndex(state.cur));
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp, std::move(saves), reg, startIdx);
             break;
         case InstType::Alter:
@@ -208,7 +209,7 @@ private:
             for(uint32_t i = 0; i < pc->dataAlter.count; ++i)
             {
                 AddThread(
-                    state, thds, curStep,
+                    state, thds,
                     pc + alterDests[i], cp,
                     SaveSlots(saves), reg, startIdx);
             }
@@ -216,23 +217,23 @@ private:
         }
         case InstType::Jump:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + pc->dataJump.offset, cp,
                 std::move(saves), reg, startIdx);
             break;
         case InstType::Branch:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + pc->dataBranch.dest[0], cp,
                 SaveSlots(saves), reg, startIdx);
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + pc->dataBranch.dest[1], cp,
                 std::move(saves), reg, startIdx);
             break;
         case InstType::CharExprSingle:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp,
                 std::move(saves),
                 cp == pc->dataCharExprSingle.codePoint,
@@ -240,13 +241,13 @@ private:
             break;
         case InstType::CharExprAny:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp,
                 std::move(saves), true, startIdx);
             break;
         case InstType::CharExprRange:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp,
                 std::move(saves),
                 pc->dataCharExprRange.fst <= cp &&
@@ -255,7 +256,7 @@ private:
             break;
         case InstType::CharExprDecDigit:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp,
                 std::move(saves),
                 StrAlgo::IsUnicodeDigit(cp),
@@ -263,7 +264,7 @@ private:
             break;
         case InstType::CharExprHexDigit:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp,
                 std::move(saves),
                 StrAlgo::IsUnicodeHexDigit(cp),
@@ -271,7 +272,7 @@ private:
             break;
         case InstType::CharExprAlpha:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp,
                 std::move(saves),
                 StrAlgo::IsUnicodeAlpha(cp),
@@ -279,7 +280,7 @@ private:
             break;
         case InstType::CharExprWordChar:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp,
                 std::move(saves),
                 StrAlgo::IsUnicodeAlnum(cp) || cp == '_',
@@ -287,7 +288,7 @@ private:
             break;
         case InstType::CharExprWhitespace:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp,
                 std::move(saves),
                 StrAlgo::IsUnicodeWhitespace(cp),
@@ -295,7 +296,7 @@ private:
             break;
         case InstType::CharExprITSTAJ:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + (reg ? pc->dataITSTAJ.offset : 1), cp,
                 std::move(saves),
                 reg,
@@ -303,7 +304,7 @@ private:
             break;
         case InstType::CharExprIFSFAJ:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + (!reg ? pc->dataIFSFAJ.offset : 1), cp,
                 std::move(saves),
                 reg,
@@ -311,7 +312,7 @@ private:
             break;
         case InstType::CharExprSetTrue:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp,
                 std::move(saves),
                 true,
@@ -319,7 +320,7 @@ private:
             break;
         case InstType::CharExprSetFalse:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp,
                 std::move(saves),
                 false,
@@ -327,7 +328,7 @@ private:
             break;
         case InstType::CharExprNot:
             AddThread(
-                state, thds, curStep,
+                state, thds,
                 pc + 1, cp,
                 std::move(saves),
                 !reg,
@@ -343,7 +344,7 @@ private:
     void AddThreadWithPC(
         MatchState &state,
         std::vector<Thread<CP>> &thds,
-        size_t cpIdx, Inst<CP> *pc,
+        Inst<CP> *pc,
         CP cp, bool reg,
         Thread<CP> *oriTh) const
     {
@@ -351,7 +352,7 @@ private:
         ++state.cur;
         AddThread(
             state,
-            thds, cpIdx,
+            thds,
             pc, cp,
             std::move(oriTh->saveSlots),
             reg, oriTh->startIdx);
@@ -365,6 +366,13 @@ private:
             return std::numeric_limits<CP>::max();
         return *it;
     }
+
+#define STEP_TO_NEXT_PC() \
+    do { \
+        AddThreadWithPC( \
+            state, newThds, pc + 1, \
+            NextCP(state), th->charExprReg, th); \
+    } while(0)
 
     template<bool AnchorBegin, bool AnchorEnd>
     std::optional<std::pair<Interval, std::vector<size_t>>>
@@ -387,29 +395,29 @@ private:
         state.matchedStart = 0;
         state.matchedEnd = 0;
         state.matchedSaveSlots.reset();
+        state.cpIdx = 0;
 
         if constexpr(AnchorBegin)
         {
             if(!str.Empty())
             {
                 AddThread(
-                    state, rdyThds, 0, &prog_.GetInst(0), *state.cur,
+                    state, rdyThds, &prog_.GetInst(0), *state.cur,
                     SaveSlots(slotCount_, saveSlotsArena),
                     true, 0);
             }
         }
 
-        uint32_t cpIdx = 0;
-        for(; state.cur != cpr.end(); ++state.cur, ++cpIdx)
+        for(; state.cur != cpr.end(); ++state.cur, ++state.cpIdx)
         {
             CP cp = *state.cur;
 
             if constexpr(!AnchorBegin)
             {
                 AddThread(
-                    state, rdyThds, cpIdx, &prog_.GetInst(0),
+                    state, rdyThds, &prog_.GetInst(0),
                     cp, SaveSlots(slotCount_, saveSlotsArena),
-                    true, cpIdx);
+                    true, state.cpIdx);
             }
             else
             {
@@ -426,74 +434,40 @@ private:
                 {
                 case InstType::CharSingle:
                     if(pc->dataCharSingle.codePoint == cp)
-                    {
-                        AddThreadWithPC(
-                            state, newThds, cpIdx, pc + 1,
-                            NextCP(state), th->charExprReg, th);
-                    }
+                        STEP_TO_NEXT_PC();
                     break;
                 case InstType::CharAny:
-                    AddThreadWithPC(
-                        state, newThds, cpIdx, pc + 1,
-                        NextCP(state), th->charExprReg, th);
+                    STEP_TO_NEXT_PC();
                     break;
                 case InstType::CharRange:
                     if(pc->dataCharRange.fst <= cp &&
                        cp <= pc->dataCharRange.lst)
-                    {
-                        AddThreadWithPC(
-                            state, newThds, cpIdx, pc + 1,
-                            NextCP(state), th->charExprReg, th);
-                    }
+                        STEP_TO_NEXT_PC();
                     break;
                 case InstType::CharDecDigit:
                     if(StrAlgo::IsUnicodeDigit(cp))
-                    {
-                        AddThreadWithPC(
-                            state, newThds, cpIdx, pc + 1,
-                            NextCP(state), th->charExprReg, th);
-                    }
+                        STEP_TO_NEXT_PC();
                     break;
                 case InstType::CharHexDigit:
                     if(StrAlgo::IsUnicodeHexDigit(cp))
-                    {
-                        AddThreadWithPC(
-                            state, newThds, cpIdx, pc + 1,
-                            NextCP(state), th->charExprReg, th);
-                    }
+                        STEP_TO_NEXT_PC();
                     break;
                 case InstType::CharAlpha:
                     if(StrAlgo::IsUnicodeAlpha(cp))
-                    {
-                        AddThreadWithPC(
-                            state, newThds, cpIdx, pc + 1,
-                            NextCP(state), th->charExprReg, th);
-                    }
+                        STEP_TO_NEXT_PC();
                     break;
                 case InstType::CharWordChar:
                     if(StrAlgo::IsUnicodeAlnum(cp) || cp == '_')
-                    {
-                        AddThreadWithPC(
-                            state, newThds, cpIdx, pc + 1,
-                            NextCP(state), th->charExprReg, th);
-                    }
+                        STEP_TO_NEXT_PC();
                     break;
                 case InstType::CharWhitespace:
                     if(StrAlgo::IsUnicodeWhitespace(cp))
-                    {
-                        AddThreadWithPC(
-                            state, newThds, cpIdx, pc + 1,
-                            NextCP(state), th->charExprReg, th);
-                    }
+                        STEP_TO_NEXT_PC();
                     break;
 
                 case InstType::CharExprEnd:
                     if(th->charExprReg)
-                    {
-                        AddThreadWithPC(
-                            state, newThds, cpIdx, pc + 1,
-                            NextCP(state), th->charExprReg, th);
-                    }
+                        STEP_TO_NEXT_PC();
                     break;
                 case InstType::Match:
                     if constexpr(!AnchorEnd)
@@ -537,6 +511,8 @@ private:
 
         return std::nullopt;
     }
+
+#undef STEP_TO_NEXT_PC
 };
 
 AGZ_NS_END(AGZ::PikeVM)
