@@ -396,13 +396,13 @@ private:
     }
 
     /*
-        转义字符被分为以下两类：
-        在当前regex context下由regex语法带来的转义，比如()这种，称为SyntaxEscape
-        SyntaxEscape又分了两类环境：
-        NormalSyntaxEscape：一般的语法转义，在CharClass以外的环境中生效
-        ClassSyntaxEscape：在CharClass中的语法转义
-        由于字符本身特性而无法好好写成字面量的转义，比如\a、\n这种，称为NativeEscape
-        NativeEscape在任何地方都有效
+        杞箟瀛楃琚垎涓轰互涓嬩袱绫伙細
+        鍦ㄥ綋鍓峳egex context涓嬬敱regex璇硶甯︽潵鐨勮浆涔夛紝姣斿()杩欑锛岀О涓篠yntaxEscape
+        SyntaxEscape鍙堝垎浜嗕袱绫荤幆澧冿細
+        NormalSyntaxEscape锛氫竴鑸殑璇硶杞箟锛屽湪CharClass浠ュ鐨勭幆澧冧腑鐢熸晥
+        ClassSyntaxEscape锛氬湪CharClass涓殑璇硶杞箟
+        鐢变簬瀛楃鏈韩鐗规�ц�屾棤娉曞ソ濂藉啓鎴愬瓧闈㈤噺鐨勮浆涔夛紝姣斿\a銆乗n杩欑锛岀О涓篘ativeEscape
+        NativeEscape鍦ㄤ换浣曞湴鏂归兘鏈夋晥
     */
     std::optional<CP> NativeEscapeChar()
     {

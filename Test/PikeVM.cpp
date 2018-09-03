@@ -138,7 +138,7 @@ TEST_CASE("VMEngEx")
     SECTION("README")
     {
         // Example of basic usage
-        // Regex<...>::Match/Search returns a Result object which can be implicitly converted to  a boolean value indicating whether the match/search succeeds
+        // Regex<...>::Match/Search returns a Result object which can be implicitly converted to a boolean value indicating whether the match/search succeeds
         REQUIRE(Regex8(u8"今天天气不错minecraft").Match(u8"今天天气不错minecraft"));
         REQUIRE(Regex8(u8"不错mine").Search(u8"今天天气不错minecraft"));
 

@@ -161,8 +161,6 @@ A non-null-terminated immutable string class...Just for fun.
 - Various char encoding
 
 ```cpp
-// using Str8 = String<UTF8<char>>; using Str32 = String<UTF32<uint32_t>>;
-
 Str8 a = u8"今天天气不错。Hello, world!";
 REQUIRE(a == u8"今天天气不错。Hello, world!");
 
@@ -225,15 +223,14 @@ REQUIRE(Regex8(u8"今天天气不错minecraft").Match(u8"今天天气不错minec
 REQUIRE(Regex8(u8"不错mine").Search(u8"今天天气不错minecraft"));
 
 // Example of boolean expression
-//     Matches a non-empty string with each character
-// satisfying one of the following:
+//     Matches a non-empty string in which each character satisfys one of the following:
 // 1. in { +, *, ? }
 // 2. in { c, d, e, ..., m, n } \ { h, k }
 REQUIRE(Regex8("@{[+*?]|[c-n]&![hk]}+").Match("cde+fm?n"));
 
 // Example of submatches tracking
-//     Each '&' defines a save point and can store a location in matched strings.
-// We can also use two save points to slice the matched strings.
+//     Each '&' defines a save point and can store a matched location.
+// We can use two save points to slice the matched string.
 auto result = Regex8("&abc&([def]|\\d)+&abc").Match("abcddee0099ff44abc");
 REQUIRE(result);
 REQUIRE(result(0, 1) == "abc");
