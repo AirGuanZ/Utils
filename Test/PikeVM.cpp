@@ -11,7 +11,7 @@ void P8(const WStr &str)
 
 void Gen(const WStr &str)
 {
-    uint32_t slotCount;
+    size_t slotCount;
     (void)PikeVM::Backend<WUTF>().Generate(
         PikeVM::Parser<WUTF>().Parse(str), &slotCount);
 }
@@ -60,23 +60,23 @@ TEST_CASE("VMEngEx")
         REQUIRE(Regex8(u8"ab.\\.c+").Match(u8"abe.cc"));
         REQUIRE(Regex8(u8"abc?").Match(u8"ab"));
         REQUIRE(Regex8(u8"ab[def]+").Match(u8"abdefdeffeddef"));
-        REQUIRE(Regex16(u8"½ñÌì(ÌìÆø)+²»´í°¡?\\?").Match(u8"½ñÌìÌìÆøÌìÆøÌìÆøÌìÆø²»´í?"));
+        REQUIRE(Regex16(u8"ä»Šå¤©(å¤©æ°”)+ä¸é”™å•Š?\\?").Match(u8"ä»Šå¤©å¤©æ°”å¤©æ°”å¤©æ°”å¤©æ°”ä¸é”™?"));
 
-        REQUIRE(Regex8(u8".*").Match(u8"½ñÌìÌìÆø²»´í°¡"));
-        REQUIRE(Regex8(u8"½ñÌì.*°¡").Match(u8"½ñÌìÌìÆø²»´í°¡"));
+        REQUIRE(Regex8(u8".*").Match(u8"ä»Šå¤©å¤©æ°”ä¸é”™å•Š"));
+        REQUIRE(Regex8(u8"ä»Šå¤©.*å•Š").Match(u8"ä»Šå¤©å¤©æ°”ä¸é”™å•Š"));
 
-        REQUIRE(Regex8(u8"½ñÌì{ 5 \t }ÌìÆø²»´í°¡").Match(L"½ñÌìÌìÌìÌìÌìÌìÆø²»´í°¡"));
-        REQUIRE(WRegex(L"½ñÌì{ 3 , 5 }Æø²»´í°¡").Match(u8"½ñÌìÌìÌìÆø²»´í°¡"));
-        REQUIRE(Regex16(u8"½ñÌì{3, 5\t}Æø²»´í°¡").Match(u8"½ñÌìÌìÌìÌìÆø²»´í°¡"));
-        REQUIRE(Regex32(u8"½ñÌì{3,\t5}Æø²»´í°¡").Match(u8"½ñÌìÌìÌìÌìÌìÆø²»´í°¡"));
+        REQUIRE(Regex8(u8"ä»Šå¤©{ 5 \t }å¤©æ°”ä¸é”™å•Š").Match(L"ä»Šå¤©å¤©å¤©å¤©å¤©å¤©æ°”ä¸é”™å•Š"));
+        REQUIRE(WRegex(L"ä»Šå¤©{ 3 , 5 }æ°”ä¸é”™å•Š").Match(u8"ä»Šå¤©å¤©å¤©æ°”ä¸é”™å•Š"));
+        REQUIRE(Regex16(u8"ä»Šå¤©{3, 5\t}æ°”ä¸é”™å•Š").Match(u8"ä»Šå¤©å¤©å¤©å¤©æ°”ä¸é”™å•Š"));
+        REQUIRE(Regex32(u8"ä»Šå¤©{3,\t5}æ°”ä¸é”™å•Š").Match(u8"ä»Šå¤©å¤©å¤©å¤©å¤©æ°”ä¸é”™å•Š"));
 
-        REQUIRE(!Regex8(u8"½ñÌì{3, 5}Æø²»´í°¡").Match(u8"½ñÌìÌìÆø²»´í°¡"));
-        REQUIRE(!Regex8(u8"½ñÌì{3, 5}Æø²»´í°¡").Match(u8"½ñÌìÌìÌìÌìÌìÌìÆø²»´í°¡"));
+        REQUIRE(!Regex8(u8"ä»Šå¤©{3, 5}æ°”ä¸é”™å•Š").Match(u8"ä»Šå¤©å¤©æ°”ä¸é”™å•Š"));
+        REQUIRE(!Regex8(u8"ä»Šå¤©{3, 5}æ°”ä¸é”™å•Š").Match(u8"ä»Šå¤©å¤©å¤©å¤©å¤©å¤©æ°”ä¸é”™å•Š"));
 
-        REQUIRE_THROWS(Regex8(u8"½ñÌì{2, 1}ÌìÆø²»´í°¡").Match(u8"½ñÌìÆø²»´í°¡"));
-        REQUIRE_THROWS(Regex8(u8"½ñÌì{0, 0}ÌìÆø²»´í°¡").Match(u8"½ñÌìÆø²»´í°¡"));
-        REQUIRE_THROWS(Regex8(u8"½ñÌì{0}ÌìÆø²»´í°¡").Match(u8"½ñÆø²»´í°¡"));
-        REQUIRE_NOTHROW(Regex8(u8"½ñÌì{0, 1}ÌìÆø²»´í°¡").Match(u8"½ñÌìÆø²»´í°¡"));
+        REQUIRE_THROWS(Regex8(u8"ä»Šå¤©{2, 1}å¤©æ°”ä¸é”™å•Š").Match(u8"ä»Šå¤©æ°”ä¸é”™å•Š"));
+        REQUIRE_THROWS(Regex8(u8"ä»Šå¤©{0, 0}å¤©æ°”ä¸é”™å•Š").Match(u8"ä»Šå¤©æ°”ä¸é”™å•Š"));
+        REQUIRE_THROWS(Regex8(u8"ä»Šå¤©{0}å¤©æ°”ä¸é”™å•Š").Match(u8"ä»Šæ°”ä¸é”™å•Š"));
+        REQUIRE_NOTHROW(Regex8(u8"ä»Šå¤©{0, 1}å¤©æ°”ä¸é”™å•Š").Match(u8"ä»Šå¤©æ°”ä¸é”™å•Š"));
 
         {
             auto m = Regex8(u8"&abc&(def)+&xyz&").Match(u8"abcdefdefxyz");
@@ -110,7 +110,7 @@ TEST_CASE("VMEngEx")
 
     SECTION("Search")
     {
-        REQUIRE(Regex8(u8"½ñÌìÌìÆø²»´í").Search(u8"GoodMorning½ñÌìÌìÆø²»´í°¡"));
+        REQUIRE(Regex8(u8"ä»Šå¤©å¤©æ°”ä¸é”™").Search(u8"GoodMorningä»Šå¤©å¤©æ°”ä¸é”™å•Š"));
 
         REQUIRE(Regex8(u8"b").Search(u8"abc"));
         REQUIRE(Regex16(u8"b+").Search(u8"abbbc"));
@@ -139,8 +139,8 @@ TEST_CASE("VMEngEx")
     {
         // Example of basic usage
         // Regex<...>::Match/Search returns a Result object which can be implicitly converted to  a boolean value indicating whether the match/search succeeds
-        REQUIRE(Regex8(u8"½ñÌìÌìÆø²»´íminecraft").Match(u8"½ñÌìÌìÆø²»´íminecraft"));
-        REQUIRE(Regex8(u8"²»´ímine").Search(u8"½ñÌìÌìÆø²»´íminecraft"));
+        REQUIRE(Regex8(u8"ä»Šå¤©å¤©æ°”ä¸é”™minecraft").Match(u8"ä»Šå¤©å¤©æ°”ä¸é”™minecraft"));
+        REQUIRE(Regex8(u8"ä¸é”™mine").Search(u8"ä»Šå¤©å¤©æ°”ä¸é”™minecraft"));
 
         // Example of boolean expression
         // Matches a non-empty string with each character satisfying one of the following:
