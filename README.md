@@ -1,6 +1,6 @@
-## Math
+## AGZ::Math
 
-Basic mathematica operations. Mainly used for graphics programming.
+Basic mathematical tools. Mainly used for graphics.
 
 ### Scalar
 
@@ -37,7 +37,7 @@ Mat4f inv_rotxy = Inverse(rotate_xy);                      // Inverse matrix
 
 ### Random
 
-Simplify using of random components in standard library.
+Simplify usage of random components in standard library.
 
 ```c++
 int x    = Uniform(1, 10);       // Sample an integer uniformly in [1, 10]
@@ -57,7 +57,7 @@ f32x4 c = Sqrt(a + b);
 Vec4f d = c.AsVec(); // d: (sqrt(3), sqrt(5), sqrt(7), sqrt(9))
 ```
 
-## Buffer
+## AGZ::Buf
 
 ```c++
 // Initialize buf with { 0, 1, 2, 3, ..., 7, 8, 9 }
@@ -75,13 +75,13 @@ auto buf21 = Buffer2D<int>::FromFn(
     100, 100, [](size_t x, size_t y){ return int(x * y); });
 ```
 
-## Endian
+## AGZ::Endian
 
 ```c++
 if constexpr(IS_LITTLE_ENDIAN)
-    ...
+    ; //...
 else
-    ...
+    ; //...
 
 // Assume using little endian
 uint32_t v1 = Native2Big((uint32_t)0x12345678);
@@ -90,16 +90,37 @@ assert(v1 == Native2Little(v1)); // Native-to-native calling does nothing
 assert(Big2Little(v1) == 0x12345678);
 ```
 
-## Range
+## AGZ::Range
 
-Between, Collect, Drop, Filter, Map, PartialFoldl, Reverse, Sequence, Take...
+### Features
+
++ Pipeline-like operations
++ Lots of pre-defined transformers: Between, Collect, Drop, Filter, Map, PartialFoldl, Reverse, Sequence, Take...
+
+| Transformer  | Semantics                                                    |
+| ------------ | ------------------------------------------------------------ |
+| All          | R \| All(f) is true iff forall e in R, s.t. f(e) is true     |
+| Any          | R \| Any(f) is true iff exists e in R, s.t. f(e) is true     |
+| Between      | Between(m, n, s) defines a sequence from m to n with step s (1 in default). |
+| Collect      | R \| Collect\<C\> collects all elements in R into a container with type C |
+| Count        | R \| Count() gives the total number of elements in R         |
+| CountIf      | R \| CountIf(f) gives the number of elements satisfying function f in R |
+| Drop         | R \| Drop(n) drops the first n elements of R                 |
+| DropWhile    | R \| DropWhile(f) keeps dropping leading elements of R until meeting the first element satisfying f |
+| Each         | R \| Each(f) calls f(e) for each e in R                      |
+| EachIndex    | R \| EachIndex(f) calls f(e, i) for each e in R with index i starting from 0 |
+| Filter       | No need to explain                                           |
+| Map          | No need to explain                                           |
+| PartualFoldl | Generic version of partial sum. See following examples for detailed usage. |
+| Reduce       | No need to explain                                           |
+| Reverse      | No need to explain                                           |
+| Seq          | Seq(n, s) defines a infinity sequence starting from m with step s (1 in default) |
+| Take         | R \| Take(n) takes the first n elements of R                 |
+| TakeWhile    | R \| TakeWhile(f) keeps taking leading elements of R until meeting the first element not satisfying f |
+
+### Examples
 
 ```cpp
-vector<int> v;
-for(auto i : Seq<int>(1) | Take(5))
-    v.push_back(i);
-REQUIRE(v == vector<int>{ 1, 2, 3, 4, 5 });
-
 v.clear();
 auto Square = [](int v) { return v * v; };
 for(auto i : Between(1, 6) | Map(Square))
@@ -108,12 +129,6 @@ REQUIRE(v == vector<int>{ 1, 4, 9, 16, 25 });
 
 auto addInt = [](int a, int b) { return a + b; };
 REQUIRE((Between(1, 4) | Reduce(0, addInt)) == 1 + 2 + 3);
-
-v.clear();
-auto IsEven = [](int v) { return v % 2 == 0; };
-for(auto i : Between(1, 7) | Filter(IsEven))
-    v.push_back(i);
-REQUIRE(v == vector<int>{ 2, 4, 6 });
 
 REQUIRE((Between(0, 100) | Count()) == 100);
 REQUIRE((Between(0, 100) | CountIf(IsEven)) == 50);
@@ -138,7 +153,7 @@ REQUIRE((Seq(1) | TakeWhile(isLessThan10) | Collect<vector<int>>())
      == vector<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 ```
 
-## String
+## AGZ::String
 
 A non-null-terminated immutable string class...Just for fun.
 
@@ -172,68 +187,53 @@ REQUIRE(Str8(u8" + ").Join(vector<Str8>{ u8"a", u8"b", u8"c" }) == u8"a + b + c"
 REQUIRE(Str8(u8"Minecraft").Find(u8"necraft") == 2);
 //...
 
-// Perfectly compatiable with Range components
+// Compatiable with Range components
 REQUIRE((Str8(u8"Mine cr aft ").Split()
         | Map([](const Str8::View &v) { return v.AsString(); })
         | Collect<vector<Str8>>())
      == vector<Str8>{ u8"Mine", u8"cr", u8"aft" });
 ```
 
-## Regex
+## AGZ::Regex
 
-- Various char encoding
+### Features
+
+- Various character encoding
+- Arbitary boolean computation in character matching
 - Flexible submatches tracking
 
-`ab`: concatenation
+| Syntax               | Semantics       | Syntax  | Semantics                   |
+| -------------------- | --------------- | ------- | --------------------------- |
+| ab                   | Concatenation   | a\|b    | Alternative                 |
+| [a-mM-Z?!]           | Character class | a+      | One or more                 |
+| ^                    | Beginning       | a*      | Zero or more                |
+| $                    | End             | a?      | Zero or one                 |
+| &                    | Save point      | .       | Any character               |
+| a{m}                 | m times         | a{m, n} | m to n times                |
+| @{([a-p]&!k)\|[?+*]} | Bool expression | \d      | Decimal digit               |
+| \c                   | A-Z and a-z     | \w      | A-Z, a-z, 0-9 or underscore |
+| \w                   | Whitespace      | \h      | Hexademical digit           |
 
-`a|b`: alternative
-
-`[abc]`: alternatives
-
-`a+`: one or more
-
-`a?`: zero or one
-
-`a*`: zero or more
-
-`^`, `$`: begin/end
-
-`&`: save point
-
-`.`: any character
-
-`a{m}`: m times
-
-`a{m, n}`: m to n times
-
-`<aq>`: character from a to q
-
-`<d>`: digit 0-9
-
-`<c>`: a-z A-Z
-
-`<w>`: alnum and _
-
-`<s>`: whitespace
-
-`<h>`: hex digit 0-9 a-f A-F
+### Examples
 
 ```cpp
-REQUIRE(Regex8("abc(def)+").Match("abcdefdefdef"));
-REQUIRE(Regex16("abc[def]+").Match("abcdddeeefffdef"));
-REQUIRE(Regex32("abc").Match("abd") == false);
-REQUIRE(Regex8("cde").Search("abcdef"));
-REQUIRE(Regex8("cDe").Search("abcdef") == false);
+// Example of basic usage
+// Regex<...>::Match/Search returns a Result object which can be implicitly converted to  a boolean value indicating whether the match/search succeeds
+REQUIRE(Regex8(u8"今天天气不错minecraft").Match(u8"今天天气不错minecraft"));
+REQUIRE(Regex8(u8"不错mine").Search(u8"今天天气不错minecraft"));
 
-{
-    auto m = Regex8("&abc&[def]*&xyz&").Match("abcddeeffxyz");
-    REQUIRE((m && m(0, 1) == "abc"
-               && m(1, 2) == "ddeeff"
-               && m(2, 3) == "xyz"));
-}
+// Example of boolean expression
+// Matches a non-empty string with each character satisfying one of the following:
+// 1. in { +, *, ? }
+// 2. in { c, d, e, ..., m, n } \ { h, k }
+REQUIRE(Regex8("@{[+*?]|[c-n]&![hk]}+").Match("cde+fm?n"));
 
-{
-    auto m = Regex8("&[def]+&").Search("abcddeeffxyz");
-    REQUIRE((m && m(0, 1) == "ddeeff"));
-}
+// Example of submatches tracking
+// Each '&' defines a save point and can store a location in matched strings. We can also use two save points to slice the matched strings.
+auto result = Regex8("&abc&([def]|\\d)+&abc").Match("abcddee0099ff44abc");
+REQUIRE(result);
+REQUIRE(result(0, 1) == "abc");
+REQUIRE(result(1, 2) == "ddee0099ff44");
+REQUIRE(result(0, 2) == "abcddee0099ff44");
 ```
+

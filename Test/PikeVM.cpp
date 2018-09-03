@@ -50,7 +50,7 @@ TEST_CASE("VMEngEx")
         REQUIRE_NOTHROW(Gen("abc\\d\\c\\w\\s\\h\\\\\\.\\\\\\...\\d"));
     }
 
-    SECTION("Machine")
+    SECTION("Match")
     {
         REQUIRE(Regex8(u8"abc").Match(u8"abc"));
         REQUIRE(!Regex8(u8"abc").Match(u8"ac"));
@@ -61,7 +61,6 @@ TEST_CASE("VMEngEx")
         REQUIRE(Regex8(u8"abc?").Match(u8"ab"));
         REQUIRE(Regex8(u8"ab[def]+").Match(u8"abdefdeffeddef"));
         REQUIRE(Regex16(u8"今天(天气)+不错啊?\\?").Match(u8"今天天气天气天气天气不错?"));
-        REQUIRE(Regex8(u8"今天天气不错").Search(u8"GoodMorning今天天气不错啊"));
 
         REQUIRE(Regex8(u8".*").Match(u8"今天天气不错啊"));
         REQUIRE(Regex8(u8"今天.*啊").Match(u8"今天天气不错啊"));
@@ -84,9 +83,6 @@ TEST_CASE("VMEngEx")
             REQUIRE((m && m(0, 1) == u8"abc" && m(1, 2) == u8"defdef" && m(2, 3) == u8"xyz"));
         }
 
-        REQUIRE(Regex8(u8"b").Search(u8"abc"));
-        REQUIRE(Regex16(u8"b+").Search(u8"abbbc"));
-
         REQUIRE(Regex8("mine|craft").Match("mine"));
         REQUIRE(Regex8("mine|craft").Match("craft"));
         REQUIRE(!Regex8("mine|craft").Match("minecraft"));
@@ -104,6 +100,22 @@ TEST_CASE("VMEngEx")
         REQUIRE(!Regex8("@{![a-z]}+").Match("abcDefg"));
 
         {
+            auto m = Regex8("&.*&\\.&@{!\\.}*&").Match("abc.x.y.z");
+            REQUIRE((m && m(0, 1) == "abc.x.y" && m(2, 3) == "z"));
+        }
+
+        REQUIRE(Regex8("@{[a-p]&[h-t]&!k|[+*?]}+").Match("hi?jl+mn*op"));
+        REQUIRE(!Regex8("@{[a-p]&[h-t]&!k}+").Match("hijklmnop"));
+    }
+
+    SECTION("Search")
+    {
+        REQUIRE(Regex8(u8"今天天气不错").Search(u8"GoodMorning今天天气不错啊"));
+
+        REQUIRE(Regex8(u8"b").Search(u8"abc"));
+        REQUIRE(Regex16(u8"b+").Search(u8"abbbc"));
+
+        {
             auto m = Regex8(u8"&b+&").Search(u8"abbbc");
             REQUIRE((m && m(0, 1) == u8"bbb"));
         }
@@ -119,15 +131,29 @@ TEST_CASE("VMEngEx")
             REQUIRE((n && n(0, 1) == "ddeeff"));
         }
 
-        {
-            auto m = Regex8("&.*&\\.&@{!\\.}*&").Match("abc.x.y.z");
-            REQUIRE((m && m(0, 1) == "abc.x.y" && m(2, 3) == "z"));
-        }
-
         REQUIRE(Regex8(u8"mine").Search(u8"abcminecraft"));
         REQUIRE(Regex32(u8"^mine").Search(u8"abcminecraft") == false);
+    }
 
-        REQUIRE(Regex8("@{[a-p]&[h-t]&!k}+").Match("hijlmnop"));
-        REQUIRE(!Regex8("@{[a-p]&[h-t]&!k}+").Match("hijklmnop"));
+    SECTION("README")
+    {
+        // Example of basic usage
+        // Regex<...>::Match/Search returns a Result object which can be implicitly converted to  a boolean value indicating whether the match/search succeeds
+        REQUIRE(Regex8(u8"今天天气不错minecraft").Match(u8"今天天气不错minecraft"));
+        REQUIRE(Regex8(u8"不错mine").Search(u8"今天天气不错minecraft"));
+
+        // Example of boolean expression
+        // Matches a non-empty string with each character satisfying one of the following:
+        // 1. in { +, *, ? }
+        // 2. in { c, d, e, ..., m, n } \ { h, k }
+        REQUIRE(Regex8("@{[+*?]|[c-n]&![hk]}+").Match("cde+fm?n"));
+
+        // Example of submatches tracking
+        // Each '&' defines a save point and can store a location in matched strings. We can also use two save points to slice the matched strings.
+        auto result = Regex8("&abc&([def]|\\d)+&abc").Match("abcddee0099ff44abc");
+        REQUIRE(result);
+        REQUIRE(result(0, 1) == "abc");
+        REQUIRE(result(1, 2) == "ddee0099ff44");
+        REQUIRE(result(0, 2) == "abcddee0099ff44");
     }
 }

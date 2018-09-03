@@ -162,7 +162,8 @@ private:
 
     void Compile() const
     {
-        prog_ = Backend<CS>().Generate(Parser<CS>().Parse(regex_), &slotCount_);
+        prog_ = Backend<CS>().Generate(
+            Parser<CS>().Parse(regex_), &slotCount_);
         regex_ = String<CS>();
         AGZ_ASSERT(prog_.Available() && prog_.Full());
     }
@@ -194,7 +195,8 @@ private:
                 pc + 1, cp, std::move(saves), reg, startIdx);
             break;
         case InstType::Save:
-            saves.Set(pc->dataSave.slot, state.cpr->CodeUnitIndex(state.cur));
+            saves.Set(pc->dataSave.slot,
+                      state.cpr->CodeUnitIndex(state.cur));
             AddThread(
                 state, thds, curStep,
                 pc + 1, cp, std::move(saves), reg, startIdx);
@@ -332,7 +334,8 @@ private:
                 startIdx);
             break;
         default:
-            thds.push_back(Thread<CP>(pc, std::move(saves), reg, startIdx));
+            thds.push_back(Thread<CP>(
+                pc, std::move(saves), reg, startIdx));
             break;
         }
     }
@@ -495,7 +498,8 @@ private:
                 case InstType::Match:
                     if constexpr(!AnchorEnd)
                     {
-                        state.matchedSaveSlots.emplace(std::move(th->saveSlots));
+                        state.matchedSaveSlots.emplace(
+                            std::move(th->saveSlots));
                         state.matchedStart = th->startIdx;
                         state.matchedEnd = cpr.CodeUnitIndex(state.cur);
                         rdyThds.clear();
