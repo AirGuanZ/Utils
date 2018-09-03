@@ -9,7 +9,7 @@
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="FileSys.cpp" />
     <ClCompile Include="Platform.cpp" />
-    <ClCompile Include="VMEngEx.cpp" />
+    <ClCompile Include="PikeVM.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Catch.hpp" />

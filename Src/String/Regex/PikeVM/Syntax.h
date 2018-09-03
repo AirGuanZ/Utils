@@ -52,7 +52,7 @@
                 (CharExpr)
 */
 
-AGZ_NS_BEG(AGZ::VMEngExImpl)
+AGZ_NS_BEG(AGZ::PikeVM)
 
 enum class ASTType
 {
@@ -280,7 +280,11 @@ private:
             newNode->dataRepeat.lst = sndNum;
         }
         else
+        {
+            if(!fstNum)
+                Error();
             newNode->dataRepeat.lst = fstNum;
+        }
 
         AdvanceOrErr('}');
         return ParseFacRest(newNode);
@@ -585,6 +589,7 @@ private:
             {
                 ErrIfEnd();
                 cp = Cur();
+                Advance();
                 switch(cp)
                 {
                 case '[':
@@ -603,7 +608,6 @@ private:
                 case '$':
                 case '&':
                 case '.':
-                    Advance();
                     break;
                 case 'd':
                     return NewNode(ASTType::CharDecDigit);
@@ -727,4 +731,4 @@ private:
     typename CodePointRange<CS>::Iterator cur_, end_;
 };
 
-AGZ_NS_END(AGZ::VMEngExImpl)
+AGZ_NS_END(AGZ::PikeVM)

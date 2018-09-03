@@ -7,7 +7,7 @@
 #include "Inst.h"
 #include "Syntax.h"
 
-AGZ_NS_BEG(AGZ::VMEngExImpl)
+AGZ_NS_BEG(AGZ::PikeVM)
 
 /*
     A|B =>    Branch(L0, L1)
@@ -204,7 +204,7 @@ public:
         return ret;
     }
 
-    const Inst<CP> &GetInst(size_t idx) const
+    Inst<CP> &GetInst(size_t idx)
     {
         AGZ_ASSERT(idx < instCount_);
         return insts_[idx];
@@ -212,13 +212,13 @@ public:
 
     const int32_t *GetRelativeOffsetArray(size_t instIdx) const
     {
-        AGZ_ASSERT(instIdx + 1 < instCount_);
+        AGZ_ASSERT(instIdx + 1 < Size());
         return &insts_[instIdx + 1].instArrUnit[0];
     }
 
     int32_t *GetRelativeOffsetArray(size_t instIdx)
     {
-        AGZ_ASSERT(instIdx + 1 < instCount_);
+        AGZ_ASSERT(instIdx + 1 < Size());
         return &insts_[instIdx + 1].instArrUnit[0];
     }
 
@@ -226,6 +226,21 @@ public:
     {
         AGZ_ASSERT(Available() && Size() < Capacity());
         return Size();
+    }
+
+    void ReinitLastSteps()
+    {
+        AGZ_ASSERT(Full());
+        for(uint32_t i = 0; i < instCount_; ++i)
+        {
+            if(insts_[i].type != InstType::Alter)
+                insts_[i].lastStep = std::numeric_limits<uint32_t>::max();
+            else
+            {
+                insts_[i].lastStep = std::numeric_limits<uint32_t>::max();
+                i += (insts_[i].dataAlter.count / 3) + (insts_[i].dataAlter.count / 3 != 0);
+            }
+        }
     }
 };
 
@@ -390,10 +405,12 @@ private:
         case ASTType::Save:
             if(canSave_)
             {
-                ++saveSlotCount_;
-                return EmitParamlessInst(InstType::Save);
+                prog_->Emit(NewInst(InstType::Save))
+                     ->dataSave.slot = saveSlotCount_++;
             }
-            Error();
+            else
+                Error();
+            return { };
         case ASTType::Cat:
             return GenerateCatImpl(node);
         case ASTType::Or:
@@ -458,6 +475,7 @@ private:
         AGZ_ASSERT(node && node->type == ASTType::Cat);
         auto bps = GenerateImpl(node->dataCat.dest[0]);
         FillBP(bps, prog_->GetNextInstIndex());
+        AGZ_ASSERT(bps.empty());
         return GenerateImpl(node->dataCat.dest[1]);
     }
 
@@ -510,6 +528,7 @@ private:
         jump->dataJump.offset = ComputeOffset(
             prog_->GetInstIndex(jump), prog_->GetInstIndex(branch));
 
+        AGZ_ASSERT(bps.empty());
         return { { prog_->GetInstIndex(branch),
                    &branch->dataBranch.dest[1] } };
     }
@@ -535,6 +554,7 @@ private:
         branch->dataBranch.dest[0] = ComputeOffset(
             prog_->GetInstIndex(branch), begin);
 
+        AGZ_ASSERT(bps.empty());
         return { { prog_->GetInstIndex(branch),
                    &branch->dataBranch.dest[1] } };
     }
@@ -594,6 +614,7 @@ private:
             FillBP(bps, prog_->GetNextInstIndex());
 
             auto alter = prog_->Emit(NewInst(InstType::Alter));
+            alter->dataAlter.count = num + 1;
             auto alterIdx = prog_->GetInstIndex(alter);
             for(uint32_t i = 0; i < num + 1; ++i)
                 prog_->EmitRelativeOffset();
@@ -632,6 +653,7 @@ private:
                 ->dataCharSingle.codePoint
                     = node->dataCharSingle.codePoint;
         }
+
         return { };
     }
 
@@ -704,6 +726,7 @@ private:
         auto endExpr = prog_->Emit(NewInst(InstType::CharExprEnd));
         FillBP(bps, prog_->GetInstIndex(endExpr));
 
+        AGZ_ASSERT(bps.empty());
         inCharExpr_ = false;
         return { };
     }
@@ -734,6 +757,7 @@ private:
 
         prog_->Emit(NewInst(InstType::CharExprSetTrue));
 
+        AGZ_ASSERT(bps.empty());
         return std::move(ret);
     }
 
@@ -763,9 +787,15 @@ private:
 
         prog_->Emit(NewInst(InstType::CharExprSetFalse));
 
+        AGZ_ASSERT(bps.empty());
         return std::move(ret);
     }
 
+    /*
+        !A
+            Inst(A)
+            bool_not
+    */
     BP GenerateCharExprNotImpl(const Node *node)
     {
         AGZ_ASSERT(node && node->type == ASTType::CharExprNot);
@@ -773,8 +803,9 @@ private:
         auto bps = GenerateImpl(node->dataCharExprNot.dest);
         FillBP(bps, prog_->GetNextInstIndex());
 
+        AGZ_ASSERT(bps.empty());
         return EmitParamlessInst(InstType::CharExprNot);
     }
 };
 
-AGZ_NS_END(AGZ::VMEngExImpl)
+AGZ_NS_END(AGZ::PikeVM)

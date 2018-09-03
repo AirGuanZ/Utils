@@ -6,8 +6,7 @@
 
 #include "../../Misc/Common.h"
 #include "../String/String.h"
-#include "VMEngEx.h"
-#include "VMEngine.h"
+#include "PikeVM.h"
 
 // Regular expression
 
@@ -138,7 +137,7 @@ private:
     std::vector<size_t> savePoints_;
 };
 
-template<typename CS, typename Eng = VMEngineImpl::Machine<CS>>
+template<typename CS, typename Eng = PikeVM::Machine<CS>>
 class Regex
 {
 public:

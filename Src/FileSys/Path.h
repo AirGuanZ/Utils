@@ -141,7 +141,7 @@ private:
 
     const Regexp &ExtRegex() const
     {
-        static const Regexp regex("&.*\\.&<^\\.\\.>+&");
+        static const Regexp regex("&.*\\.&@{!\\.}+&");
         return regex;
     }
 

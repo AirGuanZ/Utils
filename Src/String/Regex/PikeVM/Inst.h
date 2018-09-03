@@ -4,7 +4,7 @@
 
 #include "../../../Misc/Common.h"
 
-AGZ_NS_BEG(AGZ::VMEngExImpl)
+AGZ_NS_BEG(AGZ::PikeVM)
 
 enum class InstType : uint32_t
 {
@@ -31,7 +31,6 @@ enum class InstType : uint32_t
     CharExprSingle,     // Single character -> bool
     CharExprAny,        // Any character    -> true
     CharExprRange,      // Character range  -> bool
-
     CharExprDecDigit,
     CharExprHexDigit,
     CharExprAlpha,
@@ -86,4 +85,4 @@ static_assert(sizeof(Inst<char>)     == 4 * sizeof(int32_t));
 static_assert(sizeof(Inst<char16_t>) == 4 * sizeof(int32_t));
 static_assert(sizeof(Inst<char32_t>) == 4 * sizeof(int32_t));
 
-AGZ_NS_END(AGZ::VMEngExImpl)
+AGZ_NS_END(AGZ::PikeVM)
