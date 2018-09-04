@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../Misc/Common.h"
+#include "../Utils/Platform.h"
 #include "../Utils/Range.h"
 #include "../Utils/String.h"
 
@@ -111,6 +112,17 @@ public:
         return filename_;
     }
 
+    Str ToStr(SeperatorStyle style = Native)
+    {
+        return GetDirectoryStr(style) + filename_;
+    }
+
+    Str GetDirectoryStr(SeperatorStyle style = Native)
+    {
+        auto s = style == Windows ? "\\" : "/";
+        return Str(s).Join(dirs_) + s;
+    }
+
     void SetFilename(const StrView &filename) { filename_ = filename; }
 
     void SetFilename(const Str &filename = Str()) { filename_ = filename; }
@@ -135,6 +147,33 @@ public:
             filename_ = m(0, 1) + ext;
         else
             filename_ += "." + ext;
+    }
+
+    void Append(const Self &tail)
+    {
+        if(HasFilename())
+            throw ArgumentException("Append: invalid left operand");
+        if(tail.IsAbsolute())
+            throw ArgumentException("Append: invalid right operand");
+
+        dirs_.reserve(dirs_.size() + tail.dirs_.size());
+        for(const auto &s : tail.dirs_)
+            dirs_.push_back(s);
+        filename_ = tail.filename_;
+    }
+
+    Self operator+(const Self &rhs) const
+    {
+        Self ret = *this;
+        ret.Append(rhs);
+        return std::move(ret);
+    }
+
+    void ToAbsolute(SeperatorStyle style = Native)
+    {
+        if(IsAbsolute())
+            return;
+        *this = Self(Platform::GetWorkingDirectory(), false, style) + *this;
     }
 
 private:

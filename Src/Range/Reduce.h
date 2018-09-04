@@ -15,7 +15,7 @@ namespace RangeAux
         {
             remove_rcv_t<I> ret = init;
             for(auto &&val : range)
-                ret = func(ret, val);
+                ret = func(ret, std::forward<decltype(val)>(val));
             return std::move(ret);
         }
     };

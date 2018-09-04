@@ -22,5 +22,23 @@ TEST_CASE("FileSys")
 
         REQUIRE(WPath(L"abc.txt").GetExtension() == L"txt");
         REQUIRE(WPath(L"abc.txt.").GetExtension().Empty());
+
+        {
+            WPath p(L"A/B/C/a.b.txt");
+            p.SetExtension(L"rar");
+            REQUIRE(p.ToStr(WPath::Linux) == L"A/B/C/a.b.rar");
+        }
+
+        {
+            WPath p(L"A/B/C/a.b.txt.");
+            p.SetExtension(L"rar");
+            REQUIRE(p.ToStr(WPath::Linux) == L"A/B/C/a.b.txt..rar");
+        }
+
+        {
+            WPath p(L"今天天气不错\\你好啊\\", WPath::Windows);
+            p.ToAbsolute();
+            REQUIRE(p.IsAbsolute());
+        }
     }
 }

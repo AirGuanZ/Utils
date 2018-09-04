@@ -460,6 +460,9 @@ public:
     CharRange Chars() const && { return CharRange(*this, begin(), end()); }
 
     std::pair<const CodeUnit*, const CodeUnit*> BeginAndEnd() const { return storage_.BeginAndEnd(); }
+
+    template<typename RHS>
+    Self &operator+=(const RHS &rhs) { return *this = *this + rhs; }
 };
 
 template<typename CS>
