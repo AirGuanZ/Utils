@@ -104,7 +104,32 @@ public:
 
     bool IsAbsolute() const { return abs_; }
 
+    bool IsRelative() const { return !IsAbsolute(); }
+
     bool HasFilename() const { return !filename_.Empty(); }
+
+    bool IsDirectory() const { return !HasFilename(); }
+
+    bool HasParent() const
+    {
+        if(HasFilename())
+            return !dirs_.empty();
+        return dirs_.size() >= 2;
+    }
+
+    bool IsPrefixOf(const Self &parent) const
+    {
+        if(HasFilename())
+            return false;
+        if(dirs_.size() > parent.dirs_.size())
+            return false;
+        for(size_t i = 0; i < dirs_.size(); ++i)
+        {
+            if(dirs_[i] != parent.dirs_[i])
+                return false;
+        }
+        return true;
+    }
 
     StrView GetFilename() const
     {
@@ -123,9 +148,17 @@ public:
         return Str(s).Join(dirs_) + s;
     }
 
-    void SetFilename(const StrView &filename) { filename_ = filename; }
+    Self &SetFilename(const StrView &filename)
+    {
+        filename_ = filename;
+        return *this;
+    }
 
-    void SetFilename(const Str &filename = Str()) { filename_ = filename; }
+    Self &SetFilename(const Str &filename = Str())
+    {
+        filename_ = filename;
+        return *this;
+    }
 
     Str GetExtension() const
     {
@@ -134,12 +167,13 @@ public:
         return m ? Str(m(1, 2)) : Str();
     }
 
-    void SetExtension(const Str &ext)
+    Self &SetExtension(const Str &ext)
     {
         SetExtension(ext.AsView());
+        return *this;
     }
 
-    void SetExtension(const StrView &ext)
+    Self &SetExtension(const StrView &ext)
     {
         AGZ_ASSERT(HasFilename());
         auto m = ExtRegex().Match(filename_);
@@ -147,19 +181,81 @@ public:
             filename_ = m(0, 1) + ext;
         else
             filename_ += "." + ext;
+        return *this;
     }
 
-    void Append(const Self &tail)
+    Self &Append(const Self &tail)
     {
         if(HasFilename())
-            throw ArgumentException("Append: invalid left operand");
+            throw ArgumentException("Append: left operand with filename");
         if(tail.IsAbsolute())
-            throw ArgumentException("Append: invalid right operand");
+            throw ArgumentException("Append: absolute right operand");
 
         dirs_.reserve(dirs_.size() + tail.dirs_.size());
         for(const auto &s : tail.dirs_)
             dirs_.push_back(s);
         filename_ = tail.filename_;
+
+        return *this;
+    }
+
+    Self &ToAbsolute(SeperatorStyle style = Native)
+    {
+        if(IsAbsolute())
+            return *this;
+        return *this = Self(Platform::GetWorkingDirectory(), false, style)
+                     + *this;
+    }
+
+    Self &ToRelative(SeperatorStyle style = Native)
+    {
+        if(IsRelative())
+            return *this;
+
+        Self wd(Platform::GetWorkingDirectory(), false, style);
+        if(wd.IsPrefixOf(*this))
+        {
+            dirs_ = std::vector<Str>(dirs_.begin() + wd.dirs_.size(),
+                                     dirs_.end());
+        }
+
+        return *this;
+    }
+
+    Self &ToDirectory()
+    {
+        if(HasFilename())
+            filename_ = Str();
+        return *this;
+    }
+
+    Self &ToParent()
+    {
+        if(HasFilename())
+            filename_ = Str();
+        else
+        {
+            if(!dirs_.empty())
+                dirs_.pop_back();
+        }
+        return *this;
+    }
+
+    bool operator==(const Self &rhs) const
+    {
+        if(dirs_.size() != rhs.dirs_.size())
+            return false;
+        for(size_t i = 0; i < dirs_.size(); ++i)
+        {
+            if(dirs_[i] != rhs.dirs_[i])
+                return false;
+        }
+        return filename_ == rhs.filename_;
+    }
+
+    bool operator!=(const Self &rhs) const
+    {
+        return !(*this == rhs);
     }
 
     Self operator+(const Self &rhs) const
@@ -169,11 +265,9 @@ public:
         return ret;
     }
 
-    void ToAbsolute(SeperatorStyle style = Native)
+    Self &operator+=(const Self &rhs) const
     {
-        if(IsAbsolute())
-            return;
-        *this = Self(Platform::GetWorkingDirectory(), false, style) + *this;
+        return Append(rhs);
     }
 
 private:
