@@ -11,7 +11,7 @@ template<typename AllocFunc = void*(*)(size_t)>
 std::pair<size_t, unsigned char*> ReadBinaryFileRaw(
     const wchar_t *filename, AllocFunc &&func = &(std::malloc))
 {
-    std::ifstream fin(filename, std::ios::in);
+    std::ifstream fin(filename, std::ios::in | std::ios::binary);
     if(!fin)
         return { 0, nullptr };
 
