@@ -94,6 +94,12 @@ public:
     explicit OSException(const std::string &err) : Exception(err) { }
 };
 
+class FileException : public Exception
+{
+public:
+    explicit FileException(const std::string &err) : Exception(err) { }
+};
+
 template<typename T>
 using remove_rcv_t = std::remove_cv_t<std::remove_reference_t<T>>;
 

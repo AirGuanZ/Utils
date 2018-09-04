@@ -10,6 +10,7 @@
     <ClCompile Include="FileSys.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="PikeVM.cpp" />
+    <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Catch.hpp" />

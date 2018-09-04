@@ -181,9 +181,6 @@
     <ClInclude Include="..\Src\String\Charset\Charset.h">
       <Filter>String\Charset</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\String\String.h">
-      <Filter>String</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\String\String\StrAlgo.h">
       <Filter>String\String</Filter>
     </ClInclude>
@@ -238,8 +235,17 @@
     <ClInclude Include="..\Src\String\Regex\PikeVM.h">
       <Filter>String\Regex</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Texture\TexData2D.h">
+    <ClInclude Include="..\Src\Texture\Texture2D.h">
       <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Texture.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Texture\TextureFile.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\FileSys\Raw.h">
+      <Filter>FileSys</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

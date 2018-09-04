@@ -28,6 +28,7 @@
     <ClCompile Include="Range.cpp" />
     <ClCompile Include="PikeVM.cpp" />
     <ClCompile Include="String.cpp" />
+    <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Catch.hpp" />

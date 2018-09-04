@@ -2,11 +2,13 @@
 
 #include "../Misc/Common.h"
 
-AGZ_NS_BEG(AGZ)
+AGZ_NS_BEG(AGZ::Tex)
 
 template<typename PT>
-class TexData2D
+class Texture2D
 {
+    friend class TextureFile;
+
     uint32_t width_;
     uint32_t height_;
 
@@ -20,24 +22,57 @@ class TexData2D
         ::operator delete(data_);
     }
 
+    AGZ_FORCEINLINE uint32_t Index(uint32_t x, uint32_t y) const
+    {
+        AGZ_ASSERT(IsAvailable() && x < width_ && y < height_);
+        return y * width_ + x;
+    }
+
 public:
 
     using Pixel = PT;
-    using Self  = TexData2D<Pixel>;
+    using Self  = Texture2D<Pixel>;
 
-    TexData2D()
+    Texture2D()
         : width_(0), height_(0), data_(nullptr)
     {
         
     }
 
-    TexData2D(const Self &copyFrom)
+    Texture2D(uint32_t w, uint32_t h, const Pixel &initValue = Pixel())
+        : Texture2D(w, h, UNINITIALIZED)
+    {
+        AGZ_ASSERT(w > 0 && h > 0);
+
+        uint32_t cnt = w * h, i = 0;
+        try
+        {
+            for(; i < cnt; ++i)
+                new(data_ + i) Pixel(initValue);
+        }
+        catch(...)
+        {
+            for(uint32_t j = 0; j < i; ++j)
+                (data_ + j)->~PT();
+            ::operator delete(data_);
+            throw;
+        }
+    }
+
+    Texture2D(uint32_t w, uint32_t h, Uninitialized_t)
+        : width_(w), height_(h)
+    {
+        AGZ_ASSERT(w > 0 && h > 0);
+        data_ = static_cast<Pixel*>(::operator new(sizeof(Pixel) * w * h));
+    }
+
+    Texture2D(const Self &copyFrom)
         : width_(copyFrom.width_), height_(copyFrom.height_)
     {
         if(copyFrom.IsAvailable())
         {
             uint32_t cnt = width_ * height_;
-            data_ = ::operator new(sizeof(Pixel) * cnt);
+            data_ = static_cast<Pixel*>(::operator new(sizeof(Pixel) * cnt));
 
             uint32_t i = 0;
             try
@@ -57,7 +92,7 @@ public:
             data_ = nullptr;
     }
 
-    TexData2D(Self &&moveFrom) noexcept
+    Texture2D(Self &&moveFrom) noexcept
         : width_(moveFrom.width_), height_(moveFrom.height_),
           data_(moveFrom.data_)
     {
@@ -81,7 +116,7 @@ public:
         return *this;
     }
 
-    ~TexData2D()
+    ~Texture2D()
     {
         if(IsAvailable())
             UncheckedRelease();
@@ -106,6 +141,36 @@ public:
             data_ = nullptr;
         }
     }
+
+    void Clear(const Pixel &value)
+    {
+        AGZ_ASSERT(IsAvailable());
+        uint32_t cnt = width_ * height_;
+        for(uint32_t i = 0; i < cnt; ++i)
+            data_[i] = value;
+    }
+
+    Pixel &operator()(uint32_t x, uint32_t y)
+    {
+        AGZ_ASSERT(IsAvailable());
+        return data_[Index(x, y)];
+    }
+
+    const Pixel &operator()(uint32_t x, uint32_t y) const
+    {
+        AGZ_ASSERT(IsAvailable());
+        return data_[Index(x, y)];
+    }
+
+    uint32_t GetWidth() const
+    {
+        return width_;
+    }
+
+    uint32_t GetHeight() const
+    {
+        return height_;
+    }
 };
 
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::Tex)

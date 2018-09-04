@@ -20,4 +20,7 @@ int main(int argc, char* argv[])
 }
 
 #define AGZ_PLATFORM_IMPL
+#define AGZ_TEXTURE_FILE_IMPL
+
 #include <Utils/Platform.h>
+#include <Utils/Texture.h>

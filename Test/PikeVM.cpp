@@ -1,4 +1,4 @@
-#include <Utils/String.h>
+﻿#include <Utils/String.h>
 
 #include "Catch.hpp"
 

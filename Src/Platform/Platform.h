@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Misc/Common.h"
-#include "../String/String.h"
+#include "../Utils/String.h"
 
 AGZ_NS_BEG(AGZ)
 

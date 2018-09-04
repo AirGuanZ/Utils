@@ -2,7 +2,7 @@
 
 #include "Catch.hpp"
 
-using namespace AGZ;
+using namespace AGZ::FileSys;
 
 TEST_CASE("FileSys")
 {

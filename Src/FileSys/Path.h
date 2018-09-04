@@ -4,9 +4,9 @@
 
 #include "../Misc/Common.h"
 #include "../Utils/Range.h"
-#include "../String/String.h"
+#include "../Utils/String.h"
 
-AGZ_NS_BEG(AGZ)
+AGZ_NS_BEG(AGZ::FileSys)
 
 template<typename CS>
 class Path
@@ -156,4 +156,4 @@ using Path32 = Path<UTF32<>>;
 using WPath  = Path<WUTF>;
 using APath  = Path<ASCII<>>;
 
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::FileSys)

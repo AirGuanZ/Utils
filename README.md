@@ -237,4 +237,3 @@ REQUIRE(result(0, 1) == "abc");
 REQUIRE(result(1, 2) == "ddee0099ff44");
 REQUIRE(result(0, 2) == "abcddee0099ff44");
 ```
-

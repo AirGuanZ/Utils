@@ -46,7 +46,7 @@ using Color4b = Color4<uint8_t>;
 
 namespace COLOR
 {
-    COLOR_CONST(VOID,  0.0, 0.0, 0.0, 0.0, 0,   0,   0,   0);
+    COLOR_CONST(VOIDC,  0.0, 0.0, 0.0, 0.0, 0,   0,   0,   0);
     COLOR_CONST(BLACK, 0.0, 0.0, 0.0, 1.0, 0,   0,   0,   255);
     COLOR_CONST(WHITE, 1.0, 1.0, 1.0, 1.0, 255, 255, 255, 255);
     COLOR_CONST(RED,   1.0, 0.0, 0.0, 1.0, 255, 0,   0,   255);

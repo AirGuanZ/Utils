@@ -24,8 +24,8 @@ const unsigned char *BoyerMooreHorspool(const unsigned char *beg,
     //
     // alignOffset and alignFactor are meaningful only when
     // the value of beg is not aligned as AlignBytes.
-    // If this requirement can be guaranteed, this two variables
-    // must be 0 and can be deleted from this code.
+    // If this requirement can be guaranteed, these two variables
+    // must be 0 and can be eliminated.
     //
     // Believe that the compiler will do sufficient constant propagation
     // when AlignBytes == 0

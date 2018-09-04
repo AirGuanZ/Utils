@@ -88,7 +88,7 @@ TEST_CASE("Math")
 
     SECTION("Color")
     {
-        REQUIRE(ApproxEq((Color4f)COLOR::VOID, Color4f(0.f, 0.f, 0.f, 0.f), 1e-10f));
+        REQUIRE(ApproxEq((Color4f)COLOR::VOIDC, Color4f(0.f, 0.f, 0.f, 0.f), 1e-10f));
         REQUIRE(ApproxEq((Color4f)COLOR::RED, Color4f(1.f, 0.f, 0.f, 1.f), 1e-10f));
         REQUIRE(ApproxEq((Color4f)COLOR::GREEN, Color4f(0.f, 1.f, 0.f, 1.f), 1e-10f));
 

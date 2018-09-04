@@ -4,6 +4,7 @@
 #include "Catch.hpp"
 
 using namespace AGZ;
+using namespace FileSys;
 
 TEST_CASE("Platform")
 {
