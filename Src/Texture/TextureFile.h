@@ -27,7 +27,7 @@ public:
 
 AGZ_NS_END(AGZ::Tex)
 
-#ifdef AGZ_TEXTURE_FILE_IMPL
+#if defined(AGZ_TEXTURE_FILE_IMPL)
 
 #include <vector>
 
@@ -36,7 +36,7 @@ AGZ_NS_END(AGZ::Tex)
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #define STBI_MSC_SECURE_CRT
 #endif
 

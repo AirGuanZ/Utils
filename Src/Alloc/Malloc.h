@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #include <malloc.h>
 #else
 #include <cstdlib>
@@ -15,7 +15,7 @@ AGZ_NS_BEG(AGZ)
 // Aligned memory allocation
 
 // MSVC doesn't implement std::aligned_alloc/free
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
     AGZ_FORCEINLINE void *aligned_alloc(size_t align, size_t size)
     {
         return ::_aligned_malloc(size, align);

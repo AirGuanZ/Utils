@@ -14,9 +14,9 @@ public:
 
 AGZ_NS_END(AGZ)
 
-#ifdef AGZ_PLATFORM_IMPL
+#if defined(AGZ_PLATFORM_IMPL)
 
-#ifdef AGZ_OS_WIN32
+#if defined(AGZ_OS_WIN32)
 
 #include <vector>
 #include <Windows.h>
@@ -35,7 +35,7 @@ AGZ_NS_BEG(AGZ)
 
 WStr Platform::GetWorkingDirectory()
 {
-#ifdef AGZ_OS_WIN32
+#if defined(AGZ_OS_WIN32)
 
     DWORD len = GetCurrentDirectory(0, NULL);
     std::vector<wchar_t> buf(len + 1);

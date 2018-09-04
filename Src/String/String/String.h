@@ -27,7 +27,7 @@ enum class NativeCharset
 template<typename E>
 class RefCountedBuf
 {
-#ifdef AGZ_THREAD_SAFE_STRING
+#if defined(AGZ_THREAD_SAFE_STRING)
     std::atomic<size_t> refs_;
 #else
     size_t refs_;

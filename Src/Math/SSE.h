@@ -3,7 +3,7 @@
 #include "../Misc/Common.h"
 #include "../Misc/Config.h"
 
-#ifdef AGZ_USE_SSE2
+#if defined(AGZ_USE_SSE2)
 
 #include <emmintrin.h>
 

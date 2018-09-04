@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 
 #define AGZ_INLINE inline
 #define AGZ_FORCEINLINE __forceinline
@@ -22,7 +22,7 @@
 #define AGZ_ASSERT(X) assert(X)
 
 #ifndef __BYTE_ORDER__
-    #ifdef _MSC_VER
+    #if defined(_MSC_VER)
         // Platform supporting MSVC must use little endian
         #define AGZ_LITTLE_ENDIAN
     #else
@@ -31,7 +31,7 @@
     #endif
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32)
     #define AGZ_OS_WIN32
 #elif defined(__linux)
     // IMPROVE
@@ -42,7 +42,7 @@ AGZ_NS_BEG(AGZ)
 
 [[noreturn]] AGZ_FORCEINLINE void Unreachable()
 {
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
     __assume(0);
 #elif defined(__GUNC__)
     __builtin_unreachable();

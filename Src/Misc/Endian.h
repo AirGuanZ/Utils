@@ -6,7 +6,7 @@ AGZ_NS_BEG(AGZ::Endian)
 
 enum class Endian { Big, Little };
 
-#ifdef __BYTE_ORDER__
+#if defined(__BYTE_ORDER__)
 constexpr bool IS_LITTLE_ENDIAN = __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__;
 #elif defined(AGZ_BIG_ENDIAN)
 constexpr bool IS_LITTLE_ENDIAN = false;
