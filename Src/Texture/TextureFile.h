@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "../Misc/Common.h"
 #include "../Utils/Math.h"
 #include "Texture2D.h"
@@ -11,17 +13,17 @@ class TextureFile
 public:
 
     static Texture2D<Math::Color3b> LoadRGBFromFile(
-        const wchar_t *filename);
+        const char *filename);
 
     static Texture2D<Math::Color4b> LoadRGBAFromFile(
-        const wchar_t *filename);
+        const char *filename);
 
     static void WriteRGBToPNG(
-        const wchar_t *filename,
+        const char *filename,
         const Texture2D<Math::Color3b> &tex);
 
     static void WriteRGBAToPNG(
-        const wchar_t *filename,
+        const char *filename,
         const Texture2D<Math::Color4b> &tex);
 };
 
@@ -46,7 +48,7 @@ AGZ_NS_END(AGZ::Tex)
 AGZ_NS_BEG(AGZ::Tex)
 
 Texture2D<Math::Color3b> TextureFile::LoadRGBFromFile(
-    const wchar_t *filename)
+    const char *filename)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
@@ -79,11 +81,11 @@ Texture2D<Math::Color3b> TextureFile::LoadRGBFromFile(
     stbi_image_free(bytes);
     FileSys::DefaultlyReleaseRawBinaryFileContent(content);
 
-    return std::move(ret);
+    return ret;
 }
 
 Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
-    const wchar_t *filename)
+    const char *filename)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
@@ -117,7 +119,7 @@ Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
     stbi_image_free(bytes);
     FileSys::DefaultlyReleaseRawBinaryFileContent(content);
 
-    return std::move(ret);
+    return ret;
 }
 
 namespace
@@ -138,7 +140,7 @@ namespace
 }
 
 void TextureFile::WriteRGBToPNG(
-    const wchar_t *filename,
+    const char *filename,
     const Texture2D<Math::Color3b> &tex)
 {
     AGZ_ASSERT(filename && tex);
@@ -158,7 +160,7 @@ void TextureFile::WriteRGBToPNG(
 }
 
 void TextureFile::WriteRGBAToPNG(
-    const wchar_t *filename,
+    const char *filename,
     const Texture2D<Math::Color4b> &tex)
 {
     AGZ_ASSERT(filename && tex);

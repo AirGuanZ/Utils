@@ -1,4 +1,4 @@
-#include <Utils/FileSys.h>
+ï»¿#include <Utils/FileSys.h>
 
 #include "Catch.hpp"
 
@@ -36,7 +36,7 @@ TEST_CASE("FileSys")
         }
 
         {
-            WPath p(L"½ñÌìÌìÆø²»´í\\ÄãºÃ°¡\\", WPath::Windows);
+            WPath p(L"ä»Šå¤©å¤©æ°”ä¸é”™\\ä½ å¥½å•Š\\", WPath::Windows);
             p.ToAbsolute();
             REQUIRE(p.IsAbsolute());
         }
