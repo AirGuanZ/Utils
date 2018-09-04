@@ -9,9 +9,10 @@ AGZ_NS_BEG(AGZ::FileSys)
 
 template<typename AllocFunc = void*(*)(size_t)>
 std::pair<size_t, unsigned char*> ReadBinaryFileRaw(
-    const char *filename, AllocFunc &&func = &(std::malloc))
+    const WStr &filename, AllocFunc &&func = &(std::malloc))
 {
-    std::ifstream fin(filename, std::ios::in | std::ios::binary);
+    std::ifstream fin(filename.ToPlatformString().c_str(),
+                      std::ios::in | std::ios::binary);
     if(!fin)
         return { 0, nullptr };
 
@@ -32,9 +33,10 @@ AGZ_FORCEINLINE void DefaultlyReleaseRawBinaryFileContent(unsigned char *ptr)
 }
 
 inline bool WriteBinaryFileRaw(
-    const char *filename, const unsigned char *data, size_t len)
+    const WStr &filename, const unsigned char *data, size_t len)
 {
-    std::ofstream fout(filename, std::ios::binary | std::ios::trunc);
+    std::ofstream fout(filename.ToPlatformString().c_str(),
+                       std::ios::binary | std::ios::trunc);
     if(!fout)
         return false;
     fout.write(reinterpret_cast<const char*>(data), len);

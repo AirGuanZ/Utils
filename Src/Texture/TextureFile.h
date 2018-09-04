@@ -4,6 +4,7 @@
 
 #include "../Misc/Common.h"
 #include "../Utils/Math.h"
+#include "../Utils/String.h"
 #include "Texture2D.h"
 
 AGZ_NS_BEG(AGZ::Tex)
@@ -13,17 +14,17 @@ class TextureFile
 public:
 
     static Texture2D<Math::Color3b> LoadRGBFromFile(
-        const char *filename);
+        const WStr &filename);
 
     static Texture2D<Math::Color4b> LoadRGBAFromFile(
-        const char *filename);
+        const WStr &filename);
 
     static void WriteRGBToPNG(
-        const char *filename,
+        const WStr &filename,
         const Texture2D<Math::Color3b> &tex);
 
     static void WriteRGBAToPNG(
-        const char *filename,
+        const WStr &filename,
         const Texture2D<Math::Color4b> &tex);
 };
 
@@ -48,7 +49,7 @@ AGZ_NS_END(AGZ::Tex)
 AGZ_NS_BEG(AGZ::Tex)
 
 Texture2D<Math::Color3b> TextureFile::LoadRGBFromFile(
-    const char *filename)
+    const WStr &filename)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
@@ -85,7 +86,7 @@ Texture2D<Math::Color3b> TextureFile::LoadRGBFromFile(
 }
 
 Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
-    const char *filename)
+    const WStr &filename)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
@@ -140,10 +141,10 @@ namespace
 }
 
 void TextureFile::WriteRGBToPNG(
-    const char *filename,
+    const WStr &filename,
     const Texture2D<Math::Color3b> &tex)
 {
-    AGZ_ASSERT(filename && tex);
+    AGZ_ASSERT(tex);
 
     std::vector<unsigned char> data;
     BufferContext bc = { &data };
@@ -160,10 +161,10 @@ void TextureFile::WriteRGBToPNG(
 }
 
 void TextureFile::WriteRGBAToPNG(
-    const char *filename,
+    const WStr &filename,
     const Texture2D<Math::Color4b> &tex)
 {
-    AGZ_ASSERT(filename && tex);
+    AGZ_ASSERT(tex);
 
     std::vector<unsigned char> data;
     BufferContext bc = { &data };

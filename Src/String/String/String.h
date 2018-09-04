@@ -315,6 +315,12 @@ public:
     std::string ToStdString(NativeCharset cs = NativeCharset::UTF8)  const;
     std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const;
 
+#if defined(AGZ_OS_WIN32)
+    std::wstring ToPLatformString() const { return ToStdWString(); }
+#else
+    std::string ToPlatformString() const { return ToStdString(); }
+#endif
+
     Iterator begin() const;
     Iterator end()   const;
 
@@ -450,6 +456,12 @@ public:
     std::string ToStdString(NativeCharset cs   = NativeCharset::UTF8) const { return AsView().ToStdString(cs); }
     std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const { return AsView().ToStdWString(cs); }
 
+#if defined(AGZ_OS_WIN32)
+    std::wstring ToPLatformString() const { return ToStdWString(); }
+#else
+    std::string ToPlatformString() const { return ToStdString(); }
+#endif
+
     Iterator begin() const;
     Iterator end()   const;
 
@@ -553,6 +565,12 @@ using Str16 = String<UTF16<>>;
 using Str32 = String<UTF32<>>;
 using AStr  = String<ASCII<>>;
 using WStr  = String<WUTF>;
+
+#ifdef AGZ_OS_WIN32
+using PStr = WStr;
+#else
+using PStr = Str8;
+#endif
 
 using StrView8  = StringView<UTF8<>>;
 using StrView16 = StringView<UTF16<>>;
