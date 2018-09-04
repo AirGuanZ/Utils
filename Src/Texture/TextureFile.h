@@ -54,7 +54,7 @@ Texture2D<Math::Color3b> TextureFile::LoadRGBFromFile(
 
     int w, h, channels;
     unsigned char *bytes = stbi_load_from_memory(
-        content, len, &w, &h, &channels, STBI_rgb);
+        content, static_cast<int>(len), &w, &h, &channels, STBI_rgb);
     if(!bytes)
     {
         FileSys::DefaultlyReleaseRawBinaryFileContent(content);
@@ -91,7 +91,7 @@ Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
 
     int w, h, channels;
     unsigned char *bytes = stbi_load_from_memory(
-        content, len, &w, &h, &channels, STBI_rgb_alpha);
+        content, static_cast<int>(len), &w, &h, &channels, STBI_rgb_alpha);
     if(!bytes)
     {
         FileSys::DefaultlyReleaseRawBinaryFileContent(content);

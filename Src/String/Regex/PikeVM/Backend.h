@@ -187,7 +187,7 @@ public:
         AGZ_ASSERT(Available() && inst);
         AGZ_ASSERT(inst >= &insts_[0]);
         AGZ_ASSERT(static_cast<uint32_t>(inst - &insts_[0]) < instCount_);
-        return inst - insts_;
+        return static_cast<uint32_t>(inst - insts_);
     }
 
     int32_t *EmitRelativeOffset(int32_t value = 0)
@@ -406,7 +406,7 @@ private:
             if(canSave_)
             {
                 prog_->Emit(NewInst(InstType::Save))
-                     ->dataSave.slot = saveSlotCount_++;
+                     ->dataSave.slot = static_cast<uint32_t>(saveSlotCount_++);
             }
             else
                 Error();
