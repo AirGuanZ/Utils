@@ -211,9 +211,6 @@
     <ClInclude Include="..\Src\Utils\String.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\FileSys\Path.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Platform\Platform.h">
       <Filter>Platform</Filter>
     </ClInclude>
@@ -243,6 +240,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\Texture\TextureFile.h">
       <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\FileSys\BinaryFileView.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\FileSys\Path.h">
+      <Filter>FileSys</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\FileSys\Raw.h">
       <Filter>FileSys</Filter>

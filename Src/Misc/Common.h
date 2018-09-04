@@ -38,6 +38,18 @@
     #define AGZ_OS_LINUX
 #endif
 
+#if defined(AGZ_ALL_IMPL)
+
+#if not defined(AGZ_PLATFORM_IMPL)
+#define AGZ_PLATFORM_IMPL
+#endif
+
+#if not defined(AGZ_TEXTURE_FILE_IMPL)
+#define AGZ_TEXTURE_FILE_IMPL
+#endif
+
+#endif
+
 AGZ_NS_BEG(AGZ)
 
 [[noreturn]] AGZ_FORCEINLINE void Unreachable()

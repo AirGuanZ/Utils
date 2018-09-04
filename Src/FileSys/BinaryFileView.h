@@ -19,13 +19,13 @@ public:
 
     }
 
-    BinaryFileView(std::ifstream &fin)
+    explicit BinaryFileView(std::ifstream &fin)
         : BinaryFileView()
     {
         SetFile(fin);
     }
 
-    BinaryFileView(std::ofstream &fout)
+    explicit BinaryFileView(std::ofstream &fout)
         : BinaryFileView()
     {
         SetFile(fout);

@@ -316,7 +316,7 @@ public:
     std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const;
 
 #if defined(AGZ_OS_WIN32)
-    std::wstring ToPLatformString() const { return ToStdWString(); }
+    std::wstring ToPlatformString() const { return ToStdWString(); }
 #else
     std::string ToPlatformString() const { return ToStdString(); }
 #endif
@@ -457,7 +457,7 @@ public:
     std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const { return AsView().ToStdWString(cs); }
 
 #if defined(AGZ_OS_WIN32)
-    std::wstring ToPLatformString() const { return ToStdWString(); }
+    std::wstring ToPlatformString() const { return ToStdWString(); }
 #else
     std::string ToPlatformString() const { return ToStdString(); }
 #endif

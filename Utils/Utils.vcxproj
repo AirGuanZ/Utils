@@ -25,6 +25,7 @@
     <ClInclude Include="..\Src\Buffer\Buffer.h" />
     <ClInclude Include="..\Src\Buffer\Buffer2D.h" />
     <ClInclude Include="..\Src\Buffer\COWObject.h" />
+    <ClInclude Include="..\Src\FileSys\BinaryFileView.h" />
     <ClInclude Include="..\Src\FileSys\Path.h" />
     <ClInclude Include="..\Src\FileSys\Raw.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />
