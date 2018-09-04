@@ -15,16 +15,33 @@ public:
 
     static Texture2D<Math::Color4b> LoadRGBAFromFile(
         const wchar_t *filename);
+
+    static void WriteRGBToPNG(
+        const wchar_t *filename,
+        const Texture2D<Math::Color3b> &tex);
+
+    static void WriteRGBAToPNG(
+        const wchar_t *filename,
+        const Texture2D<Math::Color4b> &tex);
 };
 
 AGZ_NS_END(AGZ::Tex)
 
 #ifdef AGZ_TEXTURE_FILE_IMPL
 
+#include <vector>
+
 #include "../Utils/FileSys.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
+#ifdef _MSC_VER
+#define STBI_MSC_SECURE_CRT
+#endif
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
 AGZ_NS_BEG(AGZ::Tex)
 
@@ -101,6 +118,63 @@ Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
     FileSys::DefaultlyReleaseRawBinaryFileContent(content);
 
     return std::move(ret);
+}
+
+namespace
+{
+    struct BufferContext
+    {
+        std::vector<unsigned char> *data;
+    };
+
+    void buffer_func(void *context, void *data, int size)
+    {
+        auto bc = reinterpret_cast<BufferContext*>(context);
+        AGZ_ASSERT(bc && bc->data);
+        size_t oldSize = bc->data->size();
+        bc->data->resize(oldSize + size);
+        std::memcpy(bc->data->data() + oldSize, data, size);
+    }
+}
+
+void TextureFile::WriteRGBToPNG(
+    const wchar_t *filename,
+    const Texture2D<Math::Color3b> &tex)
+{
+    AGZ_ASSERT(filename && tex);
+
+    std::vector<unsigned char> data;
+    BufferContext bc = { &data };
+    if(!stbi_write_png_to_func(
+            buffer_func, &bc,
+            tex.GetWidth(), tex.GetHeight(),
+            3, &tex(0, 0), 0))
+    {
+        throw FileException("Failed to construct PNG file in memory");
+    }
+
+    if(!FileSys::WriteBinaryFileRaw(filename, data.data(), data.size()))
+        throw FileException("Failed to write to PNG file");
+}
+
+void TextureFile::WriteRGBAToPNG(
+    const wchar_t *filename,
+    const Texture2D<Math::Color4b> &tex)
+{
+    AGZ_ASSERT(filename && tex);
+
+    std::vector<unsigned char> data;
+    BufferContext bc = { &data };
+    if(!stbi_write_png_to_func(
+        buffer_func, &bc,
+        tex.GetWidth(), tex.GetHeight(),
+        4, &tex(0, 0), 0))
+    {
+        throw FileException("Failed to construct PNG file in memory");
+    }
+
+    if(!FileSys::WriteBinaryFileRaw(filename, data.data(), data.size()))
+        throw FileException("Failed to write to PNG file");
 }
 
 AGZ_NS_END(AGZ::Tex)

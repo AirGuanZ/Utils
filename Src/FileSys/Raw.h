@@ -31,4 +31,16 @@ AGZ_FORCEINLINE void DefaultlyReleaseRawBinaryFileContent(unsigned char *ptr)
     std::free(ptr);
 }
 
+inline bool WriteBinaryFileRaw(
+    const wchar_t *filename,
+    const unsigned char *data, size_t len)
+{
+    std::ofstream fout(filename, std::ios::binary | std::ios::trunc);
+    if(!fout)
+        return false;
+    fout.write(reinterpret_cast<const char*>(data), len);
+    fout.close();
+    return true;
+}
+
 AGZ_NS_END(AGZ::FileSys)
