@@ -166,7 +166,7 @@ public:
     {
         Self ret = *this;
         ret.Append(rhs);
-        return std::move(ret);
+        return ret;
     }
 
     void ToAbsolute(SeperatorStyle style = Native)

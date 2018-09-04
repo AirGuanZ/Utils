@@ -21,7 +21,7 @@ namespace RangeAux
              C ret;
              for(auto &&val : range)
                 ret.push_back(std::forward<decltype(val)>(val));
-            return std::move(ret);
+            return ret;
         }
     };
 
@@ -34,7 +34,7 @@ namespace RangeAux
              C ret;
              for(auto &&v : range)
                 ret.insert(std::forward<decltype(v)>(v));
-            return std::move(ret);
+            return ret;
         }
     };
 

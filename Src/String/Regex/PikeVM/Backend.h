@@ -496,7 +496,7 @@ private:
             prog_->GetInstIndex(branch), prog_->GetNextInstIndex());
         ret.splice(ret.end(), GenerateImpl(node->dataOr.dest[1]));
 
-        return std::move(ret);
+        return ret;
     }
 
     /*
@@ -570,7 +570,7 @@ private:
 
         ret.push_back({ prog_->GetInstIndex(branch),
                         &branch->dataBranch.dest[1] });
-        return std::move(ret);
+        return ret;
     }
 
     /*
@@ -628,7 +628,7 @@ private:
         }
 
         SetSaving(oldCanSave);
-        return std::move(bps);
+        return bps;
     }
 
     BP GenerateCharSingleImpl(const Node *node)
@@ -705,7 +705,7 @@ private:
             prog_->Emit(NewInst(InstType::CharExprEnd));
         }
 
-        return std::move(bps);
+        return bps;
     }
 
     BP GenerateCharExprImpl(const Node *node)
@@ -752,7 +752,7 @@ private:
         prog_->Emit(NewInst(InstType::CharExprSetTrue));
 
         AGZ_ASSERT(bps.empty());
-        return std::move(ret);
+        return ret;
     }
 
     /*
@@ -782,7 +782,7 @@ private:
         prog_->Emit(NewInst(InstType::CharExprSetFalse));
 
         AGZ_ASSERT(bps.empty());
-        return std::move(ret);
+        return ret;
     }
 
     /*

@@ -725,7 +725,7 @@ String<CS> StringView<CS>::ToUpper() const
         else
             b = CS::NextCodePoint(b);
     }
-    return std::move(ret);
+    return ret;
 }
 
 template<typename CS>
@@ -743,7 +743,7 @@ String<CS> StringView<CS>::ToLower() const
         else
             b = CS::NextCodePoint(b);
     }
-    return std::move(ret);
+    return ret;
 }
 
 template<typename CS>
@@ -766,7 +766,7 @@ String<CS> StringView<CS>::SwapCase() const
         else
             b = CS::NextCodePoint(b);
     }
-    return std::move(ret);
+    return ret;
 }
 
 template<typename CS>
@@ -787,7 +787,7 @@ std::vector<StringView<CS>> StringView<CS>::Split() const
         else if(!segLen++)
             segBeg = p;
     }
-    return std::move(ret);
+    return ret;
 }
 
 template<typename CS>
@@ -803,14 +803,14 @@ StringView<CS>::Split(const Self &spliter) const
         if(fi == NPOS)
         {
             ret.emplace_back(*str_, segBeg, len_);
-            return std::move(ret);
+            return ret;
         }
 
         if(fi != segBeg)
             ret.emplace_back(*str_, segBeg, fi);
         segBeg = fi + spliter.Length();
     }
-    return std::move(ret);
+    return ret;
 }
 
 template<typename CS>
@@ -854,7 +854,7 @@ std::vector<StringView<CS>> StringView<CS>::Split(const C &spliters) const
         if(fi == NPOS)
         {
             ret.emplace_back(*str_, segBeg, len_);
-            return std::move(ret);
+            return ret;
         }
 
         if(fi != segBeg)
@@ -863,7 +863,7 @@ std::vector<StringView<CS>> StringView<CS>::Split(const C &spliters) const
         segBeg = fi + slen;
     }
 
-    return std::move(ret);
+    return ret;
 }
 
 template<typename CS>
@@ -1299,7 +1299,7 @@ String<CS> StringBuilder<CS>::Get() const
     strs_.clear();
     if(!ret.Empty())
         strs_.push_back(ret);
-    return std::move(ret);
+    return ret;
 }
 
 template<typename DCS, typename SCS>

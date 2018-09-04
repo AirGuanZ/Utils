@@ -76,15 +76,13 @@ public:
     static Self New(size_t w, size_t h,
                     F &&initer = &DefaultElementInitializer<E>)
     {
-        Self ret(w, h, std::forward<F>(initer));
-        return std::move(ret);
+        return Self(w, h, std::forward<F>(initer));
     }
 
     template<typename F>
     static Self FromFn(size_t w, size_t h, F &&initer)
     {
-        Self ret(FROM_FN, w, h, std::forward<F>(initer));
-        return std::move(ret);
+        return Self(FROM_FN, w, h, std::forward<F>(initer));
     }
 
     template<typename A, typename F = E(*)(const A&)>
