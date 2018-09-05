@@ -3,6 +3,7 @@
 #include "../Math/Angle.h"
 #include "../Math/Color.h"
 #include "../Math/Mat4.h"
+#include "../Math/Quaternion.h"
 #include "../Math/Random.h"
 #include "../Math/Scalar.h"
 #include "../Math/SSE.h"

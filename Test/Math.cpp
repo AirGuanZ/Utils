@@ -109,4 +109,12 @@ TEST_CASE("Math")
                             [](float x) { return Sqrt(x); }),
                          1e-5f));
     }
+
+    SECTION("Quaternion")
+    {
+        REQUIRE(ApproxEq(Apply(Quaterniond::Rotate(Vec3d(0.0, 0.0, 1.0),
+                                                   PI<double>() / 2.0),
+                               Vec3d(1.0, 0.0, 0.0)),
+                         Vec3d(0.0, 1.0, 0.0), 1e-5));
+    }
 }

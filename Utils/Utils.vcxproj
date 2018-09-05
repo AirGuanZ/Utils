@@ -31,6 +31,7 @@
     <ClInclude Include="..\Src\Math\Angle.h" />
     <ClInclude Include="..\Src\Math\Color.h" />
     <ClInclude Include="..\Src\Math\Mat4.h" />
+    <ClInclude Include="..\Src\Math\Quaternion.h" />
     <ClInclude Include="..\Src\Math\Random.h" />
     <ClInclude Include="..\Src\Math\Scalar.h" />
     <ClInclude Include="..\Src\Math\SSE.h" />
@@ -38,7 +39,6 @@
     <ClInclude Include="..\Src\Math\Vec2.h" />
     <ClInclude Include="..\Src\Math\Vec3.h" />
     <ClInclude Include="..\Src\Math\Vec4.h" />
-    <ClInclude Include="..\Src\Misc\Bench.h" />
     <ClInclude Include="..\Src\Misc\Common.h" />
     <ClInclude Include="..\Src\Misc\Config.h" />
     <ClInclude Include="..\Src\Misc\Endian.h" />

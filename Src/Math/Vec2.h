@@ -27,7 +27,7 @@ public:
 
     constexpr Vec2() : Vec2(T(0)) { }
 
-    explicit constexpr Vec2(Uninitialized_t) { }
+    explicit Vec2(Uninitialized_t) { }
 
     explicit constexpr Vec2(T value) : x(value), y(value) { }
 
@@ -98,6 +98,9 @@ public:
         return ret;
     }
 };
+
+template<typename T>
+Vec2<T> operator-(const Vec2<T> &v) { return Vec2<T>(-v.x, -v.y); }
 
 template<typename T1, typename T2>
 Vec2<T2> operator+(const T1 &lhs, const Vec2<T2> &rhs) { return Vec2<T2>(lhs + rhs.x, lhs + rhs.y); }

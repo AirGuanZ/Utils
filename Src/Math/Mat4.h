@@ -21,13 +21,10 @@ class Mat4
 public:
 
     using Data = T[4][4];
-
-    Data m;
-
-public:
-
     using Component = T;
     using Self = Mat4<T>;
+
+    Data m;
 
     Mat4() : Mat4(T(1)) { }
 
@@ -71,7 +68,7 @@ public:
     static Self Scale(const Vec3<T> &s);
 
     template<typename U>
-    static Self Perspective(U fovY, T ratio, T near, T far);
+    static Self Perspective(U fovY, T ratio, T _near, T _far);
 
     static Self LookAt(const Vec3<T> &src, const Vec3<T> &dst, const Vec3<T> &up);
 };
@@ -91,7 +88,7 @@ Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec3<T> &v);
 template<typename T>
 Mat4<T> Transpose(const Mat4<T> &m);
 
-template<typename T>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 Mat4<T> Inverse(const Mat4<T> &m);
 
 using Mat4f = Mat4<float>;
@@ -291,15 +288,15 @@ typename Mat4<T>::Self Mat4<T>::Scale(const Vec3<T> &s)
 
 template<typename T>
 template<typename U>
-typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T near, T far)
+typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T _near, T _far)
 {
-    T invDis = T(1) / (far - near);
+    T invDis = T(1) / (_far - _near);
     constexpr T I = T(1), O = T(0);
     auto cot = Cot(T(0.5) * fovY);
-    return Mat4<T>(cot/ratio, O,   O,            O,
-                   O,         cot, O,            O,
-                   O,         O,   far * invDis, -far * near * invDis,
-                   O,         O,   I,            O);
+    return Mat4<T>(cot/ratio, O,   O,             O,
+                   O,         cot, O,             O,
+                   O,         O,   _far * invDis, -_far * _near * invDis,
+                   O,         O,   I,             O);
 }
 
 template<typename T>
@@ -352,8 +349,8 @@ Mat4<T> Transpose(const Mat4<T> &m)
                    m[0][3], m[1][3], m[2][3], m[3][3]);
 }
 
-template<typename T>
-Mat4<T> InverseForFloat(const Mat4<T> &_m)
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
+Mat4<T> Inverse(const Mat4<T> &_m)
 {
     int indxc[4], indxr[4], ipiv[4] = { 0 };
     T m[4][4];
@@ -425,18 +422,6 @@ Mat4<T> InverseForFloat(const Mat4<T> &_m)
     }
 
     return Mat4<T>(m);
-}
-
-template<>
-inline Mat4<float> Inverse<float>(const Mat4<float> &m)
-{
-    return InverseForFloat(m);
-}
-
-template<>
-inline Mat4<double> Inverse<double>(const Mat4<double> &m)
-{
-    return InverseForFloat(m);
 }
 
 AGZ_NS_END(AGZ::Math)
