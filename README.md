@@ -237,3 +237,16 @@ REQUIRE(result(0, 1) == "abc");
 REQUIRE(result(1, 2) == "ddee0099ff44");
 REQUIRE(result(0, 2) == "abcddee0099ff44");
 ```
+
+## AGZ::Tex
+
+```cpp
+// Load an image from "tex.png"
+Texture2D<Color3b> tex = TextureFile::LoadRGBFromFile(L"tex.png");
+// Assume tex.GetWidth() >= 10 && tex.GetHeight() > 3
+// Fill the first ten pixels in the third row with red color
+for(int x = 0; x < 10; ++x)
+    tex(x, 2) = COLOR::RED;
+// Save tex to "output.png"
+TextureFile::WriteRGBToPNG(L"output.png", tex);
+```
