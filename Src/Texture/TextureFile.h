@@ -11,17 +11,50 @@ class TextureFile
 {
 public:
 
+    enum class WriteFormat
+    {
+        PNG,
+        JPG,
+        BMP
+    };
+
     static Texture2D<Math::Color3b> LoadRGBFromFile(
         const WStr &filename);
 
     static Texture2D<Math::Color4b> LoadRGBAFromFile(
         const WStr &filename);
 
+    static void WriteTo(
+        const WStr &filename,
+        const Texture2D<Math::Color3b> &tex,
+        WriteFormat format);
+
+    static void WriteTo(
+        const WStr &filename,
+        const Texture2D<Math::Color4b> &tex,
+        WriteFormat format);
+
     static void WriteRGBToPNG(
         const WStr &filename,
         const Texture2D<Math::Color3b> &tex);
 
     static void WriteRGBAToPNG(
+        const WStr &filename,
+        const Texture2D<Math::Color4b> &tex);
+
+    static void WriteRGBToJPG(
+        const WStr &filename,
+        const Texture2D<Math::Color3b> &tex);
+
+    static void WriteRGBAToJPG(
+        const WStr &filename,
+        const Texture2D<Math::Color4b> &tex);
+
+    static void WriteRGBToBMP(
+        const WStr &filename,
+        const Texture2D<Math::Color3b> &tex);
+
+    static void WriteRGBAToBMP(
         const WStr &filename,
         const Texture2D<Math::Color4b> &tex);
 };
@@ -121,6 +154,42 @@ Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
     return ret;
 }
 
+void TextureFile::WriteTo(
+    const WStr &filename,
+    const Texture2D<Math::Color3b> &tex,
+    WriteFormat format)
+{
+    switch(format)
+    {
+    case WriteFormat::PNG:
+        return WriteRGBToPNG(filename, tex);
+    case WriteFormat::JPG:
+        return WriteRGBToJPG(filename, tex);
+    case WriteFormat::BMP:
+        return WriteRGBToPNG(filename, tex);
+    default:
+        Unreachable();
+    }
+}
+
+void TextureFile::WriteTo(
+    const WStr &filename,
+    const Texture2D<Math::Color4b> &tex,
+    WriteFormat format)
+{
+    switch(format)
+    {
+    case WriteFormat::PNG:
+        return WriteRGBAToPNG(filename, tex);
+    case WriteFormat::JPG:
+        return WriteRGBAToJPG(filename, tex);
+    case WriteFormat::BMP:
+        return WriteRGBAToPNG(filename, tex);
+    default:
+        Unreachable();
+    }
+}
+
 namespace
 {
     struct BufferContext
@@ -176,6 +245,86 @@ void TextureFile::WriteRGBAToPNG(
 
     if(!FileSys::WriteBinaryFileRaw(filename, data.data(), data.size()))
         throw FileException("Failed to write to PNG file");
+}
+
+void TextureFile::WriteRGBToJPG(
+    const WStr &filename,
+    const Texture2D<Math::Color3b> &tex)
+{
+    AGZ_ASSERT(tex);
+
+    std::vector<unsigned char> data;
+    BufferContext bc = { &data };
+    if(!stbi_write_jpg_to_func(
+        buffer_func, &bc,
+        tex.GetWidth(), tex.GetHeight(),
+        3, &tex(0, 0), 0))
+    {
+        throw FileException("Failed to construct JPG file in memory");
+    }
+
+    if(!FileSys::WriteBinaryFileRaw(filename, data.data(), data.size()))
+        throw FileException("Failed to write to JPG file");
+}
+
+void TextureFile::WriteRGBAToJPG(
+    const WStr &filename,
+    const Texture2D<Math::Color4b> &tex)
+{
+    AGZ_ASSERT(tex);
+
+    std::vector<unsigned char> data;
+    BufferContext bc = { &data };
+    if(!stbi_write_jpg_to_func(
+        buffer_func, &bc,
+        tex.GetWidth(), tex.GetHeight(),
+        4, &tex(0, 0), 0))
+    {
+        throw FileException("Failed to construct JPG file in memory");
+    }
+
+    if(!FileSys::WriteBinaryFileRaw(filename, data.data(), data.size()))
+        throw FileException("Failed to write to JPG file");
+}
+
+void TextureFile::WriteRGBToBMP(
+    const WStr &filename,
+    const Texture2D<Math::Color3b> &tex)
+{
+    AGZ_ASSERT(tex);
+
+    std::vector<unsigned char> data;
+    BufferContext bc = { &data };
+    if(!stbi_write_bmp_to_func(
+        buffer_func, &bc,
+        tex.GetWidth(), tex.GetHeight(),
+        3, &tex(0, 0)))
+    {
+        throw FileException("Failed to construct BMP file in memory");
+    }
+
+    if(!FileSys::WriteBinaryFileRaw(filename, data.data(), data.size()))
+        throw FileException("Failed to write to BMP file");
+}
+
+void TextureFile::WriteRGBAToBMP(
+    const WStr &filename,
+    const Texture2D<Math::Color4b> &tex)
+{
+    AGZ_ASSERT(tex);
+
+    std::vector<unsigned char> data;
+    BufferContext bc = { &data };
+    if(!stbi_write_bmp_to_func(
+        buffer_func, &bc,
+        tex.GetWidth(), tex.GetHeight(),
+        4, &tex(0, 0)))
+    {
+        throw FileException("Failed to construct BMP file in memory");
+    }
+
+    if(!FileSys::WriteBinaryFileRaw(filename, data.data(), data.size()))
+        throw FileException("Failed to write to BMP file");
 }
 
 AGZ_NS_END(AGZ::Tex)

@@ -122,6 +122,24 @@ public:
             UncheckedRelease();
     }
 
+    template<typename Func>
+    auto Map(Func &&convertFunc)
+    {
+        AGZ_ASSERT(IsAvailable());
+
+        using RetPixel = decltype(convertFunc(std::declval<Pixel>()));
+        Texture2D<RetPixel> ret(width_, height_);
+
+        uint32_t cnt = width_ * height_;
+        AGZ_ASSERT(cnt > 0);
+
+        auto dstData = ret.RawData();
+        for(uint32_t i = 0; i < cnt; ++i)
+            dstData[i] = convertFunc(data_[i]);
+
+        return ret;
+    }
+
     bool IsAvailable() const
     {
         return data_ != nullptr;
@@ -170,6 +188,11 @@ public:
     uint32_t GetHeight() const
     {
         return height_;
+    }
+
+    Pixel *RawData()
+    {
+        return data_;
     }
 };
 
