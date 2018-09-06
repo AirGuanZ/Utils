@@ -63,8 +63,51 @@ AGZ_NS_BEG(AGZ)
 #endif
 }
 
+struct OperatorDeleter
+{
+    template<typename T>
+    static void Process(T *ptr) { ::operator delete(ptr); }
+};
+
+struct DummyDeleter
+{
+    template<typename T> static void Process(T*) { }
+};
+
+template<typename C, typename Deleter, typename...Args>
+void ConstructN(C *ptr, size_t n, const Args&...args) noexcept(noexcept(C(args...)))
+{
+    if constexpr(noexcept(C(args...)))
+    {
+        for(size_t i = 0; i < n; ++i)
+            new(ptr + i) C(args...);
+    }
+    else
+    {
+        size_t i = 0;
+        try
+        {
+            for(; i < n; ++i)
+                new(ptr + i) C(args...);
+        }
+        catch(...)
+        {
+            for(size_t j = 0; j < i; ++j)
+                (ptr + j)->~C();
+            Deleter::Process(ptr);
+            throw;
+        }
+    }
+}
+
 struct Uninitialized_t { };
 inline Uninitialized_t UNINITIALIZED;
+
+template<typename T>
+struct CanConvertToUninitializedFlag
+{
+    static constexpr bool value = std::is_convertible_v<T, Uninitialized_t>;
+};
 
 struct CONS_FLAG_FROM_FN_t { };
 inline CONS_FLAG_FROM_FN_t FROM_FN;

@@ -3,7 +3,7 @@
 #include "../Misc/Common.h"
 #include "../Utils/Math.h"
 #include "../Utils/String.h"
-#include "Texture2D.h"
+#include "Texture.h"
 
 AGZ_NS_BEG(AGZ::Tex)
 
@@ -18,45 +18,45 @@ public:
         BMP
     };
 
-    static Texture2D<Math::Color3b> LoadRGBFromFile(
+    static Texture<2, Math::Color3b> LoadRGBFromFile(
         const WStr &filename);
 
-    static Texture2D<Math::Color4b> LoadRGBAFromFile(
+    static Texture<2, Math::Color4b> LoadRGBAFromFile(
         const WStr &filename);
 
     static void WriteTo(
         const WStr &filename,
-        const Texture2D<Math::Color3b> &tex,
+        const Texture<2, Math::Color3b> &tex,
         WriteFormat format);
 
     static void WriteTo(
         const WStr &filename,
-        const Texture2D<Math::Color4b> &tex,
+        const Texture<2, Math::Color4b> &tex,
         WriteFormat format);
 
     static void WriteRGBToPNG(
         const WStr &filename,
-        const Texture2D<Math::Color3b> &tex);
+        const Texture<2, Math::Color3b> &tex);
 
     static void WriteRGBAToPNG(
         const WStr &filename,
-        const Texture2D<Math::Color4b> &tex);
+        const Texture<2, Math::Color4b> &tex);
 
     static void WriteRGBToJPG(
         const WStr &filename,
-        const Texture2D<Math::Color3b> &tex);
+        const Texture<2, Math::Color3b> &tex);
 
     static void WriteRGBAToJPG(
         const WStr &filename,
-        const Texture2D<Math::Color4b> &tex);
+        const Texture<2, Math::Color4b> &tex);
 
     static void WriteRGBToBMP(
         const WStr &filename,
-        const Texture2D<Math::Color3b> &tex);
+        const Texture<2, Math::Color3b> &tex);
 
     static void WriteRGBAToBMP(
         const WStr &filename,
-        const Texture2D<Math::Color4b> &tex);
+        const Texture<2, Math::Color4b> &tex);
 };
 
 AGZ_NS_END(AGZ::Tex)
@@ -79,7 +79,7 @@ AGZ_NS_END(AGZ::Tex)
 
 AGZ_NS_BEG(AGZ::Tex)
 
-Texture2D<Math::Color3b> TextureFile::LoadRGBFromFile(
+Texture<2, Math::Color3b> TextureFile::LoadRGBFromFile(
     const WStr &filename)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
@@ -97,15 +97,15 @@ Texture2D<Math::Color3b> TextureFile::LoadRGBFromFile(
 
     AGZ_ASSERT(w > 0 && h > 0);
 
-    Texture2D<Math::Color3b> ret(w, h, UNINITIALIZED);
+    Texture<2, Math::Color3b> ret({ w, h }, UNINITIALIZED);
     unsigned char *scanlineData = bytes;
     for(int scanline = 0; scanline < h; ++scanline)
     {
         for(int x = 0; x < w; ++x)
         {
-            ret(x, scanline) = Math::Color3b(scanlineData[0],
-                                             scanlineData[1],
-                                             scanlineData[2]);
+            ret({ x, scanline }) = Math::Color3b(scanlineData[0],
+                                                 scanlineData[1],
+                                                 scanlineData[2]);
             scanlineData += 3;
         }
     }
@@ -116,7 +116,7 @@ Texture2D<Math::Color3b> TextureFile::LoadRGBFromFile(
     return ret;
 }
 
-Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
+Texture<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
     const WStr &filename)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
@@ -134,16 +134,16 @@ Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
 
     AGZ_ASSERT(w > 0 && h > 0);
 
-    Texture2D<Math::Color4b> ret(w, h, UNINITIALIZED);
+    Texture<2, Math::Color4b> ret({ w, h }, UNINITIALIZED);
     unsigned char *scanlineData = bytes;
     for(int scanline = 0; scanline < h; ++scanline)
     {
         for(int x = 0; x < w; ++x)
         {
-            ret(x, scanline) = Math::Color4b(scanlineData[0],
-                                             scanlineData[1],
-                                             scanlineData[2],
-                                             scanlineData[3]);
+            ret({ x, scanline }) = Math::Color4b(scanlineData[0],
+                                                 scanlineData[1],
+                                                 scanlineData[2],
+                                                 scanlineData[3]);
             scanlineData += 4;
         }
     }
@@ -156,7 +156,7 @@ Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
 
 void TextureFile::WriteTo(
     const WStr &filename,
-    const Texture2D<Math::Color3b> &tex,
+    const Texture<2, Math::Color3b> &tex,
     WriteFormat format)
 {
     switch(format)
@@ -174,7 +174,7 @@ void TextureFile::WriteTo(
 
 void TextureFile::WriteTo(
     const WStr &filename,
-    const Texture2D<Math::Color4b> &tex,
+    const Texture<2, Math::Color4b> &tex,
     WriteFormat format)
 {
     switch(format)
@@ -209,7 +209,7 @@ namespace
 
 void TextureFile::WriteRGBToPNG(
     const WStr &filename,
-    const Texture2D<Math::Color3b> &tex)
+    const Texture<2, Math::Color3b> &tex)
 {
     AGZ_ASSERT(tex);
 
@@ -217,8 +217,8 @@ void TextureFile::WriteRGBToPNG(
     BufferContext bc = { &data };
     if(!stbi_write_png_to_func(
             buffer_func, &bc,
-            tex.GetWidth(), tex.GetHeight(),
-            3, &tex(0, 0), 0))
+            tex.GetSize()[0], tex.GetSize()[1],
+            3, tex.RawData(), 0))
     {
         throw FileException("Failed to construct PNG file in memory");
     }
@@ -229,7 +229,7 @@ void TextureFile::WriteRGBToPNG(
 
 void TextureFile::WriteRGBAToPNG(
     const WStr &filename,
-    const Texture2D<Math::Color4b> &tex)
+    const Texture<2, Math::Color4b> &tex)
 {
     AGZ_ASSERT(tex);
 
@@ -237,8 +237,8 @@ void TextureFile::WriteRGBAToPNG(
     BufferContext bc = { &data };
     if(!stbi_write_png_to_func(
         buffer_func, &bc,
-        tex.GetWidth(), tex.GetHeight(),
-        4, &tex(0, 0), 0))
+        tex.GetSize()[0], tex.GetSize()[1],
+        4, tex.RawData(), 0))
     {
         throw FileException("Failed to construct PNG file in memory");
     }
@@ -249,7 +249,7 @@ void TextureFile::WriteRGBAToPNG(
 
 void TextureFile::WriteRGBToJPG(
     const WStr &filename,
-    const Texture2D<Math::Color3b> &tex)
+    const Texture<2, Math::Color3b> &tex)
 {
     AGZ_ASSERT(tex);
 
@@ -257,8 +257,8 @@ void TextureFile::WriteRGBToJPG(
     BufferContext bc = { &data };
     if(!stbi_write_jpg_to_func(
         buffer_func, &bc,
-        tex.GetWidth(), tex.GetHeight(),
-        3, &tex(0, 0), 0))
+        tex.GetSize()[0], tex.GetSize()[1],
+        3, tex.RawData(), 0))
     {
         throw FileException("Failed to construct JPG file in memory");
     }
@@ -269,7 +269,7 @@ void TextureFile::WriteRGBToJPG(
 
 void TextureFile::WriteRGBAToJPG(
     const WStr &filename,
-    const Texture2D<Math::Color4b> &tex)
+    const Texture<2, Math::Color4b> &tex)
 {
     AGZ_ASSERT(tex);
 
@@ -277,8 +277,8 @@ void TextureFile::WriteRGBAToJPG(
     BufferContext bc = { &data };
     if(!stbi_write_jpg_to_func(
         buffer_func, &bc,
-        tex.GetWidth(), tex.GetHeight(),
-        4, &tex(0, 0), 0))
+        tex.GetSize()[0], tex.GetSize()[1],
+        4, tex.RawData(), 0))
     {
         throw FileException("Failed to construct JPG file in memory");
     }
@@ -289,7 +289,7 @@ void TextureFile::WriteRGBAToJPG(
 
 void TextureFile::WriteRGBToBMP(
     const WStr &filename,
-    const Texture2D<Math::Color3b> &tex)
+    const Texture<2, Math::Color3b> &tex)
 {
     AGZ_ASSERT(tex);
 
@@ -297,8 +297,8 @@ void TextureFile::WriteRGBToBMP(
     BufferContext bc = { &data };
     if(!stbi_write_bmp_to_func(
         buffer_func, &bc,
-        tex.GetWidth(), tex.GetHeight(),
-        3, &tex(0, 0)))
+        tex.GetSize()[0], tex.GetSize()[1],
+        3, tex.RawData()))
     {
         throw FileException("Failed to construct BMP file in memory");
     }
@@ -309,7 +309,7 @@ void TextureFile::WriteRGBToBMP(
 
 void TextureFile::WriteRGBAToBMP(
     const WStr &filename,
-    const Texture2D<Math::Color4b> &tex)
+    const Texture<2, Math::Color4b> &tex)
 {
     AGZ_ASSERT(tex);
 
@@ -317,8 +317,8 @@ void TextureFile::WriteRGBAToBMP(
     BufferContext bc = { &data };
     if(!stbi_write_bmp_to_func(
         buffer_func, &bc,
-        tex.GetWidth(), tex.GetHeight(),
-        4, &tex(0, 0)))
+        tex.GetSize()[0], tex.GetSize()[1],
+        4, tex.RawData()))
     {
         throw FileException("Failed to construct BMP file in memory");
     }

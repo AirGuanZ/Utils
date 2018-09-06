@@ -3,8 +3,9 @@
 
 #include "Catch.hpp"
 
-using namespace AGZ::Endian;
-using namespace AGZ::TypeOpr;
+using namespace AGZ;
+using namespace Endian;
+using namespace TypeOpr;
 
 TEST_CASE("Misc")
 {
@@ -42,5 +43,8 @@ TEST_CASE("Misc")
         static_assert(std::is_same_v<Div<float, double>, double>);
         static_assert(std::is_same_v<Equal<int, float>, bool>);
         static_assert(std::is_same_v<BitNot<int>, int>);
+
+        static_assert(Any_v<std::is_integral, float, double, int>);
+        static_assert(!Any_v<std::is_class, int, short, unsigned char>);
     }
 }

@@ -1,4 +1,4 @@
 #pragma once
 
-#include "../Texture/Texture2D.h"
+#include "../Texture/Texture.h"
 #include "../Texture/TextureFile.h"

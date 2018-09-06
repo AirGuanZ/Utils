@@ -117,4 +117,27 @@ TEST_CASE("Math")
                                Vec3d(1.0, 0.0, 0.0)),
                          Vec3d(0.0, 1.0, 0.0), 1e-5));
     }
+
+    SECTION("Vec")
+    {
+        {
+            Vec<2, float> v(1.0f, 2.0f);
+            static_assert(Vec<2, float>::Dim == 2);
+            REQUIRE((v[0] == 1.0f && v[1] == 2.0f));
+        }
+
+        {
+            Vec<10, float> v(5.0f);
+            REQUIRE((v[3] == v[5] && v[5] == v[7] && v[7] == 5.0f));
+        }
+
+        REQUIRE(Vec<3, float>(5.0f) == Vec<3, float>(5.0f));
+        REQUIRE(Vec<3, float>(5.0f) != Vec<3, float>(4.0f));
+
+        REQUIRE(Vec<3, int>(5).Product() == 125);
+        REQUIRE(Vec<3, int>(4).EachLessThan(Vec<3, int>(5)));
+        REQUIRE(!Vec<3, int>(4, 5, 6).EachLessThan(Vec<3, int>(6)));
+
+        REQUIRE(Vec<2, int>(1, 2) != Vec<2, int>(3, 4));
+    }
 }

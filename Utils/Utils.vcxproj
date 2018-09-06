@@ -36,6 +36,7 @@
     <ClInclude Include="..\Src\Math\Scalar.h" />
     <ClInclude Include="..\Src\Math\SSE.h" />
     <ClInclude Include="..\Src\Math\Tri.h" />
+    <ClInclude Include="..\Src\Math\Vec.h" />
     <ClInclude Include="..\Src\Math\Vec2.h" />
     <ClInclude Include="..\Src\Math\Vec3.h" />
     <ClInclude Include="..\Src\Math\Vec4.h" />
@@ -76,8 +77,8 @@
     <ClInclude Include="..\Src\String\Regex\VMEngine.h" />
     <ClInclude Include="..\Src\String\String\StrAlgo.h" />
     <ClInclude Include="..\Src\String\String\String.h" />
+    <ClInclude Include="..\Src\Texture\Texture.h" />
     <ClInclude Include="..\Src\Texture\TextureFile.h" />
-    <ClInclude Include="..\Src\Texture\Texture2D.h" />
     <ClInclude Include="..\Src\Utils.h" />
     <ClInclude Include="..\Src\Utils\Alloc.h" />
     <ClInclude Include="..\Src\Utils\Buffer.h" />

@@ -8,6 +8,7 @@
 #include "../Math/Scalar.h"
 #include "../Math/SSE.h"
 #include "../Math/Tri.h"
+#include "../Math/Vec.h"
 #include "../Math/Vec2.h"
 #include "../Math/Vec3.h"
 #include "../Math/Vec4.h"

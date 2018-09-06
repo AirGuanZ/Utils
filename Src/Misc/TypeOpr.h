@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utility>
+#include <tuple>
 
 #include "../Misc/Common.h"
 
@@ -50,5 +50,22 @@ using Apply = decltype(std::declval<F>()(std::declval<Args>()...));
 #undef DV
 #undef BINARY_OPR
 #undef UNARY_OPR
+
+template<typename...TypeList>
+constexpr size_t TypeListLength_v = std::tuple_size_v<std::tuple<TypeList...>>;
+
+template<template<typename> typename FuncClass>
+constexpr bool Any() { return false; }
+
+template<template<typename> typename FuncClass, typename T, typename...Others>
+constexpr bool Any() { return FuncClass<T>::value || Any<FuncClass, Others...>(); }
+
+template<template<typename> typename FuncClass, typename...TypeList>
+constexpr bool Any_v = Any<FuncClass, TypeList...>();
+
+template<bool B> struct TrueToVoid { };
+template<> struct TrueToVoid<true>  { using type = void; };
+
+template<bool B> using TrueToVoid_t = typename TrueToVoid<B>::type;
 
 AGZ_NS_END(AGZ::TypeOpr)

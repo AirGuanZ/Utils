@@ -6,10 +6,10 @@
 using namespace AGZ::Math;
 using namespace AGZ::Tex;
 
-TEST_CASE("Texture2D")
+TEST_CASE("Texture")
 {
-    Texture2D<Color3f> tex0(640, 480);
+    Texture<2, Color3f> tex0({640, 480});
     REQUIRE(tex0);
-    REQUIRE((tex0.GetWidth() == 640 && tex0.GetHeight() == 480));
-    REQUIRE(tex0(5, 5) == Color3f());
+    REQUIRE(tex0.GetSize() == Coord<2>(640, 480));
+    REQUIRE(tex0({5, 5}) == Color3f());
 }

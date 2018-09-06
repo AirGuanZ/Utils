@@ -229,9 +229,6 @@
     <ClInclude Include="..\Src\String\Regex\PikeVM.h">
       <Filter>String\Regex</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Texture\Texture2D.h">
-      <Filter>Texture</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Utils\Texture.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -249,6 +246,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\Math\Quaternion.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Math\Vec.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Texture\Texture.h">
+      <Filter>Texture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
