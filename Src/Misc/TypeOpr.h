@@ -66,6 +66,10 @@ constexpr bool Any_v = Any<FuncClass, TypeList...>();
 template<bool B> struct TrueToVoid { };
 template<> struct TrueToVoid<true>  { using type = void; };
 
-template<bool B> using TrueToVoid_t = typename TrueToVoid<B>::type;
+template<bool B>
+using TrueToVoid_t = typename TrueToVoid<B>::type;
+
+template<typename T>
+constexpr bool True_v = true;
 
 AGZ_NS_END(AGZ::TypeOpr)
