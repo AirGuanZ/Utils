@@ -54,10 +54,10 @@ public:
     }
 
     template<typename...Args,
-             typename = TypeOpr::TrueToVoid_t<
+             std::enable_if_t<
                 (Dim > 1) &&
                 (TypeOpr::TypeListLength_v<Args...> == Dim) &&
-                !TypeOpr::Any_v<CanConvertToUninitializedFlag, Args...>>>
+                !TypeOpr::Any_v<CanConvertToUninitializedFlag, Args...>, int> = 0>
     constexpr Vec(Args&&...args)
         : data{ Element(std::forward<Args>(args))... }
     {

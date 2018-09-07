@@ -259,6 +259,21 @@ public:
         AGZ_ASSERT(IsAvailable());
         return data_;
     }
+
+    template<typename F>
+    auto Map(F &&func)
+    {
+        AGZ_ASSERT(IsAvailable());
+
+        using NewPixel = decltype(func(std::declval<Pixel>()));
+        Texture<Dim, NewPixel> ret(size_);
+        NewPixel *newData = ret.RawData();
+
+        for(uint32_t i = 0; i < cnt_; ++i)
+            newData[i] = func(data_[i]);
+        
+        return ret;
+    }
 };
 
 AGZ_NS_END(AGZ::Tex)
