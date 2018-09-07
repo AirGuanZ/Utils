@@ -68,4 +68,10 @@ template<> struct TrueToVoid<true>  { using type = void; };
 
 template<bool B> using TrueToVoid_t = typename TrueToVoid<B>::type;
 
+template<typename T>
+struct TrueImpl { static constexpr bool value = true; };
+
+template<typename T>
+static constexpr bool True_v = TrueImpl<T>::value;
+
 AGZ_NS_END(AGZ::TypeOpr)

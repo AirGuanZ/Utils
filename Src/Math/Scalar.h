@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include "../Misc/Common.h"
+#include "../Misc/TypeOpr.h"
 #include "Angle.h"
 
 AGZ_NS_BEG(AGZ::Math)
@@ -25,10 +26,8 @@ template<>           inline double Sqrt<double>(double value) { return std::sqrt
 template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 T Clamp(T v, T minv, T maxv) { return (std::max)((std::min)(v, maxv), minv); }
 
-template<typename T, typename U = decltype(T::DefaultEqEpsilon()) , typename =
-    std::void_t<decltype(
-        std::declval<T>().ApproxEq(std::declval<T>(),
-                                   std::declval<U>()))>>
+template<typename T, typename U = decltype(T::DefaultEqEpsilon()),
+    std::enable_if_t<TypeOpr::True_v<decltype(&T::ApproxEq)>, int> = 0>
 AGZ_FORCEINLINE bool ApproxEq(const T &lhs, const T &rhs, U epsilon = T::DefaultEqEpsilon())
 {
     return lhs.ApproxEq(rhs, epsilon);
