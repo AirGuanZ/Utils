@@ -66,12 +66,12 @@ AGZ_NS_BEG(AGZ)
 struct OperatorDeleter
 {
     template<typename T>
-    static void Process(T *ptr) { ::operator delete(ptr); }
+    static void Delete(T *ptr) { ::operator delete(ptr); }
 };
 
 struct DummyDeleter
 {
-    template<typename T> static void Process(T*) { }
+    template<typename T> static void Delete(T*) { }
 };
 
 template<typename C, typename Deleter, typename...Args>
@@ -94,7 +94,7 @@ void ConstructN(C *ptr, size_t n, const Args&...args) noexcept(noexcept(C(args..
         {
             for(size_t j = 0; j < i; ++j)
                 (ptr + j)->~C();
-            Deleter::Process(ptr);
+            Deleter::Delete(ptr);
             throw;
         }
     }

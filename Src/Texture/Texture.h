@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include "../Utils/Math.h"
 
 AGZ_NS_BEG(AGZ::Tex)
@@ -23,9 +25,9 @@ class Texture
         ::operator delete(data_);
     }
 
-    AGZ_FORCEINLINE uint32_t LinearIndex(const Math::Vec<DIM, uint32_t> &coord) const
+    uint32_t LinearIndex(const Math::Vec<DIM, uint32_t> &coord) const
     {
-        AGZ_ASSERT(IsAvailable() && coord.EachLessThan(size_));
+        AGZ_ASSERT(IsAvailable() && coord.EachElemLessThan(size_));
 
         if constexpr(DIM == 1)
             return coord[0];
@@ -60,14 +62,14 @@ public:
     explicit Texture(const Coord &size, const Pixel &initValue = Pixel())
         : Texture(size, UNINITIALIZED)
     {
-        AGZ_ASSERT(Coord(0).EachLessThan(size));
+        AGZ_ASSERT(Coord(0).EachElemLessThan(size));
         ConstructN<Pixel, OperatorDeleter>(data_, cnt_, initValue);
     }
 
     Texture(const Coord &size, Uninitialized_t)
         : size_(size), cnt_(size.Product())
     {
-        AGZ_ASSERT(Coord(0).EachLessThan(size));
+        AGZ_ASSERT(Coord(0).EachElemLessThan(size));
         data_ = static_cast<Pixel*>(::operator new(sizeof(Pixel) * cnt_));
     }
 
@@ -162,6 +164,34 @@ public:
         return data_[LinearIndex(coord)];
     }
 
+    const Pixel &operator()(uint32_t x) const
+    {
+        AGZ_ASSERT(IsAvailable());
+        static_assert(Dim == 1);
+        return data_[x];
+    }
+
+    Pixel &operator()(uint32_t x)
+    {
+        AGZ_ASSERT(IsAvailable());
+        static_assert(Dim == 1);
+        return data_[x];
+    }
+
+    const Pixel &operator()(uint32_t x, uint32_t y) const
+    {
+        AGZ_ASSERT(IsAvailable());
+        static_assert(Dim == 2);
+        return data_[LinearIndex({ x, y })];
+    }
+
+    Pixel &operator()(uint32_t x, uint32_t y)
+    {
+        AGZ_ASSERT(IsAvailable());
+        static_assert(Dim == 2);
+        return data_[LinearIndex({ x, y })];
+    }
+
     const Pixel &At(const Coord &coord) const
     {
         return (*this)(coord);
@@ -172,10 +202,50 @@ public:
         return (*this)(coord);
     }
 
+    const Pixel &At(uint32_t x) const
+    {
+        AGZ_ASSERT(IsAvailable());
+        static_assert(Dim == 1);
+        return data_[x];
+    }
+
+    Pixel &At(uint32_t x)
+    {
+        AGZ_ASSERT(IsAvailable());
+        static_assert(Dim == 1);
+        return data_[x];
+    }
+
+    const Pixel &At(uint32_t x, uint32_t y) const
+    {
+        AGZ_ASSERT(IsAvailable());
+        static_assert(Dim == 2);
+        return data_[LinearIndex({ x, y })];
+    }
+
+    Pixel &At(uint32_t x, uint32_t y)
+    {
+        AGZ_ASSERT(IsAvailable());
+        static_assert(Dim == 2);
+        return data_[LinearIndex({ x, y })];
+    }
+
     const Coord &GetSize() const
     {
         AGZ_ASSERT(IsAvailable());
         return size_;
+    }
+
+    uint32_t GetWidth() const
+    {
+        static_assert(Dim == 2);
+        return size_[0];
+    }
+
+    uint32_t GetHeight() const
+    {
+        static_assert(Dim == 2);
+        return size_[1];
     }
 
     Pixel *RawData()

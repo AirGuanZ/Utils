@@ -23,7 +23,7 @@ class Vec
     }
 
     template<DimType...Indices>
-    auto EachLessThanAux(const Vec<DIM, T> &rhs, std::integer_sequence<DimType, Indices...>) const
+    auto EachElemLessThanAux(const Vec<DIM, T> &rhs, std::integer_sequence<DimType, Indices...>) const
     {
         return (... && (data[Indices] < rhs[Indices]));
     }
@@ -59,7 +59,7 @@ public:
                 (TypeOpr::TypeListLength_v<Args...> == Dim) &&
                 !TypeOpr::Any_v<CanConvertToUninitializedFlag, Args...>>>
     constexpr Vec(Args&&...args)
-        : data{ static_cast<Element>(std::forward<Args>(args))... }
+        : data{ Element(std::forward<Args>(args))... }
     {
 
     }
@@ -92,9 +92,9 @@ public:
         return SumAux(std::make_integer_sequence<DimType, Dim>());
     }
 
-    auto EachLessThan(const Self &rhs) const
+    auto EachElemLessThan(const Self &rhs) const
     {
-        return EachLessThanAux(rhs, std::make_integer_sequence<DimType, Dim>());
+        return EachElemLessThanAux(rhs, std::make_integer_sequence<DimType, Dim>());
     }
 };
 

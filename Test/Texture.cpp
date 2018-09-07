@@ -10,6 +10,6 @@ TEST_CASE("Texture")
 {
     Texture<2, Color3f> tex0({640, 480});
     REQUIRE(tex0);
-    REQUIRE(tex0.GetSize() == Coord<2>(640, 480));
-    REQUIRE(tex0({5, 5}) == Color3f());
+    REQUIRE(tex0.GetWidth() == 640);
+    REQUIRE(tex0(5, 5) == Color3f());
 }

@@ -118,6 +118,12 @@ TEST_CASE("Math")
                          Vec3d(0.0, 1.0, 0.0), 1e-5));
     }
 
+    SECTION("FP")
+    {
+        REQUIRE(ApproxEq(Float(2.0f), Float(1.0f + 1.0f)));
+        REQUIRE(ApproxEq(Float(1.0f), Float(0.1f * 10.0f)));
+    }
+
     SECTION("Vec")
     {
         {
@@ -135,8 +141,8 @@ TEST_CASE("Math")
         REQUIRE(Vec<3, float>(5.0f) != Vec<3, float>(4.0f));
 
         REQUIRE(Vec<3, int>(5).Product() == 125);
-        REQUIRE(Vec<3, int>(4).EachLessThan(Vec<3, int>(5)));
-        REQUIRE(!Vec<3, int>(4, 5, 6).EachLessThan(Vec<3, int>(6)));
+        REQUIRE(Vec<3, int>(4).EachElemLessThan(Vec<3, int>(5)));
+        REQUIRE(!Vec<3, int>(4, 5, 6).EachElemLessThan(Vec<3, int>(6)));
 
         REQUIRE(Vec<2, int>(1, 2) != Vec<2, int>(3, 4));
     }
