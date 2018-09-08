@@ -10,7 +10,7 @@ template<Math::DimType DIM>
 using Coord = Math::Vec<DIM, uint32_t>;
 
 template<Math::DimType DIM, typename PT>
-class Texture
+class TextureCore
 {
     friend class TextureFile;
 
@@ -47,33 +47,33 @@ class Texture
 public:
 
     using Pixel   = PT;
-    using Self    = Texture<DIM, PT>;
+    using Self    = TextureCore<DIM, PT>;
     using Coord   = Math::Vec<DIM, uint32_t>;
     using DimType = Math::DimType;
 
     static constexpr DimType Dim = DIM;
 
-    Texture()
+    TextureCore()
         : size_(0), cnt_(0), data_(nullptr)
     {
         
     }
 
-    explicit Texture(const Coord &size, const Pixel &initValue = Pixel())
-        : Texture(size, UNINITIALIZED)
+    explicit TextureCore(const Coord &size, const Pixel &initValue = Pixel())
+        : TextureCore(size, UNINITIALIZED)
     {
         AGZ_ASSERT(Coord(0).EachElemLessThan(size));
         ConstructN<Pixel, OperatorDeleter>(data_, cnt_, initValue);
     }
 
-    Texture(const Coord &size, Uninitialized_t)
+    TextureCore(const Coord &size, Uninitialized_t)
         : size_(size), cnt_(size.Product())
     {
         AGZ_ASSERT(Coord(0).EachElemLessThan(size));
         data_ = static_cast<Pixel*>(::operator new(sizeof(Pixel) * cnt_));
     }
 
-    Texture(const Self &copyFrom)
+    TextureCore(const Self &copyFrom)
         : size_(copyFrom.size_), cnt_(copyFrom.cnt_)
     {
         if(copyFrom.IsAvailable())
@@ -98,7 +98,7 @@ public:
             data_ = nullptr;
     }
 
-    Texture(Self &&moveFrom) noexcept
+    TextureCore(Self &&moveFrom) noexcept
         : size_(moveFrom.size_), cnt_(moveFrom.cnt_), data_(moveFrom.data_)
     {
         moveFrom.data_ = nullptr;
@@ -120,7 +120,7 @@ public:
         return *this;
     }
 
-    ~Texture()
+    ~TextureCore()
     {
         if(IsAvailable())
             UncheckedRelease();
@@ -129,11 +129,6 @@ public:
     bool IsAvailable() const
     {
         return data_ != nullptr;
-    }
-
-    operator bool() const
-    {
-        return IsAvailable();
     }
 
     void Destroy()
@@ -164,34 +159,6 @@ public:
         return data_[LinearIndex(coord)];
     }
 
-    const Pixel &operator()(uint32_t x) const
-    {
-        AGZ_ASSERT(IsAvailable());
-        static_assert(Dim == 1);
-        return data_[x];
-    }
-
-    Pixel &operator()(uint32_t x)
-    {
-        AGZ_ASSERT(IsAvailable());
-        static_assert(Dim == 1);
-        return data_[x];
-    }
-
-    const Pixel &operator()(uint32_t x, uint32_t y) const
-    {
-        AGZ_ASSERT(IsAvailable());
-        static_assert(Dim == 2);
-        return data_[LinearIndex({ x, y })];
-    }
-
-    Pixel &operator()(uint32_t x, uint32_t y)
-    {
-        AGZ_ASSERT(IsAvailable());
-        static_assert(Dim == 2);
-        return data_[LinearIndex({ x, y })];
-    }
-
     const Pixel &At(const Coord &coord) const
     {
         return (*this)(coord);
@@ -202,50 +169,10 @@ public:
         return (*this)(coord);
     }
 
-    const Pixel &At(uint32_t x) const
-    {
-        AGZ_ASSERT(IsAvailable());
-        static_assert(Dim == 1);
-        return data_[x];
-    }
-
-    Pixel &At(uint32_t x)
-    {
-        AGZ_ASSERT(IsAvailable());
-        static_assert(Dim == 1);
-        return data_[x];
-    }
-
-    const Pixel &At(uint32_t x, uint32_t y) const
-    {
-        AGZ_ASSERT(IsAvailable());
-        static_assert(Dim == 2);
-        return data_[LinearIndex({ x, y })];
-    }
-
-    Pixel &At(uint32_t x, uint32_t y)
-    {
-        AGZ_ASSERT(IsAvailable());
-        static_assert(Dim == 2);
-        return data_[LinearIndex({ x, y })];
-    }
-
     const Coord &GetSize() const
     {
         AGZ_ASSERT(IsAvailable());
         return size_;
-    }
-
-    uint32_t GetWidth() const
-    {
-        static_assert(Dim == 2);
-        return size_[0];
-    }
-
-    uint32_t GetHeight() const
-    {
-        static_assert(Dim == 2);
-        return size_[1];
     }
 
     Pixel *RawData()
@@ -266,7 +193,7 @@ public:
         AGZ_ASSERT(IsAvailable());
 
         using NewPixel = decltype(func(std::declval<Pixel>()));
-        Texture<Dim, NewPixel> ret(size_);
+        TextureCore<Dim, NewPixel> ret(size_);
         NewPixel *newData = ret.RawData();
 
         for(uint32_t i = 0; i < cnt_; ++i)
@@ -274,6 +201,17 @@ public:
         
         return ret;
     }
+};
+
+template<typename PT>
+class Texture2D : public TextureCore<2, PT>
+{
+public:
+
+    using Pixel   = PT;
+    using Self    = Texture2D<PT>;
+    using Coord   = Math::Vec<2, uint32_t>;
+    using DimType = Math::DimType;
 };
 
 AGZ_NS_END(AGZ::Tex)

@@ -18,45 +18,45 @@ public:
         BMP
     };
 
-    static Texture<2, Math::Color3b> LoadRGBFromFile(
+    static TextureCore<2, Math::Color3b> LoadRGBFromFile(
         const WStr &filename);
 
-    static Texture<2, Math::Color4b> LoadRGBAFromFile(
+    static TextureCore<2, Math::Color4b> LoadRGBAFromFile(
         const WStr &filename);
 
     static void WriteTo(
         const WStr &filename,
-        const Texture<2, Math::Color3b> &tex,
+        const TextureCore<2, Math::Color3b> &tex,
         WriteFormat format);
 
     static void WriteTo(
         const WStr &filename,
-        const Texture<2, Math::Color4b> &tex,
+        const TextureCore<2, Math::Color4b> &tex,
         WriteFormat format);
 
     static void WriteRGBToPNG(
         const WStr &filename,
-        const Texture<2, Math::Color3b> &tex);
+        const TextureCore<2, Math::Color3b> &tex);
 
     static void WriteRGBAToPNG(
         const WStr &filename,
-        const Texture<2, Math::Color4b> &tex);
+        const TextureCore<2, Math::Color4b> &tex);
 
     static void WriteRGBToJPG(
         const WStr &filename,
-        const Texture<2, Math::Color3b> &tex);
+        const TextureCore<2, Math::Color3b> &tex);
 
     static void WriteRGBAToJPG(
         const WStr &filename,
-        const Texture<2, Math::Color4b> &tex);
+        const TextureCore<2, Math::Color4b> &tex);
 
     static void WriteRGBToBMP(
         const WStr &filename,
-        const Texture<2, Math::Color3b> &tex);
+        const TextureCore<2, Math::Color3b> &tex);
 
     static void WriteRGBAToBMP(
         const WStr &filename,
-        const Texture<2, Math::Color4b> &tex);
+        const TextureCore<2, Math::Color4b> &tex);
 };
 
 AGZ_NS_END(AGZ::Tex)
@@ -79,7 +79,7 @@ AGZ_NS_END(AGZ::Tex)
 
 AGZ_NS_BEG(AGZ::Tex)
 
-Texture<2, Math::Color3b> TextureFile::LoadRGBFromFile(
+TextureCore<2, Math::Color3b> TextureFile::LoadRGBFromFile(
     const WStr &filename)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
@@ -97,7 +97,7 @@ Texture<2, Math::Color3b> TextureFile::LoadRGBFromFile(
 
     AGZ_ASSERT(w > 0 && h > 0);
 
-    Texture<2, Math::Color3b> ret({ w, h }, UNINITIALIZED);
+    TextureCore<2, Math::Color3b> ret({ w, h }, UNINITIALIZED);
     unsigned char *scanlineData = bytes;
     for(int scanline = 0; scanline < h; ++scanline)
     {
@@ -116,7 +116,7 @@ Texture<2, Math::Color3b> TextureFile::LoadRGBFromFile(
     return ret;
 }
 
-Texture<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
+TextureCore<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
     const WStr &filename)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
@@ -134,7 +134,7 @@ Texture<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
 
     AGZ_ASSERT(w > 0 && h > 0);
 
-    Texture<2, Math::Color4b> ret({ w, h }, UNINITIALIZED);
+    TextureCore<2, Math::Color4b> ret({ w, h }, UNINITIALIZED);
     unsigned char *scanlineData = bytes;
     for(int scanline = 0; scanline < h; ++scanline)
     {
@@ -156,7 +156,7 @@ Texture<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
 
 void TextureFile::WriteTo(
     const WStr &filename,
-    const Texture<2, Math::Color3b> &tex,
+    const TextureCore<2, Math::Color3b> &tex,
     WriteFormat format)
 {
     switch(format)
@@ -174,7 +174,7 @@ void TextureFile::WriteTo(
 
 void TextureFile::WriteTo(
     const WStr &filename,
-    const Texture<2, Math::Color4b> &tex,
+    const TextureCore<2, Math::Color4b> &tex,
     WriteFormat format)
 {
     switch(format)
@@ -209,9 +209,9 @@ namespace
 
 void TextureFile::WriteRGBToPNG(
     const WStr &filename,
-    const Texture<2, Math::Color3b> &tex)
+    const TextureCore<2, Math::Color3b> &tex)
 {
-    AGZ_ASSERT(tex);
+    AGZ_ASSERT(tex.IsAvailable());
 
     std::vector<unsigned char> data;
     BufferContext bc = { &data };
@@ -229,9 +229,9 @@ void TextureFile::WriteRGBToPNG(
 
 void TextureFile::WriteRGBAToPNG(
     const WStr &filename,
-    const Texture<2, Math::Color4b> &tex)
+    const TextureCore<2, Math::Color4b> &tex)
 {
-    AGZ_ASSERT(tex);
+    AGZ_ASSERT(tex.IsAvailable());
 
     std::vector<unsigned char> data;
     BufferContext bc = { &data };
@@ -249,9 +249,9 @@ void TextureFile::WriteRGBAToPNG(
 
 void TextureFile::WriteRGBToJPG(
     const WStr &filename,
-    const Texture<2, Math::Color3b> &tex)
+    const TextureCore<2, Math::Color3b> &tex)
 {
-    AGZ_ASSERT(tex);
+    AGZ_ASSERT(tex.IsAvailable());
 
     std::vector<unsigned char> data;
     BufferContext bc = { &data };
@@ -269,9 +269,9 @@ void TextureFile::WriteRGBToJPG(
 
 void TextureFile::WriteRGBAToJPG(
     const WStr &filename,
-    const Texture<2, Math::Color4b> &tex)
+    const TextureCore<2, Math::Color4b> &tex)
 {
-    AGZ_ASSERT(tex);
+    AGZ_ASSERT(tex.IsAvailable());
 
     std::vector<unsigned char> data;
     BufferContext bc = { &data };
@@ -289,9 +289,9 @@ void TextureFile::WriteRGBAToJPG(
 
 void TextureFile::WriteRGBToBMP(
     const WStr &filename,
-    const Texture<2, Math::Color3b> &tex)
+    const TextureCore<2, Math::Color3b> &tex)
 {
-    AGZ_ASSERT(tex);
+    AGZ_ASSERT(tex.IsAvailable());
 
     std::vector<unsigned char> data;
     BufferContext bc = { &data };
@@ -309,9 +309,9 @@ void TextureFile::WriteRGBToBMP(
 
 void TextureFile::WriteRGBAToBMP(
     const WStr &filename,
-    const Texture<2, Math::Color4b> &tex)
+    const TextureCore<2, Math::Color4b> &tex)
 {
-    AGZ_ASSERT(tex);
+    AGZ_ASSERT(tex.IsAvailable());
 
     std::vector<unsigned char> data;
     BufferContext bc = { &data };

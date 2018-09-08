@@ -49,7 +49,7 @@ public:
 
     Self operator*(const Self &rhs) const;
 
-    Vec4<T> operator*(const Vec4<T> &p);
+    Vec4<T> operator*(const Vec4<T> &p) const;
 
     static Self Translate(const Vec3<T> &v);
 
@@ -71,19 +71,15 @@ public:
     static Self Perspective(U fovY, T ratio, T _near, T _far);
 
     static Self LookAt(const Vec3<T> &src, const Vec3<T> &dst, const Vec3<T> &up);
+
+    Vec4<T> ApplyToPoint(const Vec4<T> &p) const;
+    Vec3<T> ApplyToPoint(const Vec3<T> &p) const;
+
+    Vec4<T> ApplyToVector(const Vec4<T> &p) const;
+    Vec3<T> ApplyToVector(const Vec3<T> &p) const;
+
+    Vec3<T> ApplyInverseToNormal(const Vec3<T> &n) const;
 };
-
-template<typename T>
-Vec4<T> ApplyToPoint(const Mat4<T> &m, const Vec4<T> &v);
-
-template<typename T>
-Vec3<T> ApplyToPoint(const Mat4<T> &m, const Vec3<T> &p);
-
-template<typename T>
-Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec4<T> &v);
-
-template<typename T>
-Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec3<T> &v);
 
 template<typename T>
 Mat4<T> Transpose(const Mat4<T> &m);
@@ -189,7 +185,7 @@ typename Mat4<T>::Self Mat4<T>::operator*(const Self &rhs) const
 }
 
 template<typename T>
-Vec4<T> Mat4<T>::operator*(const Vec4<T> &p)
+Vec4<T> Mat4<T>::operator*(const Vec4<T> &p) const
 {
     return Vec4<T>(m[0][0] * p.x + m[0][1] * p.y + m[0][2] * p.z + m[0][3] * p.w,
                    m[1][0] * p.x + m[1][1] * p.y + m[1][2] * p.z + m[1][3] * p.w,
@@ -313,31 +309,39 @@ typename Mat4<T>::Self Mat4<T>::LookAt(const Vec3<T>& src, const Vec3<T>& dst, c
 }
 
 template<typename T>
-Vec4<T> ApplyToPoint(const Mat4<T> &m, const Vec4<T> &v)
+Vec4<T> Mat4<T>::ApplyToPoint(const Vec4<T> &v) const
 {
-    return m * v;
+    return *this * v;
 }
 
 template<typename T>
-Vec3<T> ApplyToPoint(const Mat4<T> &m, const Vec3<T> &p)
+Vec3<T> Mat4<T>::ApplyToPoint(const Vec3<T> &p) const
 {
-    Vec4<T> ret = m * Vec4<T>(p.x, p.y, p.z, 1.0);
+    Vec4<T> ret = *this * Vec4<T>(p.x, p.y, p.z, T(1.0));
     T dw = T(1) / ret.w;
     return Vec3<T>(dw * ret.x, dw * ret.y, dw * ret.z);
 }
 
 template<typename T>
-Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec4<T> &v)
+Vec4<T> Mat4<T>::ApplyToVector(const Vec4<T> &v) const
 {
-    return m * v;
+    return *this * v;
 }
 
 template<typename T>
-Vec4<T> ApplyToVector(const Mat4<T> &m, const Vec3<T> &v)
+Vec3<T> Mat4<T>::ApplyToVector(const Vec3<T> &v) const
 {
-    return Vec3<T>(m.m[0][0] * v.x + m.m[0][1] * v.y + m.m[0][2] * v.z,
-                   m.m[1][0] * v.x + m.m[1][1] * v.y + m.m[1][2] * v.z,
-                   m.m[2][0] * v.x + m.m[2][1] * v.y + m.m[2][2] * v.z);
+    return Vec3<T>(m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
+                   m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
+                   m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
+}
+
+template<typename T>
+Vec3<T> Mat4<T>::ApplyInverseToNormal(const Vec3<T> &n) const
+{
+    return Vec3<T>(m[0][0] * n.x + m[1][0] * n.y + m[2][0] * n.z,
+                   m[0][1] * n.x + m[1][1] * n.y + m[2][1] * n.z, 
+                   m[0][2] * n.x + m[1][2] * n.y + m[2][2] * n.z);
 }
 
 template<typename T>

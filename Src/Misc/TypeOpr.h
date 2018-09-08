@@ -63,6 +63,15 @@ constexpr bool Any() { return FuncClass<T>::value || Any<FuncClass, Others...>()
 template<template<typename> typename FuncClass, typename...TypeList>
 constexpr bool Any_v = Any<FuncClass, TypeList...>();
 
+template<template<typename> typename FuncClass>
+constexpr bool All() { return true; }
+
+template<template<typename> typename FuncClass, typename T, typename...Others>
+constexpr bool All() { return FuncClass<T>::value && All<FuncClass, Others...>(); }
+
+template<template<typename> typename FuncClass, typename...TypeList>
+constexpr bool All_v = All<FuncClass, TypeList...>();
+
 template<bool B> struct TrueToVoid { };
 template<> struct TrueToVoid<true>  { using type = void; };
 
@@ -71,5 +80,12 @@ using TrueToVoid_t = typename TrueToVoid<B>::type;
 
 template<typename T>
 constexpr bool True_v = true;
+
+template<typename T>
+struct CanConvertToGenerator
+{
+    template<typename U>
+    using type = std::is_convertible<U, T>;
+};
 
 AGZ_NS_END(AGZ::TypeOpr)
