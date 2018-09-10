@@ -188,7 +188,7 @@ public:
     }
 
     template<typename F>
-    auto Map(F &&func)
+    auto Map(F &&func) const
     {
         AGZ_ASSERT(IsAvailable());
 
@@ -204,14 +204,244 @@ public:
 };
 
 template<typename PT>
+class Texture1D : public TextureCore<1, PT>
+{
+    using Core = TextureCore<1, PT>;
+
+    Core &GetCore() { return static_cast<Core&>(this); }
+
+    explicit Texture1D(TextureCore<1, PT> &&moveFrom) noexcept
+        : Core(std::move(moveFrom))
+    {
+
+    }
+
+public:
+
+    using Pixel = PT;
+    using Self = Texture1D<PT>;
+    using Coord = Math::Vec<1, uint32_t>;
+    using DimType = Math::DimType;
+
+    Texture1D() = default;
+
+    explicit Texture1D(uint32_t size, const Pixel &initVal = Pixel())
+        : Core(Coord(size), initVal)
+    {
+
+    }
+
+    Texture1D(const Self &)       = default;
+    Self &operator=(const Self &) = default;
+
+    Texture1D(Self &&moveFrom) noexcept
+        : Core(std::move(moveFrom.GetCore()))
+    {
+
+    }
+
+    Self &operator=(Self &&moveFrom) noexcept
+    {
+        GetCore() = std::move(moveFrom.GetCore());
+        return *this;
+    }
+
+    uint32_t GetLength() const
+    {
+        return Core::GetSize()[0];
+    }
+
+    const Pixel &operator()(uint32_t idx) const
+    {
+        return Core::At(Coord(idx));
+    }
+
+    Pixel &operator()(uint32_t idx)
+    {
+        return Core::At(Coord(idx));
+    }
+
+    const Pixel &At(uint32_t idx) const
+    {
+        return Core::At(Coord(idx));
+    }
+
+    Pixel &At(uint32_t idx)
+    {
+        return Core::At(Coord(idx));
+    }
+
+    template<typename F>
+    auto Map(F &&func) const
+    {
+        return Self(Core::Map(std::forward<F>(func)));
+    }
+};
+
+template<typename PT>
 class Texture2D : public TextureCore<2, PT>
 {
+    using Core = TextureCore<2, PT>;
+
+    Core &GetCore() { return static_cast<Core&>(this); }
+
+    explicit Texture2D(TextureCore<2, PT> &&moveFrom) noexcept
+        : Core(std::move(moveFrom))
+    {
+        
+    }
+    
 public:
 
     using Pixel   = PT;
     using Self    = Texture2D<PT>;
     using Coord   = Math::Vec<2, uint32_t>;
     using DimType = Math::DimType;
+    
+    Texture2D() = default;
+    
+    Texture2D(uint32_t w, uint32_t h, const Pixel &initVal = Pixel())
+        : Core(Coord(w, h), initVal)
+    {
+        
+    }
+
+    Texture2D(const Self &)       = default;
+    Self &operator=(const Self &) = default;
+    
+    Texture2D(Self &&moveFrom) noexcept
+        : Core(std::move(moveFrom.GetCore()))
+    {
+        
+    }
+
+    Self &operator=(Self &&moveFrom) noexcept
+    {
+        GetCore() = std::move(moveFrom.GetCore());
+        return *this;
+    }
+
+    uint32_t GetWidth() const
+    {
+        return Core::GetSize()[0];
+    }
+
+    uint32_t GetHeight() const
+    {
+        return Core::GetSize()[1];
+    }
+
+    const Pixel &operator()(uint32_t x, uint32_t y) const
+    {
+        return Core::At(Coord(x, y));
+    }
+
+    Pixel &operator()(uint32_t x, uint32_t y)
+    {
+        return Core::At(Coord(x, y));
+    }
+
+    const Pixel &At(uint32_t x, uint32_t y) const
+    {
+        return Core::At(Coord(x, y));
+    }
+
+    Pixel &At(uint32_t x, uint32_t y)
+    {
+        return Core::At(Coord(x, y));
+    }
+
+    template<typename F>
+    auto Map(F &&func) const
+    {
+        return Self(Core::Map(std::forward<F>(func)));
+    }
+};
+
+
+template<typename PT>
+class Texture3D : public TextureCore<3, PT>
+{
+    using Core = TextureCore<3, PT>;
+
+    Core &GetCore() { return static_cast<Core&>(this); }
+
+    explicit Texture3D(TextureCore<3, PT> &&moveFrom) noexcept
+        : Core(std::move(moveFrom))
+    {
+
+    }
+
+public:
+
+    using Pixel   = PT;
+    using Self    = Texture3D<PT>;
+    using Coord   = Math::Vec<3, uint32_t>;
+    using DimType = Math::DimType;
+
+    Texture3D() = default;
+
+    Texture3D(uint32_t x, uint32_t y, uint32_t z, const Pixel &initVal = Pixel())
+        : Core(Coord(x, y, z), initVal)
+    {
+
+    }
+
+    Texture3D(const Self &)       = default;
+    Self &operator=(const Self &) = default;
+
+    Texture3D(Self &&moveFrom) noexcept
+        : Core(std::move(moveFrom.GetCore()))
+    {
+
+    }
+
+    Self &operator=(Self &&moveFrom) noexcept
+    {
+        GetCore() = std::move(moveFrom.GetCore());
+        return *this;
+    }
+
+    uint32_t GetXSize() const
+    {
+        return Core::GetSize()[0];
+    }
+
+    uint32_t GetYSize() const
+    {
+        return Core::GetSize()[1];
+    }
+
+    uint32_t GetZSize() const
+    {
+        return Core::GetSize()[2];
+    }
+
+    const Pixel &operator()(uint32_t x, uint32_t y, uint32_t z) const
+    {
+        return Core::At(Coord(x, y, z));
+    }
+
+    Pixel &operator()(uint32_t x, uint32_t y, uint32_t z)
+    {
+        return Core::At(Coord(x, y, z));
+    }
+
+    const Pixel &At(uint32_t x, uint32_t y, uint32_t z) const
+    {
+        return Core::At(Coord(x, y, z));
+    }
+
+    Pixel &At(uint32_t x, uint32_t y, uint32_t z)
+    {
+        return Core::At(Coord(x, y, z));
+    }
+
+    template<typename F>
+    auto Map(F &&func) const
+    {
+        return Self(Core::Map(std::forward<F>(func)));
+    }
 };
 
 AGZ_NS_END(AGZ::Tex)

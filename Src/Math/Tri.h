@@ -47,4 +47,13 @@ template<typename T> auto Cos(T angle) { return Cos_impl<T>::Cos(angle); }
 template<typename T> auto Tan(T angle) { return Sin<T>(angle) / Cos<T>(angle); }
 template<typename T> auto Cot(T angle) { return Cos<T>(angle) / Sin<T>(angle); }
 
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+T Arcsin(T v) { return std::asin(v); }
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+T Arccos(T v) { return std::acos(v); }
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+T Arctan(T v) { return std::atan(v); }
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+T Arctan2(T y, T x) { return std::atan2(y, x); }
+
 AGZ_NS_END(AGZ::Math)

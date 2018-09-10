@@ -98,7 +98,7 @@ public:
 
     constexpr FP() : float_(F(0)) { }
     constexpr FP(F v) : float_(v) { }
-    FP(Uninitialized_t) { }
+    explicit FP(Uninitialized_t) { }
 
     static Self Infinity() { return Bits2Value(EXPT_BIT_MASK); }
     static Self Max()      { return std::numeric_limits<ValueType>::max(); }
@@ -109,6 +109,8 @@ public:
     InternalUInt ExptBits() const { return EXPT_BIT_MASK & uint_; }
     InternalUInt FracBits() const { return FRAC_BIT_MASK & uint_; }
     InternalUInt SignBit()  const { return SIGN_BIT_MASK & uint_; }
+
+    operator ValueType() const { return Value(); }
 
     bool IsNAN()      const { return ExptBits() == EXPT_BIT_MASK && FracBits(); }
     bool IsInfinity() const { return ExptBits() == EXPT_BIT_MASK && !FracBits(); }
