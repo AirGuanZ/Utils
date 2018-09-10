@@ -122,6 +122,7 @@ TEST_CASE("Math")
     {
         REQUIRE(ApproxEq(Float(2.0f), Float(1.0f + 1.0f)));
         REQUIRE(ApproxEq(Float(1.0f), Float(0.1f * 10.0f)));
+        REQUIRE(!ApproxEq(Float(1.0f), Float(0.11f * 10.0f)));
     }
 
     SECTION("Vec")

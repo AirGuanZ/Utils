@@ -40,7 +40,7 @@ AGZ_FORCEINLINE bool ApproxEq(T lhs, T rhs, U epsilon)
 }
 
 // IEEE754 floating-poing number
-// See https://randomascii.wordpress.com/category/floating-point/
+// See https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
 template<typename F, std::enable_if_t<(std::is_floating_point_v<F> &&
                                        !std::is_same_v<F, long double>),
                                       int> = 0>
@@ -51,6 +51,12 @@ public:
     using ValueType    = F;
     using InternalUInt = std::conditional_t<sizeof(F) == sizeof(uint32_t),
                                             uint32_t, uint64_t>;
+
+    union
+    {
+        ValueType float_;
+        InternalUInt uint_;
+    };
 
 private:
 
@@ -64,12 +70,6 @@ private:
 
     static constexpr size_t DEFAULT_MAX_ULP = 4;
 
-    union
-    {
-        ValueType float_;
-        InternalUInt uint_;
-    };
-
     static ValueType Bits2Value(InternalUInt uint)
     {
         Self ret(UNINITIALIZED);
@@ -81,17 +81,6 @@ private:
     {
         Self ret(v);
         return ret.uint_;
-    }
-
-    static InternalUInt SAM2Biased(InternalUInt sam)
-    {
-        return (SIGN_BIT_MASK & sam) ? (~sam + 1) : (SIGN_BIT_MASK | sam);
-    }
-
-    static InternalUInt DistanceBetweenSAMs(InternalUInt lhs, InternalUInt rhs)
-    {
-        auto blhs = SAM2Biased(lhs), brhs = SAM2Biased(rhs);
-        return (blhs >= brhs) ? (blhs - brhs) : (brhs - blhs);
     }
 
 public:
@@ -114,15 +103,32 @@ public:
 
     bool IsNAN()      const { return ExptBits() == EXPT_BIT_MASK && FracBits(); }
     bool IsInfinity() const { return ExptBits() == EXPT_BIT_MASK && !FracBits(); }
+    bool IsNegative() const { return SignBit() != 0; }
 
     static constexpr size_t DefaultEqEpsilon() { return DEFAULT_MAX_ULP; }
 
-    bool ApproxEq(const Self &rhs, size_t maxULP = DEFAULT_MAX_ULP) const
+    bool ApproxEq(Self rhs, size_t maxULPs = DEFAULT_MAX_ULP) const
     {
-        return !IsNAN() && !rhs.IsNAN() &&
-                DistanceBetweenSAMs(uint_, rhs.uint_) <= maxULP;
+        if(IsNegative() != rhs.IsNegative())
+            return float_ == rhs.float_;
+        InternalUInt ULPsDiff = uint_ > rhs.uint_ ? uint_ - rhs.uint_ : rhs.uint_ - uint_;
+        return ULPsDiff <= maxULPs;
     }
+
+#define FP_BINARY_OPERATOR(binary_opr, assign_opr) \
+    auto operator binary_opr(Self rhs) const { return Self(float_ binary_opr rhs.float_); } \
+    Self &operator assign_opr(Self rhs) { float_ assign_opr rhs,float_; return *this; }
+
+    FP_BINARY_OPERATOR(+, +=)
+    FP_BINARY_OPERATOR(-, -=)
+    FP_BINARY_OPERATOR(*, *=)
+    FP_BINARY_OPERATOR(/, /=)
+
+#undef FP_BINARY_OPERATOR
+
+    Self operator-() const { return Self(-float_); }
 };
+
 
 using Float  = FP<float>;
 using Double = FP<double>;
