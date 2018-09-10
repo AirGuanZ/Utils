@@ -126,9 +126,20 @@ public:
 
 #undef FP_BINARY_OPERATOR
 
+#define FP_COMPARE_OPERATOR(comp_opr) \
+    bool operator comp_opr(Self rhs) const { return float_ comp_opr rhs.float_; }
+
+    FP_COMPARE_OPERATOR(==)
+    FP_COMPARE_OPERATOR(!=)
+    FP_COMPARE_OPERATOR(<)
+    FP_COMPARE_OPERATOR(>)
+    FP_COMPARE_OPERATOR(<=)
+    FP_COMPARE_OPERATOR(>=)
+
+#undef FP_COMPARE_OPERATOR
+
     Self operator-() const { return Self(-float_); }
 };
-
 
 using Float  = FP<float>;
 using Double = FP<double>;
