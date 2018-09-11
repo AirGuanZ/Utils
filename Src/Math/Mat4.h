@@ -79,6 +79,9 @@ public:
     Vec3<T> ApplyToVector(const Vec3<T> &p) const;
 
     Vec3<T> ApplyInverseToNormal(const Vec3<T> &n) const;
+
+    Self Transpose() const;
+    Self Inverse() const;
 };
 
 template<typename T>
@@ -426,6 +429,18 @@ Mat4<T> Inverse(const Mat4<T> &_m)
     }
 
     return Mat4<T>(m);
+}
+
+template<typename T>
+Mat4<T> Mat4<T>::Transpose() const
+{
+    return ::AGZ::Math::Transpose(*this);
+}
+
+template<typename T>
+Mat4<T> Mat4<T>::Inverse() const
+{
+    return ::AGZ::Math::Inverse(*this);
 }
 
 AGZ_NS_END(AGZ::Math)

@@ -11,15 +11,15 @@ TEST_CASE("Math")
 {
     SECTION("Angle")
     {
-        REQUIRE(ApproxEq(PI<Radd>().value, 3.1415926, 1e-5));
-        REQUIRE(ApproxEq(PI<Degd>().value, 180.0, 1e-7));
-        REQUIRE(ApproxEq(PI<double>(), 3.1415926, 1e-5));
+        REQUIRE(ApproxEq(PI<Radd>.value, 3.1415926, 1e-5));
+        REQUIRE(ApproxEq(PI<Degd>.value, 180.0, 1e-7));
+        REQUIRE(ApproxEq(PI<double>, 3.1415926, 1e-5));
 
-        REQUIRE(ApproxEq(Sin(PI<Degd>()), 0.0, 1e-5));
-        REQUIRE(ApproxEq(Cos(PI<Degd>()), -1.0, 1e-5));
-        REQUIRE(ApproxEq(Sin(PI<Degd>() / 2.0), 1.0, 1e-5));
+        REQUIRE(ApproxEq(Sin(PI<Degd>), 0.0, 1e-5));
+        REQUIRE(ApproxEq(Cos(PI<Degd>), -1.0, 1e-5));
+        REQUIRE(ApproxEq(Sin(PI<Degd> / 2.0), 1.0, 1e-5));
 
-        REQUIRE(ApproxEq(Sin(PI<Degd>() / 2.0 + PI<Degd>() / 2.0),
+        REQUIRE(ApproxEq(Sin(PI<Degd> / 2.0 + PI<Degd> / 2.0),
                          0.0, 1e-5));
     }
 
@@ -41,7 +41,7 @@ TEST_CASE("Math")
         REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
 
         v = Vec4d::UNIT_Y();
-        m = Mat4d::Rotate(Vec3d::UNIT_X(), PI<Radd>() / 2.0);
+        m = Mat4d::Rotate(Vec3d::UNIT_X(), PI<Radd> / 2.0);
         REQUIRE(ApproxEq(m * v, Vec4d::UNIT_Z(), 1e-5));
         REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
 
@@ -51,7 +51,7 @@ TEST_CASE("Math")
         REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
 
         v = Vec4d::UNIT_Y();
-        m = Mat4d::RotateX(PI<Radd>() / 2.0);
+        m = Mat4d::RotateX(PI<Radd> / 2.0);
         REQUIRE(ApproxEq(m * v, Vec4d::UNIT_Z(), 1e-5));
         REQUIRE(ApproxEq(Inverse(m) * m * v, v, 1e-5));
     }
@@ -113,7 +113,7 @@ TEST_CASE("Math")
     SECTION("Quaternion")
     {
         REQUIRE(ApproxEq(Apply(Quaterniond::Rotate(Vec3d(0.0, 0.0, 1.0),
-                                                   PI<double>() / 2.0),
+                                                   PI<double> / 2.0),
                                Vec3d(1.0, 0.0, 0.0)),
                          Vec3d(0.0, 1.0, 0.0), 1e-5));
     }

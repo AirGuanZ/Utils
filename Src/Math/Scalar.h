@@ -12,7 +12,7 @@
 AGZ_NS_BEG(AGZ::Math)
 
 template<typename T> struct Abs_impl;
-template<>           struct Abs_impl<float>  { static float Abs(float v)   { return std::abs(v); } };
+template<>           struct Abs_impl<float>  { static float  Abs(float v)   { return std::abs(v); } };
 template<>           struct Abs_impl<double> { static double Abs(double v) { return std::fabs(v); } };
 template<typename T> struct Abs_impl<Rad<T>> { static Rad<T> Abs(Rad<T> v) { return Rad<T>{ Abs_impl<T>::Abs(v.value) }; } };
 template<typename T> struct Abs_impl<Deg<T>> { static Deg<T> Abs(Deg<T> v) { return Deg<T>{ Abs_impl<T>::Abs(v.value) }; } };
@@ -64,9 +64,9 @@ private:
     static constexpr size_t FRAC_BIT_COUNT = std::numeric_limits<F>::digits - 1;
     static constexpr size_t EXPT_BIT_COUNT = BIT_COUNT - 1 - FRAC_BIT_COUNT;
 
-    static constexpr size_t SIGN_BIT_MASK = static_cast<InternalUInt>(1) << (BIT_COUNT - 1);
-    static constexpr size_t FRAC_BIT_MASK = ~static_cast<InternalUInt>(0) >> (EXPT_BIT_COUNT + 1);
-    static constexpr size_t EXPT_BIT_MASK = ~(SIGN_BIT_MASK | FRAC_BIT_MASK);
+    static constexpr InternalUInt SIGN_BIT_MASK = static_cast<InternalUInt>(1) << (BIT_COUNT - 1);
+    static constexpr InternalUInt FRAC_BIT_MASK = ~static_cast<InternalUInt>(0) >> (EXPT_BIT_COUNT + 1);
+    static constexpr InternalUInt EXPT_BIT_MASK = ~(SIGN_BIT_MASK | FRAC_BIT_MASK);
 
     static constexpr size_t DEFAULT_MAX_ULP = 4;
 
