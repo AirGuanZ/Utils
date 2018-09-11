@@ -19,8 +19,6 @@ public:
         struct { T x; T y; };
     };
 
-public:
-
     using Data = T[2];
     using Component = T;
     using Self = Vec2<T>;
@@ -97,6 +95,12 @@ public:
         static const Self ret(T(0), T(1));
         return ret;
     }
+
+    auto LengthSquare()      const;
+    auto Length()            const;
+    Self Normalize()         const;
+    Self Clamp(T min, T max) const;
+    Self Sqrt()              const;
 };
 
 template<typename T>
@@ -157,6 +161,36 @@ bool ApproxEq(const Vec2<T> &lhs, const Vec2<T> &rhs, T epsilon)
 {
     return ApproxEq(lhs.x, rhs.x, epsilon) &&
            ApproxEq(lhs.y, rhs.y, epsilon);
+}
+
+template<typename T>
+auto Vec2<T>::LengthSquare() const
+{
+    return ::AGZ::Math::LengthSquare(*this);
+}
+
+template<typename T>
+auto Vec2<T>::Length() const
+{
+    return ::AGZ::Math::Length(*this);
+}
+
+template<typename T>
+Vec2<T> Vec2<T>::Normalize() const
+{
+    return ::AGZ::Math::Normalize(*this);
+}
+
+template<typename T>
+Vec2<T> Vec2<T>::Clamp(T min, T max) const
+{
+    return ::AGZ::Math::Clamp(*this, min, max);
+}
+
+template<typename T>
+Vec2<T> Vec2<T>::Sqrt() const
+{
+    return ::AGZ::Math::Sqrt(*this);
 }
 
 using Vec2f = Vec2<float>;

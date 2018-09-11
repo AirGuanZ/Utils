@@ -21,8 +21,6 @@ public:
         struct { T r; T g; T b; };
     };
 
-public:
-
     using Data = T[3];
     using Component = T;
     using Self = Vec3<T>;
@@ -118,6 +116,12 @@ public:
         static const Self ret(T(0), T(0), T(1));
         return ret;
     }
+
+    auto LengthSquare()      const;
+    auto Length()            const;
+    Self Normalize()         const;
+    Self Clamp(T min, T max) const;
+    Self Sqrt()              const;
 };
 
 template<typename T>
@@ -195,6 +199,36 @@ template<typename T>
 auto Brightness(const Vec3<T> &v)
 {
     return T(0.2126) * v.r + T(0.7152) * v.g + T(0.0722) * v.b;
+}
+
+template<typename T>
+auto Vec3<T>::LengthSquare() const
+{
+    return ::AGZ::Math::LengthSquare(*this);
+}
+
+template<typename T>
+auto Vec3<T>::Length() const
+{
+    return ::AGZ::Math::Length(*this);
+}
+
+template<typename T>
+Vec3<T> Vec3<T>::Normalize() const
+{
+    return ::AGZ::Math::Normalize(*this);
+}
+
+template<typename T>
+Vec3<T> Vec3<T>::Clamp(T min, T max) const
+{
+    return ::AGZ::Math::Clamp(*this, min, max);
+}
+
+template<typename T>
+Vec3<T> Vec3<T>::Sqrt() const
+{
+    return ::AGZ::Math::Sqrt(*this);
 }
 
 using Vec3f = Vec3<float>;

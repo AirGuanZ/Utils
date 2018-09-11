@@ -21,15 +21,13 @@ template<typename T>
 using Deg = AngleTemplate<T, 1>;
 
 template<typename T, int I>
-auto operator+(AngleTemplate<T, I> lhs,
-                                AngleTemplate<T, I> rhs)
+auto operator+(AngleTemplate<T, I> lhs, AngleTemplate<T, I> rhs)
 {
     return AngleTemplate<T, I>{ lhs.value + rhs.value };
 }
 
 template<typename T, int I>
-auto operator-(AngleTemplate<T, I> lhs,
-                                AngleTemplate<T, I> rhs)
+auto operator-(AngleTemplate<T, I> lhs, AngleTemplate<T, I> rhs)
 {
     return AngleTemplate<T, I>{ lhs.value - rhs.value };
 }
