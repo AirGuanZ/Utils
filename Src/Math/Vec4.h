@@ -42,6 +42,42 @@ public:
 
     Vec4(const Self &other) : x(other.x), y(other.y), z(other.z), w(other.w) { }
 
+    Vec4(T param0, T param1, const Vec2<T> &param2)
+        : x(param0), y(param1), z(param2.x), w(param2.y)
+    {
+
+    }
+
+    Vec4(T param0, const Vec2<T> &param1, T param2)
+        : x(param0), y(param1.x), z(param1.y), w(param2)
+    {
+
+    }
+
+    Vec4(T param0, const Vec3<T> &param1)
+        : x(param0), y(param1.x), z(param1.y), w(param1.z)
+    {
+
+    }
+
+    Vec4(const Vec2<T> &param0, T param1, T param2)
+        : x(param0.x), y(param0.y), z(param1), w(param2)
+    {
+
+    }
+
+    Vec4(const Vec2<T> &param0, const Vec2<T> &param1)
+        : x(param0.x), y(param0.y), z(param1.x), w(param1.y)
+    {
+
+    }
+
+    Vec4(const Vec3<T> &param0, T param1)
+        : x(param0.x), y(param0.y), z(param0.z), w(param1)
+    {
+
+    }
+
     Self &operator=(const Self &other)
     {
         x = other.x;

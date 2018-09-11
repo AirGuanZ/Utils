@@ -41,6 +41,18 @@ public:
         std::memcpy(&x, data, sizeof(Data));
     }
 
+    Vec3(T param0, const Vec2<T> &param1)
+        : x(param0), y(param1.x), z(param1.y)
+    {
+
+    }
+
+    Vec3(const Vec2<T> &param0, T param1)
+        : x(param0.x), y(param0.y), z(param1)
+    {
+
+    }
+
     Self &operator=(const Self &other)
     {
         x = other.x;
