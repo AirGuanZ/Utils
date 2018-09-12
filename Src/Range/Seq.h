@@ -117,7 +117,7 @@ namespace RangeAux
                 if(b.IsEnd())
                 {
                     if(a.IsEnd()) return difference_type(0);
-                    return std::numeric_limits<difference_type>::max();
+                    return (std::numeric_limits<difference_type>::max)();
                 }
                 if(a.IsEnd())
                     return std::numeric_limits<difference_type>::lowest();
