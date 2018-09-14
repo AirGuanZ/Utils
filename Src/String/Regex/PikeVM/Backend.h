@@ -70,6 +70,8 @@ AGZ_NS_BEG(AGZ::PikeVM)
           bool_not
 */
 
+constexpr size_t INST_REL_OFFSET_CAPACITY = sizeof(Inst<char32_t>) / sizeof(int32_t);
+
 template<typename CP>
 class Program
 {
@@ -195,7 +197,7 @@ public:
         AGZ_ASSERT(Available());
         auto ret = &insts_[instCount_].instArrUnit[relativeOffsetCount_];
         *ret = value;
-        if(++relativeOffsetCount_ == 3)
+        if(++relativeOffsetCount_ == INST_REL_OFFSET_CAPACITY)
         {
             relativeOffsetCount_ = 0;
             instCount_ += 1;
@@ -238,7 +240,8 @@ public:
             else
             {
                 insts_[i].lastStep = std::numeric_limits<uint32_t>::max();
-                i += (insts_[i].dataAlter.count / 3) + (insts_[i].dataAlter.count / 3 != 0);
+                i += (insts_[i].dataAlter.count / INST_REL_OFFSET_CAPACITY)
+                   + (insts_[i].dataAlter.count / INST_REL_OFFSET_CAPACITY != 0);
             }
         }
     }
