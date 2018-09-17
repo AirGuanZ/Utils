@@ -329,7 +329,8 @@ private:
 
     static uint32_t AlterSize(uint32_t alterDestCount)
     {
-        return 1 + alterDestCount / 3 + (alterDestCount % 3 != 0);
+        return 1 + alterDestCount / INST_REL_OFFSET_CAPACITY
+                 + (alterDestCount % INST_REL_OFFSET_CAPACITY != 0);
     }
 
     static uint32_t CountInst(const Node *node, bool inExpr = false)
