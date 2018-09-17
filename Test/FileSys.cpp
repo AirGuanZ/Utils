@@ -4,6 +4,14 @@
 
 using namespace AGZ::FileSys;
 
+TEST_CASE("BinaryView")
+{
+    SECTION("Memory")
+    {
+
+    }
+}
+
 TEST_CASE("FileSys")
 {
     SECTION("Path")

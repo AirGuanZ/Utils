@@ -155,6 +155,12 @@ public:
     explicit FileException(const std::string &err) : Exception(err) { }
 };
 
+class UnreachableException : public Exception
+{
+public:
+    explicit UnreachableException(const std::string &err) : Exception(err) { }
+};
+
 template<typename T>
 using remove_rcv_t = std::remove_cv_t<std::remove_reference_t<T>>;
 
