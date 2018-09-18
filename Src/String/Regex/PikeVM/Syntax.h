@@ -364,7 +364,7 @@ private:
                 {
                     state = WaitingForFirst;
 
-                    auto n = classMemNodeArena_.Malloc();
+                    auto n = classMemNodeArena_.Alloc();
                     n->next = ret->dataCharClass.mems;
                     n->isRange = false;
                     n->fst = fst;
@@ -378,7 +378,7 @@ private:
             {
                 state = WaitingForFirst;
 
-                auto n = classMemNodeArena_.Malloc();
+                auto n = classMemNodeArena_.Alloc();
                 n->next = ret->dataCharClass.mems;
                 n->isRange = true;
                 n->fst = fst;
@@ -673,7 +673,7 @@ private:
 
     Node *NewNode(ASTType type)
     {
-        Node *ret = astNodeArena_.Malloc();
+        Node *ret = astNodeArena_.Alloc();
         ret->type = type;
         return ret;
     }

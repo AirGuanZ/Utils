@@ -253,6 +253,12 @@
     <ClInclude Include="..\Src\FileSys\BinaryView.h">
       <Filter>FileSys</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Alloc\Arena.h">
+      <Filter>Alloc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Misc\Uncopiable.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">

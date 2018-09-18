@@ -2,11 +2,12 @@
 
 #include "../Misc/Common.h"
 #include "Alloc.h"
+#include "Arena.h"
 
 AGZ_NS_BEG(AGZ)
 
-template<typename Alloc = DefaultAllocator>
-class FixedSizedArena
+template<typename BaseAlloc = DefaultAllocator>
+class FixedSizedArena : public ArbitaryArena
 {
     struct Chunk
     {
@@ -24,6 +25,16 @@ class FixedSizedArena
 
     Node *freeNodes_;
     Chunk *chunkEntry_;
+
+    void FreeAllImpl()
+    {
+        while(chunkEntry_)
+        {
+            Chunk *next = chunkEntry_->next;
+            BaseAlloc::Free(chunkEntry_);
+            chunkEntry_ = next;
+        }
+    }
 
 public:
 
@@ -46,23 +57,19 @@ public:
 
     ~FixedSizedArena()
     {
-        ReleaseAll();
+        FreeAllImpl();
     }
 
-    FixedSizedArena(const FixedSizedArena<Alloc>&)            = delete;
-    FixedSizedArena &operator=(const FixedSizedArena<Alloc>&) = delete;
-
-    template<typename T = void>
-    T *Malloc()
+    void *Alloc(size_t _size) override
     {
         if(freeNodes_)
         {
             Node *ret = freeNodes_;
             freeNodes_ = freeNodes_->next;
-            return reinterpret_cast<T*>(ret);
+            return ret;
         }
 
-        Chunk *nChunk = reinterpret_cast<Chunk*>(Alloc::Malloc(chunkSize_));
+        Chunk *nChunk = reinterpret_cast<Chunk*>(BaseAlloc::Malloc(chunkSize_));
         nChunk->next = chunkEntry_;
         chunkEntry_ = nChunk;
 
@@ -74,35 +81,30 @@ public:
             node += nodeSize_;
         }
 
-        return Malloc<T>();
+        return Alloc(0);
     }
 
-    void Free(void *ptr)
+    void Free(void *ptr) override
     {
         Node *n = reinterpret_cast<Node*>(ptr);
         n->next = freeNodes_;
         freeNodes_ = n;
     }
 
-    void ReleaseAll()
+    void FreeAll() override
     {
-        while(chunkEntry_)
-        {
-            Chunk *next = chunkEntry_->next;
-            Alloc::Free(chunkEntry_);
-            chunkEntry_ = next;
-        }
+        FreeAllImpl();
     }
 };
 
-template<typename E, typename Alloc = DefaultAllocator>
-class SmallObjArena
+template<typename E, typename BaseAlloc = DefaultAllocator>
+class SmallObjArena : public FixedArena<E>
 {
-    FixedSizedArena<Alloc> base_;
+    FixedSizedArena<BaseAlloc> base_;
 
 public:
 
-    using Self = SmallObjArena<E, Alloc>;
+    using Self = SmallObjArena<E, BaseAlloc>;
 
     explicit SmallObjArena(size_t chunkSize = 32 * sizeof(E))
         : base_(sizeof(E), chunkSize)
@@ -114,19 +116,14 @@ public:
     Self &operator=(const Self &) = delete;
     ~SmallObjArena()              = default;
 
-    E *Malloc()
+    E *Alloc() override
     {
-        return base_.template Malloc<E>();
+        return static_cast<E*>(base_.Alloc(0));
     }
 
-    void Free(void *ptr)
+    void Free(E *ptr) override
     {
         base_.Free(ptr);
-    }
-
-    void ReleaseAll()
-    {
-        base_.ReleaseAll();
     }
 };
 

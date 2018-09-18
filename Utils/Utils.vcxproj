@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Alloc\Alloc.h" />
+    <ClInclude Include="..\Src\Alloc\Arena.h" />
     <ClInclude Include="..\Src\Alloc\FixedSizedArena.h" />
     <ClInclude Include="..\Src\Alloc\Malloc.h" />
     <ClInclude Include="..\Src\Buffer\Buffer.h" />
@@ -44,6 +45,7 @@
     <ClInclude Include="..\Src\Misc\Config.h" />
     <ClInclude Include="..\Src\Misc\Endian.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
+    <ClInclude Include="..\Src\Misc\Uncopiable.h" />
     <ClInclude Include="..\Src\Platform\Platform.h" />
     <ClInclude Include="..\Src\Range\Aggregate.h" />
     <ClInclude Include="..\Src\Range\All.h" />
