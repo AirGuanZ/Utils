@@ -259,6 +259,9 @@
     <ClInclude Include="..\Src\Misc\Uncopiable.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Math\Mat3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">

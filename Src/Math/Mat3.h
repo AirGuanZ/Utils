@@ -73,4 +73,7 @@ public:
     }
 };
 
+using Mat3f = Mat3<float>;
+using Mat3d = Mat3<double>;
+
 AGZ_NS_END(AGZ::Math)

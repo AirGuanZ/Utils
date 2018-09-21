@@ -3,6 +3,7 @@
 #include <Utils/Math.h>
 
 #include "Catch.hpp"
+#include "Math/Mat3.h"
 
 using namespace AGZ::Math;
 using namespace std;
@@ -146,5 +147,20 @@ TEST_CASE("Math")
         REQUIRE(!Vec<3, int>(4, 5, 6).EachElemLessThan(Vec<3, int>(6)));
 
         REQUIRE(Vec<2, int>(1, 2) != Vec<2, int>(3, 4));
+    }
+
+    SECTION("Mat3")
+    {
+        ApproxEq(Mat3d(1.0, 3.0, 5.0,
+                       7.0, 9.0, 11.0,
+                       2.0, 4.0, 6.0)
+                    .Determinant(),
+                 0.0, 1e-5);
+
+        ApproxEq(Mat3d(1.0, 3.0, 5.0,
+                       8.0, 9.0, 10.0,
+                       4.0, 6.0, 1.0)
+                    .Determinant(),
+                 105.0, 1e-5);
     }
 }
