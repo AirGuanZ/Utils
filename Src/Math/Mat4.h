@@ -108,7 +108,7 @@ Mat4<T>::Mat4(T v)
 template<typename T>
 Mat4<T>::Mat4(const Data &_m)
 {
-    static_assert(std::is_trivially_copyable<Component>::value);
+    static_assert(std::is_trivially_copyable_v<Component>);
     std::memcpy(m, _m, sizeof(m));
 }
 
@@ -138,7 +138,7 @@ Mat4<T> Mat4<T>::All(T v)
 template<typename T>
 const Mat4<T> &Mat4<T>::IDENTITY()
 {
-    static const Self ret;
+    static const Self ret(T(1));
     return ret;
 }
 
