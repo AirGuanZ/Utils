@@ -3,7 +3,6 @@
 #include <Utils/Math.h>
 
 #include "Catch.hpp"
-#include "Math/Mat3.h"
 
 using namespace AGZ::Math;
 using namespace std;

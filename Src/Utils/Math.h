@@ -2,6 +2,7 @@
 
 #include "../Math/Angle.h"
 #include "../Math/Color.h"
+#include "../Math/Mat3.h"
 #include "../Math/Mat4.h"
 #include "../Math/Quaternion.h"
 #include "../Math/Random.h"

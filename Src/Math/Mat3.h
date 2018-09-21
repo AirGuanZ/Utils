@@ -57,6 +57,16 @@ public:
         return ret;
     }
 
+    static Self FromCols(const Vec3<T> &col0,
+                         const Vec3<T> &col1,
+                         const Vec3<T> &col2)
+    {
+        Self ret(col0.x, col1.x, col2.x,
+                 col0.y, col1.y, col2.y,
+                 col0.z, col1.z, col2.z);
+        return ret;
+    }
+
     static const Self &IDENTITY()
     {
         static const Self ret(T(1));
