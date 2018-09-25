@@ -45,6 +45,7 @@
     <ClInclude Include="..\Src\Misc\Common.h" />
     <ClInclude Include="..\Src\Misc\Config.h" />
     <ClInclude Include="..\Src\Misc\Endian.h" />
+    <ClInclude Include="..\Src\Misc\Singleton.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
     <ClInclude Include="..\Src\Misc\Uncopiable.h" />
     <ClInclude Include="..\Src\Platform\Platform.h" />

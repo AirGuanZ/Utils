@@ -262,6 +262,9 @@
     <ClInclude Include="..\Src\Math\Mat3.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Misc\Singleton.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">
