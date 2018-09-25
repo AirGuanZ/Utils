@@ -73,6 +73,14 @@ float sum = buf1.Foldl(0.0f, [](float a, float b) { return a + b; });
 auto buf20 = Buffer2D<int>::New(100, 100);
 auto buf21 = Buffer2D<int>::FromFn(
     100, 100, [](size_t x, size_t y){ return int(x * y); });
+
+// COW (Copy-On-Write) Object
+COWObject<string> s0("Minecraft");
+COWObject<string> s1 = s0;
+REQUIRE(s0.Refs() == 2);
+REQUIRE(*s1 == "Minecraft");
+s1.Mutable() = "Dark Souls";
+REQUIRE((s0.Refs() == 1 && s1.Refs() == 1));
 ```
 
 ## AGZ::Endian
@@ -250,3 +258,13 @@ for(int x = 0; x < 10; ++x)
 // Save tex to "output.png"
 TextureFile::WriteRGBToPNG(L"output.png", tex);
 ```
+
+## Others
+
+| Module   | Class                                        |
+| -------- | -------------------------------------------- |
+| Alloc    | CRTAllocator, FixedSizedArena, SmallObjArena |
+| FileSys  | BinaryStreamView, Path                       |
+| Misc     | TypeOpr, Singleton, Uncopiable               |
+| Platform | Platform                                     |
+
