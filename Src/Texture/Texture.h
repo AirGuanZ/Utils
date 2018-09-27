@@ -255,7 +255,7 @@ public:
 
     Self &operator=(Self &&moveFrom) noexcept
     {
-        GetCore() = std::move(moveFrom.GetCore());
+        Core::GetCore() = std::move(moveFrom.GetCore());
         return *this;
     }
 
@@ -328,7 +328,7 @@ public:
 
     Self &operator=(Self &&moveFrom) noexcept
     {
-        GetCore() = std::move(moveFrom.GetCore());
+        Core::GetCore() = std::move(moveFrom.GetCore());
         return *this;
     }
 
@@ -407,7 +407,7 @@ public:
 
     Self &operator=(Self &&moveFrom) noexcept
     {
-        GetCore() = std::move(moveFrom.GetCore());
+        Core::GetCore() = std::move(moveFrom.GetCore());
         return *this;
     }
 
@@ -465,7 +465,7 @@ auto ClampedF2B(const TextureCore<DIM, E<EE>> &tex)
 
     for(uint32_t i = 0; i < size; ++i)
     {
-        retRawData[i] = texRawData[i].Map<uint8_t>([](EE v)
+        retRawData[i] = texRawData[i].template Map<uint8_t>([](EE v)
         { return static_cast<uint8_t>(Math::Clamp(v, EE(0), EE(1)) * 255); });
     }
 
