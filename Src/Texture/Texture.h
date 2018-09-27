@@ -474,10 +474,23 @@ auto ClampedF2B(const TextureCore<DIM, E<EE>> &tex)
 
 template<template<typename> typename E, typename EE,
     std::enable_if_t<std::is_floating_point_v<EE>, int> = 0>
+    auto ClampedF2B(const Texture1D<E<EE>> &tex)
+{
+    return Texture1D<E<uint8_t>>(ClampedF2B(tex.GetCore()));
+}
+
+template<template<typename> typename E, typename EE,
+    std::enable_if_t<std::is_floating_point_v<EE>, int> = 0>
 auto ClampedF2B(const Texture2D<E<EE>> &tex)
 {
     return Texture2D<E<uint8_t>>(ClampedF2B(tex.GetCore()));
 }
 
+template<template<typename> typename E, typename EE,
+    std::enable_if_t<std::is_floating_point_v<EE>, int> = 0>
+    auto ClampedF2B(const Texture3D<E<EE>> &tex)
+{
+    return Texture3D<E<uint8_t>>(ClampedF2B(tex.GetCore()));
+}
 
 AGZ_NS_END(AGZ::Tex)
