@@ -126,6 +126,16 @@ public:
             UncheckedRelease();
     }
 
+    Self &GetCore()
+    {
+        return *this;
+    }
+
+    const Self &GetCore() const
+    {
+        return *this;
+    }
+
     bool IsAvailable() const
     {
         return data_ != nullptr;
@@ -215,9 +225,6 @@ public:
 
     using Core = TextureCore<1, PT>;
 
-    Core &GetCore() { return static_cast<Core&>(*this); }
-    const Core &GetCore() const { return static_cast<const Core&>(*this); }
-
     explicit Texture1D(TextureCore<1, PT> &&moveFrom) noexcept
         : Core(std::move(moveFrom))
     {
@@ -290,9 +297,6 @@ class Texture2D : public TextureCore<2, PT>
 public:
 
     using Core = TextureCore<2, PT>;
-
-    Core &GetCore() { return static_cast<Core&>(*this); }
-    const Core &GetCore() const { return static_cast<const Core&>(*this); }
 
     explicit Texture2D(TextureCore<2, PT> &&moveFrom) noexcept
         : Core(std::move(moveFrom))
@@ -372,9 +376,6 @@ class Texture3D : public TextureCore<3, PT>
 public:
 
     using Core = TextureCore<3, PT>;
-
-    Core &GetCore() { return static_cast<Core&>(*this); }
-    const Core &GetCore() const { return static_cast<const Core&>(*this); }
 
     explicit Texture3D(TextureCore<3, PT> &&moveFrom) noexcept
         : Core(std::move(moveFrom))
