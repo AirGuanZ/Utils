@@ -175,6 +175,11 @@ public:
         return size_;
     }
 
+    uint32_t GetLinearSize() const
+    {
+        return cnt_;
+    }
+
     Pixel *RawData()
     {
         AGZ_ASSERT(IsAvailable());
@@ -206,17 +211,18 @@ public:
 template<typename PT>
 class Texture1D : public TextureCore<1, PT>
 {
+public:
+
     using Core = TextureCore<1, PT>;
 
-    Core &GetCore() { return static_cast<Core&>(this); }
+    Core &GetCore() { return static_cast<Core&>(*this); }
+    const Core &GetCore() const { return static_cast<const Core&>(*this); }
 
     explicit Texture1D(TextureCore<1, PT> &&moveFrom) noexcept
         : Core(std::move(moveFrom))
     {
 
     }
-
-public:
 
     using Pixel = PT;
     using Self = Texture1D<PT>;
@@ -281,17 +287,18 @@ public:
 template<typename PT>
 class Texture2D : public TextureCore<2, PT>
 {
+public:
+
     using Core = TextureCore<2, PT>;
 
-    Core &GetCore() { return static_cast<Core&>(this); }
+    Core &GetCore() { return static_cast<Core&>(*this); }
+    const Core &GetCore() const { return static_cast<const Core&>(*this); }
 
     explicit Texture2D(TextureCore<2, PT> &&moveFrom) noexcept
         : Core(std::move(moveFrom))
     {
         
     }
-    
-public:
 
     using Pixel   = PT;
     using Self    = Texture2D<PT>;
@@ -362,17 +369,18 @@ public:
 template<typename PT>
 class Texture3D : public TextureCore<3, PT>
 {
+public:
+
     using Core = TextureCore<3, PT>;
 
-    Core &GetCore() { return static_cast<Core&>(this); }
+    Core &GetCore() { return static_cast<Core&>(*this); }
+    const Core &GetCore() const { return static_cast<const Core&>(*this); }
 
     explicit Texture3D(TextureCore<3, PT> &&moveFrom) noexcept
         : Core(std::move(moveFrom))
     {
 
     }
-
-public:
 
     using Pixel   = PT;
     using Self    = Texture3D<PT>;
@@ -443,5 +451,32 @@ public:
         return Self(Core::Map(std::forward<F>(func)));
     }
 };
+
+template<template<typename> typename E, typename EE, Math::DimType DIM,
+            std::enable_if_t<std::is_floating_point_v<EE>, int> = 0>
+auto ClampedF2B(const TextureCore<DIM, E<EE>> &tex)
+{
+    AGZ_ASSERT(tex.IsAvailable());
+    TextureCore<DIM, E<uint8_t>> ret(tex.GetSize());
+    const E<EE> *texRawData = tex.RawData();
+    E<uint8_t> *retRawData = ret.RawData();
+    uint32_t size = ret.GetLinearSize();
+
+    for(uint32_t i = 0; i < size; ++i)
+    {
+        retRawData[i] = texRawData[i].Map<uint8_t>([](EE v)
+        { return static_cast<uint8_t>(Math::Clamp(v, EE(0), EE(1)) * 255); });
+    }
+
+    return ret;
+}
+
+template<template<typename> typename E, typename EE,
+    std::enable_if_t<std::is_floating_point_v<EE>, int> = 0>
+auto ClampedF2B(const Texture2D<E<EE>> &tex)
+{
+    return Texture2D<E<uint8_t>>(ClampedF2B(tex.GetCore()));
+}
+
 
 AGZ_NS_END(AGZ::Tex)
