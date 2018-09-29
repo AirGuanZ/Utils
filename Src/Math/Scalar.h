@@ -90,7 +90,8 @@ public:
     explicit FP(Uninitialized_t) { }
 
     static Self Infinity() { return Bits2Value(EXPT_BIT_MASK); }
-    static Self Max()      { return std::numeric_limits<ValueType>::max(); }
+    static Self Max()      { return (std::numeric_limits<ValueType>::max)(); }
+    static Self Min()      { return (std::numeric_limits<ValueType>::lowest()); }
 
     ValueType Value()   const { return float_; }
     InternalUInt Bits() const { return uint_; }
