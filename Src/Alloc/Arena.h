@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Misc/Common.h"
-#include "../misc/Uncopiable.h"
+#include "../Misc/Uncopiable.h"
 
 AGZ_NS_BEG(AGZ)
 
