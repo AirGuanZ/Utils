@@ -41,10 +41,18 @@ template<>           struct Cos_impl<double> { static auto Cos(double rad) { ret
 template<typename T> struct Cos_impl<Rad<T>> { static auto Cos(Rad<T> rad) { return Cos_rawimpl<T>(rad.value); } };
 template<typename T> struct Cos_impl<Deg<T>> { static auto Cos(Deg<T> deg) { return Cos_rawimpl<T>(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
 
-//template<typename T> constexpr T PI() { return PI_impl<T>::PI(); }
-
 template<typename T>
 constexpr auto PI = PI_impl<T>::PI();
+template<typename T>
+constexpr auto PIx2 = T(2) * PI<T>;
+template<typename T>
+constexpr auto PIx4 = T(4) * PI<T>;
+template<typename T>
+constexpr auto InvPI = T(1) / PI<T>;
+template<typename T>
+constexpr auto Inv2PI = T(1) / PIx2<T>;
+template<typename T>
+constexpr auto Inv4PI = T(1) / PIx4<T>;
 
 template<typename T> auto Sin(T angle) { return Sin_impl<T>::Sin(angle); }
 template<typename T> auto Cos(T angle) { return Cos_impl<T>::Cos(angle); }
