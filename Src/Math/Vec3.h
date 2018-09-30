@@ -143,17 +143,17 @@ public:
 template<typename T>
 Vec3<T> operator-(const Vec3<T> &v) { return Vec3<T>(-v.x, -v.y, -v.z); }
 
-template<typename T1, typename T2>
+template<typename T1, typename T2, std::enable_if_t<std::is_arithmetic_v<T1>, int> = 0>
 Vec3<T2> operator+(const T1 &lhs, const Vec3<T2> &rhs) { return Vec3<T2>(lhs + rhs.x, lhs + rhs.y, lhs + rhs.z); }
-template<typename T1, typename T2>
+template<typename T1, typename T2, std::enable_if_t<std::is_arithmetic_v<T2>, int> = 0>
 Vec3<T1> operator+(const Vec3<T1> &lhs, const T2 &rhs) { return Vec3<T1>(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs); }
-template<typename T1, typename T2>
+template<typename T1, typename T2, std::enable_if_t<std::is_arithmetic_v<T2>, int> = 0>
 Vec3<T1> operator-(const Vec3<T1> &lhs, const T2 &rhs) { return Vec3<T1>(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs); }
 template<typename T1, typename T2>
 Vec3<T2> operator*(const T1 &lhs, const Vec3<T2> &rhs) { return Vec3<T2>(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z); }
-template<typename T1, typename T2>
+template<typename T1, typename T2, std::enable_if_t<std::is_arithmetic_v<T2>, int> = 0>
 Vec3<T1> operator*(const Vec3<T1> &lhs, const T2 &rhs) { return Vec3<T1>(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs); }
-template<typename T1, typename T2>
+template<typename T1, typename T2, std::enable_if_t<std::is_arithmetic_v<T2>, int> = 0>
 Vec3<T1> operator/(const Vec3<T1> &lhs, const T2 &rhs) { return Vec3<T1>(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs); }
 
 template<typename T>

@@ -29,6 +29,12 @@ inline double Pow(double x, double y) { return std::pow(x, y); }
 template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 T Clamp(T v, T minv, T maxv) { return (std::max)((std::min)(v, maxv), minv); }
 
+template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+T Min(T lhs, T rhs) { return (std::min)(lhs, rhs); }
+
+template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+T Max(T lhs, T rhs) { return (std::max)(lhs, rhs); }
+
 template<typename T, typename U = decltype(T::DefaultEqEpsilon()),
     std::enable_if_t<TypeOpr::True_v<decltype(&T::ApproxEq)>, int> = 0>
 AGZ_FORCEINLINE bool ApproxEq(const T &lhs, const T &rhs, U epsilon = T::DefaultEqEpsilon())
