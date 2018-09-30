@@ -350,10 +350,10 @@ Vec3<T> Mat4<T>::ApplyInverseToNormal(const Vec3<T> &n) const
 template<typename T>
 Mat4<T> Transpose(const Mat4<T> &m)
 {
-    return Mat4<T>(m[0][0], m[1][0], m[2][0], m[3][0],
-                   m[0][1], m[1][1], m[2][1], m[3][1],
-                   m[0][2], m[1][2], m[2][2], m[3][2],
-                   m[0][3], m[1][3], m[2][3], m[3][3]);
+    return Mat4<T>(m.m[0][0], m.m[1][0], m.m[2][0], m.m[3][0],
+                   m.m[0][1], m.m[1][1], m.m[2][1], m.m[3][1],
+                   m.m[0][2], m.m[1][2], m.m[2][2], m.m[3][2],
+                   m.m[0][3], m.m[1][3], m.m[2][3], m.m[3][3]);
 }
 
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
