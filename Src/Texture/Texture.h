@@ -287,7 +287,8 @@ public:
     template<typename F>
     auto Map(F &&func) const
     {
-        return Self(Core::Map(std::forward<F>(func)));
+        using U = remove_rcv_t<decltype(func(std::declval<PT>()))>;
+        return Texture1D<U>(Core::Map(std::forward<F>(func)));
     }
 };
 
@@ -365,7 +366,8 @@ public:
     template<typename F>
     auto Map(F &&func) const
     {
-        return Self(Core::Map(std::forward<F>(func)));
+        using U = remove_rcv_t<decltype(func(std::declval<PT>()))>;
+        return Texture2D<U>(Core::Map(std::forward<F>(func)));
     }
 };
 
@@ -449,48 +451,9 @@ public:
     template<typename F>
     auto Map(F &&func) const
     {
-        return Self(Core::Map(std::forward<F>(func)));
+        using U = remove_rcv_t<decltype(func(std::declval<PT>()))>;
+        return Texture3D<U>(Core::Map(std::forward<F>(func)));
     }
 };
-
-template<template<typename> typename E, typename EE, Math::DimType DIM,
-            std::enable_if_t<std::is_floating_point_v<EE>, int> = 0>
-auto ClampedF2B(const TextureCore<DIM, E<EE>> &tex)
-{
-    AGZ_ASSERT(tex.IsAvailable());
-    TextureCore<DIM, E<uint8_t>> ret(tex.GetSize());
-    const E<EE> *texRawData = tex.RawData();
-    E<uint8_t> *retRawData = ret.RawData();
-    uint32_t size = ret.GetLinearSize();
-
-    for(uint32_t i = 0; i < size; ++i)
-    {
-        retRawData[i] = texRawData[i].Map([](EE v)
-        { return static_cast<uint8_t>(Math::Clamp(v, EE(0), EE(1)) * 255); });
-    }
-
-    return ret;
-}
-
-template<template<typename> typename E, typename EE,
-    std::enable_if_t<std::is_floating_point_v<EE>, int> = 0>
-    auto ClampedF2B(const Texture1D<E<EE>> &tex)
-{
-    return Texture1D<E<uint8_t>>(ClampedF2B(tex.GetCore()));
-}
-
-template<template<typename> typename E, typename EE,
-    std::enable_if_t<std::is_floating_point_v<EE>, int> = 0>
-auto ClampedF2B(const Texture2D<E<EE>> &tex)
-{
-    return Texture2D<E<uint8_t>>(ClampedF2B(tex.GetCore()));
-}
-
-template<template<typename> typename E, typename EE,
-    std::enable_if_t<std::is_floating_point_v<EE>, int> = 0>
-    auto ClampedF2B(const Texture3D<E<EE>> &tex)
-{
-    return Texture3D<E<uint8_t>>(ClampedF2B(tex.GetCore()));
-}
 
 AGZ_NS_END(AGZ::Tex)
