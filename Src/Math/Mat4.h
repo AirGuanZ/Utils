@@ -305,10 +305,10 @@ typename Mat4<T>::Self Mat4<T>::LookAt(const Vec3<T>& src, const Vec3<T>& dst, c
     auto D = Normalize(dst - src);
     auto R = Normalize(Cross(up, D));
     auto U = Cross(D, R);
-    return Inverse(Mat4<T>(R.x, U.x, D.x, src.x,
-                           R.y, U.y, D.y, src.y,
-                           R.z, U.z, D.z, src.z,
-                           O, O, O, I));
+    return Mat4<T>(R.x, U.x, D.x, src.x,
+                   R.y, U.y, D.y, src.y,
+                   R.z, U.z, D.z, src.z,
+                   O, O, O, I).Inverse();
 }
 
 template<typename T>
