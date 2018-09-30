@@ -105,7 +105,7 @@ TEST_CASE("Math")
         REQUIRE(ApproxEq(a + b, f32x4(3.0, 5.0, 7.0, 9.0), 1e-7f));
 
         REQUIRE(ApproxEq(Sqrt(f32x4(4.0f, 3.0f, 2.0f, 1.0f) * F32X4::ONE).AsVec(),
-                         Vec4f(4.0f, 3.0f, 2.0f, 1.0f).Map<float>(
+                         Vec4f(4.0f, 3.0f, 2.0f, 1.0f).Map(
                             [](float x) { return Sqrt(x); }),
                          1e-5f));
     }

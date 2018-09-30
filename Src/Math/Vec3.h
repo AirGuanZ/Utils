@@ -61,8 +61,12 @@ public:
         return *this;
     }
 
-    template<typename U, typename F>
-    Vec3<U> Map(F &&f) const { return Vec3<U>(f(x), f(y), f(z)); }
+    template<typename F>
+    auto Map(F &&f) const
+    {
+        using U = remove_rcv_t<decltype(f(x))>;
+        return Vec3<U>(f(x), f(y), f(z));
+    }
 
 #include "SwizzleVec3.inl"
 

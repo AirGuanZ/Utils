@@ -87,8 +87,12 @@ public:
         return *this;
     }
 
-    template<typename U, typename F>
-    Vec4<U> Map(F &&f) const { return Vec4<U>(f(x), f(y), f(z), f(w)); }
+    template<typename F>
+    auto Map(F &&f) const
+    {
+        using U = remove_rcv_t<decltype(f(x))>;
+        return Vec4<U>(f(x), f(y), f(z), f(w));
+    }
 
 #include "SwizzleVec4.inl"
 

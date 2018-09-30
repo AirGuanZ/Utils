@@ -465,7 +465,7 @@ auto ClampedF2B(const TextureCore<DIM, E<EE>> &tex)
 
     for(uint32_t i = 0; i < size; ++i)
     {
-        retRawData[i] = texRawData[i].template Map<uint8_t>([](EE v)
+        retRawData[i] = texRawData[i].Map([](EE v)
         { return static_cast<uint8_t>(Math::Clamp(v, EE(0), EE(1)) * 255); });
     }
 

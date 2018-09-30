@@ -23,6 +23,9 @@ template<typename T>        T      Sqrt(T);
 template<>           inline float  Sqrt<float>(float value)   { return std::sqrt(value); }
 template<>           inline double Sqrt<double>(double value) { return std::sqrt(value); }
 
+inline float Pow(float x, float y) { return std::pow(x, y); }
+inline double Pow(double x, double y) { return std::pow(x, y); }
+
 template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 T Clamp(T v, T minv, T maxv) { return (std::max)((std::min)(v, maxv), minv); }
 

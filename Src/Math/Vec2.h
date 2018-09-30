@@ -46,8 +46,12 @@ public:
         return *this;
     }
 
-    template<typename U, typename F>
-    Vec2<U> Map(F &&f) const { return Vec2<U>(f(x), f(y)); }
+    template<typename F>
+    auto Map(F &&f) const
+    {
+        using U = remove_rcv_t<decltype(f(x))>;
+        return Vec2<U>(f(x), f(y));
+    }
 
 #include "SwizzleVec2.inl"
 
