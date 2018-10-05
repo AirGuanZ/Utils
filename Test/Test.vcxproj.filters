@@ -11,6 +11,7 @@
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="PikeVM.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Catch.hpp" />

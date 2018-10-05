@@ -787,6 +787,8 @@ std::vector<StringView<CS>> StringView<CS>::Split() const
         else if(!segLen++)
             segBeg = p;
     }
+    if(segLen)
+        ret.emplace_back(*str_, segBeg, segLen);
     return ret;
 }
 

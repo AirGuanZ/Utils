@@ -9,7 +9,7 @@
 #include "../Utils/FileSys.h"
 #include "Model.h"
 
-AGZ_NS_BEG(AGZ::FileSys)
+AGZ_NS_BEG(AGZ::Model)
 
 // See https://en.wikipedia.org/wiki/Wavefront_.obj_file
 class WavefrontObj
@@ -137,7 +137,7 @@ inline bool WavefrontObjFile::LoadFromObjFile(const WStr &filename, WavefrontObj
     AGZ_ASSERT(objs && objs->Empty());
 
     WStr content;
-    if(!ReadTextFileRaw(filename, &content))
+    if(!FileSys::ReadTextFileRaw(filename, &content))
         return false;
 
     return LoadFromMemory(content, objs);
@@ -167,7 +167,7 @@ inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *
             static thread_local WRegex oReg(
                 R"___(o\s+&@{!\s}+&\s*)___");
             static thread_local WRegex vReg(
-                R"___(v\s+&@{!\s}+&\s+&@{!\s}+&\s+&@{!\s}+&\s+&(@{!\s}+)?&\s*)___");
+                R"___(v\s+&@{!\s}+&\s+&@{!\s}+&\s+&@{!\s}+&(\s+@{!\s}+)?&\s*)___");
             static thread_local WRegex vtReg(
                 R"___(vt\s+&@{!\s}+&\s+&@{!\s}+&\s+&(@{!\s}+)?&\s*)___");
             static thread_local WRegex vnReg(
@@ -187,7 +187,7 @@ inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *
                 vtx.x = m(0, 1).Parse<double>();
                 vtx.y = m(2, 3).Parse<double>();
                 vtx.z = m(4, 5).Parse<double>();
-                vtx.w = m(6, 7).Empty() ? 1.0 : m(6, 7).Parse<double>();
+                vtx.w = m(5, 6).Empty() ? 1.0 : m(5, 6).TrimLeft().Parse<double>();
                 checkCur()->vertices.push_back(vtx);
                 continue;
             }
@@ -252,28 +252,28 @@ inline WavefrontObj::Index WavefrontObjFile::ParseIndex(const WStrView &str)
     static thread_local WRegex reg0(R"___(\d+)___");
     if(auto m = reg0.Match(str); m)
     {
-        ret.vtx = str.Parse<int32_t>();
+        ret.vtx = str.Parse<int32_t>() - 1;
         return ret;
     }
 
     static thread_local WRegex reg1(R"___(&\d+&/&\d+&)___");
     if(auto m = reg1.Match(str); m)
     {
-        ret.vtx = m(0, 1).Parse<int32_t>();
-        ret.tex = m(2, 3).Parse<int32_t>();
+        ret.vtx = m(0, 1).Parse<int32_t>() - 1;
+        ret.tex = m(2, 3).Parse<int32_t>() - 1;
         return ret;
     }
 
     static thread_local WRegex reg2(R"___(&\d+&/&\d*&/&\d+&)___");
     if(auto m = reg2.Match(str); m)
     {
-        ret.vtx = m(0, 1).Parse<int32_t>();
-        ret.tex = m(2, 3).Empty() ? -1 : m(2, 3).Parse<int32_t>();
-        ret.nor = m(4, 5).Parse<int32_t>();
+        ret.vtx = m(0, 1).Parse<int32_t>() - 1;
+        ret.tex = m(2, 3).Empty() ? -1 : (m(2, 3).Parse<int32_t>() - 1);
+        ret.nor = m(4, 5).Parse<int32_t>() - 1;
         return ret;
     }
 
     throw ArgumentException("Invalid face index format");
 }
 
-AGZ_NS_END(AGZ::FileSys)
+AGZ_NS_END(AGZ::Model)

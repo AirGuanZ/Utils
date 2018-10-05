@@ -1,12 +1,13 @@
 #pragma once
 
+#include <map>
 #include <vector>
 
 #include "../Misc/Common.h"
 #include "../Utils/Math.h"
 #include "../Utils/String.h"
 
-AGZ_NS_BEG(AGZ)
+AGZ_NS_BEG(AGZ::Model)
 
 struct GeometryMesh
 {
@@ -25,4 +26,4 @@ struct GeometryMeshGroup
     std::map<Str8, GeometryMesh> submeshes;
 };
 
-AGZ_NS_END(AGZ)
+AGZ_NS_END(AGZ::Model)

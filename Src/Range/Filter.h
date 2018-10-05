@@ -44,7 +44,7 @@ namespace RangeAux
                 typename std::iterator_traits<InIt>::reference;
 
             Iterator(InIt _it, InIt _end, F *f)
-                : it(std::move(_it)), end(_end), f(f)
+                : it(std::move(_it)), end(std::move(_end)), f(f)
             {
                 while(it != end && !(*f)(*it))
                     ++it;
@@ -62,7 +62,7 @@ namespace RangeAux
 
             Iterator &operator++()
             {
-                while(it != end && !(*f)(*++it))
+                while(++it != end && !(*f)(*it))
                     ;
                 return *this;
             }
