@@ -43,6 +43,9 @@
     <Filter Include="Texture">
       <UniqueIdentifier>{c1ae0090-5471-4554-a3d3-52f330293e4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{9130d6f5-4bad-4832-8701-b37d5d29d8bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Math\Scalar.h">
@@ -265,8 +268,14 @@
     <ClInclude Include="..\Src\Misc\Singleton.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\FileSys\WavefrontOBJ.h">
-      <Filter>FileSys</Filter>
+    <ClInclude Include="..\Src\Model\WavefrontOBJ.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Model.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Model\Model.h">
+      <Filter>Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

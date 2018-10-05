@@ -29,7 +29,6 @@
     <ClInclude Include="..\Src\FileSys\BinaryView.h" />
     <ClInclude Include="..\Src\FileSys\Path.h" />
     <ClInclude Include="..\Src\FileSys\Raw.h" />
-    <ClInclude Include="..\Src\FileSys\WavefrontOBJ.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />
     <ClInclude Include="..\Src\Math\Color.h" />
     <ClInclude Include="..\Src\Math\Mat3.h" />
@@ -49,6 +48,8 @@
     <ClInclude Include="..\Src\Misc\Singleton.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
     <ClInclude Include="..\Src\Misc\Uncopiable.h" />
+    <ClInclude Include="..\Src\Model\Model.h" />
+    <ClInclude Include="..\Src\Model\WavefrontOBJ.h" />
     <ClInclude Include="..\Src\Platform\Platform.h" />
     <ClInclude Include="..\Src\Range\Aggregate.h" />
     <ClInclude Include="..\Src\Range\All.h" />
@@ -90,6 +91,7 @@
     <ClInclude Include="..\Src\Utils\FileSys.h" />
     <ClInclude Include="..\Src\Utils\Math.h" />
     <ClInclude Include="..\Src\Utils\Misc.h" />
+    <ClInclude Include="..\Src\Utils\Model.h" />
     <ClInclude Include="..\Src\Utils\Platform.h" />
     <ClInclude Include="..\Src\Utils\Range.h" />
     <ClInclude Include="..\Src\Utils\String.h" />
