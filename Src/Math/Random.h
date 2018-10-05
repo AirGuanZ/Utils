@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <ctime>
 #include <random>
 
 #include "../Misc/Common.h"
@@ -11,6 +12,12 @@ using SharedEngine = std::default_random_engine;
 
 struct SharedRandomEngine_t
 {
+    SharedRandomEngine_t()
+        : eng(static_cast<SharedEngine::result_type>(std::time(nullptr)))
+    {
+        
+    }
+
     auto &GetEng() { return eng; }
     SharedEngine eng;
 };
