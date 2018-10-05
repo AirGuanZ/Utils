@@ -68,6 +68,7 @@ TEST_CASE("FileSys")
     }
 }
 
+/*
 TEST_CASE("Raw")
 {
     SECTION("Text")
@@ -78,3 +79,4 @@ TEST_CASE("Raw")
         REQUIRE(output == u8"今天天气minecraft真不错啊");
     }
 }
+*/
