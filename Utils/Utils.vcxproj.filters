@@ -277,6 +277,9 @@
     <ClInclude Include="..\Src\Model\Model.h">
       <Filter>Model</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Range\FilterMap.h">
+      <Filter>Range</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">

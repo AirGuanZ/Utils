@@ -158,8 +158,13 @@ inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *
     try
     {
         auto lines = content.Split("\n")
-            | Map([](const WStr &line) -> WStr { return line.Trim(); })
-            | Filter([](const WStr &line) -> bool { return !line.Empty() && !line.StartsWith("#"); })
+            | FilterMap([](const WStr &line) -> std::optional<WStr>
+              {
+                  WStr ret = line.Trim();
+                  if(ret.Empty() || ret.StartsWith("#"))
+                      return std::nullopt;
+                  return ret;
+              })
             | Collect<std::vector<WStr>>();
 
         for(const WStr &line : lines)

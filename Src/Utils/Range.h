@@ -9,6 +9,7 @@
 #include "../Range/Drop.h"
 #include "../Range/Each.h"
 #include "../Range/Filter.h"
+#include "../Range/FilterMap.h"
 #include "../Range/Map.h"
 #include "../Range/PartialFoldl.h"
 #include "../Range/Reduce.h"

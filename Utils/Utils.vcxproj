@@ -59,6 +59,7 @@
     <ClInclude Include="..\Src\Range\Count.h" />
     <ClInclude Include="..\Src\Range\Drop.h" />
     <ClInclude Include="..\Src\Range\Filter.h" />
+    <ClInclude Include="..\Src\Range\FilterMap.h" />
     <ClInclude Include="..\Src\Range\Iterator.h" />
     <ClInclude Include="..\Src\Range\Map.h" />
     <ClInclude Include="..\Src\Range\PartialFoldl.h" />
