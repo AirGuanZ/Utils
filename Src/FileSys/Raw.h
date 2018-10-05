@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fstream>
+#include <iterator>
 
 #include "../Misc/Common.h"
 #include "../Utils/String.h"
@@ -41,6 +42,25 @@ inline bool WriteBinaryFileRaw(
         return false;
     fout.write(reinterpret_cast<const char*>(data), len);
     fout.close();
+    return true;
+}
+
+inline bool ReadTextFileRaw(const WStr &filename, WStr *str)
+{
+    std::wifstream fin(filename.ToStdWString(), std::ios_base::in);
+    if(!fin)
+        return false;
+    *str = std::wstring(std::istreambuf_iterator<wchar_t>(fin),
+                        std::istreambuf_iterator<wchar_t>());
+    return true;
+}
+
+inline bool WriteTextFileRaw(const WStr &filename, const WStr &str)
+{
+    std::wofstream fout(filename.ToStdWString(), std::ios_base::out | std::ios_base::trunc);
+    if(!fout)
+        return false;
+    fout << str.ToStdWString();
     return true;
 }
 

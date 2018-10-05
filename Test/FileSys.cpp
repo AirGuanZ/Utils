@@ -2,7 +2,8 @@
 
 #include "Catch.hpp"
 
-using namespace AGZ::FileSys;
+using namespace AGZ;
+using namespace FileSys;
 
 TEST_CASE("BinaryView")
 {
@@ -64,5 +65,16 @@ TEST_CASE("FileSys")
         
         REQUIRE(WPath(L"A/B/C/D").ToParent() == WPath(L"A/B/C/"));
         REQUIRE(WPath(L"A/B/C/D/").ToParent() == WPath(L"A/B/C/"));
+    }
+}
+
+TEST_CASE("Raw")
+{
+    SECTION("Text")
+    {
+        WriteTextFileRaw("rawTextFile.txt", u8"今天天气minecraft真不错啊");
+        WStr output;
+        ReadTextFileRaw("rawTextFile.txt", &output);
+        REQUIRE(output == u8"今天天气minecraft真不错啊");
     }
 }

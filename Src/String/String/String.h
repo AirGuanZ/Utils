@@ -565,18 +565,14 @@ using Str16 = String<UTF16<>>;
 using Str32 = String<UTF32<>>;
 using AStr  = String<ASCII<>>;
 using WStr  = String<WUTF>;
-
-#ifdef AGZ_OS_WIN32
-using PStr = WStr;
-#else
-using PStr = Str8;
-#endif
+using PStr  = String<PUTF>;
 
 using StrView8  = StringView<UTF8<>>;
 using StrView16 = StringView<UTF16<>>;
 using StrView32 = StringView<UTF32<>>;
 using AStrView  = StringView<ASCII<>>;
 using WStrView  = StringView<WUTF>;
+using PStrView  = StringView<PUTF>;
 
 using CSConv = StrImpl::CharsetConvertor;
 

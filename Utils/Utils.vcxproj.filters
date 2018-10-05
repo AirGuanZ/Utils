@@ -265,6 +265,9 @@
     <ClInclude Include="..\Src\Misc\Singleton.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\FileSys\WavefrontOBJ.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">

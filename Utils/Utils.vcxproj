@@ -29,6 +29,7 @@
     <ClInclude Include="..\Src\FileSys\BinaryView.h" />
     <ClInclude Include="..\Src\FileSys\Path.h" />
     <ClInclude Include="..\Src\FileSys\Raw.h" />
+    <ClInclude Include="..\Src\FileSys\WavefrontOBJ.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />
     <ClInclude Include="..\Src\Math\Color.h" />
     <ClInclude Include="..\Src\Math\Mat3.h" />
