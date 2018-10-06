@@ -66,9 +66,9 @@ class WavefrontObjFile
 {
 public:
 
-    static bool LoadFromObjFile(const WStr &filename, WavefrontObj *objs);
+    static bool LoadFromObjFile(const WStr &filename, WavefrontObj *objs, bool ignoreUnknownLine = true);
 
-    static bool LoadFromMemory(const WStr &content, WavefrontObj *objs);
+    static bool LoadFromMemory(const WStr &content, WavefrontObj *objs, bool ignoreUnknownLine = true);
 
 private:
 
@@ -83,42 +83,47 @@ inline GeometryMesh WavefrontObj::Obj::ToGeometryMesh(bool reverseNor, bool reve
     if(reverseTex)
         std::swap(tB, tC);
 
+    auto addTri = [&](const Face &f, const int (&js)[3])
+    {
+        size_t i = vtces.size();
+        vtces.resize(vtces.size() + 3);
+
+        for(int j = 0; j < 3; ++j)
+            vtces[i + j].pos = vertices[f.indices[js[j]].vtx].xyz() / vertices[f.indices[js[j]].vtx].w;
+
+        if(f.indices[0].nor >= 0 && f.indices[1].nor >= 0 && f.indices[2].nor >= 0)
+        {
+            for(int j = 0; j < 3; ++j)
+                vtces[i + j].nor = normals[f.indices[js[j]].nor];
+        }
+        else
+        {
+            Normal nor = Cross(
+                vtces[i + 1].pos - vtces[i].pos, vtces[i + 2].pos - vtces[i].pos).Normalize();
+            if(reverseNor)
+                nor = -nor;
+            for(int j = 0; j < 3; ++j)
+                vtces[i + j].nor = nor;
+        }
+
+        if(f.indices[js[0]].tex >= 0 && f.indices[js[1]].tex >= 0 && f.indices[js[2]].tex >= 0)
+        {
+            for(int j = 0; j < 3; ++j)
+                vtces[i + j].tex = texCoords[f.indices[js[j]].tex];
+        }
+        else
+        {
+            vtces[i].tex = TexCoord(0.0);
+            vtces[i + 1].tex = tB;
+            vtces[i + 2].tex = tC;
+        }
+    };
+
     for(auto &f : faces)
     {
-        if(f.indices[3].vtx < 0)
-        {
-            size_t i = vtces.size();
-            vtces.resize(vtces.size() + 3);
-
-            for(int j = 0; j < 3; ++j)
-                vtces[i + j].pos = vertices[f.indices[j].vtx].xyz() / vertices[f.indices[j].vtx].w;
-
-            if(f.indices[0].nor >= 0 && f.indices[1].nor >= 0 && f.indices[2].nor >= 0)
-            {
-                for(int j = 0; j < 3; ++j)
-                    vtces[i + j].nor = normals[f.indices[j].nor];
-            }
-            else
-            {
-                Normal nor = Cross(vtces[i + 1].pos - vtces[i].pos, vtces[i + 2].pos - vtces[i].pos).Normalize();
-                if(reverseNor)
-                    nor = -nor;
-                for(int j = 0; j < 3; ++j)
-                    vtces[i + j].nor = nor;
-            }
-
-            if(f.indices[0].tex >= 0 && f.indices[1].tex >= 0 && f.indices[2].tex >= 0)
-            {
-                for(int j = 0; j < 3; ++j)
-                    vtces[i + j].tex = texCoords[f.indices[j].tex];
-            }
-            else
-            {
-                vtces[i].tex = TexCoord(0.0);
-                vtces[i + 1].tex = tB;
-                vtces[i + 2].tex = tC;
-            }
-        }
+        addTri(f, { 0, 1, 2 });
+        if(f.indices[3].vtx >= 0)
+            addTri(f, { 0, 2, 3 });
     }
 
     return GeometryMesh{ vtces };
@@ -132,7 +137,7 @@ inline GeometryMeshGroup WavefrontObj::ToGeometryMeshGroup(bool reverseNor, bool
     return GeometryMeshGroup{ submeshes };
 }
 
-inline bool WavefrontObjFile::LoadFromObjFile(const WStr &filename, WavefrontObj *objs)
+inline bool WavefrontObjFile::LoadFromObjFile(const WStr &filename, WavefrontObj *objs, bool ignoreUnknownLine)
 {
     AGZ_ASSERT(objs && objs->Empty());
 
@@ -140,10 +145,10 @@ inline bool WavefrontObjFile::LoadFromObjFile(const WStr &filename, WavefrontObj
     if(!FileSys::ReadTextFileRaw(filename, &content))
         return false;
 
-    return LoadFromMemory(content, objs);
+    return LoadFromMemory(content, objs, ignoreUnknownLine);
 }
 
-inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *objs)
+inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *objs, bool ignoreUnknownLine)
 {
     AGZ_ASSERT(objs && objs->Empty());
 
@@ -174,7 +179,7 @@ inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *
             static thread_local WRegex vReg(
                 R"___(v\s+&@{!\s}+&\s+&@{!\s}+&\s+&@{!\s}+&(\s+@{!\s}+)?&\s*)___");
             static thread_local WRegex vtReg(
-                R"___(vt\s+&@{!\s}+&\s+&@{!\s}+&\s+&(@{!\s}+)?&\s*)___");
+                R"___(vt\s+&@{!\s}+&\s+&@{!\s}+&(\s+@{!\s}+)?&\s*)___");
             static thread_local WRegex vnReg(
                 R"___(vn\s+&@{!\s}+&\s+&@{!\s}+&\s+&@{!\s}+&\s*)___");
 
@@ -202,7 +207,7 @@ inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *
                 WavefrontObj::TexCoord texCoord;
                 texCoord.u = m(0, 1).Parse<double>();
                 texCoord.v = m(2, 3).Parse<double>();
-                texCoord.m = m(4, 5).Empty() ? 0.0 : m(4, 5).Parse<double>();
+                texCoord.m = m(4, 5).Empty() ? 0.0 : m(4, 5).TrimLeft().Parse<double>();
                 checkCur()->texCoords.push_back(texCoord);
                 continue;
             }
@@ -238,6 +243,13 @@ inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *
                 }
 
                 checkCur()->faces.push_back(face);
+                continue;
+            }
+
+            if(!ignoreUnknownLine)
+            {
+                objs->Clear();
+                return false;
             }
         }
     }
