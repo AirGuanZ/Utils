@@ -24,19 +24,19 @@ namespace RangeAux
         auto Eval(R &&range)
         {
             return std::make_from_tuple<
-                        typename ImplTrait::template Impl<R>>(
+                        typename ImplTrait::template Impl<remove_rcv_t<R>>>(
                             std::tuple_cat(
                                 std::tuple<remove_rcv_t<R>>(
                                     std::forward<R>(range)),
                                 args));
         }
     };
-}
 
-template<typename R, typename Impl, typename...Args>
-auto operator|(R &&range, RangeAux::TransformWrapper<Impl, Args...> &&opr)
-{
-    return opr.Eval(std::forward<R>(range));
+    template<typename R, typename Impl, typename...Args>
+    auto operator|(R &&range, TransformWrapper<Impl, Args...> &&opr)
+    {
+        return opr.Eval(std::forward<R>(range));
+    }
 }
 
 AGZ_NS_END(AGZ)

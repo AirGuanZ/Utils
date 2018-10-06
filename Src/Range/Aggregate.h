@@ -29,12 +29,12 @@ namespace RangeAux
                                   args));
         }
     };
-}
 
-template<typename R, typename RHS, typename...Args>
-auto operator|(R &&range, RangeAux::AggregateWrapper<RHS, Args...> &&opr)
-{
-    return opr.Eval(std::forward<R>(range));
+    template<typename R, typename RHS, typename...Args>
+    auto operator|(R &&range, AggregateWrapper<RHS, Args...> &&opr)
+    {
+        return opr.Eval(std::forward<R>(range));
+    }
 }
 
 AGZ_NS_END(AGZ)
