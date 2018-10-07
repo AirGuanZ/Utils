@@ -207,7 +207,7 @@ inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *
                 WavefrontObj::TexCoord texCoord;
                 texCoord.u = m(0, 1).Parse<double>();
                 texCoord.v = m(2, 3).Parse<double>();
-                texCoord.m = m(4, 5).Empty() ? 0.0 : m(4, 5).TrimLeft().Parse<double>();
+                texCoord.m = m(3, 4).Empty() ? 0.0 : m(3, 4).TrimLeft().Parse<double>();
                 checkCur()->texCoords.push_back(texCoord);
                 continue;
             }

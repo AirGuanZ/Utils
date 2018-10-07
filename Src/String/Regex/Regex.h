@@ -120,7 +120,7 @@ public:
     {
         AGZ_ASSERT(Valid());
         AGZ_ASSERT(firstSavePoint <= secondSavePoint);
-        AGZ_ASSERT(secondSavePoint <= savePoints_.size());
+        AGZ_ASSERT(secondSavePoint < savePoints_.size());
         return whole_.Slice(savePoints_[firstSavePoint],
                             savePoints_[secondSavePoint]);
     }
