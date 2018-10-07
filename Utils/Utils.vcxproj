@@ -86,6 +86,7 @@
     <ClInclude Include="..\Src\String\String\String.h" />
     <ClInclude Include="..\Src\Texture\Texture.h" />
     <ClInclude Include="..\Src\Texture\TextureFile.h" />
+    <ClInclude Include="..\Src\Time\Timer.h" />
     <ClInclude Include="..\Src\Utils.h" />
     <ClInclude Include="..\Src\Utils\Alloc.h" />
     <ClInclude Include="..\Src\Utils\Buffer.h" />
@@ -97,6 +98,7 @@
     <ClInclude Include="..\Src\Utils\Range.h" />
     <ClInclude Include="..\Src\Utils\String.h" />
     <ClInclude Include="..\Src\Utils\Texture.h" />
+    <ClInclude Include="..\Src\Utils\Time.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec2.inl" />
