@@ -251,7 +251,7 @@ struct Str2IntImpl
         }
 
         auto c = cur;
-        if(cur == end || (*++c == '0' && c != end))
+        if(cur == end || (*c++ == '0' && c != end))
             throw ArgumentException("Parsing error in Str2Int");
 
         T ret = T(0);
