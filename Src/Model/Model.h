@@ -64,7 +64,7 @@ inline GeometryMesh &GeometryMesh::SmoothenNormals()
     return *this;
 }
 
-GeometryMeshGroup &GeometryMeshGroup::SmoothenNormals()
+inline GeometryMeshGroup &GeometryMeshGroup::SmoothenNormals()
 {
     for(auto &p : submeshes)
         p.second.SmoothenNormals();
