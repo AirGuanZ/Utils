@@ -1,6 +1,6 @@
 CPPC = clang++
 CPPC_INCLUDE_FLAGS = -I ./Src/
-CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS)  \
+CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -stdlib=libc++  \
 			 -std=gnu++17 -Werror -Wall -O2
 
 CPP_FILES = $(shell find ./Src/ -name "*.cpp")

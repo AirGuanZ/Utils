@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdexcept>
+#include <string>
 
 #if defined(_MSC_VER)
 
@@ -131,35 +132,20 @@ public:
     explicit Exception(const std::string &err) : runtime_error(err) { }
 };
 
-class CharsetException : public Exception
-{
-public:
-    explicit CharsetException(const std::string &err) : Exception(err) { }
-};
+#define AGZ_NEW_EXCEPTION(NAME) \
+    class NAME : public Exception \
+    { \
+    public: \
+        explicit NAME(const std::string &err) : Exception(err) { } \
+    }
 
-class ArgumentException : public Exception
-{
-public:
-    explicit ArgumentException(const std::string &err) : Exception(err) { }
-};
+AGZ_NEW_EXCEPTION(CharsetException);
+AGZ_NEW_EXCEPTION(ArgumentException);
+AGZ_NEW_EXCEPTION(OSException);
+AGZ_NEW_EXCEPTION(FileException);
+AGZ_NEW_EXCEPTION(UnreachableException);
 
-class OSException : public Exception
-{
-public:
-    explicit OSException(const std::string &err) : Exception(err) { }
-};
-
-class FileException : public Exception
-{
-public:
-    explicit FileException(const std::string &err) : Exception(err) { }
-};
-
-class UnreachableException : public Exception
-{
-public:
-    explicit UnreachableException(const std::string &err) : Exception(err) { }
-};
+#undef AGZ_NEW_EXCEPTION
 
 template<typename T>
 using remove_rcv_t = std::remove_cv_t<std::remove_reference_t<T>>;
