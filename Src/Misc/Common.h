@@ -134,31 +134,31 @@ public:
 class CharsetException : public Exception
 {
 public:
-    explicit CharsetException(const char *err) : Exception(err) { }
+    explicit CharsetException(const std::string &err) : Exception(err) { }
 };
 
 class ArgumentException : public Exception
 {
 public:
-    explicit ArgumentException(const char *err) : Exception(err) { }
+    explicit ArgumentException(const std::string &err) : Exception(err) { }
 };
 
 class OSException : public Exception
 {
 public:
-    explicit OSException(const char *err) : Exception(err) { }
+    explicit OSException(const std::string &err) : Exception(err) { }
 };
 
 class FileException : public Exception
 {
 public:
-    explicit FileException(const char *err) : Exception(err) { }
+    explicit FileException(const std::string &err) : Exception(err) { }
 };
 
 class UnreachableException : public Exception
 {
 public:
-    explicit UnreachableException(const char *err) : Exception(err) { }
+    explicit UnreachableException(const std::string &err) : Exception(err) { }
 };
 
 template<typename T>
