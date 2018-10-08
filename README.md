@@ -57,6 +57,15 @@ f32x4 c = Sqrt(a + b);
 Vec4f d = c.AsVec(); // d: (sqrt(3), sqrt(5), sqrt(7), sqrt(9))
 ```
 
+### Quaternion
+
+```cpp
+REQUIRE(ApproxEq(Apply(Quaterniond::Rotate(Vec3d(0.0, 0.0, 1.0),
+                                           PI<double> / 2.0),
+                       Vec3d(1.0, 0.0, 0.0)),
+                 Vec3d(0.0, 1.0, 0.0), 1e-5));
+```
+
 ## AGZ::Buf
 
 ```c++
@@ -119,6 +128,7 @@ assert(Big2Little(v1) == 0x12345678);
 | EachIndex    | R \| EachIndex(f) calls f(e, i) for each e in R with index i starting from 0 |
 | Filter       | No need to explain                                           |
 | Map          | No need to explain                                           |
+| FilterMap    | Filter + Map                                                 |
 | PartualFoldl | Generic version of partial sum. See following examples for detailed usage. |
 | Reduce       | No need to explain                                           |
 | Reverse      | No need to explain                                           |
@@ -264,7 +274,9 @@ TextureFile::WriteRGBToPNG(L"output.png", tex);
 | Module   | Class                                        |
 | -------- | -------------------------------------------- |
 | Alloc    | CRTAllocator, FixedSizedArena, SmallObjArena |
-| FileSys  | BinaryStreamView, Path                       |
+| FileSys  | BinaryStreamView, Path, Raw                  |
 | Misc     | TypeOpr, Singleton, Uncopiable               |
+| Model    | GeometryMesh, WavefrontOBJFile               |
 | Platform | Platform                                     |
+| Time     | Timer                                        |
 
