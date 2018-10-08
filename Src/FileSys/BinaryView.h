@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstring>
 #include <fstream>
 
 #include "../Misc/Common.h"

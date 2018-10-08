@@ -218,7 +218,7 @@ inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *
                 nor.x = m(0, 1).Parse<double>();
                 nor.y = m(2, 3).Parse<double>();
                 nor.z = m(4, 5).Parse<double>();
-                checkCur()->normals.push_back(nor);
+                checkCur()->normals.push_back(nor.Normalize());
                 continue;
             }
 

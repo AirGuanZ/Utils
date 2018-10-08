@@ -82,6 +82,9 @@ template<typename T>
 constexpr bool True_v = true;
 
 template<typename T>
+using Void_t = void;
+
+template<typename T>
 struct CanConvertToGenerator
 {
     template<typename U>

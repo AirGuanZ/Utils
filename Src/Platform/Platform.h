@@ -23,6 +23,7 @@ AGZ_NS_END(AGZ)
 
 #elif defined(AGZ_OS_LINUX)
 
+#include <limits.h>
 #include <unistd.h>
 
 #else
