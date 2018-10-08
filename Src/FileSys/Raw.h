@@ -47,7 +47,7 @@ inline bool WriteBinaryFileRaw(
 
 inline bool ReadTextFileRaw(const WStr &filename, WStr *str)
 {
-    std::wifstream fin(filename.ToStdWString(), std::ios_base::in);
+    std::wifstream fin(filename.ToPlatformString(), std::ios_base::in);
     if(!fin)
         return false;
     *str = std::wstring(std::istreambuf_iterator<wchar_t>(fin),
@@ -57,7 +57,7 @@ inline bool ReadTextFileRaw(const WStr &filename, WStr *str)
 
 inline bool WriteTextFileRaw(const WStr &filename, const WStr &str)
 {
-    std::wofstream fout(filename.ToStdWString(), std::ios_base::out | std::ios_base::trunc);
+    std::wofstream fout(filename.ToPlatformString(), std::ios_base::out | std::ios_base::trunc);
     if(!fout)
         return false;
     fout << str.ToStdWString();
