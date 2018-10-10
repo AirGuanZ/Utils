@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Misc/Common.h"
+#include "../Misc/Exception.h"
 #include "Alloc.h"
 #include "Arena.h"
 

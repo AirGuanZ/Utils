@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Misc/Common.h"
+#include "../Misc/Exception.h"
 #include "../Misc/Uncopiable.h"
 
 AGZ_NS_BEG(AGZ)

@@ -4,6 +4,7 @@
 
 #include "../../../Alloc/FixedSizedArena.h"
 #include "../../../Misc/Common.h"
+#include "../../../Misc/Exception.h"
 #include "Inst.h"
 #include "Syntax.h"
 

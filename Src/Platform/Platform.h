@@ -16,6 +16,8 @@ AGZ_NS_END(AGZ)
 
 #if defined(AGZ_PLATFORM_IMPL)
 
+#include "../Misc/Exception.h"
+
 #if defined(AGZ_OS_WIN32)
 
 #include <vector>

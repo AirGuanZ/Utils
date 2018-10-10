@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "../Misc/Common.h"
+#include "../Misc/Exception.h"
 
 AGZ_NS_BEG(AGZ)
 

@@ -3,6 +3,7 @@
 #include <type_traits>
 
 #include "../../Misc/Common.h"
+#include "../../Misc/Exception.h"
 #include "../../Range/Iterator.h"
 #include "Charset.h"
 

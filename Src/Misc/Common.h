@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <string>
 
+// ============================= forceinline =============================
+
 #if defined(_MSC_VER)
 
 #define AGZ_INLINE inline
@@ -16,11 +18,17 @@
     #define AGZ_FORCEINLINE inline
 #endif
 
+// ============================= namespace guard =============================
+
 #define AGZ_NS_BEG(N) namespace N {
 #define AGZ_NS_END(N) }
 
+// ============================= assertion =============================
+
 #include <cassert>
 #define AGZ_ASSERT(X) assert(X)
+
+// ============================= when __BYTE_ORDER__ unavailable =============================
 
 #ifndef __BYTE_ORDER__
     #if defined(_MSC_VER)
@@ -32,12 +40,16 @@
     #endif
 #endif
 
+// ============================= operating system =============================
+
 #if defined(_WIN32)
     #define AGZ_OS_WIN32
 #elif defined(__linux)
     // IMPROVE
     #define AGZ_OS_LINUX
 #endif
+
+// ============================= implementation flag =============================
 
 #if defined(AGZ_ALL_IMPL)
 
@@ -53,16 +65,19 @@
 
 AGZ_NS_BEG(AGZ)
 
+// ============================= unreachable hint =============================
+
 [[noreturn]] AGZ_FORCEINLINE void Unreachable()
 {
 #if defined(_MSC_VER)
     __assume(0);
 #elif defined(__GUNC__)
     __builtin_unreachable();
-#else
-    std::terminate();
 #endif
+    std::terminate();
 }
+
+// ============================= common deleter =============================
 
 struct OperatorDeleter
 {
@@ -74,6 +89,8 @@ struct DummyDeleter
 {
     template<typename T> static void Delete(T*) { }
 };
+
+// ============================= exception-safe array constructor =============================
 
 template<typename C, typename Deleter, typename...Args>
 void ConstructN(C *ptr, size_t n, const Args&...args) noexcept(noexcept(C(args...)))
@@ -101,6 +118,8 @@ void ConstructN(C *ptr, size_t n, const Args&...args) noexcept(noexcept(C(args..
     }
 }
 
+// ============================= type flags (dummy arguments) =============================
+
 struct Uninitialized_t { };
 inline Uninitialized_t UNINITIALIZED;
 
@@ -124,28 +143,7 @@ inline CONS_FLAG_NOCHECK_t NOCHECK;
 struct CONS_FLAG_UNSPECIFIED_t { };
 inline CONS_FLAG_UNSPECIFIED_t UNSPECIFIED;
 
-struct Void_t { };
-
-class Exception : public std::runtime_error
-{
-public:
-    explicit Exception(const std::string &err) : runtime_error(err) { }
-};
-
-#define AGZ_NEW_EXCEPTION(NAME) \
-    class NAME : public Exception \
-    { \
-    public: \
-        explicit NAME(const std::string &err) : Exception(err) { } \
-    }
-
-AGZ_NEW_EXCEPTION(CharsetException);
-AGZ_NEW_EXCEPTION(ArgumentException);
-AGZ_NEW_EXCEPTION(OSException);
-AGZ_NEW_EXCEPTION(FileException);
-AGZ_NEW_EXCEPTION(UnreachableException);
-
-#undef AGZ_NEW_EXCEPTION
+// ============================= Misc =============================
 
 template<typename T>
 using remove_rcv_t = std::remove_cv_t<std::remove_reference_t<T>>;

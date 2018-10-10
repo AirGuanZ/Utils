@@ -178,9 +178,6 @@
     <ClInclude Include="..\Src\Buffer\COWObject.h">
       <Filter>Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\String\Regex\VMEngine.h">
-      <Filter>String\Regex</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\String\Charset\Charset.h">
       <Filter>String\Charset</Filter>
     </ClInclude>
@@ -288,6 +285,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\Utils\Time.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Misc\Exception.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Misc\PrettyTypeName.h">
+      <Filter>Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

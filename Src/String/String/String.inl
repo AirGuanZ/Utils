@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include "../../Alloc/Malloc.h"
+#include "../../Misc/Exception.h"
 #include "StrAlgo.h"
 #include "String.h"
 

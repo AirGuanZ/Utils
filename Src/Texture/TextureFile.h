@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Misc/Common.h"
+#include "../Misc/Exception.h"
 #include "../Utils/Math.h"
 #include "../Utils/String.h"
 #include "Texture.h"

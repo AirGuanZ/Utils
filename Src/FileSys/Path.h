@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../Misc/Common.h"
+#include "../Misc/Exception.h"
 #include "../Utils/Platform.h"
 #include "../Utils/Range.h"
 #include "../Utils/String.h"

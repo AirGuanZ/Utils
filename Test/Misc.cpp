@@ -47,4 +47,12 @@ TEST_CASE("Misc")
         static_assert(Any_v<std::is_integral, float, double, int>);
         static_assert(!Any_v<std::is_class, int, short, unsigned char>);
     }
+
+    SECTION("PrettyTypeName")
+    {
+        REQUIRE(PrettyTypeName<int(*)(float, double)>() == "ptr-to (float, double) -> int");
+        const int &x = 4;
+        REQUIRE(PrettyTypeName<decltype((x))>() == "lref-to const int");
+        REQUIRE(PrettyTypeName<const int * const>() == "const ptr-to const int");
+    }
 }

@@ -6,6 +6,7 @@
 
 #include "../../Alloc/FixedSizedArena.h"
 #include "../../Misc/Common.h"
+#include "../../Misc/Exception.h"
 #include "../String/StrAlgo.h"
 #include "../String/String.h"
 
@@ -952,7 +953,7 @@ public:
     SaveSlots(size_t slotCount, FixedSizedArena<> &arena)
         : slotCount_(slotCount), arena_(arena)
     {
-        storage_ = arena_.Malloc<SaveSlotsStorage>();
+        storage_ = arena_.Alloc<SaveSlotsStorage>();
         storage_->refs = 1;
         for(size_t i = 0; i < slotCount_; ++i)
             storage_->slots[i] = numeric_limits<size_t>::max();

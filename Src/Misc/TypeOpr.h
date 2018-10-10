@@ -47,7 +47,6 @@ using Addr = T*;
 template<typename F, typename...Args>
 using Apply = decltype(std::declval<F>()(std::declval<Args>()...));
 
-#undef DV
 #undef BINARY_OPR
 #undef UNARY_OPR
 

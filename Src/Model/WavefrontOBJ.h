@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 
+#include "../Misc/Exception.h"
 #include "../Utils/Math.h"
 #include "../Utils/Range.h"
 #include "../Utils/String.h"
