@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <functional>
 #include <limits>
 #include <list>
 #include <string>
@@ -586,3 +587,30 @@ template<typename CS>
 using CharRange = typename StrImpl::StringView<CS>::CharRange;
 
 AGZ_NS_END(AGZ)
+
+namespace std
+{
+    template<typename CS>
+    struct hash<AGZ::String<CS>>
+    {
+        size_t operator()(const AGZ::String<CS>& s) const
+        {
+            size_t ret = 0;
+            for(size_t i = 0; i < s.size(); i++)
+                ret = 65599 * ret + s[i];
+            return ret ^ (ret >> 16);
+        }
+    };
+
+    template<typename CS>
+    struct hash<AGZ::StringView<CS>>
+    {
+        size_t operator()(const AGZ::StringView<CS>& s) const
+        {
+            size_t ret = 0;
+            for(size_t i = 0; i < s.size(); i++)
+                ret = 65599 * ret + s[i];
+            return ret ^ (ret >> 16);
+        }
+    };
+}

@@ -151,4 +151,9 @@ using remove_rcv_t = std::remove_cv_t<std::remove_reference_t<T>>;
 template<typename T>
 constexpr T StaticMax(T lhs, T rhs) { return lhs < rhs ? rhs : lhs; }
 
+inline size_t CombineHash(size_t fst, size_t snd)
+{
+    return fst ^ (snd + 0x9e3779b9 + (fst << 6) + (fst >> 2));
+}
+
 AGZ_NS_END(AGZ)
