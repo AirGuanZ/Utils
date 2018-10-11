@@ -90,4 +90,10 @@ struct CanConvertToGenerator
     using type = std::is_convertible<U, T>;
 };
 
+template<typename To, typename From>
+To StaticCaster(const From &from)
+{
+    return static_cast<To>(from);
+}
+
 AGZ_NS_END(AGZ::TypeOpr)

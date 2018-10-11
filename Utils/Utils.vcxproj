@@ -85,6 +85,7 @@
     <ClInclude Include="..\Src\String\Regex\PikeVM.h" />
     <ClInclude Include="..\Src\String\String\StrAlgo.h" />
     <ClInclude Include="..\Src\String\String\String.h" />
+    <ClInclude Include="..\Src\Texture\Sampler.h" />
     <ClInclude Include="..\Src\Texture\Texture.h" />
     <ClInclude Include="..\Src\Texture\TextureFile.h" />
     <ClInclude Include="..\Src\Time\Timer.h" />

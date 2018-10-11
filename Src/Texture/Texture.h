@@ -371,7 +371,6 @@ public:
     }
 };
 
-
 template<typename PT>
 class Texture3D : public TextureCore<3, PT>
 {

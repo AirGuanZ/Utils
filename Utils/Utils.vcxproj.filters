@@ -292,6 +292,9 @@
     <ClInclude Include="..\Src\Misc\PrettyTypeName.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Texture\Sampler.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">
