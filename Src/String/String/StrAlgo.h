@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "../Misc/Exception.h"
+#include "../../Misc/Exception.h"
 #include "String.h"
 
 AGZ_NS_BEG(AGZ::StrAlgo)

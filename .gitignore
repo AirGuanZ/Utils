@@ -24,6 +24,7 @@ bld/
 
 *.o
 *.d
+*.dtmp
 Build/
 .vscode/
 
