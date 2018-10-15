@@ -8,18 +8,19 @@
 
 AGZ_NS_BEG(AGZ::Math::Random)
 
-using SharedEngine = std::default_random_engine;
+using DefaultSharedEngine = std::default_random_engine;
 
+template<typename Engine = DefaultSharedEngine>
 struct SharedRandomEngine_t
 {
     SharedRandomEngine_t()
-        : eng(static_cast<SharedEngine::result_type>(std::time(nullptr)))
+        : eng(static_cast<typename Engine::result_type>(std::time(nullptr)))
     {
         
     }
 
     auto &GetEng() { return eng; }
-    SharedEngine eng;
+    Engine eng;
 };
 
 template<typename T, typename S> struct IntUniform_t
@@ -74,23 +75,19 @@ MAKE_REAL_NORMAL_T(double);
 #undef MAKE_REAL_UNIFORM_T
 #undef MAKE_REAL_NORMAL_T
 
-inline thread_local SharedRandomEngine_t SHARED_RNG;
+template<typename Engine>
+inline thread_local SharedRandomEngine_t<Engine> SHARED_RNG;
 
-template<typename T, typename S = SharedRandomEngine_t>
-T Uniform(T min, T max, S &rng = SHARED_RNG)
+template<typename T, typename S = SharedRandomEngine_t<>>
+T Uniform(T min, T max, S &rng = SHARED_RNG<DefaultSharedEngine>)
 {
     return Uniform_t<T, S>::Eval(min, max, rng);
 }
 
-template<typename T, typename S = SharedRandomEngine_t>
-T Normal(T mean, T stddev, S &rng = SHARED_RNG)
+template<typename T, typename S = SharedRandomEngine_t<>>
+T Normal(T mean, T stddev, S &rng = SHARED_RNG<DefaultSharedEngine>)
 {
     return Normal_t<T, S>::Eval(mean, stddev, rng);
-}
-
-AGZ_INLINE void SetSharedSeed(SharedEngine::result_type seed)
-{
-    SHARED_RNG.GetEng().seed(seed);
 }
 
 AGZ_NS_END(AGZ::Math::Random)
