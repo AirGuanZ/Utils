@@ -75,23 +75,9 @@ auto [sample, pdf] = UniformOnHemisphere<double>::Transform(u);
 REQUIRE(ApproxEq(pdf, Inv2PI<double>, 1e-5));
 ```
 
-## AGZ::Buf
+## Buffer
 
 ```c++
-// Initialize buf with { 0, 1, 2, 3, ..., 7, 8, 9 }
-auto buf0 = Buffer<int>::FromFn(10, [](size_t i) { return i; });
-// Map buf to buf1 with x -> sqrt(x)
-auto buf1 = buf0.Map<float>([](int s) { return Sqrt(float(s)); });
-// Random access with element index
-float elem_at_2 = buf1(2);
-// Foldl
-float sum = buf1.Foldl(0.0f, [](float a, float b) { return a + b; });
-
-// Buffer2D is similar
-auto buf20 = Buffer2D<int>::New(100, 100);
-auto buf21 = Buffer2D<int>::FromFn(
-    100, 100, [](size_t x, size_t y){ return int(x * y); });
-
 // COW (Copy-On-Write) Object
 COWObject<string> s0("Minecraft");
 COWObject<string> s1 = s0;

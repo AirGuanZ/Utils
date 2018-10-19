@@ -81,12 +81,6 @@
     <ClInclude Include="..\Src\Math\SSE.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Buffer\Buffer2D.h">
-      <Filter>Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Buffer\Buffer.h">
-      <Filter>Buffer</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Utils.h" />
     <ClInclude Include="..\Src\Misc\Endian.h">
       <Filter>Misc</Filter>

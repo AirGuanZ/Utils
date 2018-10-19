@@ -23,8 +23,6 @@
     <ClInclude Include="..\Src\Alloc\Arena.h" />
     <ClInclude Include="..\Src\Alloc\FixedSizedArena.h" />
     <ClInclude Include="..\Src\Alloc\Malloc.h" />
-    <ClInclude Include="..\Src\Buffer\Buffer.h" />
-    <ClInclude Include="..\Src\Buffer\Buffer2D.h" />
     <ClInclude Include="..\Src\Buffer\COWObject.h" />
     <ClInclude Include="..\Src\FileSys\BinaryView.h" />
     <ClInclude Include="..\Src\FileSys\Path.h" />
