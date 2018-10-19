@@ -12,6 +12,7 @@ template<typename T> class UniformOnUnitHemisphere;
 template<typename T> class UniformOnUnitSphere;
 template<typename T> class ZWeightedOnUnitHemisphere;
 template<typename T> class ZWeightedOnUnitSphere;
+template<typename T> class UniformOnTriangle;
 
 template<typename T>
 class UniformOnUnitDisk
@@ -112,6 +113,18 @@ public:
     static T PDF(const Vec3<T> &sample)
     {
         return sample.z / InvPI<T>;
+    }
+};
+
+template<typename T>
+class UniformOnTriangle
+{
+public:
+
+    static Vec2<T> Transform(const Vec2<T> &u)
+    {
+        T t = Sqrt(u.u);
+        return { 1 - t, t * u.v };
     }
 };
 
