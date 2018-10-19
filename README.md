@@ -10,8 +10,8 @@ Sqrt(n)                 // sqrt(n)
 Clamp(n, minv, maxv)    // min(maxv, max(minv, n))
 ApproxEq(lhs, rhs, eps) // |lhs - rhs| <= eps
 
-Radf pi_rad = PI<Radf>();     // Pi in (float) radian
-Degd pi_deg = PI<Degd>();     // Pi in (double) degree
+Radf pi_rad = PI<Radf>;       // Pi in (float) radian
+Degd pi_deg = PI<Degd>;       // Pi in (double) degree
 Degf hpi_rad = pi_rad / 2.f;  // Pi/2 in (float) radian
 float sin_hpi = Sin(hpi_rad); // Common trigonometric functions
 ```
@@ -64,6 +64,15 @@ REQUIRE(ApproxEq(Apply(Quaterniond::Rotate(Vec3d(0.0, 0.0, 1.0),
                                            PI<double> / 2.0),
                        Vec3d(1.0, 0.0, 0.0)),
                  Vec3d(0.0, 1.0, 0.0), 1e-5));
+```
+
+### DistributionTransform
+
+```cpp
+Vec2d u(Uniform(0.0, 1.0), Uniform(0.0, 1.0));
+auto [sample, pdf] = UniformOnHemisphere<double>::Transform(u);
+// "sample" sampled uniformly on hemisphere solid angle
+REQUIRE(ApproxEq(pdf, Inv2PI<double>, 1e-5));
 ```
 
 ## AGZ::Buf

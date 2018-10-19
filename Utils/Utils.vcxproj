@@ -35,6 +35,7 @@
     <ClInclude Include="..\Src\Math\Mat4.h" />
     <ClInclude Include="..\Src\Math\Quaternion.h" />
     <ClInclude Include="..\Src\Math\Random.h" />
+    <ClInclude Include="..\Src\Math\DistributionTransform.h" />
     <ClInclude Include="..\Src\Math\Scalar.h" />
     <ClInclude Include="..\Src\Math\SSE.h" />
     <ClInclude Include="..\Src\Math\Tri.h" />
