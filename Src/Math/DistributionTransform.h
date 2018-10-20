@@ -13,6 +13,7 @@ template<typename T> class UniformOnUnitSphere;
 template<typename T> class ZWeightedOnUnitHemisphere;
 template<typename T> class ZWeightedOnUnitSphere;
 template<typename T> class UniformOnTriangle;
+template<typename T> class UniformOnCone;
 
 template<typename T>
 class UniformOnUnitDisk
@@ -32,7 +33,7 @@ public:
         return { { r * Cos(theta), r*  Sin(theta) }, PI<T> };
     }
 
-    static T PDF(const Vec3<T> &smaple)
+    static T PDF()
     {
         return PI<T>;
     }
@@ -59,7 +60,7 @@ public:
         return { { x, y, z }, Inv2PI<T> };
     }
 
-    static T PDF(const Vec3<T> &sample)
+    static T PDF()
     {
         return Inv2PI<T>;
     }
@@ -86,7 +87,7 @@ public:
         return { { x, y, z }, Inv4PI<T> };
     }
 
-    static T PDF(const Vec3<T> &sample)
+    static T PDF()
     {
         return Inv4PI<T>;
     }
@@ -125,6 +126,34 @@ public:
     {
         T t = Sqrt(u.u);
         return { 1 - t, t * u.v };
+    }
+};
+
+template<typename T>
+class UniformOnCone
+{
+public:
+
+    struct Result
+    {
+        Vec3<T> sample;
+        T pdf;
+    };
+
+    Result Transform(T maxCosTheta, const Vec2<T> &u)
+    {
+        T cosTheta = (1 - u.u) + u.u * maxCosTheta;
+        T sinTheta = Sqrt(Max(T(0), T(1) - cosTheta * cosTheta));
+        T phi = 2 * PI<T> * u.v;
+        return {
+            { Cos(phi) * sinTheta, Sin(phi) * sinTheta, cosTheta },
+            1 / (2 * PI<T> * (1 - maxCosTheta))
+        };
+    }
+
+    static T PDF(T maxCosTheta)
+    {
+        return 1 / (2 * PI<T> * (1 - maxCosTheta));
     }
 };
 
