@@ -104,16 +104,33 @@ public:
         T pdf;
     };
 
-    static Result Transform(const Vec2<T> &u)
+    static Result Transform(Vec2<T> u)
     {
-        auto [sam, pdf] = UniformOnUnitDisk<T>::Transform(u);
+        Vec2<T> sam;
+        u = T(2) * u - Vec2<T>(1);
+        if(u.x == 0 && u.y == 0)
+            sam = Vec2<T>(0.0);
+        else
+        {
+            T theta, r;
+            if(Abs(u.x) > Abs(u.y)) {
+                r = u.x;
+                theta = 0.25 * PI<T> * (u.y / u.x);
+            }
+            else {
+                r = u.y;
+                theta = 0.5 * PI<T> -0.25 * PI<T> * (u.x / u.y);
+            }
+            sam = r * Vec2<T>(Cos(theta), Sin(theta));
+        }
+
         T z = Sqrt(Max(T(0), 1 - sam.LengthSquare()));
         return { { sam.x, sam.y, z }, z * InvPI<T> };
     }
 
     static T PDF(const Vec3<T> &sample)
     {
-        return sample.z / InvPI<T>;
+        return sample.z * InvPI<T>;
     }
 };
 

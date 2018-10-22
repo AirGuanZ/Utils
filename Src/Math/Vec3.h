@@ -150,7 +150,7 @@ Vec3<T1> operator+(const Vec3<T1> &lhs, const T2 &rhs) { return Vec3<T1>(lhs.x +
 template<typename T1, typename T2, std::enable_if_t<std::is_arithmetic_v<T2>, int> = 0>
 Vec3<T1> operator-(const Vec3<T1> &lhs, const T2 &rhs) { return Vec3<T1>(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs); }
 template<typename T1, typename T2>
-Vec3<T2> operator*(const T1 &lhs, const Vec3<T2> &rhs) { return Vec3<T2>(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z); }
+Vec3<T2> operator*(const T1 &lhs, const Vec3<T2> &rhs) { return Vec3<T2>(T1(lhs) * rhs.x, T1(lhs) * rhs.y, T1(lhs) * rhs.z); }
 template<typename T1, typename T2, std::enable_if_t<std::is_arithmetic_v<T2>, int> = 0>
 Vec3<T1> operator*(const Vec3<T1> &lhs, const T2 &rhs) { return Vec3<T1>(T1(lhs.x * rhs), T1(lhs.y * rhs), T1(lhs.z * rhs)); }
 template<typename T1, typename T2, std::enable_if_t<std::is_arithmetic_v<T2>, int> = 0>
