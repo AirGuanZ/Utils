@@ -69,8 +69,8 @@ REQUIRE(ApproxEq(Apply(Quaterniond::Rotate(Vec3d(0.0, 0.0, 1.0),
 ### DistributionTransform
 
 ```cpp
-Vec2d u(Uniform(0.0, 1.0), Uniform(0.0, 1.0));
-auto [sample, pdf] = UniformOnHemisphere<double>::Transform(u);
+double u0 = Uniform(0.0, 1.0), u1 = Uniform(0.0, 1.0);
+auto [sample, pdf] = UniformOnHemisphere<double>::Transform({ u0, u1 });
 // "sample" sampled uniformly on hemisphere solid angle
 REQUIRE(ApproxEq(pdf, Inv2PI<double>, 1e-5));
 ```
