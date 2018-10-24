@@ -103,6 +103,8 @@ class SmallObjArena : public FixedArena<E>
 {
     FixedSizedArena<BaseAlloc> base_;
 
+    static_assert(std::is_trivially_destructible_v<E>);
+
 public:
 
     using Self = SmallObjArena<E, BaseAlloc>;
