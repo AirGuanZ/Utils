@@ -4,3 +4,4 @@
 #include "../Alloc/Arena.h"
 #include "../Alloc/FixedSizedArena.h"
 #include "../Alloc/Malloc.h"
+#include "../Alloc/ObjArena.h"

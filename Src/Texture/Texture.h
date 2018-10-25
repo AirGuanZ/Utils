@@ -4,10 +4,7 @@
 
 #include "../Utils/Math.h"
 
-AGZ_NS_BEG(AGZ::Tex)
-
-template<Math::DimType DIM>
-using Coord = Math::Vec<DIM, uint32_t>;
+AGZ_NS_BEG(AGZ)
 
 template<Math::DimType DIM, typename PT>
 class TextureCore
@@ -455,4 +452,4 @@ public:
     }
 };
 
-AGZ_NS_END(AGZ::Tex)
+AGZ_NS_END(AGZ)

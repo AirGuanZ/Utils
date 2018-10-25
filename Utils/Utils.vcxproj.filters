@@ -292,6 +292,9 @@
     <ClInclude Include="..\Src\Math\DistributionTransform.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Alloc\ObjArena.h">
+      <Filter>Alloc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">

@@ -4,7 +4,7 @@
 #include "Catch.hpp"
 
 using namespace AGZ::Math;
-using namespace AGZ::Tex;
+using namespace AGZ;
 
 TEST_CASE("Texture")
 {
