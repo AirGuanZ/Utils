@@ -23,6 +23,10 @@ template<typename T>        T      Sqrt(T);
 template<>           inline float  Sqrt<float>(float value)   { return std::sqrt(value); }
 template<>           inline double Sqrt<double>(double value) { return std::sqrt(value); }
 
+template<typename T>        T      Exp(T);
+template<>           inline float  Exp<float>(float value) { return std::exp(value); }
+template<>           inline double Exp<double>(double value) { return std::exp(value); }
+
 inline float Pow(float x, float y) { return std::pow(x, y); }
 inline double Pow(double x, double y) { return std::pow(x, y); }
 
