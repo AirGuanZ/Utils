@@ -596,8 +596,8 @@ namespace std
         size_t operator()(const AGZ::String<CS>& s) const
         {
             size_t ret = 0;
-            for(size_t i = 0; i < s.size(); i++)
-                ret = 65599 * ret + s[i];
+            for(size_t i = 0; i < s.Length(); i++)
+                ret = 65599 * ret + s.Data()[i];
             return ret ^ (ret >> 16);
         }
     };
@@ -608,8 +608,8 @@ namespace std
         size_t operator()(const AGZ::StringView<CS>& s) const
         {
             size_t ret = 0;
-            for(size_t i = 0; i < s.size(); i++)
-                ret = 65599 * ret + s[i];
+            for(size_t i = 0; i < s.Length(); i++)
+                ret = 65599 * ret + s.Data()[i];
             return ret ^ (ret >> 16);
         }
     };
