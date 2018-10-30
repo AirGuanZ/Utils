@@ -4,6 +4,7 @@
 #include <optional>
 #include <utility>
 
+#include "../../../Alloc/FixedSizedArena.h"
 #include "../../../Misc/Common.h"
 #include "Syntax.h"
 #include "Backend.h"

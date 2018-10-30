@@ -3,12 +3,14 @@
 #include "../Misc/Common.h"
 #include "../Misc/Exception.h"
 #include "Alloc.h"
-#include "Arena.h"
 
 AGZ_NS_BEG(AGZ)
 
+/*
+    只能分配固定大小内存块的Arena
+*/
 template<typename BaseAlloc = DefaultAllocator>
-class FixedSizedArena : public ArbitaryArena
+class FixedSizedArena
 {
     struct Chunk
     {
@@ -61,7 +63,7 @@ public:
         FreeAllImpl();
     }
 
-    void *Alloc(size_t _size) override
+    void *Alloc(size_t _size)
     {
         if(freeNodes_)
         {
@@ -70,7 +72,7 @@ public:
             return ret;
         }
 
-        Chunk *nChunk = reinterpret_cast<Chunk*>(BaseAlloc::Malloc(chunkSize_));
+        auto *nChunk = reinterpret_cast<Chunk*>(BaseAlloc::Malloc(chunkSize_));
         nChunk->next = chunkEntry_;
         chunkEntry_ = nChunk;
 
@@ -85,48 +87,16 @@ public:
         return Alloc(0);
     }
 
-    void Free(void *ptr) override
+    void Free(void *ptr)
     {
         Node *n = reinterpret_cast<Node*>(ptr);
         n->next = freeNodes_;
         freeNodes_ = n;
     }
 
-    void FreeAll() override
+    void FreeAll()
     {
         FreeAllImpl();
-    }
-};
-
-template<typename E, typename BaseAlloc = DefaultAllocator>
-class SmallObjArena : public FixedArena<E>
-{
-    FixedSizedArena<BaseAlloc> base_;
-
-    static_assert(std::is_trivially_destructible_v<E>);
-
-public:
-
-    using Self = SmallObjArena<E, BaseAlloc>;
-
-    explicit SmallObjArena(size_t chunkSize = 32 * sizeof(E))
-        : base_(sizeof(E), chunkSize)
-    {
-
-    }
-
-    SmallObjArena(const Self &)   = delete;
-    Self &operator=(const Self &) = delete;
-    ~SmallObjArena()              = default;
-
-    E *Alloc() override
-    {
-        return static_cast<E*>(base_.Alloc(0));
-    }
-
-    void Free(E *ptr) override
-    {
-        base_.Free(ptr);
     }
 };
 

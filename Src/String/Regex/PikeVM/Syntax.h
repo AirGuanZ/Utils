@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "../../../Alloc/FixedSizedArena.h"
+#include "../../../Alloc/ObjArena.h"
 #include "../../../Misc/Common.h"
 #include "../../../Misc/Exception.h"
 #include "../../String/StrAlgo.h"
@@ -365,7 +365,7 @@ private:
                 {
                     state = WaitingForFirst;
 
-                    auto n = classMemNodeArena_.Alloc();
+                    auto n = classMemNodeArena_.Create<ClassMemNode<CP>>();
                     n->next = ret->dataCharClass.mems;
                     n->isRange = false;
                     n->fst = fst;
@@ -379,7 +379,7 @@ private:
             {
                 state = WaitingForFirst;
 
-                auto n = classMemNodeArena_.Alloc();
+                auto n = classMemNodeArena_.Create<ClassMemNode<CP>>();
                 n->next = ret->dataCharClass.mems;
                 n->isRange = true;
                 n->fst = fst;
@@ -674,7 +674,7 @@ private:
 
     Node *NewNode(ASTType type)
     {
-        Node *ret = astNodeArena_.Alloc();
+        Node *ret = astNodeArena_.Create<Node>();
         ret->type = type;
         return ret;
     }
@@ -728,8 +728,8 @@ private:
             Error();
     }
 
-    SmallObjArena<Node> astNodeArena_;
-    SmallObjArena<ClassMemNode<CP>> classMemNodeArena_;
+    ObjArena<> astNodeArena_;
+    ObjArena<> classMemNodeArena_;
     typename CodePointRange<CS>::Iterator cur_, end_;
 };
 

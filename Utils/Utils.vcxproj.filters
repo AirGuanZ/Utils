@@ -160,9 +160,6 @@
     <ClInclude Include="..\Src\Alloc\Alloc.h">
       <Filter>Alloc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Alloc\FixedSizedArena.h">
-      <Filter>Alloc</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Alloc\Malloc.h">
       <Filter>Alloc</Filter>
     </ClInclude>
@@ -250,9 +247,6 @@
     <ClInclude Include="..\Src\FileSys\BinaryView.h">
       <Filter>FileSys</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Alloc\Arena.h">
-      <Filter>Alloc</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Misc\Uncopiable.h">
       <Filter>Misc</Filter>
     </ClInclude>
@@ -293,6 +287,9 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\Alloc\ObjArena.h">
+      <Filter>Alloc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Alloc\FixedSizedArena.h">
       <Filter>Alloc</Filter>
     </ClInclude>
   </ItemGroup>

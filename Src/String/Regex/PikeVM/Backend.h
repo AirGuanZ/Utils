@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-#include "../../../Alloc/FixedSizedArena.h"
+#include "../../../Alloc/ObjArena.h"
 #include "../../../Misc/Common.h"
 #include "../../../Misc/Exception.h"
 #include "Inst.h"

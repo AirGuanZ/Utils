@@ -23,6 +23,9 @@ AGZ_NS_BEG(AGZ)
     }
 */
 
+/*
+    基于C run-time library实现的内存分配器
+*/
 class CRTAllocator
 {
 public:
