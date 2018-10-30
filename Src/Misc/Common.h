@@ -49,6 +49,12 @@
     #define AGZ_OS_LINUX
 #endif
 
+#if defined(_MSC_VER)
+    #define AGZ_CC_MSVC
+#elif defined(__GUNC__)
+    #define AGZ_CC_GUNC
+#endif
+
 // ============================= implementation flag =============================
 
 #if defined(AGZ_ALL_IMPL)
