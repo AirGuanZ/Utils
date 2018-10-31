@@ -264,14 +264,86 @@ for(int x = 0; x < 10; ++x)
 TextureFile::WriteRGBToPNG(L"output.png", tex);
 ```
 
+## AGZ::Alloc::ObjArena
+
+* Allocate objects in a fast memory pool
+* Call destructor automatically when destroyed
+
+```cpp
+ObjArena<> arena;
+auto *pStr = arena.Create<Str8>(u8"今天天气不错");
+auto *pInt = arena.Create<int>(4);
+arena.Clear(); // Destructor of pStr is automatically called
+```
+
+## AGZ::FileSys
+
+### Path
+
+Cross-platform file/directory path
+
+```cpp
+REQUIRE(WPath(L"A/B/C/D\\", WPath::Windows).IsDirectory());
+REQUIRE(WPath(L"A/B/C/a.b.txt.")
+        .SetExtension(L"rar")
+        .ToStr(WPath::Linux) == L"A/B/C/a.b.txt..rar");
+REQUIRE(WPath(L"A/B/C/D/").ToParent() == WPath(L"A/B/C/"));
+
+REQUIRE(Path8("C:\\Minecraft/XYZ", Path8::Windows).IsAbsolute());
+REQUIRE(Path8("/Minecraft/XYZ", Path8::Linux).IsAbsolute());
+```
+
+### Raw
+
+Read a whole binary/text file once
+
+```cpp
+template<typename AllocFunc = void*(*)(size_t)>
+std::pair<size_t, unsigned char*> ReadBinaryFileRaw(
+    const WStr &filename, AllocFunc &&func = &(std::malloc));
+void DefaultlyReleaseRawBinaryFileContent(unsigned char *ptr);
+bool WriteBinaryFileRaw(
+    const WStr &filename, const unsigned char *data, size_t len);
+
+ReadTextFileRaw(const WStr &filename, WStr *str);
+WriteTextFileRaw(const WStr &filename, const WStr &str);
+```
+
+## AGZ::Config
+
+Easy-use Configuration parser
+
+```cpp
+static const Str8 configText = u8R"___(
+Window =
+{
+    Title = "AGZ Application";
+    Size = { Width = 640; Height = 480; };
+    Pos = { Left = 0; Top = 0; };
+};
+
+Array = (("Minecraft", 123, False), 996.1234, (), {});
+
+Others =
+{
+    PI = 3.141592654;
+    Strings = ("1", "2", "3");
+    Integer = 27;
+};
+)___";
+Config config;
+REQUIRE(config.LoadFromMemory(configText));
+auto &r = config.Root();
+REQUIRE(r.Find("Window.Title")->AsValue().GetStr() == "AGZ Application");
+REQUIRE(r.Find("Others.Integer")->AsValue().GetStr().Parse<int>() == 27);
+```
+
 ## Others
 
-| Module   | Class                                        |
-| -------- | -------------------------------------------- |
-| Alloc    | CRTAllocator, FixedSizedArena, SmallObjArena |
-| FileSys  | BinaryStreamView, Path, Raw                  |
-| Misc     | TypeOpr, Singleton, Uncopiable               |
-| Model    | GeometryMesh, WavefrontOBJFile               |
-| Platform | Platform                                     |
-| Time     | Timer                                        |
+| Module   | Class                          |
+| -------- | ------------------------------ |
+| Misc     | TypeOpr, Singleton, Uncopiable |
+| Model    | GeometryMesh, WavefrontOBJFile |
+| Platform | Platform                       |
+| Time     | Timer                          |
 
