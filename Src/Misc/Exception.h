@@ -26,6 +26,4 @@ AGZ_NEW_EXCEPTION(OSException);
 AGZ_NEW_EXCEPTION(FileException);
 AGZ_NEW_EXCEPTION(UnreachableException);
 
-#undef AGZ_NEW_EXCEPTION
-
 AGZ_NS_END(AGZ)

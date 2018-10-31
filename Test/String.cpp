@@ -135,6 +135,9 @@ TEST_CASE("String")
         REQUIRE(Str8(u8"Minecraft").Find(u8"Minecraft") == 0);
         REQUIRE(Str8(u8"Minecraft").Find(u8"eecraft")   == Str8::NPOS);
         REQUIRE(Str8(u8"Minecraft").Find(u8"er")        == Str8::NPOS);
+
+        REQUIRE(Str8(u8"minecraft今天").FindCPIf([](auto c) { return c == 't'; }) == 8);
+        REQUIRE(Str8(u8"minecraft今天").FindCPIf([](auto c) { return c == *Str8(u8"今").CodePoints().begin(); }) == 9);
     }
 
     SECTION("Chars")

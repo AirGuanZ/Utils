@@ -343,6 +343,9 @@ public:
     size_t Find(const Self &dst, size_t begIdx = 0) const;
     size_t Find(const Str &dst, size_t begIdx = 0)  const { return Find(dst.AsView(), begIdx); }
 
+    template<typename F>
+    size_t FindCPIf(F &&f) const;
+
     CodePointRange<CS> CodePoints() const &  { return CodePointRange<CS>(beg_, beg_ + len_); }
     CodePointRange<CS> CodePoints() const && { return CodePointRange<CS>(*str_, beg_, beg_ + len_); }
 
@@ -374,7 +377,11 @@ public:
 template<typename CS>
 class String
 {
+#if defined(AGZ_ENABLE_STRING_SSO)
+    using InternalStorage = Storage<typename CS::CodeUnit>;
+#else
     using InternalStorage = Storage_NoSSO<typename CS::CodeUnit>;
+#endif
 
     friend class StringBuilder<CS>;
     friend class StringView<CS>;
@@ -491,6 +498,9 @@ public:
     template<typename R> Self Join(R &&strRange)    const { return AsView().Join(std::forward<R>(strRange)); }
     size_t Find(const View &dst, size_t begIdx = 0) const { return AsView().Find(dst, begIdx);               }
     size_t Find(const Self &dst, size_t begIdx = 0) const { return AsView().Find(dst, begIdx);               }
+
+    template<typename F>
+    size_t FindCPIf(F &&f) const { return AsView().FindCPIf(std::forward<F>(f)); }
 
     std::string ToStdString(NativeCharset cs   = NativeCharset::UTF8) const { return AsView().ToStdString(cs); }
     std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const { return AsView().ToStdWString(cs); }

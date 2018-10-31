@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include "../../Alloc/Malloc.h"
+#include "../../Math/Scalar.h"
 #include "../../Misc/Exception.h"
 #include "StrAlgo.h"
 #include "String.h"
@@ -637,7 +638,8 @@ StringView<CS> StringView<CS>::Slice(size_t begIdx) const
 template<typename CS>
 StringView<CS> StringView<CS>::Slice(size_t begIdx, size_t endIdx) const
 {
-    AGZ_ASSERT(begIdx <= endIdx && endIdx <= len_);
+    endIdx = Math::Min(endIdx, len_);
+    begIdx = Math::Min(begIdx, endIdx);
     size_t idxOffset = beg_ - str_->begin();
     return Self(*str_, idxOffset + begIdx, idxOffset + endIdx);
 }
@@ -1006,6 +1008,19 @@ size_t StringView<CS>::Find(const Self &dst, size_t begIdx) const
     auto rt = StrAlgo::FindSubPattern(begin() + begIdx, end(),
                                       dst.begin(), dst.end());
     return rt == end() ? NPOS : (rt - beg_);
+}
+
+template<typename CS>
+template<typename F>
+size_t StringView<CS>::FindCPIf(F &&f) const
+{
+    auto cpr = CodePoints();
+    for(auto it = cpr.begin(); it != cpr.end(); ++it)
+    {
+        if(f(*it))
+            return cpr.CodeUnitIndex(it);
+    }
+    return NPOS;
 }
 
 template<typename CS>

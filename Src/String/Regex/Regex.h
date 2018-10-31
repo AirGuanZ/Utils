@@ -216,6 +216,22 @@ public:
         return Result(dst, rt.value().first, std::move(rt.value().second));
     }
 
+    Result SearchPrefix(const StringView<CS> &dst) const
+    {
+        auto rt = engine_->SearchPrefix(dst);
+        if(!rt.has_value())
+            return Result();
+        return Result(dst, rt.value().first, std::move(rt.value().second));
+    }
+
+    Result SearchSuffix(const StringView<CS> &dst) const
+    {
+        auto rt = engine_->SearchSuffix(dst);
+        if(!rt.has_value())
+            return Result();
+        return Result(dst, rt.value().first, std::move(rt.value().second));
+    }
+
 private:
 
     std::shared_ptr<Engine> engine_;

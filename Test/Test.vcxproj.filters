@@ -12,6 +12,7 @@
     <ClCompile Include="PikeVM.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Config.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Catch.hpp" />

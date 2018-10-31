@@ -24,6 +24,7 @@
     <ClInclude Include="..\Src\Alloc\ObjArena.h" />
     <ClInclude Include="..\Src\Alloc\FixedSizedArena.h" />
     <ClInclude Include="..\Src\Buffer\COWObject.h" />
+    <ClInclude Include="..\Src\Config\Config.h" />
     <ClInclude Include="..\Src\FileSys\BinaryView.h" />
     <ClInclude Include="..\Src\FileSys\Path.h" />
     <ClInclude Include="..\Src\FileSys\Raw.h" />
@@ -91,6 +92,7 @@
     <ClInclude Include="..\Src\Utils.h" />
     <ClInclude Include="..\Src\Utils\Alloc.h" />
     <ClInclude Include="..\Src\Utils\Buffer.h" />
+    <ClInclude Include="..\Src\Utils\Config.h" />
     <ClInclude Include="..\Src\Utils\FileSys.h" />
     <ClInclude Include="..\Src\Utils\Math.h" />
     <ClInclude Include="..\Src\Utils\Misc.h" />
@@ -106,6 +108,9 @@
     <None Include="..\Src\Math\SwizzleVec3.inl" />
     <None Include="..\Src\Math\SwizzleVec4.inl" />
     <None Include="..\Src\String\String\String.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Src\Config\Config.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

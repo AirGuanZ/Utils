@@ -106,6 +106,39 @@ TEST_CASE("VMEngEx")
 
         REQUIRE(Regex8("@{[a-p]&[h-t]&!k|[+*?]}+").Match("hi?jl+mn*op"));
         REQUIRE(!Regex8("@{[a-p]&[h-t]&!k}+").Match("hijklmnop"));
+
+        {
+            Str8 s0 = R"__("minecraft")__";
+            Str8 s1 = R"__("")__";
+            Str8 s2 = R"__("mine\"cr\"aft")__";
+            Str8 s3 = R"__("mine\"cr\"aft\")__";
+
+            Regex8 regex(R"__("&((@{!"}|\\")*@{!\\})?&")__");
+
+            REQUIRE(regex.Match(s0));
+            REQUIRE(regex.Match(s1));
+            REQUIRE(regex.Match(s2));
+            REQUIRE(!regex.Match(s3));
+
+            REQUIRE(regex.SearchPrefix(s0));
+            REQUIRE(regex.SearchPrefix(s1));
+            REQUIRE(regex.SearchPrefix(s2));
+            REQUIRE(!regex.SearchPrefix(s3));
+
+            REQUIRE(!regex.SearchPrefix("x" + s0));
+            REQUIRE(!regex.SearchPrefix("y" + s1));
+            REQUIRE(!regex.SearchPrefix("z" + s2));
+            REQUIRE(!regex.SearchPrefix("w" + s3));
+        }
+
+        {
+            Regex8 regex(R"__(&(\w|-)+&)__");
+
+            Str8 s0 = "-_abcdefg  xsz0-";
+            REQUIRE(!regex.Match(s0));
+            REQUIRE(regex.SearchPrefix(s0)(0, 1) == "-_abcdefg");
+            REQUIRE(regex.SearchSuffix(s0)(0, 1) == "xsz0-");
+        }
     }
 
     SECTION("Search")

@@ -143,6 +143,24 @@ public:
         return Run<false, false>(dst);
     }
 
+    std::optional<std::pair<std::pair<size_t, size_t>,
+                  std::vector<size_t>>>
+        SearchPrefix(const StringView<CS> &dst) const
+    {
+        if(!prog_.Available())
+            Compile();
+        return Run<true, false>(dst);
+    }
+
+    std::optional<std::pair<std::pair<size_t, size_t>,
+                  std::vector<size_t>>>
+        SearchSuffix(const StringView<CS> &dst) const
+    {
+        if(!prog_.Available())
+            Compile();
+        return Run<false, true>(dst);
+    }
+
 private:
 
     using It = typename CS::Iterator;

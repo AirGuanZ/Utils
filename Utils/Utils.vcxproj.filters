@@ -49,6 +49,9 @@
     <Filter Include="Time">
       <UniqueIdentifier>{30c6b6e7-ea30-4779-a730-3228e127d24e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{1618bb83-3dd2-4098-92c2-9e803689af30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Math\Scalar.h">
@@ -292,6 +295,12 @@
     <ClInclude Include="..\Src\Alloc\FixedSizedArena.h">
       <Filter>Alloc</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Config\Config.h">
+      <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Config.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">
@@ -306,5 +315,10 @@
     <None Include="..\Src\String\String\String.inl">
       <Filter>String\String</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Src\Config\Config.cpp">
+      <Filter>Config</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
