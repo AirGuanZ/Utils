@@ -5,36 +5,30 @@
 using namespace AGZ;
 using namespace std;
 
-static const Str8 S0 = R"___(
-window =
+static const Str8 S0 = u8R"___(
+Window =
 {
-    title = "My Application";
-    size = { w = 640; h = 480; };
-    pos = { x = 350; y = 250; };
+    Title = "AGZ Application";
+    Size = { Width = 640; Height = 480; };
+    Pos = { Left = 0; Top = 0; };
 };
 
-list = ( ( "abc", 123, true ), 1.234, ( ) );
+Array = (( "Minecraft", 123, False), 996.1234, ());
 
-books = ({
-        title = "Treasure Island";
-        author = "Robert Louis Stevenson";
-        price = 29.95;
-        qty = 5;
+Students = ({
+        Name = "Zhang3";
+        Age = 18;
     },
     {
-        title = "Snow Crash";
-        author = "Neal Stephenson";
-        price = 9.99;
-        qty = 8;
+        Name = "Li4";
+        Age = 21;
     });
 
-misc =
+Others =
 {
-    pi = 3.141592654;
-    bigint = 9223372036854775807L;
-    columns = ("Last Name", "First Name", "MI");
-    bitmask = 0x1FC3;
-    umask = 27;
+    PI = 3.141592654;
+    Strings = ("1", "2", "3");
+    Integer = 27;
 };
 )___";
 
@@ -45,8 +39,11 @@ TEST_CASE("Config")
         Config config;
         REQUIRE(config.LoadFromMemory(S0));
 
-        auto &root = config.Root();
-        REQUIRE(root.Find("window.title")->AsValue().GetStr() == "My Application");
-        REQUIRE(root.Find("misc.umask")->AsValue().GetStr().Parse<int>() == 27);
+        if(config.IsAvailable())
+        {
+            auto &root = config.Root();
+            REQUIRE(root.Find("Window.Title")->AsValue().GetStr() == "AGZ Application");
+            REQUIRE(root.Find("Others.Integer")->AsValue().GetStr().Parse<int>() == 27);
+        }
     }
 }
