@@ -59,7 +59,7 @@ public:
 
     virtual const ConfigGroup &AsGroup() const { throw ConfigNodeInvalidCasting("ConfigASTNode: invalid casting"); }
     virtual const ConfigArray &AsArray() const { throw ConfigNodeInvalidCasting("ConfigASTNode: invalid casting"); }
-    virtual const ConfigValue &AsValue() const { throw ConfigNodeInvalidCasting("ConfigASTNode: invalid casting"); }
+    virtual const Str8        &AsValue() const { throw ConfigNodeInvalidCasting("ConfigASTNode: invalid casting"); }
 };
 
 class ConfigGroup : public ConfigNode
@@ -110,7 +110,7 @@ public:
 
     const Str8 &operator*() const;
 
-    const ConfigValue &AsValue() const override;
+    const Str8 &AsValue() const override;
 };
 
 class Config : public Uncopiable

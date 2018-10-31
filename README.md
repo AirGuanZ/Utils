@@ -334,8 +334,8 @@ Others =
 Config config;
 REQUIRE(config.LoadFromMemory(configText));
 auto &r = config.Root();
-REQUIRE(r.Find("Window.Title")->AsValue().GetStr() == "AGZ Application");
-REQUIRE(r.Find("Others.Integer")->AsValue().GetStr().Parse<int>() == 27);
+REQUIRE(r.Find("Window.Title")->AsValue() == "AGZ Application");
+REQUIRE(r.Find("Others.Integer")->AsValue().Parse<int>() == 27);
 ```
 
 ## Others

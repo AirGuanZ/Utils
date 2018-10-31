@@ -42,8 +42,8 @@ TEST_CASE("Config")
         if(config.IsAvailable())
         {
             auto &root = config.Root();
-            REQUIRE(root.Find("Window.Title")->AsValue().GetStr() == "AGZ Application");
-            REQUIRE(root.Find("Others.Integer")->AsValue().GetStr().Parse<int>() == 27);
+            REQUIRE(root.Find("Window.Title")->AsValue() == "AGZ Application");
+            REQUIRE(root.Find("Others.Integer")->AsValue().Parse<int>() == 27);
         }
     }
 }

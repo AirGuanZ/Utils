@@ -100,9 +100,9 @@ inline const Str8 &ConfigValue::operator*() const
     return str_;
 }
 
-inline const ConfigValue &ConfigValue::AsValue() const
+inline const Str8 &ConfigValue::AsValue() const
 {
-    return *this;
+    return str_;
 }
 
 namespace ConfigImpl
