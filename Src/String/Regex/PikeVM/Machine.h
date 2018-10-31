@@ -37,7 +37,7 @@ public:
     SaveSlots(size_t slotCount, FixedSizedArena<> &arena)
         : slotCount_(slotCount), arena_(arena)
     {
-        storage_ = static_cast<SaveSlotsStorage*>(arena_.Alloc(0));
+        storage_ = static_cast<SaveSlotsStorage*>(arena_.Alloc());
         storage_->refs = 1;
         for(size_t i = 0; i < slotCount_; ++i)
             storage_->slots[i] = std::numeric_limits<size_t>::max();
@@ -72,7 +72,7 @@ public:
         // Copy-On-Write Strategy
         if(storage_->refs > 1)
         {
-            auto newSto = static_cast<SaveSlotsStorage*>(arena_.Alloc(0));
+            auto newSto = static_cast<SaveSlotsStorage*>(arena_.Alloc());
             newSto->refs = 1;
             for(size_t i = 0; i < slotCount_; ++i)
                 newSto->slots[i] = storage_->slots[i];

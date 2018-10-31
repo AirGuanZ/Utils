@@ -65,9 +65,6 @@ class Storage
 
     using LargeBuf = RefCountedBuf<CU>;
 
-    template<typename CS>
-    friend class String;
-
     union
     {
         struct
@@ -90,13 +87,13 @@ class Storage
     CU *GetSmallMutableData();
     CU *GetLargeMutableData();
 
-    CU *GetMutableData();
-
 public:
 
     using Self = Storage<CU>;
 
     static_assert(std::is_trivially_copyable_v<CU>);
+
+    CU *GetMutableData();
 
     explicit Storage(size_t len);
     Storage(const CU *data, size_t len);
@@ -116,6 +113,45 @@ public:
 
     size_t GetSmallLength() const;
     size_t GetLargeLength() const;
+    size_t GetLength() const;
+
+    const CU *Begin() const;
+    const CU *End() const;
+
+    std::pair<const CU*, size_t> BeginAndLength() const;
+    std::pair<const CU*, const CU*> BeginAndEnd() const;
+};
+
+template<typename CU>
+class Storage_NoSSO
+{
+    using Buf = RefCountedBuf<CU>;
+    Buf *buf_;
+    CU *beg_, *end_;
+
+    void Alloc(size_t len);
+
+public:
+
+    using Self = Storage_NoSSO<CU>;
+
+    static_assert(std::is_trivially_copyable_v<CU>);
+
+    CU *GetMutableData();
+
+    explicit Storage_NoSSO(size_t len);
+    Storage_NoSSO(const CU *data, size_t len);
+    Storage_NoSSO(const CU *beg, const CU *end);
+
+    Storage_NoSSO(const Self &copyFrom);
+    Storage_NoSSO(const Self &copyFrom, size_t begIdx, size_t endIdx);
+    Storage_NoSSO(Self &&moveFrom) noexcept;
+
+    ~Storage_NoSSO();
+
+    Self &operator=(const Self &copyFrom);
+    Self &operator=(Self &&moveFrom) noexcept;
+
     size_t GetLength() const;
 
     const CU *Begin() const;
@@ -338,10 +374,12 @@ public:
 template<typename CS>
 class String
 {
+    using InternalStorage = Storage_NoSSO<typename CS::CodeUnit>;
+
     friend class StringBuilder<CS>;
     friend class StringView<CS>;
 
-    Storage<typename CS::CodeUnit> storage_;
+    InternalStorage storage_;
 
     typename CS::CodeUnit *GetMutableData();
     std::pair<typename CS::CodeUnit*, typename CS::CodeUnit*>

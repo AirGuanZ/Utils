@@ -63,7 +63,7 @@ public:
         FreeAllImpl();
     }
 
-    void *Alloc(size_t _size)
+    void *Alloc()
     {
         if(freeNodes_)
         {
@@ -84,12 +84,12 @@ public:
             node += nodeSize_;
         }
 
-        return Alloc(0);
+        return Alloc();
     }
 
     void Free(void *ptr)
     {
-        Node *n = reinterpret_cast<Node*>(ptr);
+        auto *n = reinterpret_cast<Node*>(ptr);
         n->next = freeNodes_;
         freeNodes_ = n;
     }

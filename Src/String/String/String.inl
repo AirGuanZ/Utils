@@ -255,6 +255,122 @@ std::pair<const CU*, const CU*> Storage<CU>::BeginAndEnd() const
             { large_.beg, large_.end };
 }
 
+template<typename CU>
+void Storage_NoSSO<CU>::Alloc(size_t len)
+{
+    buf_ = Buf::New(len);
+    beg_ = buf_->GetData();
+    end_ = beg_ + len;
+}
+
+template<typename CU>
+CU *Storage_NoSSO<CU>::GetMutableData()
+{
+    return beg_;
+}
+
+template<typename CU>
+Storage_NoSSO<CU>::Storage_NoSSO(size_t len)
+{
+    Alloc(len);
+}
+
+template<typename CU>
+Storage_NoSSO<CU>::Storage_NoSSO(const CU *data, size_t len)
+{
+    Alloc(len);
+    Copy(data, len, beg_);
+}
+
+template<typename CU>
+Storage_NoSSO<CU>::Storage_NoSSO(const CU *beg, const CU *end)
+    : Storage_NoSSO(beg, static_cast<size_t>(end - beg))
+{
+
+}
+
+template<typename CU>
+Storage_NoSSO<CU>::Storage_NoSSO(const Self &copyFrom)
+    : Storage_NoSSO(copyFrom, 0, copyFrom.GetLength())
+{
+
+}
+
+template<typename CU>
+Storage_NoSSO<CU>::Storage_NoSSO(const Self &copyFrom, size_t begIdx, size_t endIdx)
+{
+    buf_ = copyFrom.buf_;
+    beg_ = copyFrom.beg_ + begIdx;
+    end_ = copyFrom.beg_ + endIdx;
+    buf_->IncRef();
+}
+
+template<typename CU>
+Storage_NoSSO<CU>::Storage_NoSSO(Self &&moveFrom) noexcept
+{
+    buf_ = moveFrom.buf_;
+    beg_ = moveFrom.beg_;
+    end_ = moveFrom.end_;
+
+    moveFrom.buf_ = nullptr;
+    moveFrom.beg_ = moveFrom.end_ = nullptr;
+}
+
+template<typename CU>
+Storage_NoSSO<CU>::~Storage_NoSSO()
+{
+    if(buf_)
+        buf_->DecRef();
+}
+
+template<typename CU>
+typename Storage_NoSSO<CU>::Self &Storage_NoSSO<CU>::operator=(const Self &copyFrom)
+{
+    if(buf_)
+        buf_->DecRef();
+    new(this) Self(copyFrom);
+    return *this;
+}
+
+template<typename CU>
+typename Storage_NoSSO<CU>::Self &Storage_NoSSO<CU>::operator=(Self &&moveFrom) noexcept
+{
+    if(buf_)
+        buf_->DecRef();
+    new(this) Self(std::move(moveFrom));
+    return *this;
+}
+
+template<typename CU>
+size_t Storage_NoSSO<CU>::GetLength() const
+{
+    return end_ - beg_;
+}
+
+template<typename CU>
+const CU *Storage_NoSSO<CU>::Begin() const
+{
+    return beg_;
+}
+
+template<typename CU>
+const CU *Storage_NoSSO<CU>::End() const
+{
+    return end_;
+}
+
+template<typename CU>
+std::pair<const CU*, size_t> Storage_NoSSO<CU>::BeginAndLength() const
+{
+    return { beg_, end_ - beg_ };
+}
+
+template<typename CU>
+std::pair<const CU*, const CU*> Storage_NoSSO<CU>::BeginAndEnd() const
+{
+    return { beg_, end_ };
+}
+
 template<typename CS>
 CodePointRange<CS>::CodePointRange(const CodeUnit *beg, const CodeUnit *end)
     : beg_(beg), end_(end)
