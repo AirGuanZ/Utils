@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tuple>
+#include <variant>
 
 #include "../Misc/Common.h"
 
@@ -94,6 +95,26 @@ template<typename To, typename From>
 To StaticCaster(const From &from)
 {
     return static_cast<To>(from);
+}
+
+template<typename...Ts>
+using Variant = std::variant<Ts...>;
+
+template<typename R = void, typename E, typename...Vs>
+R MatchVar(E &&e, Vs...vs)
+{
+    struct overloaded : Vs...
+    {
+        explicit overloaded(Vs...vss)
+            : Vs(vss)...
+        {
+
+        }
+    };
+
+    return std::visit(
+        overloaded(vs...),
+        std::forward<E>(e));
 }
 
 AGZ_NS_END(AGZ::TypeOpr)

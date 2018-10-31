@@ -48,7 +48,6 @@
     <ClInclude Include="..\Src\Misc\Exception.h" />
     <ClInclude Include="..\Src\Misc\PrettyTypeName.h" />
     <ClInclude Include="..\Src\Misc\Singleton.h" />
-    <ClInclude Include="..\Src\Misc\TypeUnion.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
     <ClInclude Include="..\Src\Misc\Uncopiable.h" />
     <ClInclude Include="..\Src\Model\Model.h" />
