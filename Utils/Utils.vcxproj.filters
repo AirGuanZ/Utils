@@ -301,6 +301,10 @@
     <ClInclude Include="..\Src\Utils\Config.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Config\Config.inl" />
+    <ClInclude Include="..\Src\Misc\TypeUnion.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">
@@ -315,10 +319,5 @@
     <None Include="..\Src\String\String\String.inl">
       <Filter>String\String</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\Src\Config\Config.cpp">
-      <Filter>Config</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

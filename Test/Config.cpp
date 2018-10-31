@@ -7,13 +7,14 @@ using namespace std;
 
 static const Str8 S0 = u8R"___(
 Window =
-{
+{ # This is a comment
     Title = "AGZ Application";
     Size = { Width = 640; Height = 480; };
     Pos = { Left = 0; Top = 0; };
 };
-
+# This is a comment
 Array = (( "Minecraft", 123, False), 996.1234, ());
+## Hello?!
 
 Students = ({
         Name = "Zhang3";

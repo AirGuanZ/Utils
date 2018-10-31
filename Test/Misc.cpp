@@ -48,6 +48,16 @@ TEST_CASE("Misc")
         static_assert(!Any_v<std::is_class, int, short, unsigned char>);
     }
 
+    SECTION("TypeUnion")
+    {
+        Variant<int, float, std::string> tu = 3.0f;
+
+        auto v = MatchVar<float>(tu,
+            [](float f) { return f; },
+            [](auto v) { return 0.0f; });
+        REQUIRE(v == 3.0f);
+    }
+
     SECTION("PrettyTypeName")
     {
         REQUIRE(PrettyTypeName<int(*)(float, double)>() == "ptr-to (float, double) -> int");
