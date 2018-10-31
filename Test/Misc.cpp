@@ -50,12 +50,13 @@ TEST_CASE("Misc")
 
     SECTION("TypeUnion")
     {
-        Variant<int, float, std::string> tu = 3.0f;
+        Variant<int, float, std::string> tu = 5;
 
-        auto v = MatchVar<float>(tu,
+        auto v = MatchVar(tu,
             [](float f) { return f; },
+            [](int x) { return x + 2.0f; },
             [](auto v) { return 0.0f; });
-        REQUIRE(v == 3.0f);
+        REQUIRE(v == 7);
     }
 
     SECTION("PrettyTypeName")

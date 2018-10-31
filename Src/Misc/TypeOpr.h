@@ -100,8 +100,8 @@ To StaticCaster(const From &from)
 template<typename...Ts>
 using Variant = std::variant<Ts...>;
 
-template<typename R = void, typename E, typename...Vs>
-R MatchVar(E &&e, Vs...vs)
+template<typename E, typename...Vs>
+auto MatchVar(E &&e, Vs...vs)
 {
     struct overloaded : Vs...
     {
