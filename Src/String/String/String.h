@@ -198,8 +198,8 @@ public:
     }
 };
 
-template<typename CS>
 // Immutable string slice
+template<typename CS>
 class StringView
 {
     const String<CS> *str_;

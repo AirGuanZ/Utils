@@ -38,18 +38,9 @@ TEST_CASE("Misc")
     
     SECTION("TypeOpr")
     {
-        static_assert(std::is_same_v<Add<int, int>, int>);
-        static_assert(std::is_same_v<Add<int, float>, float>);
-        static_assert(std::is_same_v<Div<float, double>, double>);
-        static_assert(std::is_same_v<Equal<int, float>, bool>);
-        static_assert(std::is_same_v<BitNot<int>, int>);
-
         static_assert(Any_v<std::is_integral, float, double, int>);
         static_assert(!Any_v<std::is_class, int, short, unsigned char>);
-    }
 
-    SECTION("TypeUnion")
-    {
         Variant<int, float, std::string> tu = 5;
 
         auto v = MatchVar(tu,
