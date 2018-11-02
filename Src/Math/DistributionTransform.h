@@ -109,17 +109,17 @@ public:
         Vec2<T> sam;
         u = T(2) * u - Vec2<T>(1);
         if(u.x == 0 && u.y == 0)
-            sam = Vec2<T>(0.0);
+            sam = Vec2<T>(T(0));
         else
         {
             T theta, r;
             if(Abs(u.x) > Abs(u.y)) {
                 r = u.x;
-                theta = 0.25 * PI<T> * (u.y / u.x);
+                theta = T(0.25) * PI<T> * (u.y / u.x);
             }
             else {
                 r = u.y;
-                theta = 0.5 * PI<T> -0.25 * PI<T> * (u.x / u.y);
+                theta = T(0.5) * PI<T> - T(0.25) * PI<T> * (u.x / u.y);
             }
             sam = r * Vec2<T>(Cos(theta), Sin(theta));
         }

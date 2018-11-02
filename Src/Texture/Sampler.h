@@ -47,8 +47,8 @@ public:
         int apu = Math::Clamp(pu + dpu, 0, static_cast<int>(tex.GetWidth() - 1));
         int apv = Math::Clamp(pv + dpv, 0, static_cast<int>(tex.GetHeight() - 1));
 
-        E du = Math::Min(Math::Abs(fu - pu - 0.5), E(1));
-        E dv = Math::Min(Math::Abs(fv - pv - 0.5), E(1));
+        E du = Math::Min(Math::Abs(fu - pu - E(0.5)), E(1));
+        E dv = Math::Min(Math::Abs(fv - pv - E(0.5)), E(1));
 
         return Interpolate(tex(pu, pv), tex(apu, pv), tex(pu, apv), tex(apu, apv), du, dv);
     }
