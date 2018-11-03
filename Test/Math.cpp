@@ -98,17 +98,30 @@ TEST_CASE("Math")
                          Color3d(0.f, 1.f, 1.f), 1e-7));
     }
 
-    SECTION("f32x4")
+    SECTION("F32x4")
     {
-        f32x4 a(1.0f, 2.0f, 3.0f, 4.0f);
-        f32x4 b(2.0f, 3.0f, 4.0f, 5.0f);
-        REQUIRE(ApproxEq(a + b, f32x4(3.0, 5.0, 7.0, 9.0), 1e-7f));
+        F32x4 a(1.0f, 2.0f, 3.0f, 4.0f);
+        F32x4 b(2.0f, 3.0f, 4.0f, 5.0f);
+        REQUIRE(ApproxEq(a + b, F32x4(3.0, 5.0, 7.0, 9.0), 1e-5f));
 
-        REQUIRE(ApproxEq(Sqrt(f32x4(4.0f, 3.0f, 2.0f, 1.0f) * F32X4::ONE).AsVec(),
+        REQUIRE(ApproxEq(Sqrt(F32x4(4.0f, 3.0f, 2.0f, 1.0f) * F32X4::ONE).AsVec(),
                          Vec4f(4.0f, 3.0f, 2.0f, 1.0f).Map(
                             [](float x) { return Sqrt(x); }),
                          1e-5f));
     }
+
+	SECTION("D64x4")
+	{
+		D64x4 a(1.0, 2.0, 3.0, 4.0);
+		D64x4 b(2.0, 3.0, 4.0, 5.0);
+
+		REQUIRE(ApproxEq(a + b, D64x4(3.0, 5.0, 7.0, 9.0), 1e-7));
+
+		REQUIRE(ApproxEq(Sqrt(D64x4(4.0, 3.0, 2.0, 1.0)).AsVec(),
+						 Vec4d(4.0, 3.0, 2.0, 1.0).Map(
+							[](double x) { return Sqrt(x); }),
+						 1e-5));
+	}
 
     SECTION("Quaternion")
     {

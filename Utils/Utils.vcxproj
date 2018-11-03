@@ -30,13 +30,14 @@
     <ClInclude Include="..\Src\FileSys\Raw.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />
     <ClInclude Include="..\Src\Math\Color.h" />
+    <ClInclude Include="..\Src\Math\D64x4.h" />
     <ClInclude Include="..\Src\Math\Mat3.h" />
     <ClInclude Include="..\Src\Math\Mat4.h" />
     <ClInclude Include="..\Src\Math\Quaternion.h" />
     <ClInclude Include="..\Src\Math\Random.h" />
     <ClInclude Include="..\Src\Math\DistributionTransform.h" />
     <ClInclude Include="..\Src\Math\Scalar.h" />
-    <ClInclude Include="..\Src\Math\SSE.h" />
+    <ClInclude Include="..\Src\Math\F32x4.h" />
     <ClInclude Include="..\Src\Math\Tri.h" />
     <ClInclude Include="..\Src\Math\Vec.h" />
     <ClInclude Include="..\Src\Math\Vec2.h" />
@@ -117,7 +118,7 @@
     <ProjectGuid>{8E5BB8AB-2C07-4815-807F-EA23991B3F93}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Utils</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
