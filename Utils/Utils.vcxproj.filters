@@ -305,6 +305,9 @@
     <ClInclude Include="..\Src\Math\F32x4.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Misc\Either.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">

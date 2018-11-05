@@ -9,6 +9,15 @@ using namespace TypeOpr;
 
 TEST_CASE("Misc")
 {
+	SECTION("Either")
+	{
+		Either<int, float> intOrFloat = 4;
+		REQUIRE(intOrFloat.IsLeft());
+		REQUIRE(!intOrFloat.IsRight());
+		REQUIRE(intOrFloat.GetLeft() == 4);
+		REQUIRE_THROWS(intOrFloat.GetRight());
+	}
+
     SECTION("Endian")
     {
         REQUIRE(Big2Little(uint8_t(0))   == uint8_t(0));

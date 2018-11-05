@@ -45,6 +45,7 @@
     <ClInclude Include="..\Src\Math\Vec4.h" />
     <ClInclude Include="..\Src\Misc\Common.h" />
     <ClInclude Include="..\Src\Misc\Config.h" />
+    <ClInclude Include="..\Src\Misc\Either.h" />
     <ClInclude Include="..\Src\Misc\Endian.h" />
     <ClInclude Include="..\Src\Misc\Exception.h" />
     <ClInclude Include="..\Src\Misc\PrettyTypeName.h" />

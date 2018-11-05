@@ -19,16 +19,23 @@ template<typename T> struct Abs_impl<Deg<T>> { static Deg<T> Abs(Deg<T> v) { ret
 
 template<typename T> T Abs(T v) { return Abs_impl<T>::Abs(v); }
 
-template<typename T>        T      Sqrt(T);
-template<>           inline float  Sqrt<float>(float value)   { return std::sqrt(value); }
-template<>           inline double Sqrt<double>(double value) { return std::sqrt(value); }
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+auto Sqrt(T value) { return std::sqrt(value); }
 
-template<typename T>        T      Exp(T);
-template<>           inline float  Exp<float>(float value) { return std::exp(value); }
-template<>           inline double Exp<double>(double value) { return std::exp(value); }
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+auto Exp(T value) { return std::exp(value); }
 
-inline float Pow(float x, float y) { return std::pow(x, y); }
-inline double Pow(double x, double y) { return std::pow(x, y); }
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+auto Log_e(T value) { return std::log(value); }
+
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+auto Log_2(T value) { return std::log2(value); }
+
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+auto Log_10(T value) { return std::log10(value); }
+
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+auto Pow(T x, T y) { return std::pow(x, y); }
 
 template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 T Clamp(T v, T minv, T maxv) { return (std::max)((std::min)(v, maxv), minv); }
