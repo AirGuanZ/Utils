@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <map>
 #include <vector>
@@ -12,26 +12,37 @@
 
 namespace AGZ::Model {
 
-// See https://en.wikipedia.org/wiki/Wavefront_.obj_file
+/**
+ * @brief Wavefront OBJ模型加载结果
+ */
 class WavefrontObj
 {
 public:
 
-    using Vertex = Math::Vec4<double>;
-    using TexCoord = Math::Vec3<double>;
-    using Normal = Math::Vec3<double>;
+    using Vertex = Math::Vec4<double>;	 ///< 顶点类型
+    using TexCoord = Math::Vec3<double>; ///< 纹理坐标类型
+    using Normal = Math::Vec3<double>;   ///< 法线类型
 
+	/**
+	 * 顶点索引
+	 */
     struct Index
     {
         int32_t vtx, tex, nor;
     };
 
+	/**
+	 * 包含三个点的面为三角形，四个点则是四边形
+	 */
     struct Face
     {
         // -1 means this index is inavailable
         Index indices[4];
     };
 
+	/**
+	 * @brief Obj模型数据
+	 */
     struct Obj
     {
         std::vector<Vertex> vertices;
@@ -40,35 +51,68 @@ public:
 
         std::vector<Face> faces;
 
-        // Convert self to GeometryMesh
-        // Missing normals will be filled with Cross(B - A, C - A)
-        //      Specify reverseNor = true to use Cross(C - A, B - A)
-        // Missing texcoods will be filled with B <- (1, 0) and C <- (0, 1)
-        //      Specify reverseTex = true to use B <- (0, 1) and C <- (1, 0)
+        /**
+         * 转换为 GeometryMesh
+         * 
+         * Missing normals will be filled with Cross(B - A, C - A)
+         *      Specify reverseNor = true to use Cross(C - A, B - A)
+         * Missing texcoods will be filled with B <- (1, 0) and C <- (0, 1)
+         *      Specify reverseTex = true to use B <- (0, 1) and C <- (1, 0)
+         */
         GeometryMesh ToGeometryMesh(bool reverseNor = false, bool reverseTex = false) const;
     };
 
     std::map<Str8, Obj> objs;
 
+	/**
+	 * 是否不包含任何模型
+	 */
     bool Empty() const
     {
         return objs.empty();
     }
 
+	/**
+	 * 清空所有加载的数据
+	 */
     void Clear()
     {
         objs.clear();
     }
 
+	/**
+	 * 转换为 GeometryMeshGroup
+	 */
     GeometryMeshGroup ToGeometryMeshGroup(bool reverseNor = false, bool reverseTex = false) const;
 };
 
+/**
+ * @brief Wafefront模型加载器
+ * 
+ * 见https://en.wikipedia.org/wiki/Wavefront_.obj_file
+ */
 class WavefrontObjFile
 {
 public:
 
+	/**
+	 * 从文件中加载
+	 * 
+	 * @filename 文件路径
+	 * @obj 输出模型，不得为空
+	 * 
+	 * @return 加载成功时返回true
+	 */
     static bool LoadFromObjFile(const WStr &filename, WavefrontObj *objs, bool ignoreUnknownLine = true);
 
+	/**
+	 * 从文本中加载
+	 * 
+	 * @content OBJ格式的文本字符串
+	 * @obj 输出模型，不得为空
+	 * 
+	 * @return 加载成功时返回true
+	 */
     static bool LoadFromMemory(const WStr &content, WavefrontObj *objs, bool ignoreUnknownLine = true);
 
 private:

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Misc/Common.h"
 
@@ -7,6 +7,11 @@ namespace AGZ::Math {
 template<typename T>
 struct Deg;
 
+/**
+ * @brief 弧度值
+ * 
+ * 可进行基本的算术运算和三角函数运算，与角度值间可自动转换
+ */
 template<typename T>
 struct Rad
 {
@@ -18,6 +23,11 @@ struct Rad
     constexpr Rad(const Deg<T> &d);
 };
 
+/**
+ * @brief 角度制
+ * 
+ * 可进行基本的算术运算和三角函数运算，与角度值间可自动转换
+ */
 template<typename T>
 struct Deg
 {

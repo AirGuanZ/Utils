@@ -1,4 +1,4 @@
-PROJECT_NAME           = AGZ-Utils
+PROJECT_NAME = "AGZ Utils"
 
 PROJECT_BRIEF = "Header-only C++17 utility tools"
 

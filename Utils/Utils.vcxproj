@@ -25,7 +25,6 @@
     <ClInclude Include="..\Src\Alloc\FixedSizedArena.h" />
     <ClInclude Include="..\Src\Buffer\COWObject.h" />
     <ClInclude Include="..\Src\Config\Config.h" />
-    <ClInclude Include="..\Src\FileSys\BinaryView.h" />
     <ClInclude Include="..\Src\FileSys\Path.h" />
     <ClInclude Include="..\Src\FileSys\Raw.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />

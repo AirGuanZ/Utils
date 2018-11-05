@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <atomic>
 #include <type_traits>
@@ -9,9 +9,10 @@
 
 namespace AGZ {
 
-template<typename T,
-         typename Alloc = DefaultAllocator,
-         std::enable_if_t<Alloc::AnyAlign, int> = 0>
+/**
+ * @brief 将任意类型封装为引用计数类型，线程不安全
+ */
+template<typename T, typename Alloc = DefaultAllocator>
 class COWObject
 {
     using RefCounter = size_t;
@@ -35,6 +36,11 @@ public:
         
     }
 
+	/**
+	 * @param args 转发给内部对象构造函数的参数
+	 * 
+	 * @exception std::bad_alloc 内存分配失败时抛出
+	 */
     template<typename...Args>
     explicit COWObject(Args&&...args)
     {
@@ -87,6 +93,9 @@ public:
         return *this;
     }
 
+	/**
+	 * @brief 释放自己所持有的共享所有权，若自己是最后一个持有者，销毁内部对象
+	 */
     void Release()
     {
         if(storage_ && !--storage_->refs_)
@@ -97,38 +106,59 @@ public:
         }
     }
 
+	/**
+	 * @brief 内部对象共享所有权的持有者数量
+	 */
     RefCounter Refs() const
     {
         return storage_ ? storage_->refs_ : 0;
     }
 
+	/**
+	 * @brief 是否持有某个对象的所有权
+	 */
     bool IsAvailable() const
     {
         return storage_ != nullptr;
     }
 
+	/**
+	 * @brief 是否持有某个对象的所有权
+	 */
     operator bool() const
     {
         return IsAvailable();
     }
 
+	/**
+	 * @brief 取得内部对象的常量引用
+	 */
     const T &operator*() const
     {
         AGZ_ASSERT(storage_);
         return storage_->obj;
     }
 
+	/**
+	 * @brief 将调用转发给内部对象
+	 */
     const T *operator->() const
     {
         AGZ_ASSERT(storage_);
         return &storage_->obj;
     }
 
+	/**
+	 * @brief 取得内部对象的可变指针
+	 */
     T *MutablePtr()
     {
         return &Mutable();
     }
 
+	/**
+	 * @brief 取得内部对象的可变引用
+	 */
     T &Mutable()
     {
         AGZ_ASSERT(storage_);

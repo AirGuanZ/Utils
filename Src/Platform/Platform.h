@@ -1,14 +1,19 @@
-#pragma once
+﻿#pragma once
 
-#include "../Misc/Common.h"
 #include "../Utils/String.h"
 
 namespace AGZ {
 
+/**
+ * @brief 一些平台相关的功能
+ */
 class Platform
 {
 public:
 
+	/**
+	 * 取得当前工作目录
+	 */
     static WStr GetWorkingDirectory();
 };
 

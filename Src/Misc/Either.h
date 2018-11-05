@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <type_traits>
 
@@ -7,6 +7,9 @@
 
 namespace AGZ {
 
+/**
+ * @brief 你掉的是这把金斧头呢，还是这把银斧头呢？
+ */
 template<typename L, typename R, std::enable_if_t<!std::is_same_v<L, R>, int> = 0>
 class Either
 {

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Misc/Common.h"
 #include "../Misc/Config.h"
@@ -11,6 +11,9 @@
 
 namespace AGZ::Math {
 
+/**
+ * @brief 使用SSE加速的四float向量
+ */
 class alignas(16) F32x4
 {
 public:
@@ -103,6 +106,9 @@ public:
 	bool operator==(const Self &rhs) const { return _mm_movemask_ps(_mm_cmpeq_ps(d, rhs.d)) == 0x0f; }
 	bool operator!=(const Self &rhs) const { return !(*this == rhs); }
 
+	/**
+	 * 是否每个元素都小于rhs
+	 */
     bool ElemwiseLessThan(const Self &rhs) const { return _mm_movemask_ps(_mm_cmplt_ps(d, rhs.d)) == 0x0f; }
 };
 

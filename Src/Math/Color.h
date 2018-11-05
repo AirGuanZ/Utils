@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Misc/Common.h"
 #include "Vec3.h"
@@ -6,9 +6,15 @@
 
 namespace AGZ::Math {
 
+/**
+ * @brief RGB颜色坐标
+ */
 template<typename T>
 using Color3 = Vec3<T>;
 
+/**
+ * @brief RGB颜色坐标以及alpha分量
+ */
 template<typename T>
 using Color4 = Vec4<T>;
 
@@ -44,6 +50,9 @@ using Color4b = Color4<uint8_t>;
     } \
     inline constexpr Aux::Color_##N##_t N
 
+/**
+ * 常用RGB常量值
+ */
 namespace COLOR
 {
     COLOR_CONST(VOIDC,  0.0, 0.0, 0.0, 0.0, 0,   0,   0,   0);

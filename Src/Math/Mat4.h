@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <algorithm>
 #include <cstring>
@@ -12,75 +12,160 @@
 
 namespace AGZ::Math {
 
-/*
-    Row-major 4x4 matrix
-*/
+/**
+ * @brief 按行存储的4x4矩阵
+ */
 template<typename T>
 class Mat4
 {
 public:
 
-    using Data = T[4][4];
-    using Component = T;
-    using Self = Mat4<T>;
+    using Data = T[4][4]; ///< 所存储的数据
+	using Component = T;  ///< 元素类型
+	using Self = Mat4<T>; ///< 自身类型
 
     Data m;
 
+	/**
+	 * 初始化为单位矩阵
+	 */
     Mat4() : Mat4(T(1)) { }
 
+	/**
+	 * 不初始化任何元素
+	 */
     explicit Mat4(Uninitialized_t) { }
 
+	/**
+	 * 初始化为对角阵，对角元素值为v
+	 */
     explicit Mat4(T v);
 
+	/**
+	 * 从4x4数组中取得初始化数据
+	 */
     explicit Mat4(const Data &_m);
 
+	/**
+	 * 逐个指定每个元素的值，mij代表第i行第j列
+	 */
     Mat4(T m00, T m01, T m02, T m03,
          T m10, T m11, T m12, T m13,
          T m20, T m21, T m22, T m23,
          T m30, T m31, T m32, T m33);
 
+	/**
+	 * 将所有元素设置为v
+	 */
     static Self All(T v);
 
+	/**
+	 * 返回一个单位矩阵
+	 */
     static const Self &IDENTITY();
 
     bool operator==(const Self &other) const;
 
     bool operator!=(const Self &other) const;
 
+	/**
+	 * 矩阵-矩阵乘法
+	 */
     Self operator*(const Self &rhs) const;
 
+	/**
+	 * 矩阵-向量乘法
+	 */
     Vec4<T> operator*(const Vec4<T> &p) const;
 
+	/**
+	 * 构造平移矩阵
+	 * 
+	 * @param v 平移向量
+	 */
     static Self Translate(const Vec3<T> &v);
 
+	/**
+	 * 构造绕指定轴的旋转矩阵
+	 * 
+	 * @param _axis 旋转轴
+	 * @param angle 旋转角。为Deg/Rad时会自动进行单位转换，为float/double时单位为弧度
+	 */
     template<typename U>
-    static Self Rotate(const Vec3<T> &axis, U angle);
+    static Self Rotate(const Vec3<T> &_axis, U angle);
 
+	/**
+	 * 构造绕X轴的旋转矩阵
+	 */
     template<typename U>
     static Self RotateX(U angle);
 
+	/**
+	 * 构造绕Y轴的旋转矩阵
+	 */
     template<typename U>
     static Self RotateY(U angle);
 
+	/**
+	 * 构造绕Z轴的旋转矩阵
+	 */
     template<typename U>
     static Self RotateZ(U angle);
 
+	/**
+	 * 构造缩放矩阵
+	 */
     static Self Scale(const Vec3<T> &s);
 
+	/**
+	 * 构造透视投影矩阵
+	 * 
+	 * @param fovY 竖直方向视野角
+	 * @param ratio 视野宽度/视野高度
+	 * @param _near 近截面和视点的距离
+	 * @param _far 远截面和视点的距离
+	 */
     template<typename U>
     static Self Perspective(U fovY, T ratio, T _near, T _far);
 
+	/**
+	 * 构造视点矩阵
+	 * 
+	 * @param src 眼睛位置
+	 * @param dst 目标点位置
+	 * @param up 用来确定视野侧向倾斜角度的up向量
+	 */
     static Self LookAt(const Vec3<T> &src, const Vec3<T> &dst, const Vec3<T> &up);
 
+	/**
+	 * 将矩阵变换作用在点上并进行齐次坐标归一化
+	 */
     Vec4<T> ApplyToPoint(const Vec4<T> &p) const;
+	//! @copydoc Mat4<T>::ApplyToPoint(const Vec4<T> &) const
     Vec3<T> ApplyToPoint(const Vec3<T> &p) const;
 
-    Vec4<T> ApplyToVector(const Vec4<T> &p) const;
+	/**
+	 * 将矩阵变换作用在方向上
+	 */
+	Vec4<T> ApplyToVector(const Vec4<T> &p) const;
+	//! @copydoc Mat4<T>::ApplyToVector(const Vec4<T> &) const
     Vec3<T> ApplyToVector(const Vec3<T> &p) const;
 
+	/**
+	 * 将逆变换作用在法线上
+	 */
     Vec3<T> ApplyInverseToNormal(const Vec3<T> &n) const;
 
+	/**
+	 * 转置矩阵
+	 */
     Self Transpose() const;
+
+	/**
+	 * 逆矩阵
+	 * 
+	 * @warning 若原矩阵不可逆，会造成UB
+	 */
     Self Inverse() const;
 };
 

@@ -1,10 +1,8 @@
-#pragma once
+﻿#pragma once
 
 #include <cstdint>
 #include <ctime>
 #include <random>
-
-#include "../Misc/Common.h"
 
 namespace AGZ::Math::Random {
 
@@ -78,12 +76,22 @@ MAKE_REAL_NORMAL_T(double);
 template<typename Engine>
 inline thread_local SharedRandomEngine_t<Engine> SHARED_RNG;
 
+/**
+ * [min, max]上的均匀分布
+ * 
+ * @note 该函数是线程安全的
+ */
 template<typename T, typename S = SharedRandomEngine_t<>>
 T Uniform(T min, T max, S &rng = SHARED_RNG<DefaultSharedEngine>)
 {
     return Uniform_t<T, S>::Eval(min, max, rng);
 }
 
+/**
+ * 以mean为均值、以stddev为标准差的正态分布
+ * 
+ * @note 该函数是线程安全的
+ */
 template<typename T, typename S = SharedRandomEngine_t<>>
 T Normal(T mean, T stddev, S &rng = SHARED_RNG<DefaultSharedEngine>)
 {

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -7,6 +7,9 @@
 
 namespace AGZ {
 
+/**
+ * @brief AGZ Utils自定义的所有异常的基类
+ */
 class Exception : public std::runtime_error
 {
 public:

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Misc/Common.h"
 #include "../Misc/Exception.h"
@@ -7,20 +7,11 @@
 
 namespace AGZ {
 
-/*
-    С������������������乹���������͵�С���󣬲�֧��ͳһ�ͷ�
-    �ռ��þ����chunk list�������ѷ��������һ��freelist����
-
-    chunk���֣�
-        chunkEntry -> chunkWithFreeSpace -> chunkUsed -> chunkUsed -> ... -> nullptr
-
-    node���֣�
-        nodeEntry -> {
-            nextNodePtr
-            destructor
-            obj
-        }
-*/
+/**
+ * @brief 快速小对象分配器，允许分配构造任意类型的小对象，并支持统一释放
+ *    
+ * 空间用经典的chunklist管理，已分配对象由freelist管理。
+ */
 template<typename Alloc = CRTAllocator>
 class ObjArena : public Uncopiable
 {
@@ -69,8 +60,8 @@ class ObjArena : public Uncopiable
     };
 
     ChunkHead *chunkEntry_;
-    char *curChunkTop_;    // ��ǰchunk���������׸�δռ���ֽڵ�ַ
-    size_t curChunkRest_;   // ��ǰchunk��ʣ�����ֽ�
+    char *curChunkTop_;    // 当前chunk数据区的首个未占用字节地址
+    size_t curChunkRest_;   // 当前chunk还剩多少字节
 
     NodeHead *nodeEntry_;
 
@@ -99,6 +90,11 @@ class ObjArena : public Uncopiable
 
 public:
 
+	/**
+	 * @param chunkDataSize 每次预分配块中有多少可用字节
+	 * 
+	 * @exception ArgumentException 参数非法时抛出
+	 */
     explicit ObjArena(size_t chunkDataSize = 1025 - sizeof(ChunkHead))
         : chunkEntry_(nullptr), curChunkTop_(nullptr), curChunkRest_(0),
           nodeEntry_(nullptr), chunkDataSize_(chunkDataSize), usedBytes_(0)
@@ -112,17 +108,32 @@ public:
         Clear();
     }
 
+	/**
+	 * @brief 取得目前已使用的总字节数，包括簿记内存，但不包含预分配的未使用的内存
+	 */
     size_t GetUsedBytes() const
     {
         return usedBytes_;
     }
 
+	/**
+	 * @brief 快速创建指定类型的对象
+	 * 
+	 * 如果对象过大，会将内存分配直接转发给Alloc；
+	 * 否则会尝试从预分配空间中取得内存。
+	 * 若预分配空间不足，会向Alloc申请更多的预分配内存。
+	 * 
+	 * @param args 被创建对象的构造函数参数
+	 * @return 指向被创建对象的指针
+	 * 
+	 * @exception std::bad_alloc 向Alloc请求更多内存空间失败时抛出
+	 */
     template<typename T, typename...Args>
     T *Create(Args&&...args)
     {
         size_t nodeSize = ObjSize2NodeSize<T>();
 
-        // ����Ķ���ֱ����Alloc::Malloc����
+        // 过大的对象直接用Alloc::Malloc分配
         if(nodeSize > chunkDataSize_)
         {
             char *data = static_cast<char*>(Alloc::Malloc(nodeSize));
@@ -149,7 +160,7 @@ public:
             return reinterpret_cast<T*>(obj);
         }
 
-        // �����ǰchunkʣ��ռ䲻�㣬�ͷ���һ����chunk
+        // 如果当前chunk剩余空间不足，就分配一个新chunk
         if(curChunkRest_ < nodeSize)
             AllocNewChunk();
         AGZ_ASSERT(curChunkRest_ >= nodeSize);
@@ -172,9 +183,12 @@ public:
         return reinterpret_cast<T*>(obj);
     }
 
+	/**
+	 * @brief 析构从上一次调用Clear以来所有用该分配器创建的对象，并释放它们的内存空间
+	 */
     void Clear()
     {
-        // ���������ѷ���Ķ���
+        // 析构所有已分配的对象
         for(NodeHead *nodeHead = nodeEntry_, *next; nodeHead; nodeHead = next)
         {
             next = nodeHead->nextNode;
@@ -188,7 +202,7 @@ public:
                 Alloc::Free(nodeHead);
         }
 
-        // �ͷ�����chunk
+        // 释放所有chunk
         for(ChunkHead *chunkHead = chunkEntry_, *next; chunkHead; chunkHead = next)
         {
             next = chunkHead->nextChunk;

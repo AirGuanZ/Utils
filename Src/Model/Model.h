@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <map>
 #include <numeric>
@@ -11,6 +11,9 @@
 
 namespace AGZ::Model {
 
+/**
+ * @brief 简单的几何模型，仅包含顶点位置、纹理坐标以及法线
+ */
 struct GeometryMesh
 {
     struct Vertex
@@ -22,13 +25,26 @@ struct GeometryMesh
 
     std::vector<Vertex> vertices;
 
+	/**
+	 * @brief 自动平滑模型法线
+	 * 
+	 * @warning 算法非常糙，慎用
+	 */
     GeometryMesh &SmoothenNormals();
 };
 
+/**
+ * @brief 简单的几何模型组，为从名字到几何模型的映射
+ */
 struct GeometryMeshGroup
 {
     std::map<Str8, GeometryMesh> submeshes;
 
+	/**
+	 * @brief 自动平滑模型法线
+	 *
+	 * @warning 算法非常糙，慎用
+	 */
     GeometryMeshGroup &SmoothenNormals();
 };
 

@@ -1,10 +1,15 @@
-#pragma once
+﻿#pragma once
 
 #include "../Misc/Common.h"
 #include "Vec3.h"
 
 namespace AGZ::Math {
 
+/**
+ * @brief 四元数类型
+ * 
+ * @see https://airguanz.github.io/2018/09/04/quaternion.html
+ */
 template<typename T>
 class Quaternion
 {
