@@ -4,7 +4,7 @@
 #include "Iterator.h"
 #include "Transform.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace RangeAux
 {
@@ -111,4 +111,4 @@ auto PartialFoldl(I init, F func)
                 std::move(init), std::move(func));
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

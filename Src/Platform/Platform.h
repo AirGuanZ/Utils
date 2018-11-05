@@ -3,7 +3,7 @@
 #include "../Misc/Common.h"
 #include "../Utils/String.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 class Platform
 {
@@ -12,7 +12,7 @@ public:
     static WStr GetWorkingDirectory();
 };
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ
 
 #if defined(AGZ_PLATFORM_IMPL)
 
@@ -34,7 +34,7 @@ AGZ_NS_END(AGZ)
 
 #endif
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 WStr Platform::GetWorkingDirectory()
 {
@@ -70,6 +70,6 @@ WStr Platform::GetWorkingDirectory()
 #endif
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ
 
 #endif

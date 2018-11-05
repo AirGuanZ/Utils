@@ -8,7 +8,7 @@
 #include "Inst.h"
 #include "Syntax.h"
 
-AGZ_NS_BEG(AGZ::PikeVM)
+namespace AGZ::PikeVM {
 
 /*
     A|B =>    Branch(L0, L1)
@@ -807,4 +807,4 @@ private:
     }
 };
 
-AGZ_NS_END(AGZ::PikeVM)
+} // namespace AGZ::PikeVM

@@ -4,7 +4,7 @@
 #include "Iterator.h"
 #include "Transform.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace RangeAux
 {
@@ -81,4 +81,4 @@ auto DropWhile(F &&func)
                     std::forward<F>(func));
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

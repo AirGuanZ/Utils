@@ -22,7 +22,7 @@
     }
 */
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 template<typename CS>
 class Match
@@ -242,4 +242,4 @@ using Regex16 = Regex<UTF16<>>;
 using Regex32 = Regex<UTF32<>>;
 using WRegex  = Regex<WUTF>;
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

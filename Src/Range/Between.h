@@ -4,7 +4,7 @@
 
 #include "../Misc/Common.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace RangeAux
 {
@@ -186,4 +186,4 @@ RangeAux::BetweenImpl<T> Between(T start, T end, T step)
     return RangeAux::BetweenImpl<T>(start, end, step);
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

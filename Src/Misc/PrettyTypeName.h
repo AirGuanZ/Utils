@@ -5,7 +5,7 @@
 #include "../Utils/String.h"
 #include "Common.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace PrettyTypeNameImpl
 {
@@ -125,4 +125,4 @@ WStr PrettyTypeName()
     return PrettyTypeNameImpl::Impl<T>::Name();
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

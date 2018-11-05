@@ -7,7 +7,7 @@
 #include "../../Range/Iterator.h"
 #include "Charset.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 template<typename T>
 class UTF16Core
@@ -243,4 +243,4 @@ std::pair<const T*, const T*> UTF16Core<T>::Iterator::CodeUnits() const
     return { cur, UTF16Core<T>::NextCodePoint(cur) };
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

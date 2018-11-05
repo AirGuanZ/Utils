@@ -5,7 +5,7 @@
 #include "../FileSys/Raw.h"
 #include "Config.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 inline ConfigGroup::ConfigGroup(std::unordered_map<Str8, const ConfigNode*> &&children)
     : children_(std::move(children))
@@ -357,4 +357,4 @@ inline const ConfigGroup &Config::Root() const
     return *global_;
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

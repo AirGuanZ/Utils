@@ -3,7 +3,7 @@
 #include "../Misc/Common.h"
 #include "../Misc/TypeOpr.h"
 
-AGZ_NS_BEG(AGZ::Math)
+namespace AGZ::Math {
 
 using DimType = uint32_t;
 
@@ -98,4 +98,4 @@ public:
     }
 };
 
-AGZ_NS_END(AGZ::Math)
+} // namespace AGZ::Math

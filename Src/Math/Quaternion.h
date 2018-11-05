@@ -3,7 +3,7 @@
 #include "../Misc/Common.h"
 #include "Vec3.h"
 
-AGZ_NS_BEG(AGZ::Math)
+namespace AGZ::Math {
 
 template<typename T>
 class Quaternion
@@ -82,4 +82,4 @@ Vec3<T> Apply(const Quaternion<T> &q, const Vec3<T> &v)
 using Quaternionf = Quaternion<float>;
 using Quaterniond = Quaternion<double>;
 
-AGZ_NS_END(AGZ::Math)
+} // namespace AGZ::Math

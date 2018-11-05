@@ -9,7 +9,7 @@
 
 #include "../Math/Vec4.h"
 
-AGZ_NS_BEG(AGZ::Math)
+namespace AGZ::Math {
 
 class alignas(32) D64x4
 {
@@ -142,6 +142,6 @@ AGZ_FORCEINLINE double Dot(D64x4 lhs, D64x4 rhs)
 	return r.x + r.y + r.z + r.w;
 }
 
-AGZ_NS_END(AGZ::Math)
+} // namespace AGZ::Math
 
 #endif

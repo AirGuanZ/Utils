@@ -6,7 +6,7 @@
 #include "../Utils/String.h"
 #include "Texture.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 class TextureFile
 {
@@ -60,9 +60,11 @@ public:
         const TextureCore<2, Math::Color4b> &tex);
 };
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ
 
 #if defined(AGZ_TEXTURE_FILE_IMPL)
+
+namespace AGZ {
 
 #include <vector>
 
@@ -77,8 +79,6 @@ AGZ_NS_END(AGZ)
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
-
-AGZ_NS_BEG(AGZ)
 
 TextureCore<2, Math::Color3b> TextureFile::LoadRGBFromFile(
     const WStr &filename)
@@ -328,6 +328,6 @@ void TextureFile::WriteRGBAToBMP(
         throw FileException("Failed to write to BMP file");
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ
 
 #endif

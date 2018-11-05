@@ -14,7 +14,7 @@
 #include "../Charset/ASCII.h"
 #include "../Charset/UTF.h"
 
-AGZ_NS_BEG(AGZ::StrImpl)
+namespace AGZ::StrImpl {
 
 // Charsets that can be used by c-style string and std::string
 enum class NativeCharset
@@ -598,9 +598,9 @@ public:
     static String<DCS> Convert(const String<SCS> &src) { return Convert<DCS, SCS>(src.AsView()); }
 };
 
-AGZ_NS_END(AGZ::StrImpl)
+} // namespace AGZ::StrImpl
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 using NativeCharset = StrImpl::NativeCharset;
 
@@ -634,7 +634,7 @@ using CodePointRange = StrImpl::CodePointRange<CS>;
 template<typename CS>
 using CharRange = typename StrImpl::StringView<CS>::CharRange;
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ
 
 namespace std
 {

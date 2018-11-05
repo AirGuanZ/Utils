@@ -53,7 +53,7 @@
                 (CharExpr)
 */
 
-AGZ_NS_BEG(AGZ::PikeVM)
+namespace AGZ::PikeVM {
 
 enum class ASTType
 {
@@ -733,4 +733,4 @@ private:
     typename CodePointRange<CS>::Iterator cur_, end_;
 };
 
-AGZ_NS_END(AGZ::PikeVM)
+} // namespace AGZ::PikeVM

@@ -6,7 +6,7 @@
 #include "../Misc/Common.h"
 #include "../Utils/String.h"
 
-AGZ_NS_BEG(AGZ::FileSys)
+namespace AGZ::FileSys {
 
 template<typename AllocFunc = void*(*)(size_t)>
 std::pair<size_t, unsigned char*> ReadBinaryFileRaw(
@@ -64,4 +64,4 @@ inline bool WriteTextFileRaw(const WStr &filename, const WStr &str)
     return true;
 }
 
-AGZ_NS_END(AGZ::FileSys)
+} // namespace AGZ::FileSys

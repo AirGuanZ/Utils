@@ -5,7 +5,7 @@
 #include "Common.h"
 #include "TypeOpr.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 template<typename L, typename R, std::enable_if_t<!std::is_same_v<L, R>, int> = 0>
 class Either
@@ -45,4 +45,4 @@ public:
 	const R &GetRight() const { return std::get<1>(var_); }
 };
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

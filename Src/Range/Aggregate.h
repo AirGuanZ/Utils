@@ -5,7 +5,7 @@
 
 #include "../Misc/Common.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace RangeAux
 {
@@ -37,4 +37,4 @@ namespace RangeAux
     }
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

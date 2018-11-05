@@ -4,7 +4,7 @@
 #include "Aggregate.h"
 #include "Iterator.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace RangeAux
 {
@@ -60,4 +60,4 @@ auto CountIf(F &&func)
                     std::forward<F>(func));
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

@@ -9,7 +9,7 @@
 #include "../Utils/Math.h"
 #include "../Utils/String.h"
 
-AGZ_NS_BEG(AGZ::Model)
+namespace AGZ::Model {
 
 struct GeometryMesh
 {
@@ -71,4 +71,4 @@ inline GeometryMeshGroup &GeometryMeshGroup::SmoothenNormals()
     return *this;
 }
 
-AGZ_NS_END(AGZ::Model)
+} // namespace AGZ::Model

@@ -3,7 +3,7 @@
 #include "../Misc/Common.h"
 #include "Aggregate.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace RangeAux
 {
@@ -28,4 +28,4 @@ auto Reduce(I &&init, F &&func)
                 I, F>, I, F>(std::forward<I>(init), std::forward<F>(func));
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

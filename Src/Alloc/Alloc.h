@@ -5,7 +5,7 @@
 #include "../Misc/Common.h"
 #include "Malloc.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 /*
     concept Allocator
@@ -56,4 +56,4 @@ public:
 
 using DefaultAllocator = CRTAllocator;
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

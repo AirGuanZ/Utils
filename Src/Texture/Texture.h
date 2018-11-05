@@ -4,7 +4,7 @@
 
 #include "../Utils/Math.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 template<Math::DimType DIM, typename PT>
 class TextureCore
@@ -452,4 +452,4 @@ public:
     }
 };
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

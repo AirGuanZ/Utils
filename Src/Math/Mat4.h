@@ -10,7 +10,7 @@
 #include "Vec3.h"
 #include "Vec4.h"
 
-AGZ_NS_BEG(AGZ::Math)
+namespace AGZ::Math {
 
 /*
     Row-major 4x4 matrix
@@ -443,4 +443,4 @@ Mat4<T> Mat4<T>::Inverse() const
     return ::AGZ::Math::Inverse(*this);
 }
 
-AGZ_NS_END(AGZ::Math)
+} // namespace AGZ::Math

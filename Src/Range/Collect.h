@@ -8,7 +8,7 @@
 #include "../Misc/Common.h"
 #include "Aggregate.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace RangeAux
 {
@@ -72,4 +72,4 @@ auto Collect()
             typename RangeAux::CollectorSelector<T>::RHS>();
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

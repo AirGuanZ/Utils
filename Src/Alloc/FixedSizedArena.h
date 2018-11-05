@@ -4,7 +4,7 @@
 #include "../Misc/Exception.h"
 #include "Alloc.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 /*
     只能分配固定大小内存块的Arena
@@ -100,4 +100,4 @@ public:
     }
 };
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

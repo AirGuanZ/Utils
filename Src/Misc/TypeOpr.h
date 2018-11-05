@@ -5,7 +5,7 @@
 
 #include "../Misc/Common.h"
 
-AGZ_NS_BEG(AGZ::TypeOpr)
+namespace AGZ::TypeOpr {
 
 template<typename...TypeList>
 constexpr size_t TypeListLength_v = std::tuple_size_v<std::tuple<TypeList...>>;
@@ -71,4 +71,4 @@ auto MatchVar(E &&e, Vs...vs)
     return std::visit(overloaded(vs...), std::forward<E>(e));
 }
 
-AGZ_NS_END(AGZ::TypeOpr)
+} // namespace AGZ::TypeOpr

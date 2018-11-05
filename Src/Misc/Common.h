@@ -70,7 +70,7 @@
 
 #endif
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 // ============================= unreachable hint =============================
 
@@ -163,4 +163,4 @@ inline size_t CombineHash(size_t fst, size_t snd)
     return fst ^ (snd + 0x9e3779b9 + (fst << 6) + (fst >> 2));
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

@@ -4,7 +4,7 @@
 #include "Vec3.h"
 #include "Vec4.h"
 
-AGZ_NS_BEG(AGZ::Math)
+namespace AGZ::Math {
 
 template<typename T>
 using Color3 = Vec3<T>;
@@ -56,4 +56,4 @@ namespace COLOR
 
 #undef COLOR_CONST
 
-AGZ_NS_END(AGZ::Math)
+} // namespace AGZ::Math

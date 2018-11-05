@@ -9,7 +9,7 @@
 #include "../Misc/Uncopiable.h"
 #include "../Utils/String.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 /*
 window =
@@ -129,6 +129,6 @@ public:
     const ConfigGroup &Root() const;
 };
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ
 
 #include "Config.inl"

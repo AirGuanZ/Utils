@@ -10,7 +10,7 @@
 #include "../Utils/FileSys.h"
 #include "Model.h"
 
-AGZ_NS_BEG(AGZ::Model)
+namespace AGZ::Model {
 
 // See https://en.wikipedia.org/wiki/Wavefront_.obj_file
 class WavefrontObj
@@ -294,4 +294,4 @@ inline WavefrontObj::Index WavefrontObjFile::ParseIndex(const WStrView &str)
     throw ArgumentException("Invalid face index format");
 }
 
-AGZ_NS_END(AGZ::Model)
+} // namespace AGZ::Model

@@ -7,7 +7,7 @@
 #include "../Misc/Common.h"
 #include "Transform.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace RangeAux
 {
@@ -97,4 +97,4 @@ auto TakeWhile(F func)
             RangeAux::TakeWhileTrait<F>,F>(std::move(func));
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

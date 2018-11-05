@@ -9,7 +9,7 @@
 
 #include "../Math/Vec4.h"
 
-AGZ_NS_BEG(AGZ::Math)
+namespace AGZ::Math {
 
 class alignas(16) F32x4
 {
@@ -128,6 +128,6 @@ namespace F32X4
     inline const F32x4 UNIT_W = F32x4(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-AGZ_NS_END(AGZ::Math)
+} // namespace AGZ::Math
 
 #endif

@@ -5,7 +5,7 @@
 #include "../Misc/Common.h"
 #include "Vec3.h"
 
-AGZ_NS_BEG(AGZ::Math)
+namespace AGZ::Math {
 
 /*
     Row-major 3x3 matrix
@@ -86,4 +86,4 @@ public:
 using Mat3f = Mat3<float>;
 using Mat3d = Mat3<double>;
 
-AGZ_NS_END(AGZ::Math)
+} // namespace AGZ::Math

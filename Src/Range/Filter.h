@@ -6,7 +6,7 @@
 #include "Iterator.h"
 #include "Transform.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace RangeAux
 {
@@ -132,4 +132,4 @@ auto Filter(F f)
             RangeAux::FilterTrait<F>, F>(std::move(f));
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

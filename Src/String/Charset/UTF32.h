@@ -3,7 +3,7 @@
 #include "../../Misc/Common.h"
 #include "Charset.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 template<typename T>
 class UTF32Core
@@ -63,4 +63,4 @@ public:
 template<typename T = char32_t>
 using UTF32 = Charset<UTF32Core<T>>;
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

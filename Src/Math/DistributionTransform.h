@@ -5,7 +5,7 @@
 #include "Vec2.h"
 #include "Vec3.h"
 
-AGZ_NS_BEG(AGZ::Math::DistributionTransform)
+namespace AGZ::Math::DistributionTransform {
 
 template<typename T> class UniformOnUnitDisk;
 template<typename T> class UniformOnUnitHemisphere;
@@ -174,4 +174,4 @@ public:
     }
 };
 
-AGZ_NS_END(AGZ::Math::DistributionTransform)
+} // namespace AGZ::Math::DistributionTransform

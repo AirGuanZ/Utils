@@ -11,7 +11,7 @@
 #include "StrAlgo.h"
 #include "String.h"
 
-AGZ_NS_BEG(AGZ::StrImpl)
+namespace AGZ::StrImpl {
 
 template<typename E>
 void Copy(const E *src, size_t cnt, E *dst)
@@ -1466,4 +1466,4 @@ String<DCS> CharsetConvertor::Convert(const typename String<SCS>::View &src)
     }
 }
 
-AGZ_NS_END(AGZ::StrImpl)
+} // namespace AGZ::StrImpl

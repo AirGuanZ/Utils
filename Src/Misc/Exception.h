@@ -5,7 +5,7 @@
 
 #include "Common.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 class Exception : public std::runtime_error
 {
@@ -26,4 +26,4 @@ AGZ_NEW_EXCEPTION(OSException);
 AGZ_NEW_EXCEPTION(FileException);
 AGZ_NEW_EXCEPTION(UnreachableException);
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

@@ -4,7 +4,7 @@
 
 #include "Common.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 template<typename T>
 class Singleton
@@ -24,4 +24,4 @@ public:
     }
 };
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

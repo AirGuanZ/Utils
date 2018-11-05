@@ -5,7 +5,7 @@
 
 #include "../Misc/Common.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace RangeAux
 {
@@ -193,4 +193,4 @@ RangeAux::SeqImpl<T> Seq(T start, T step = T(1))
     return RangeAux::SeqImpl<T>(start, step);
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

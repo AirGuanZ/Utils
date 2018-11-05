@@ -10,7 +10,7 @@
 
 #include "../Misc/Common.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 // Aligned memory allocation
 
@@ -45,4 +45,4 @@ AGZ_FORCEINLINE D *alloc_throw(F &&alloc_func, Args&&...args)
     return static_cast<D*>(ret);
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

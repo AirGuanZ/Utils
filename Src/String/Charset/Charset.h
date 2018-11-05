@@ -2,7 +2,7 @@
 
 #include "../../Misc/Common.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace CharsetAux
 {
@@ -132,4 +132,4 @@ public:
     }
 };
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

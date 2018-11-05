@@ -6,7 +6,7 @@
 #include "../Misc/Common.h"
 #include "Scalar.h"
 
-AGZ_NS_BEG(AGZ::Math)
+namespace AGZ::Math {
 
 template<typename T>
 class Vec2
@@ -200,4 +200,4 @@ Vec2<T> Vec2<T>::Sqrt() const
 using Vec2f = Vec2<float>;
 using Vec2d = Vec2<double>;
 
-AGZ_NS_END(AGZ::Math)
+} // namespace AGZ::Math

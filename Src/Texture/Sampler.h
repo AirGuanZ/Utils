@@ -2,7 +2,7 @@
 
 #include "Texture.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 class NearestSampler
 {
@@ -54,4 +54,4 @@ public:
     }
 };
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

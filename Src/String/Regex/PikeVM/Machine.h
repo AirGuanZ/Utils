@@ -9,7 +9,7 @@
 #include "Syntax.h"
 #include "Backend.h"
 
-AGZ_NS_BEG(AGZ::PikeVM)
+namespace AGZ::PikeVM {
 
 class SaveSlots
 {
@@ -564,4 +564,4 @@ private:
 #undef STEP_TO_NEXT_PC
 };
 
-AGZ_NS_END(AGZ::PikeVM)
+} // namespace AGZ::PikeVM

@@ -9,7 +9,7 @@
 #include "../Misc/TypeOpr.h"
 #include "Angle.h"
 
-AGZ_NS_BEG(AGZ::Math)
+namespace AGZ::Math {
 
 template<typename T> struct Abs_impl;
 template<>           struct Abs_impl<float>  { static float  Abs(float v)   { return std::abs(v); } };
@@ -165,4 +165,4 @@ public:
 using Float  = FP<float>;
 using Double = FP<double>;
 
-AGZ_NS_END(AGZ::Math)
+} // namespace AGZ::Math

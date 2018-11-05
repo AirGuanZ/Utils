@@ -26,6 +26,7 @@ bld/
 *.d
 *.dtmp
 Build/
+Doc/
 .vscode/
 
 # Visual Studio 2015 cache/options directory

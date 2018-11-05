@@ -7,7 +7,7 @@
 #include "../Misc/Common.h"
 #include "../Misc/Exception.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 class BinaryStreamCore
 {
@@ -367,4 +367,4 @@ using BinaryFileStreamView        = BinaryStreamView<BinaryFileStreamCore>;
 using BinaryMemoryReadStreamView  = BinaryStreamView<BinaryMemoryReadStreamCore>;
 using BinaryMemoryWriteStreamView = BinaryStreamView<BinaryMemoryReadStreamCore>;
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

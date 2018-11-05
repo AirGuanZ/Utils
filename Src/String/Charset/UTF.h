@@ -7,7 +7,7 @@
 #include "UTF16.h"
 #include "UTF32.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 // wchar_t on Windows holds UTF-16 code units
 using WUTF = std::conditional_t<sizeof(wchar_t) == 4, UTF32<wchar_t>, UTF16<wchar_t>>;
@@ -18,4 +18,4 @@ using PUTF = UTF16<wchar_t>;
 using PUTF = UTF8<char>;
 #endif
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

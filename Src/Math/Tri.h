@@ -5,7 +5,7 @@
 #include "../Misc/Common.h"
 #include "Angle.h"
 
-AGZ_NS_BEG(AGZ::Math)
+namespace AGZ::Math {
 
 template<typename T> struct PI_impl;
 template<>           struct PI_impl<float>  { static constexpr float  PI() { return 3.141592653589793238462643383f; } };
@@ -68,4 +68,4 @@ T Arctan(T v) { return std::atan(v); }
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 T Arctan2(T y, T x) { return std::atan2(y, x); }
 
-AGZ_NS_END(AGZ::Math)
+} // namespace AGZ::Math

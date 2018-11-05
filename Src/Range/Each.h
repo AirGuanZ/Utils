@@ -3,7 +3,7 @@
 #include "../Misc/Common.h"
 #include "Aggregate.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 namespace RangeAux
 {
@@ -49,4 +49,4 @@ auto EachIndex(F &&func)
                     std::forward<F>(func));
 }
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

@@ -8,7 +8,7 @@
 #include "Vec2.h"
 #include "Vec3.h"
 
-AGZ_NS_BEG(AGZ::Math)
+namespace AGZ::Math {
 
 template<typename T>
 class Vec4
@@ -287,4 +287,4 @@ Vec4<T> Vec4<T>::Sqrt() const
 using Vec4f = Vec4<float>;
 using Vec4d = Vec4<double>;
 
-AGZ_NS_END(AGZ::Math)
+} // namespace AGZ::Math

@@ -1,0 +1,10 @@
+PROJECT_NAME           = AGZ-Utils
+
+PROJECT_BRIEF = "Header-only C++17 utility tools"
+
+OUTPUT_DIRECTORY = ./Doc/
+
+INLINE_GROUPED_CLASSES = YES
+
+INPUT = ./Src/
+RECURSIVE = YES

@@ -7,7 +7,7 @@
 #include "../Alloc/Malloc.h"
 #include "../Alloc/Alloc.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 template<typename T,
          typename Alloc = DefaultAllocator,
@@ -154,4 +154,4 @@ public:
     }
 };
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

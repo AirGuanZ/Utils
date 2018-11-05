@@ -5,7 +5,7 @@
 #include "../Misc/Uncopiable.h"
 #include "Alloc.h"
 
-AGZ_NS_BEG(AGZ)
+namespace AGZ {
 
 /*
     小对象分配器，允许分配构造任意类型的小对象，并支持统一释放
@@ -205,4 +205,4 @@ public:
     }
 };
 
-AGZ_NS_END(AGZ)
+} // namespace AGZ

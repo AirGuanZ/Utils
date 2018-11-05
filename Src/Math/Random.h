@@ -6,7 +6,7 @@
 
 #include "../Misc/Common.h"
 
-AGZ_NS_BEG(AGZ::Math::Random)
+namespace AGZ::Math::Random {
 
 using DefaultSharedEngine = std::default_random_engine;
 
@@ -90,4 +90,4 @@ T Normal(T mean, T stddev, S &rng = SHARED_RNG<DefaultSharedEngine>)
     return Normal_t<T, S>::Eval(mean, stddev, rng);
 }
 
-AGZ_NS_END(AGZ::Math::Random)
+} // namespace AGZ::Math::Random
