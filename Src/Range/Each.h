@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Misc/Common.h"
 #include "Aggregate.h"
@@ -33,6 +33,13 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief 以range中的每个元素为参数，分别调用给定的函数
+ * 
+ * @return 未求值的原range
+ * 
+ * @note 该函数会导致range中的每一个元素被求一次值
+ */
 template<typename F>
 auto Each(F &&func)
 {
@@ -41,6 +48,13 @@ auto Each(F &&func)
                     std::forward<F>(func));
 }
 
+/**
+ * @brief 对range中的每一个元素，用它和它的下标调用给定的函数
+ * 
+ * @return 未求值的原range
+ * 
+ * @note 该函数会导致range中的每一个元素被求一次值
+ */
 template<typename F>
 auto EachIndex(F &&func)
 {

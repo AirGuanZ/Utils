@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <iterator>
 
@@ -212,6 +212,9 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief Map是干嘛的还需要写注释吗？
+ */
 template<typename F>
 auto Map(F f)
 {

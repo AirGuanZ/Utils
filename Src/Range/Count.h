@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Misc/Common.h"
 #include "Aggregate.h"
@@ -48,11 +48,21 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief 计算一个range中元素的数量
+ * 
+ * @note 该聚合函数会导致range中所有的元素被求值
+ */
 inline auto Count()
 {
     return RangeAux::AggregateWrapper<RangeAux::CountRHS>();
 }
 
+/**
+ * @brief 计算一个range中满足某谓词的元素数量
+ * 
+ * @note 该聚合函数可能导致range中所有元素被求值
+ */
 template<typename F>
 auto CountIf(F &&func)
 {

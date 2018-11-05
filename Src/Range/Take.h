@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <iterator>
 #include <type_traits>
@@ -84,12 +84,20 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief 取某个range的前n个元素
+ * 
+ * @note 若原range仅拥有m < n个元素，则得到的range也只有m个元素
+ */
 inline auto Take(size_t n)
 {
     return RangeAux::TransformWrapper<
         RangeAux::TakeTrait, size_t>(std::move(n));
 }
 
+/**
+ * @brief 丢弃range中第一个不满足给定谓词的元素和它之后的元素
+ */
 template<typename F>
 auto TakeWhile(F func)
 {

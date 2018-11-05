@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Misc/Common.h"
 #include "Transform.h"
@@ -168,6 +168,11 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief 逆转一个range中元素的次序
+ * 
+ * @warning 只能对有限range使用，不然，嘿嘿
+ */
 inline auto Reverse()
 {
     return RangeAux::TransformWrapper<RangeAux::ReverseTrait>();

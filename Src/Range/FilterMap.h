@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <iterator>
 
@@ -123,6 +123,11 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief 丢弃range中不满足特定谓词的元素，并将剩下的元素映射为别的元素
+ * 
+ * @param f: RangeElem -> std::optional<ResultType>
+ */
 template<typename F>
 auto FilterMap(F f)
 {

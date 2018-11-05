@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <list>
 #include <set>
@@ -65,6 +65,18 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief 将某个range中的元素按遍历次序收集到某个容器中
+ * 
+ * 目前支持的容器包括：
+ * - std::vector
+ * - std::list
+ * - std::set
+ * - ste::unordered_set
+ * 
+ * 理论上可以通过进一步的SFINAE把该函数推广到所有拥有insert/push/push_back的容器上，
+ * 但是我暂时用不着
+ */
 template<typename T>
 auto Collect()
 {

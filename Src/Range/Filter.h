@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <iterator>
 
@@ -125,6 +125,9 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief 丢弃range中不满足给定谓词的元素
+ */
 template<typename F>
 auto Filter(F f)
 {

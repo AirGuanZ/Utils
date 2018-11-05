@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <algorithm>
 #include <iterator>
@@ -51,6 +51,9 @@ typename R::const_iterator GetIteratorImpl();
 template<typename R>
 using GetIteratorType = decltype(GetIteratorImpl<R>());
 
+/**
+ * @brief 将一个值包装成可以进行解引用等操作的样子
+ */
 template<typename T>
 class ValuePointer
 {

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <atomic>
 #include <cstdint>
@@ -16,15 +16,19 @@
 
 namespace AGZ::StrImpl {
 
-// Charsets that can be used by c-style string and std::string
+/**
+ * C style string和std::string可能使用的编码，
+ * 作为编码转换的参数
+ */
 enum class NativeCharset
 {
     UTF8, // for const char * / std::string
     WUTF, // for const wchar_t * / std::wstring
 };
 
-// Reference counted value container
-// Used for large string storage
+/**
+ * 使用引用计数的缓存块
+ */
 template<typename E>
 class RefCountedBuf
 {
@@ -53,11 +57,11 @@ public:
     const E *GetData() const;
 };
 
-// Implementation of string storage.
-// Small strings are stored in internal buffer (small_.buf),
-// while larges ones are shared by a reference counted buffer (large_.buf).
-// Immutable design due to safe consideration.
-// Can only be modified by StringBuilder to initialize contents.
+/**
+ * @brief 带SSO的字符串存储
+ * 
+ * 小字符串被存储在栈上，大字符串则用引用计数共享，除了内部实现外，对外不可变
+ */
 template<typename CU>
 class Storage
 {
@@ -87,16 +91,26 @@ class Storage
     CU *GetSmallMutableData();
     CU *GetLargeMutableData();
 
+	bool IsSmallStorage() const;
+	bool IsLargeStorage() const;
+
+	size_t GetSmallLength() const;
+	size_t GetLargeLength() const;
+
 public:
 
     using Self = Storage<CU>;
 
     static_assert(std::is_trivially_copyable_v<CU>);
 
+	//! 取得可变缓存指针，仅限String内部使用
     CU *GetMutableData();
 
+	//! 准备长度为len的缓存，但不初始化其内容
     explicit Storage(size_t len);
+	//! 准备长度为len的缓存，并用data初始化它
     Storage(const CU *data, size_t len);
+	//! 准备合适长度的缓存，保存[beg, end)间的内容
     Storage(const CU *beg, const CU *end);
 
     Storage(const Self &copyFrom);
@@ -108,20 +122,21 @@ public:
     Self &operator=(const Self &copyFrom);
     Self &operator=(Self &&moveFrom) noexcept;
 
-    bool IsSmallStorage() const;
-    bool IsLargeStorage() const;
-
-    size_t GetSmallLength() const;
-    size_t GetLargeLength() const;
+	//! 取得缓存大小
     size_t GetLength() const;
 
+	//! 取得首元素指针
     const CU *Begin() const;
+	//! 取得最后一个元素的下一个元素的指针
     const CU *End() const;
 
     std::pair<const CU*, size_t> BeginAndLength() const;
     std::pair<const CU*, const CU*> BeginAndEnd() const;
 };
 
+/**
+ * @brief 不带SSO优化的字符串存储，接口含义和 Storage<CU> 相同
+ */
 template<typename CU>
 class Storage_NoSSO
 {
@@ -170,6 +185,9 @@ class StringBuilder;
 template<typename CS>
 class String;
 
+/**
+ * @brief 用于遍历字符串中的码点的range对象
+ */
 template<typename CS>
 class CodePointRange
 {
@@ -183,22 +201,26 @@ public:
     using CodePoint = typename CS::CodePoint;
     using Iterator  = GetIteratorType<CS>;
 
+	//! 用beg和end初始化该range，此时range中仅保存首尾指针
     CodePointRange(const CodeUnit *beg, const CodeUnit *end);
+
+	//! range中会保存整个字符串的内容
     CodePointRange(const String<CS> &str, const CodeUnit *beg,
                                           const CodeUnit *end);
 
     Iterator begin() const;
     Iterator end()   const;
 
-    const String<CS> &GetStr() const { return str_; }
-
+	//! 给定码点迭代器，求它的第一个码元在该range的码元中的下标
     size_t CodeUnitIndex(const Iterator &it) const
     {
         return CS::CodeUnitsBeginFromCodePointIterator(it) - beg_;
     }
 };
 
-// Immutable string slice
+/**
+ * @brief 不可变字符串视图
+ */
 template<typename CS>
 class StringView
 {
@@ -208,6 +230,9 @@ class StringView
 
 public:
 
+	/**
+	 * @brief 可以以小字符串的形式遍历整个字符串中单个字符（码点）的range对象
+	 */
     class CharRange
     {
         using InIt = GetIteratorType<CS>;
@@ -267,7 +292,7 @@ public:
     static constexpr size_t NPOS = std::numeric_limits<size_t>::max();
 
     StringView(const Str &str);
-    StringView(const Str &str, const CodeUnit* beg, size_t len);
+    StringView(const Str &str, const CodeUnit *beg, size_t len);
     StringView(const Str &str, size_t begIdx, size_t endIdx);
 
     StringView() = delete;
@@ -275,95 +300,154 @@ public:
     ~StringView() = default;
     Self &operator=(const Self &) = default;
 
+	//! 转换为对应的String
     Str AsString() const;
 
+	//! 取得内部保存的码元数据
     const CodeUnit *Data() const;
+	//! 取得内部保存的码元数据以及长度
     std::pair<const CodeUnit*, size_t> DataAndLength() const;
 
+	//! 码元数量
     size_t Length() const;
+	//! 是否为空串
     bool Empty()    const;
 
+	//! 以给定进制转换为指定类型的整数
     template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
     T Parse(unsigned base = 10) const;
 
+	//! 转换为指定类型的浮点数
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
     T Parse() const;
 
+	//! 返回消除左侧空白字符后的字符串
     Self Trim()      const;
+	//! 返回消除右侧空白字符后的字符串
     Self TrimLeft()  const;
+	//! 返回消除两侧空白字符后的字符串
     Self TrimRight() const;
 
+	//! 返回从以begIdx为下标的码元开始，直到结尾的子串
     Self Slice(size_t begIdx)                const;
+	//! 返回下标范围位于[begIdx, endIdx)间的码元构成的子串
     Self Slice(size_t begIdx, size_t endIdx) const;
 
+	//! 返回前n个码元构成的子串
     Self Prefix(size_t n) const;
+	//! 返回后n个码元构成的子串
     Self Suffix(size_t n) const;
 
+	//! 是否以给定的字符串开头
     bool StartsWith(const Self &s) const;
+	//! 是否以给定的字符串开头
     bool StartsWith(const Str &s)  const { return StartsWith(s.AsView()); }
 
+	//! 是否以给定的字符串结尾
     bool EndsWith(const Self &s) const;
+	//! 是否以给定的字符串结尾
     bool EndsWith(const Str &s)  const { return EndsWith(s.AsView()); }
 
+	//! 是否是单个数字字符
     bool IsDigit(unsigned int base = 10)  const;
+	//! 是否是数字串
     bool IsDigits(unsigned int base = 10) const;
 
+	//! 是否是单个英文字母
     bool IsAlpha()  const;
+	//! 是否是英文字母串
     bool IsAlphas() const;
 
+	//! 是否是单个数字/英文字母
     bool IsAlnum(unsigned int base = 10)  const;
+	//! 是否是数字/英文字母串
     bool IsAlnums(unsigned int base = 10) const;
 
+	//! 是否是单个大写英文字母
     bool IsUpper()  const;
+	//! 是否是大写字母串
     bool IsUppers() const;
 
+	//! 是否是单个小写字母
     bool IsLower()  const;
+	//! 是否是小写字母串
     bool IsLowers() const;
 
+	//! 是否是单个空白字符
     bool IsWhitespace()  const;
+	//! 是否是空白字符串
     bool IsWhitespaces() const;
 
+	//! 是否是ASCII字符串
     bool IsASCII() const;
 
+	//! 将小写英文字母转换为大写，其余字符不变
     Str ToUpper()  const;
+	//! 将大写英文字母转换为小写，其余字符不变
     Str ToLower()  const;
+	//! 将英文字母大小写互换，其余字符不变
     Str SwapCase() const;
 
+	//! 以空白字符为分隔符拆分此串
     std::vector<Self> Split()                    const;
+	//! 以给定的字符串为分隔符拆分此串
     std::vector<Self> Split(const Self &spliter) const;
+	//! 以给定的字符串为分隔符拆分此串
     std::vector<Self> Split(const Str &spliter)  const { return Split(spliter.AsView()); }
 
+	//! 以给定的字符串集合中的任意一个为分隔符拆分此串
     template<typename C, std::enable_if_t<!std::is_array_v<C>, int> = 0,
                          typename = std::void_t<decltype(std::declval<C>().begin())>>
     std::vector<Self> Split(const C &spliters) const;
 
+	//! 以自己为分隔符连接一个字符串range中的所有元素
     template<typename R>
     Str Join(R &&strRange) const;
 
+	/**
+	 * @brief 从以begIdx为下标的码元开始查找子串
+	 * 
+	 * @return 查找失败时返回NPOS
+	 */
     size_t Find(const Self &dst, size_t begIdx = 0) const;
+	//! @copydoc StringView<CS>::Find(const StringView<CS>&, size_t) const
     size_t Find(const Str &dst, size_t begIdx = 0)  const { return Find(dst.AsView(), begIdx); }
 
+	/**
+	 * @brief 查找第一个满足给定谓词的码点的第一个码元的下标
+	 * 
+	 * @return 查找失败时返回NPOS
+	 */
     template<typename F>
     size_t FindCPIf(F &&f) const;
 
+	//! 用于遍历码点的range对象
     CodePointRange<CS> CodePoints() const &  { return CodePointRange<CS>(beg_, beg_ + len_); }
-    CodePointRange<CS> CodePoints() const && { return CodePointRange<CS>(*str_, beg_, beg_ + len_); }
+	//! 用于遍历码点的range对象
+	CodePointRange<CS> CodePoints() const && { return CodePointRange<CS>(*str_, beg_, beg_ + len_); }
 
+	//! 用于以子串形式遍历字符串中每个字符的range对象
     CharRange Chars() const &  { return CharRange(beg_, beg_ + len_); }
+	//! 用于以子串形式遍历字符串中每个字符的range对象
     CharRange Chars() const && { return CharRange(*str_, beg_, beg_ + len_); }
 
+	//! 转换为指定编码的std::string，默认使用UTF-8
     std::string ToStdString(NativeCharset cs = NativeCharset::UTF8)  const;
-    std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const;
+    //! 转换为宽字符串，默认编码和平台有关
+	std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const;
 
 #if defined(AGZ_OS_WIN32)
+	//! 转换为平台默认使用的字符串
     std::wstring ToPlatformString() const { return ToStdWString(); }
 #else
+	//! 转换为平台默认使用的字符串
     std::string ToPlatformString() const { return ToStdString(); }
 #endif
 
     Iterator begin() const;
     Iterator end()   const;
 
+	//! 和其他字符串连接产生新串
     Str operator+(const Self &rhs) const;
 
     bool operator==(const Self &rhs) const;
@@ -374,6 +458,11 @@ public:
     bool operator>=(const Self &rhs) const;
 };
 
+/**
+ * @brief 不可变的字符串类
+ * 
+ * 大部分访问功能都委托给了StringView
+ */
 template<typename CS>
 class String
 {

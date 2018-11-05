@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <limits>
 #include <type_traits>
@@ -187,6 +187,12 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief 无限数值序列
+ * 
+ * @param start 第一个数值
+ * @param step 步长，缺省为1
+ */
 template<typename T>
 RangeAux::SeqImpl<T> Seq(T start, T step = T(1))
 {

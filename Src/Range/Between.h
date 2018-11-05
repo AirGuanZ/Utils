@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <type_traits>
 
@@ -172,6 +172,12 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief 以1/-1为步长，某个区间中所有的整数
+ * 
+ * @param start 第一个整数
+ * @param end 区间的另一个边界，不包含在range内
+ */
 template<typename T>
 RangeAux::BetweenImpl<T> Between(T start, T end)
 {
@@ -180,6 +186,13 @@ RangeAux::BetweenImpl<T> Between(T start, T end)
     return RangeAux::BetweenImpl<T>(start, end, -1);
 }
 
+/**
+ * @brief 以指定步长扫描某个整数区间得到的range
+ * 
+ * @param start 第一个整数
+ * @param end 区间的另一个边界，不包含在range内
+ * @param step 扫描步长
+ */
 template<typename T>
 RangeAux::BetweenImpl<T> Between(T start, T end, T step)
 {

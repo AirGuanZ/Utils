@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Misc/Common.h"
 #include "Aggregate.h"
@@ -21,6 +21,9 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief Reduce是干嘛的还需要写注释吗？
+ */
 template<typename I, typename F>
 auto Reduce(I &&init, F &&func)
 {

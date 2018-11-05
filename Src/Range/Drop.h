@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Misc/Common.h"
 #include "Iterator.h"
@@ -67,12 +67,20 @@ namespace RangeAux
     };
 }
 
+/**
+ * @brief 丢弃某range中的前n个元素
+ * 
+ * @note 若range中元素不足n个，则会得到一个空range
+ */
 inline auto Drop(size_t n)
 {
     return RangeAux::TransformWrapper<
             RangeAux::DropTrait, size_t>(std::move(n));
 }
 
+/**
+ * @brief 不断丢弃range中的元素，直到遇到第一个不满足谓词的元素为止
+ */
 template<typename F>
 auto DropWhile(F &&func)
 {
