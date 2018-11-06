@@ -109,7 +109,7 @@ TEST_CASE("Math")
                             [](float x) { return Sqrt(x); }),
                          1e-5f));
     }
-
+#if defined(AGZ_USE_AVX)
 	SECTION("D64x4")
 	{
 		D64x4 a(1.0, 2.0, 3.0, 4.0);
@@ -122,7 +122,7 @@ TEST_CASE("Math")
 							[](double x) { return Sqrt(x); }),
 						 1e-5));
 	}
-
+#endif
     SECTION("Quaternion")
     {
         REQUIRE(ApproxEq(Apply(Quaterniond::Rotate(Vec3d(0.0, 0.0, 1.0),
