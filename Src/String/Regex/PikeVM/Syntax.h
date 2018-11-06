@@ -53,7 +53,7 @@
                 (CharExpr)
 */
 
-namespace AGZ::PikeVM {
+namespace AGZ::StrImpl::PikeVM {
 
 enum class ASTType
 {

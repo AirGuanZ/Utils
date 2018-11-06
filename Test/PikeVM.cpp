@@ -6,14 +6,14 @@ using namespace AGZ;
 
 void P8(const WStr &str)
 {
-    (void)PikeVM::Parser<WUTF>().Parse(str);
+    (void)StrImpl::PikeVM::Parser<WUTF>().Parse(str);
 }
 
 void Gen(const WStr &str)
 {
     size_t slotCount;
-    (void)PikeVM::Backend<WUTF>().Generate(
-        PikeVM::Parser<WUTF>().Parse(str), &slotCount);
+    (void)StrImpl::PikeVM::Backend<WUTF>().Generate(
+		StrImpl::PikeVM::Parser<WUTF>().Parse(str), &slotCount);
 }
 
 TEST_CASE("VMEngEx")

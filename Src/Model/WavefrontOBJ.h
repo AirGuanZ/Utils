@@ -98,8 +98,9 @@ public:
 	/**
 	 * 从文件中加载
 	 * 
-	 * @filename 文件路径
-	 * @obj 输出模型，不得为空
+	 * @param filename 文件路径
+	 * @param objs 输出模型，不得为空
+	 * @param ignoreUnknownLine 是否忽略无法识别的行，缺省为true
 	 * 
 	 * @return 加载成功时返回true
 	 */
@@ -108,8 +109,9 @@ public:
 	/**
 	 * 从文本中加载
 	 * 
-	 * @content OBJ格式的文本字符串
-	 * @obj 输出模型，不得为空
+	 * @param content OBJ格式的文本字符串
+	 * @param objs 输出模型，不得为空
+	 * @param ignoreUnknownLine 是否忽略无法识别的行，缺省为true
 	 * 
 	 * @return 加载成功时返回true
 	 */

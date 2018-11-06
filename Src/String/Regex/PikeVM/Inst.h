@@ -4,7 +4,7 @@
 
 #include "../../../Misc/Common.h"
 
-namespace AGZ::PikeVM {
+namespace AGZ::StrImpl::PikeVM {
 
 enum class InstType : uint32_t
 {

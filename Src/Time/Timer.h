@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <chrono>
 
@@ -6,6 +6,9 @@
 
 namespace AGZ {
 
+/**
+ * @brief 仅用于计时的时钟类
+ */
 class Timer
 {
     using Clock = std::chrono::high_resolution_clock;
@@ -14,10 +17,13 @@ class Timer
 
 public:
 
+	//! 被创建时会自动开始计时
     Timer() { Restart(); }
 
+	//! 重新开始计时
     void Restart() { start_ = Clock::now(); }
 
+	//! 从上一次开始计时起过了多少秒
     uint64_t Seconds() const
     {
         return std::chrono::duration_cast<
@@ -25,6 +31,7 @@ public:
                         (Clock::now() - start_).count();
     }
 
+	//! 从上一次开始计时起过了多少毫秒
     uint64_t Milliseconds() const
     {
         return std::chrono::duration_cast<
@@ -32,6 +39,7 @@ public:
                         (Clock::now() - start_).count();
     }
 
+	//! 从上一次开始计时起过了多少微秒
     uint64_t Microseconds() const
     {
         return std::chrono::duration_cast<

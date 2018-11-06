@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Misc/Common.h"
 #include "../Misc/Exception.h"
@@ -8,10 +8,14 @@
 
 namespace AGZ {
 
+/**
+ * @brief 纹理对象的读取/保存
+ */
 class TextureFile
 {
 public:
 
+	//! 可选的保存格式
     enum class WriteFormat
     {
         PNG,
@@ -19,42 +23,52 @@ public:
         BMP
     };
 
+	//! 从文件中加载一个二维RGB纹理对象
     static TextureCore<2, Math::Color3b> LoadRGBFromFile(
         const WStr &filename);
 
+	//! 从文件中加载一个二维RGBA纹理对象
     static TextureCore<2, Math::Color4b> LoadRGBAFromFile(
         const WStr &filename);
 
+	//! 将一个二维RGB纹理对象写入到指定格式的文件
     static void WriteTo(
         const WStr &filename,
         const TextureCore<2, Math::Color3b> &tex,
         WriteFormat format);
 
+	//! 将一个二维RGBA纹理对象写入到指定格式的文件
     static void WriteTo(
         const WStr &filename,
         const TextureCore<2, Math::Color4b> &tex,
         WriteFormat format);
 
+	//! 将一个二维RGB纹理对象写入到PNG文件
     static void WriteRGBToPNG(
         const WStr &filename,
         const TextureCore<2, Math::Color3b> &tex);
 
+	//! 将一个二维RGBA纹理对象写入到PNG文件
     static void WriteRGBAToPNG(
         const WStr &filename,
         const TextureCore<2, Math::Color4b> &tex);
 
+	//! 将一个二维RGB纹理对象写入到JPG文件
     static void WriteRGBToJPG(
         const WStr &filename,
         const TextureCore<2, Math::Color3b> &tex);
 
+	//! 将一个二维RGBA纹理对象写入到JPG文件
     static void WriteRGBAToJPG(
         const WStr &filename,
         const TextureCore<2, Math::Color4b> &tex);
 
+	//! 将一个二维RGB纹理对象写入到BMP文件
     static void WriteRGBToBMP(
         const WStr &filename,
         const TextureCore<2, Math::Color3b> &tex);
 
+	//! 将一个二维RGBA纹理对象写入到BMP文件
     static void WriteRGBAToBMP(
         const WStr &filename,
         const TextureCore<2, Math::Color4b> &tex);

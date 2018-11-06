@@ -461,7 +461,7 @@ public:
 /**
  * @brief 不可变的字符串类
  * 
- * 大部分访问功能都委托给了StringView
+ * 大部分访问功能应参考 @class StringView
  */
 template<typename CS>
 class String
@@ -485,39 +485,51 @@ class String
 
 public:
 
-    using Charset   = CS;
-    using CodeUnit  = typename CS::CodeUnit;
-    using CodePoint = typename CS::CodePoint;
-    using Builder   = StringBuilder<CS>;
-    using View      = StringView<CS>;
-    using Self      = String<CS>;
+    using Charset   = CS;					  ///< 字符编码方案
+    using CodeUnit  = typename CS::CodeUnit;  ///< 码元类型
+    using CodePoint = typename CS::CodePoint; ///< 码点类型
+    using Builder   = StringBuilder<CS>;	  ///< 字符串构造器
+    using View      = StringView<CS>;		  ///< 视图类型
+    using Self      = String<CS>;			  ///< 自身类型
 
-    using CharRange = typename View::CharRange;
+    using CharRange = typename View::CharRange; ///< 以字符形式遍历码点的range类型
 
-    using Iterator = const CodeUnit*;
+    using Iterator = const CodeUnit*; ///< 遍历码元的range类型
 
     static constexpr size_t NPOS = View::NPOS;
 
     String();
+
+	//! 将字符串初始化为n个相同字符
     explicit String(CodePoint cp, size_t count = 1);
+	//! 从视图构造字符串
     String(const View &view);
+	//! 用给定的一段码元初始化字符串
     String(const CodeUnit *beg, size_t len);
+	//! 用给定的一段码元初始化字符串
     String(const CodeUnit *beg, const CodeUnit *end);
+	//! 以另一个字符串中的一段码元初始化字符串
     String(const Self &copyFrom, size_t begIdx, size_t endIdx);
 
+	//! 从C-style字符串中初始化，缺省认为输入串使用UTF-8编码
     String(const char *cstr, NativeCharset cs = NativeCharset::UTF8);
+	//! 从std::string中初始化，缺省认为输入串使用UTF-8编码
     String(const std::string &cppStr, NativeCharset cs = NativeCharset::UTF8);
 
+	//! 从C-style宽字符串中初始化，缺省认为输入串使用WUTF编码
     String(const wchar_t *cstr, NativeCharset cs = NativeCharset::WUTF);
+	//! 从std::wstring中初始化，缺省认为输入串使用WUTF编码
     String(const std::wstring &cppStr, NativeCharset cs = NativeCharset::WUTF);
 
     String(const Self &copyFrom);
     String(Self &&moveFrom) noexcept;
 
+	//! 从使用其他编码方案的字符串中初始化，会自动进行编码转换
     template<typename OCS, std::enable_if_t<!std::is_same_v<CS, OCS>, int> = 0>
     explicit String(const StringView<OCS> &convertFrom);
 
-    template<typename OCS, std::enable_if_t<!std::is_same_v<CS, OCS>, int> = 0>
+	//! 从使用其他编码方案的字符串中初始化，会自动进行编码转换
+	template<typename OCS, std::enable_if_t<!std::is_same_v<CS, OCS>, int> = 0>
     explicit String(const String<OCS> &convertFrom): Self(convertFrom.AsView()) {  }
 
     ~String() = default;
@@ -525,26 +537,70 @@ public:
     Self &operator=(const Self &copyFrom);
     Self &operator=(Self &&moveFrom) noexcept;
 
+	/**
+	 * 将整数转换为字符串
+	 * @param v 待转换的整数值
+	 * @param base 转换所使用的进制，缺省为10
+	 */
     static Self From(char               v, unsigned int base = 10);
+	/**
+	 * 见 String<CS>::From(char, unsigned int)
+	 */
     static Self From(signed char        v, unsigned int base = 10);
+	/**
+	 * 见 String::From(char, unsigned int)
+	 */
     static Self From(unsigned char      v, unsigned int base = 10);
+	/**
+	 * 见 String<CS>::From(char, unsigned int)
+	 */
     static Self From(short              v, unsigned int base = 10);
+	/**
+	 * 见 String<CS>::From(char, unsigned int)
+	 */
     static Self From(unsigned short     v, unsigned int base = 10);
+	/**
+	 * 见 String<CS>::From(char, unsigned int)
+	 */
     static Self From(int                v, unsigned int base = 10);
+	/**
+	 * 见 String<CS>::From(char, unsigned int)
+	 */
     static Self From(unsigned int       v, unsigned int base = 10);
+	/**
+	 * 见 String<CS>::From(char, unsigned int)
+	 */
     static Self From(long               v, unsigned int base = 10);
+	/**
+	 * 见 String<CS>::From(char, unsigned int)
+	 */
     static Self From(unsigned long      v, unsigned int base = 10);
+	/**
+	 * 见 String<CS>::From(char, unsigned int)
+	 */
     static Self From(long long          v, unsigned int base = 10);
+	/**
+	 * 见 String<CS>::From(char, unsigned int)
+	 */
     static Self From(unsigned long long v, unsigned int base = 10);
 
+	/**
+	 * @brief 将字符串转换为整数值
+	 * @param base 转换所使用的进制，缺省为10
+	 */
     template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
     T Parse(unsigned int base = 10) const { return AsView().template Parse<T>(base); }
 
+	/**
+	 * @brief 将字符串转换为浮点数
+	 */
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
     T Parse() const { return AsView().template Parse<T>(); }
 
+	//! 取得自己的视图
     View AsView() const;
 
+	//! 取得自己所存储的码元指针和数量
     const CodeUnit *Data() const;
     std::pair<const CodeUnit*, size_t> DataAndLength() const;
 
@@ -611,16 +667,23 @@ public:
 
     std::pair<const CodeUnit*, const CodeUnit*> BeginAndEnd() const { return storage_.BeginAndEnd(); }
 
+    //! 将其他字符串追加到末尾
     template<typename RHS>
     Self &operator+=(const RHS &rhs) { return *this = *this + rhs; }
 };
 
+/**
+ * @brief 将某个字符串重复R次
+ */
 template<typename CS>
 String<CS> operator*(const String<CS> &L, size_t R);
+//! @copydoc operator*(const String<CS>&, size_t)
 template<typename CS>
 String<CS> operator*(size_t L, const String<CS> &R) { return R * L; }
+//! @copydoc operator*(const String<CS>&, size_t)
 template<typename CS>
 String<CS> operator*(const StringView<CS> &L, size_t R) { return L.AsString() * R; }
+//! @copydoc operator*(const String<CS>&, size_t)
 template<typename CS>
 String<CS> operator*(size_t L, const StringView<CS> &R) { return R * L; }
 
@@ -655,6 +718,11 @@ AGZ_WRAP_STR_COMP(std::wstring&,   StringView<CS>&, String<CS>(lhs),          rh
 
 #undef AGZ_WRAP_STR_COMP
 
+/**
+ * @brief 用于加速大量字符串的拼接
+ * 
+ * @note 线程不安全
+ */
 template<typename CS>
 class StringBuilder
 {
@@ -664,25 +732,48 @@ public:
 
     using Self = StringBuilder<CS>;
 
+	/**
+	 * @brief 将给定视图的内容追加到正在构建的字符串末尾
+	 * 
+	 * @param view 被追加的视图
+	 * @param n 追加重复次数，缺省为1
+	 */
     Self &Append(const StringView<CS> &view, size_t n = 1);
+	/**
+	 * @brief 将给定字符串追加到正在构建的字符串末尾
+	 *
+	 * @param str 被追加的字符串
+	 * @param n 追加重复次数，缺省为1
+	 */
     Self &Append(const String<CS> &str, size_t n = 1);
 
+	//! 将给定视图的内容追加到正在构建的字符串末尾
     Self &operator<<(const StringView<CS> &view);
+	//! 将给定字符串追加到正在构建的字符串末尾
+	Self &operator<<(const String<CS> &view) { return *this << view.AsView(); }
 
+	//! 取得被构建的字符串
     String<CS> Get() const;
 
+	//! 是否包含任何正在被构建的字符串
     bool Empty() const { return strs_.empty(); }
 
+	//! 清空正在被构建的字符串
     void Clear() { strs_.clear(); }
 };
 
+/**
+ * @brief 字符编码转换器
+ */
 class CharsetConvertor
 {
 public:
 
+	//! 将以SCS方案编码的字符串视图转换为以DCS方案编码的字符串
     template<typename DCS, typename SCS>
     static String<DCS> Convert(const typename String<SCS>::View &src);
 
+	//! 将以SCS方案编码的字符串转换为以DCS方案编码的字符串
     template<typename DCS, typename SCS>
     static String<DCS> Convert(const String<SCS> &src) { return Convert<DCS, SCS>(src.AsView()); }
 };
@@ -691,26 +782,29 @@ public:
 
 namespace AGZ {
 
+//! @copydoc StrImpl::NativeCharset
 using NativeCharset = StrImpl::NativeCharset;
 
+//! @copydoc StrImpl::String<CS>
 template<typename CS>
 using String = StrImpl::String<CS>;
+//! @copydoc StrImpl::StringView<CS>
 template<typename CS>
 using StringView = StrImpl::StringView<CS>;
 
-using Str8  = String<UTF8<>>;
-using Str16 = String<UTF16<>>;
-using Str32 = String<UTF32<>>;
-using AStr  = String<ASCII<>>;
-using WStr  = String<WUTF>;
-using PStr  = String<PUTF>;
+using Str8  = String<UTF8<>>;  ///< 以UTF-8编码的字符串
+using Str16 = String<UTF16<>>; ///< 以UTF-16编码的字符串
+using Str32 = String<UTF32<>>; ///< 以UTF-32编码的字符串
+using AStr  = String<ASCII<>>; ///< 以ASCII编码的字符串
+using WStr  = String<WUTF>;	   ///< 以宽字符编码（平台相关）的字符串
+using PStr  = String<PUTF>;	   ///< 平台缺省使用的字符串
 
-using StrView8  = StringView<UTF8<>>;
-using StrView16 = StringView<UTF16<>>;
-using StrView32 = StringView<UTF32<>>;
-using AStrView  = StringView<ASCII<>>;
-using WStrView  = StringView<WUTF>;
-using PStrView  = StringView<PUTF>;
+using StrView8  = StringView<UTF8<>>;  ///< 以UTF-8编码的字符串视图
+using StrView16 = StringView<UTF16<>>; ///< 以UTF-16编码的字符串视图
+using StrView32 = StringView<UTF32<>>; ///< 以UTF-32编码的字符串视图
+using AStrView  = StringView<ASCII<>>; ///< 以ASCII编码的字符串视图
+using WStrView  = StringView<WUTF>;	   ///< 以宽字符编码（平台相关）的字符串视图
+using PStrView  = StringView<PUTF>;	   ///< 平台缺省使用的字符串视图
 
 using CSConv = StrImpl::CharsetConvertor;
 

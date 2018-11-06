@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <type_traits>
 
@@ -6,6 +6,9 @@
 
 namespace AGZ {
 
+/**
+ * @brief 各维度纹理的核心存储类，其他纹理对象都只是在这之上封装了一层接口
+ */
 template<Math::DimType DIM, typename PT>
 class TextureCore
 {
@@ -215,6 +218,9 @@ public:
     }
 };
 
+/**
+ * @brief 一维纹理对象
+ */
 template<typename PT>
 class Texture1D : public TextureCore<1, PT>
 {
@@ -256,31 +262,37 @@ public:
         return *this;
     }
 
+	//! 包含的texel数量
     uint32_t GetLength() const
     {
         return Core::GetSize()[0];
     }
 
+	//! 取得具有给定下标的texel
     const Pixel &operator()(uint32_t idx) const
     {
         return Core::At(Coord(idx));
     }
 
+	//! 取得具有给定下标的texel
     Pixel &operator()(uint32_t idx)
     {
         return Core::At(Coord(idx));
     }
 
+	//! 取得具有给定下标的texel
     const Pixel &At(uint32_t idx) const
     {
         return Core::At(Coord(idx));
     }
 
+	//! 取得具有给定下标的texel
     Pixel &At(uint32_t idx)
     {
         return Core::At(Coord(idx));
     }
 
+	//! 将每个texel用给定方法映射为另一texel，得到一个新的一维纹理
     template<typename F>
     auto Map(F &&func) const
     {
@@ -289,6 +301,9 @@ public:
     }
 };
 
+/**
+ * @brief 二维纹理对象
+ */
 template<typename PT>
 class Texture2D : public TextureCore<2, PT>
 {
@@ -330,36 +345,43 @@ public:
         return *this;
     }
 
+	//! 取得横向texel数量
     uint32_t GetWidth() const
     {
         return Core::GetSize()[0];
     }
 
+	//! 取得纵向texel数量
     uint32_t GetHeight() const
     {
         return Core::GetSize()[1];
     }
 
+	//! 取得具有给定下标的texel
     const Pixel &operator()(uint32_t x, uint32_t y) const
     {
         return Core::At(Coord(x, y));
     }
 
+	//! 取得具有给定下标的texel
     Pixel &operator()(uint32_t x, uint32_t y)
     {
         return Core::At(Coord(x, y));
     }
 
+	//! 取得具有给定下标的texel
     const Pixel &At(uint32_t x, uint32_t y) const
     {
         return Core::At(Coord(x, y));
     }
 
+	//! 取得具有给定下标的texel
     Pixel &At(uint32_t x, uint32_t y)
     {
         return Core::At(Coord(x, y));
     }
 
+	//! 将每个texel用给定方法映射为另一texel，得到一个新的二维纹理
     template<typename F>
     auto Map(F &&func) const
     {
@@ -368,6 +390,9 @@ public:
     }
 };
 
+/**
+ * @brief 三维纹理对象
+ */
 template<typename PT>
 class Texture3D : public TextureCore<3, PT>
 {
@@ -409,41 +434,49 @@ public:
         return *this;
     }
 
+	//! 取得X方向的texel数量
     uint32_t GetXSize() const
     {
         return Core::GetSize()[0];
     }
 
+	//! 取得Y方向的texel数量
     uint32_t GetYSize() const
     {
         return Core::GetSize()[1];
     }
 
+	//! 取得Z方向的texel数量
     uint32_t GetZSize() const
     {
         return Core::GetSize()[2];
     }
 
+	//! 取得具有给定下标的texel
     const Pixel &operator()(uint32_t x, uint32_t y, uint32_t z) const
     {
         return Core::At(Coord(x, y, z));
     }
 
+	//! 取得具有给定下标的texel
     Pixel &operator()(uint32_t x, uint32_t y, uint32_t z)
     {
         return Core::At(Coord(x, y, z));
     }
 
+	//! 取得具有给定下标的texel
     const Pixel &At(uint32_t x, uint32_t y, uint32_t z) const
     {
         return Core::At(Coord(x, y, z));
     }
 
+	//! 取得具有给定下标的texel
     Pixel &At(uint32_t x, uint32_t y, uint32_t z)
     {
         return Core::At(Coord(x, y, z));
     }
 
+	//! 将每个texel用给定方法映射为另一texel，得到一个新的三维纹理
     template<typename F>
     auto Map(F &&func) const
     {

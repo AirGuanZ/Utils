@@ -9,7 +9,7 @@
 #include "Syntax.h"
 #include "Backend.h"
 
-namespace AGZ::PikeVM {
+namespace AGZ::StrImpl::PikeVM {
 
 class SaveSlots
 {

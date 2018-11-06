@@ -8,7 +8,7 @@
 #include "Inst.h"
 #include "Syntax.h"
 
-namespace AGZ::PikeVM {
+namespace AGZ::StrImpl::PikeVM {
 
 /*
     A|B =>    Branch(L0, L1)

@@ -1,13 +1,22 @@
-#pragma once
+﻿#pragma once
 
 #include "Texture.h"
 
 namespace AGZ {
 
+/**
+ * @brief 最近邻纹理采样器
+ */
 class NearestSampler
 {
 public:
 
+	/**
+	 * @brief 给定二维纹理和纹理坐标，对其进行最近邻采样
+	 * 
+	 * @param tex 纹理对象
+	 * @param texCoord 纹理坐标，取值范围为[0, 1]^2，(0, 0)对应纹理左上角
+	 */
     template<typename PT, typename E>
     static auto Sample(const Texture2D<PT> &tex, const Math::Vec2<E> &texCoord)
     {
@@ -19,6 +28,9 @@ public:
     }
 };
 
+/**
+ * @brief 双线性插值采样器
+ */
 class LinearSampler
 {
     template<typename PT, typename E>
@@ -32,6 +44,12 @@ class LinearSampler
 
 public:
 
+	/**
+	 * @brief 给定二维纹理和纹理坐标，对其进行双线性采样
+	 *
+	 * @param tex 纹理对象
+	 * @param texCoord 纹理坐标，取值范围为[0, 1]^2，(0, 0)对应纹理左上角
+	 */
     template<typename PT, typename E>
     static auto Sample(const Texture2D<PT> &tex, const Math::Vec2<E> &texCoord)
     {
