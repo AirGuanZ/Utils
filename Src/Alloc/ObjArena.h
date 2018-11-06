@@ -91,7 +91,7 @@ class ObjArena : public Uncopiable
 public:
 
 	/**
-	 * @param chunkDataSize 每次预分配块中有多少可用字节
+	 * @param chunkDataSize 每次预分配块中有多少可用字节，默认为1024
 	 * 
 	 * @exception ArgumentException 参数非法时抛出
 	 */
@@ -109,7 +109,7 @@ public:
     }
 
 	/**
-	 * @brief 取得目前已使用的总字节数，包括簿记内存，但不包含预分配的未使用的内存
+	 * @brief 取得目前已使用的总字节数，包括簿记内存，但不包含预分配但未使用的内存
 	 */
     size_t GetUsedBytes() const
     {

@@ -76,7 +76,7 @@ public:
 };
 
 /**
- * 默认内存分配器
+ * @brief 默认内存分配器
  */
 using DefaultAllocator = CRTAllocator;
 

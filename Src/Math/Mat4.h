@@ -5,7 +5,6 @@
 #include <type_traits>
 
 #include "../Misc/Common.h"
-#include "Scalar.h"
 #include "Tri.h"
 #include "Vec3.h"
 #include "Vec4.h"
@@ -26,56 +25,38 @@ public:
 
     Data m;
 
-	/**
-	 * 初始化为单位矩阵
-	 */
+	/** 初始化为单位矩阵 */
     Mat4() : Mat4(T(1)) { }
 
-	/**
-	 * 不初始化任何元素
-	 */
+	/** 不初始化任何元素 */
     explicit Mat4(Uninitialized_t) { }
 
-	/**
-	 * 初始化为对角阵，对角元素值为v
-	 */
+	/** 初始化为对角阵，对角元素值为v */
     explicit Mat4(T v);
 
-	/**
-	 * 从4x4数组中取得初始化数据
-	 */
+	/** 从4x4数组中取得初始化数据 */
     explicit Mat4(const Data &_m);
 
-	/**
-	 * 逐个指定每个元素的值，mij代表第i行第j列
-	 */
+	/** 逐个指定每个元素的值，mij代表第i行第j列 */
     Mat4(T m00, T m01, T m02, T m03,
          T m10, T m11, T m12, T m13,
          T m20, T m21, T m22, T m23,
          T m30, T m31, T m32, T m33);
 
-	/**
-	 * 将所有元素设置为v
-	 */
+	/** 将所有元素设置为v */
     static Self All(T v);
 
-	/**
-	 * 返回一个单位矩阵
-	 */
+	/** 返回一个单位矩阵 */
     static const Self &IDENTITY();
 
     bool operator==(const Self &other) const;
 
     bool operator!=(const Self &other) const;
 
-	/**
-	 * 矩阵-矩阵乘法
-	 */
+	/** 矩阵-矩阵乘法 */
     Self operator*(const Self &rhs) const;
 
-	/**
-	 * 矩阵-向量乘法
-	 */
+	/** 矩阵-向量乘法 */
     Vec4<T> operator*(const Vec4<T> &p) const;
 
 	/**
@@ -94,27 +75,19 @@ public:
     template<typename U>
     static Self Rotate(const Vec3<T> &_axis, U angle);
 
-	/**
-	 * 构造绕X轴的旋转矩阵
-	 */
+	/** 构造绕X轴的旋转矩阵 */
     template<typename U>
     static Self RotateX(U angle);
 
-	/**
-	 * 构造绕Y轴的旋转矩阵
-	 */
+	/** 构造绕Y轴的旋转矩阵 */
     template<typename U>
     static Self RotateY(U angle);
 
-	/**
-	 * 构造绕Z轴的旋转矩阵
-	 */
+	/** 构造绕Z轴的旋转矩阵 */
     template<typename U>
     static Self RotateZ(U angle);
 
-	/**
-	 * 构造缩放矩阵
-	 */
+	/** 构造缩放矩阵 */
     static Self Scale(const Vec3<T> &s);
 
 	/**
@@ -137,28 +110,20 @@ public:
 	 */
     static Self LookAt(const Vec3<T> &src, const Vec3<T> &dst, const Vec3<T> &up);
 
-	/**
-	 * 将矩阵变换作用在点上并进行齐次坐标归一化
-	 */
+	/** 将矩阵变换作用在点上并进行齐次坐标归一化 */
     Vec4<T> ApplyToPoint(const Vec4<T> &p) const;
 	//! @copydoc Mat4<T>::ApplyToPoint(const Vec4<T> &) const
     Vec3<T> ApplyToPoint(const Vec3<T> &p) const;
 
-	/**
-	 * 将矩阵变换作用在方向上
-	 */
+	/** 将矩阵变换作用在方向上 */
 	Vec4<T> ApplyToVector(const Vec4<T> &p) const;
 	//! @copydoc Mat4<T>::ApplyToVector(const Vec4<T> &) const
     Vec3<T> ApplyToVector(const Vec3<T> &p) const;
 
-	/**
-	 * 将逆变换作用在法线上
-	 */
+	/** 将逆变换作用在法线上 */
     Vec3<T> ApplyInverseToNormal(const Vec3<T> &n) const;
 
-	/**
-	 * 转置矩阵
-	 */
+	/** 转置矩阵 */
     Self Transpose() const;
 
 	/**

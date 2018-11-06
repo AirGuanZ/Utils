@@ -24,9 +24,9 @@ struct Rad
 };
 
 /**
- * @brief 角度制
+ * @brief 角度值
  * 
- * 可进行基本的算术运算和三角函数运算，与角度值间可自动转换
+ * 可进行基本的算术运算和三角函数运算，与弧度值间可自动转换
  */
 template<typename T>
 struct Deg

@@ -23,9 +23,7 @@ public:
     using StrView = StringView<CS>;	///< 所使用的字符串视图类型
     using Self    = Path<CS>;		///< 自身类型
 
-	/**
-	 * @brief 不同操作系统下的路径风格
-	 */
+	/** 不同操作系统下的路径风格 */
     enum SeperatorStyle
     {
         Linux,				///< *nix风格，以“/”作为唯一分隔符，绝对路径以根目录“/”开头
@@ -77,9 +75,7 @@ public:
         }
     }
 
-	/**
-	 * 同 Path::Path(const StrView&, bool, SeperatorStyle) ，取mayHasFilename为true
-	 */
+	/** 同 Path::Path(const StrView&, bool, SeperatorStyle) ，取mayHasFilename为true */
     Path(const StrView &s, SeperatorStyle style = Native)
         : Path(s, true, style)
     {
@@ -93,9 +89,7 @@ public:
 
     }
 
-	/**
-	 * 同 Path::Path(const Str&, bool, SeperatorStyle) ，取mayHasFilename为true
-	 */
+	/** 同 Path::Path(const Str&, bool, SeperatorStyle) ，取mayHasFilename为true */
     Path(const Str &s, SeperatorStyle style = Native)
         : Path(s.AsView(), style)
     {
@@ -123,32 +117,26 @@ public:
     ~Path()                               = default;
 
 	/**
-	 * @return 是否是一个绝对路径
+	 * 是否是一个绝对路径
 	 * 
 	 * @note 空路径被认为是相对路径
 	 */
     bool IsAbsolute() const { return abs_; }
 
 	/**
-	 * @return 是否是一个相对路径
+	 * 是否是一个相对路径
 	 * 
 	 * @note 空路径被认为是相对路径
 	 */
     bool IsRelative() const { return !IsAbsolute(); }
 
-	/**
-	 * @return 是否是一个常规文件
-	 */
+	/** 是否是一个常规文件 */
     bool HasFilename() const { return !filename_.Empty(); }
 
-	/**
-	 * @return 是否是一个目录
-	 */
+	/** 是否是一个目录 */
     bool IsDirectory() const { return !HasFilename(); }
 
-	/**
-	 * @return 是否有父目录
-	 */
+	/** 是否有父目录 */
     bool HasParent() const
     {
         if(HasFilename())
@@ -156,9 +144,7 @@ public:
         return dirs_.size() >= 2;
     }
 
-	/**
-	 * @return 是否是另一个路径的前缀
-	 */
+	/** 是否是另一个路径的前缀 */
     bool IsPrefixOf(const Self &parent) const
     {
         if(HasFilename())
@@ -174,7 +160,7 @@ public:
     }
 
 	/**
-	 * @return 常规文件的文件名本身
+	 * 常规文件的文件名本身
 	 * 
 	 * @warning 对目录路径调用该方法会造成UB
 	 */
@@ -185,7 +171,7 @@ public:
     }
 
 	/**
-	 * @return 本路径的字符串表示
+	 * 本路径的字符串表示
 	 * 
 	 * @param style 转换时使用的路径风格，缺省由编译器自动判断
 	 */
@@ -226,7 +212,7 @@ public:
     }
 
 	/**
-	 * @return 取得文件扩展名，不包含“.”
+	 * 取得文件扩展名，不包含“.”
 	 * 
 	 * @warning *this不是文件路径会造成UB
 	 */
@@ -285,7 +271,7 @@ public:
     }
 
 	/**
-	 * @return 将本路径转换为绝对路径的结果
+	 * 将本路径转换为绝对路径的结果
 	 * 
 	 * @note 若本路径已经是绝对路径，则返回值与本路径相同
 	 */
@@ -298,7 +284,7 @@ public:
     }
 
 	/**
-	 * @return 将本路径转换为相对路径的结果
+	 * 将本路径转换为相对路径的结果
 	 * 
 	 * @note 若本路径已经是相对路径，则返回值与本路径相同
 	 */
@@ -318,7 +304,7 @@ public:
     }
 
 	/**
-	 * @return 将本路径转换为目录的结果（去掉文件名）
+	 * 将本路径转换为目录的结果（去掉文件名）
 	 * 
 	 * @note 若本路径已经是目录，则返回值与本路径相同
 	 */
@@ -330,7 +316,7 @@ public:
     }
 
 	/**
-	 * @return 返回本路径的父目录
+	 * 返回本路径的父目录
 	 * 
 	 * 若本路径为目录，则返回其上一级目录；若本路径为文件路径，则返回文件所处目录。
 	 */
@@ -346,6 +332,7 @@ public:
         return *this;
     }
 
+	/** 两个路径严格相等 */
     bool operator==(const Self &rhs) const
     {
         if(dirs_.size() != rhs.dirs_.size())
@@ -358,6 +345,7 @@ public:
         return filename_ == rhs.filename_;
     }
 
+	/** 两个路径间存在差异 */
     bool operator!=(const Self &rhs) const
     {
         return !(*this == rhs);
@@ -371,6 +359,7 @@ public:
         return ret;
     }
 
+	/** 将rhs以 Path<CS>::Append 的方式追加到本路径后方  */
     Self &operator+=(const Self &rhs) const
     {
         return Append(rhs);

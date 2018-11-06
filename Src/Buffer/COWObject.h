@@ -10,7 +10,7 @@
 namespace AGZ {
 
 /**
- * @brief 将任意类型封装为引用计数类型，线程不安全
+ * @brief 将任意类型封装为引用计数的写时复制类型，线程不安全
  */
 template<typename T, typename Alloc = DefaultAllocator>
 class COWObject
@@ -93,9 +93,7 @@ public:
         return *this;
     }
 
-	/**
-	 * @brief 释放自己所持有的共享所有权，若自己是最后一个持有者，销毁内部对象
-	 */
+	/** 释放自己所持有的共享所有权，若自己是最后一个持有者，销毁内部对象 */
     void Release()
     {
         if(storage_ && !--storage_->refs_)
@@ -106,42 +104,32 @@ public:
         }
     }
 
-	/**
-	 * @brief 内部对象共享所有权的持有者数量
-	 */
+	/** 内部对象共享所有权的持有者数量 */
     RefCounter Refs() const
     {
         return storage_ ? storage_->refs_ : 0;
     }
 
-	/**
-	 * @brief 是否持有某个对象的所有权
-	 */
+	/** 是否持有某个对象的所有权 */
     bool IsAvailable() const
     {
         return storage_ != nullptr;
     }
 
-	/**
-	 * @brief 是否持有某个对象的所有权
-	 */
+	/** 是否持有某个对象的所有权 */
     operator bool() const
     {
         return IsAvailable();
     }
 
-	/**
-	 * @brief 取得内部对象的常量引用
-	 */
+	/** 取得内部对象的常量引用 */
     const T &operator*() const
     {
         AGZ_ASSERT(storage_);
         return storage_->obj;
     }
 
-	/**
-	 * @brief 将调用转发给内部对象
-	 */
+	/** 将调用转发给内部对象 */
     const T *operator->() const
     {
         AGZ_ASSERT(storage_);
@@ -149,7 +137,9 @@ public:
     }
 
 	/**
-	 * @brief 取得内部对象的可变指针
+	 * 取得内部对象的可变指针
+	 * 
+	 * @note 若内部对象持有者数量大于1，则该操作会将内部对象复制一份，并持有复制出的新对象
 	 */
     T *MutablePtr()
     {
@@ -157,7 +147,9 @@ public:
     }
 
 	/**
-	 * @brief 取得内部对象的可变引用
+	 * 取得内部对象的可变引用
+	 * 
+	 * @note 若内部对象持有者数量大于1，则该操作会将内部对象复制一份，并持有复制出的新对象
 	 */
     T &Mutable()
     {

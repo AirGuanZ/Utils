@@ -51,7 +51,7 @@ using Color4b = Color4<uint8_t>;
     inline constexpr Aux::Color_##N##_t N
 
 /**
- * 常用RGB常量值
+ * @brief 常用RGB常量值
  */
 namespace COLOR
 {

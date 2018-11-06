@@ -34,17 +34,17 @@ public:
     virtual ~ConfigNode() = default;
 
 	/**
-	 * @brief 将this转换为参数集合
+	 * 将this转换为参数集合
 	 * @exception ConfigNodeInvalidCasting this并不是参数集合时抛出
 	 */
     virtual const ConfigGroup &AsGroup() const { throw ConfigNodeInvalidCasting("ConfigASTNode: invalid casting"); }
     /**
-     * @brief 将this转换为参数数组
+     * 将this转换为参数数组
 	 * @exception ConfigNodeInvalidCasting this并不是参数数组时抛出
      */
 	virtual const ConfigArray &AsArray() const { throw ConfigNodeInvalidCasting("ConfigASTNode: invalid casting"); }
 	/**
-	 * @brief 将this转换为参数值
+	 * 将this转换为参数值
 	 * @exception ConfigNodeInvalidCasting this并不是参数值时抛出
 	 */
     virtual const Str8 &AsValue() const { throw ConfigNodeInvalidCasting("ConfigASTNode: invalid casting"); }
@@ -64,7 +64,7 @@ public:
     explicit ConfigGroup(std::unordered_map<Str8, const ConfigNode*> &&children);
 
 	/**
-	 * @brief 查找具有指定路径的配置参数值
+	 * 查找具有指定路径的配置参数值
 	 * 
 	 * @param k 带查找的参数路径，用“.”作为路径分隔符
 	 */
@@ -81,7 +81,7 @@ public:
     const ConfigNode &operator[](const StrView8 &k) const;
 
 	/**
-	 * @brief 返回作为ConfigGroup的this指针
+	 * 返回作为ConfigGroup的this指针
 	 * 
 	 * @note 仅在从父类接口调用时有意义，免得到处写dynamic_cast
 	 */
@@ -100,7 +100,7 @@ public:
     explicit ConfigArray(std::vector<const ConfigNode*> &&content);
 
 	/**
-	 * @brief 取得指定位置的元素
+	 * 取得指定位置的元素
 	 * 
 	 * @param idx 从0开始计的元素下标
 	 * 
@@ -109,7 +109,7 @@ public:
     const ConfigNode *At(size_t idx) const;
 
 	/**
-	 * @brief 取得指定位置的元素
+	 * 取得指定位置的元素
 	 * 
 	 * @param idx 从0开始计的元素下标
 	 * 
@@ -117,13 +117,11 @@ public:
 	 */
     const ConfigNode &operator[](size_t idx) const;
 
-	/**
-	 * @brief 取得数组元素数量
-	 */
+	/** 取得数组元素数量 */
     size_t Size() const;
 
 	/**
-	 * @brief 返回作为ConfigArray的this指针
+	 * 返回作为ConfigArray的this指针
 	 *
 	 * @note 仅在从父类接口调用时有意义，免得到处写dynamic_cast
 	 */
@@ -141,18 +139,14 @@ public:
 
     explicit ConfigValue(Str8 &&str);
 
-	/**
-	 * @brief 取得字符串内容
-	 */
+	/** 取得字符串内容 */
     const Str8 &GetStr() const;
 
-	/**
-	 * @brief 取得字符串内容
-	 */
+	/** 取得字符串内容 */
     const Str8 &operator*() const;
 
 	/**
-	 * @brief 返回作为ConfigValue的this指针
+	 * 返回作为ConfigValue的this指针
 	 *
 	 * @note 仅在从父类接口调用时有意义，免得到处写dynamic_cast
 	 */
@@ -204,7 +198,7 @@ class Config : public Uncopiable
 public:
 
 	/**
-	 * @brief 从字符串中加载配置
+	 * 从字符串中加载配置
 	 * 
 	 * @note 这一操作会清除之前加载的内容
 	 * 
@@ -213,7 +207,7 @@ public:
     bool LoadFromMemory(const Str8 &src);
 
 	/**
-	 * @brief 从文本文件中加载配置
+	 * 从文本文件中加载配置
 	 * 
 	 * @note 这一操作会清除之前加载的内容
 	 * 
@@ -221,19 +215,13 @@ public:
 	 */
     bool LoadFromFile(const Str8 &filename);
 
-	/**
-	 * @brief 是否包含可用的配置文件内容
-	 */
+	/** 是否包含可用的配置文件内容 */
     bool IsAvailable() const;
 
-	/**
-	 * @brief 清除已加载的配置文件内容
-	 */
+	/** 清除已加载的配置文件内容 */
     void Clear();
 
-	/**
-	 * @brief 取得全局参数集合
-	 */
+	/** 取得全局参数集合 */
     const ConfigGroup &Root() const;
 };
 

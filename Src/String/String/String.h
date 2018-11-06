@@ -17,17 +17,16 @@
 namespace AGZ::StrImpl {
 
 /**
- * C style string和std::string可能使用的编码，
- * 作为编码转换的参数
+ * @brief C style string和std::string可能使用的编码，作为编码转换的参数
  */
 enum class NativeCharset
 {
-    UTF8, // for const char * / std::string
-    WUTF, // for const wchar_t * / std::wstring
+    UTF8, ///< for const char * / std::string
+    WUTF, ///< for const wchar_t * / std::wstring
 };
 
 /**
- * 使用引用计数的缓存块
+ * @brief 使用引用计数的缓存块
  */
 template<typename E>
 class RefCountedBuf
@@ -291,13 +290,16 @@ public:
 
     static constexpr size_t NPOS = std::numeric_limits<size_t>::max();
 
+	//! 取某个字符串的视图
     StringView(const Str &str);
+	//! 取某字符串的子串视图，并将该串缓存到视图中
     StringView(const Str &str, const CodeUnit *beg, size_t len);
+	//! 取某字符串的子串视图，并将该串缓存到视图中
     StringView(const Str &str, size_t begIdx, size_t endIdx);
 
-    StringView() = delete;
-    StringView(const Self &) = default;
-    ~StringView() = default;
+    StringView()				  = delete;
+    StringView(const Self &)	  = default;
+    ~StringView()				  = default;
     Self &operator=(const Self &) = default;
 
 	//! 转换为对应的String
@@ -444,12 +446,15 @@ public:
     std::string ToPlatformString() const { return ToStdString(); }
 #endif
 
+	//! 用于码元遍历的头部迭代器
     Iterator begin() const;
+	//! 用于码元遍历的尾部迭代器
     Iterator end()   const;
 
 	//! 和其他字符串连接产生新串
     Str operator+(const Self &rhs) const;
 
+	/** 逐码元严格相等 */
     bool operator==(const Self &rhs) const;
     bool operator!=(const Self &rhs) const;
     bool operator< (const Self &rhs) const;
@@ -538,7 +543,8 @@ public:
     Self &operator=(Self &&moveFrom) noexcept;
 
 	/**
-	 * 将整数转换为字符串
+	 * @brief 将整数转换为字符串
+	 * 
 	 * @param v 待转换的整数值
 	 * @param base 转换所使用的进制，缺省为10
 	 */
@@ -586,14 +592,13 @@ public:
 
 	/**
 	 * @brief 将字符串转换为整数值
+	 * 
 	 * @param base 转换所使用的进制，缺省为10
 	 */
     template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
     T Parse(unsigned int base = 10) const { return AsView().template Parse<T>(base); }
 
-	/**
-	 * @brief 将字符串转换为浮点数
-	 */
+	//! 将字符串转换为浮点数
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
     T Parse() const { return AsView().template Parse<T>(); }
 

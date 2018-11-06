@@ -385,13 +385,13 @@ namespace Catch {
 
     class StringData;
 
-    /// A non-owning string class (similar to the forthcoming std::string_view)
-    /// Note that, because a StringRef may be a substring of another string,
-    /// it may not be null terminated. c_str() must return a null terminated
-    /// string, however, and so the StringRef will internally take ownership
-    /// (taking a copy), if necessary. In theory this ownership is not externally
-    /// visible - but it does mean (substring) StringRefs should not be shared between
-    /// threads.
+    //! A non-owning string class (similar to the forthcoming std::string_view)
+    //! Note that, because a StringRef may be a substring of another string,
+    //! it may not be null terminated. c_str() must return a null terminated
+    //! string, however, and so the StringRef will internally take ownership
+    //! (taking a copy), if necessary. In theory this ownership is not externally
+    //! visible - but it does mean (substring) StringRefs should not be shared between
+    //! threads.
     class StringRef {
     public:
         using size_type = std::size_t;
@@ -10902,11 +10902,11 @@ namespace Catch {
         return d;
     }
 
-    //// ======================================================= ////
+    ///! ======================================================= ////
     //
     //   Out-of-line defs for full specialization of StringMaker
     //
-    //// ======================================================= ////
+    ///! ======================================================= ////
 
     std::string StringMaker<std::string>::convert(const std::string& str) {
         if(!getCurrentContext().getConfig()->showInvisibles()) {
