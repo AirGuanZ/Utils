@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <algorithm>
 #include <map>
 #include <numeric>
 #include <set>
@@ -46,6 +47,11 @@ struct GeometryMeshGroup
 	 * @warning 算法非常糙，慎用
 	 */
     GeometryMeshGroup &SmoothenNormals();
+
+	/**
+	 * @brief 把submeshes合并成一个mesh并返回
+	 */
+	GeometryMesh MergeAllSubmeshes() const;
 };
 
 inline GeometryMesh &GeometryMesh::SmoothenNormals()
@@ -85,6 +91,18 @@ inline GeometryMeshGroup &GeometryMeshGroup::SmoothenNormals()
     for(auto &p : submeshes)
         p.second.SmoothenNormals();
     return *this;
+}
+
+inline GeometryMesh GeometryMeshGroup::MergeAllSubmeshes() const
+{
+	GeometryMesh ret;
+	for(auto &it : submeshes)
+	{
+		auto &sm = it.second;
+		std::copy(std::begin(sm.vertices), std::end(sm.vertices),
+				  std::back_inserter(ret.vertices));
+	}
+	return ret;
 }
 
 } // namespace AGZ::Model

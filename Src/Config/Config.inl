@@ -322,7 +322,7 @@ inline bool Config::LoadFromMemory(const Str8 &src)
     Clear();
     try
     {
-        global_ = ConfigImpl::ParseConfig(src.AsView(), arena_);
+        global_ = Impl::ParseConfig(src.AsView(), arena_);
         return true;
     }
     catch(...)
