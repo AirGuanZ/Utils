@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iterator>
+#include <sstream>
 
 #include "../Misc/Common.h"
 #include "../Utils/String.h"
@@ -137,8 +138,9 @@ inline bool ReadTextFileRaw(const WStr &filename, WStr *str)
     std::wifstream fin(filename.ToPlatformString(), std::ios_base::in);
     if(!fin)
         return false;
-    *str = std::wstring(std::istreambuf_iterator<wchar_t>(fin),
-                        std::istreambuf_iterator<wchar_t>());
+	std::wstringstream sst;
+	sst << fin.rdbuf();
+	*str = sst.str();
     return true;
 }
 
