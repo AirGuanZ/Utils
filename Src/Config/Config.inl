@@ -105,7 +105,7 @@ inline const Str8 &ConfigValue::AsValue() const
     return str_;
 }
 
-namespace ConfigImpl
+namespace Impl
 {
     template<typename T>
     using Option = std::optional<T>;

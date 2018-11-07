@@ -48,6 +48,13 @@ public:
 	 * @exception ConfigNodeInvalidCasting this并不是参数值时抛出
 	 */
     virtual const Str8 &AsValue() const { throw ConfigNodeInvalidCasting("ConfigASTNode: invalid casting"); }
+
+	//! 是否是Group类型
+	virtual bool IsGroup() const { return false; }
+	//! 是否是Array类型
+	virtual bool IsArray() const { return false; }
+	//! 是否是Value类型
+	virtual bool IsValue() const { return false; }
 };
 
 /**
@@ -86,6 +93,8 @@ public:
 	 * @note 仅在从父类接口调用时有意义，免得到处写dynamic_cast
 	 */
     const ConfigGroup &AsGroup() const override;
+
+	bool IsGroup() const override { return true; }
 };
 
 /**
@@ -126,6 +135,8 @@ public:
 	 * @note 仅在从父类接口调用时有意义，免得到处写dynamic_cast
 	 */
     const ConfigArray &AsArray() const override;
+
+	bool IsArray() const override { return true; }
 };
 
 /**
@@ -151,6 +162,8 @@ public:
 	 * @note 仅在从父类接口调用时有意义，免得到处写dynamic_cast
 	 */
     const Str8 &AsValue() const override;
+
+	bool IsValue() const override { return true; }
 };
 
 /**
