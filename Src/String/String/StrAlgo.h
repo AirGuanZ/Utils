@@ -264,7 +264,10 @@ struct Str2IntImpl
             ret = base * ret + DIGIT_CHAR_VALUE_TABLE[cp];
         }
 
-        return neg ? -ret : ret;
+		if constexpr(std::is_signed_v<T>)
+			return neg ? -ret : ret;
+		else
+			return ret;
     }
 };
 
