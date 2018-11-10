@@ -7,10 +7,22 @@
 
 namespace AGZ {
 
-inline ConfigGroup::ConfigGroup(std::unordered_map<Str8, const ConfigNode*> &&children)
+inline ConfigGroup::ConfigGroup(std::unordered_map<Str8, ConfigNode*> &&children)
     : children_(std::move(children))
 {
 
+}
+
+inline void ConfigGroup::Expand(const std::unordered_map<Str8, ConfigNode*> &more)
+{
+    for(auto &moreIt : more)
+    {
+        auto it = children_.find(moreIt.first);
+        if(it == children_.end() || !it->second->IsGroup() || !moreIt.second->IsGroup())
+            children_[moreIt.first] = moreIt.second;
+        else
+            dynamic_cast<ConfigGroup*>(it->second)->Expand(moreIt.second->AsGroup().GetChildren());
+    }
 }
 
 inline const ConfigNode *ConfigGroup::FindSection(const StrView8 &k) const
@@ -206,9 +218,9 @@ namespace Impl
         return Token{ TokenType::Name, std::move(s) };
     }
 
-    std::unordered_map<Str8, const ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena);
+    std::unordered_map<Str8, ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena);
 
-    inline const ConfigNode *ParseItemRight(std::list<Token> &toks, ObjArena<> &arena)
+    inline ConfigNode *ParseItemRight(std::list<Token> &toks, ObjArena<> &arena)
     {
         if(toks.empty())
             throw Exception("");
@@ -270,9 +282,9 @@ namespace Impl
         throw Exception("");
     }
 
-    inline std::unordered_map<Str8, const ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena)
+    inline std::unordered_map<Str8, ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena)
     {
-        std::unordered_map<Str8, const ConfigNode*> ret;
+        std::unordered_map<Str8, ConfigNode*> ret;
 
         while(!toks.empty() && toks.front().type != TokenType::RightBrac)
         {
@@ -292,7 +304,11 @@ namespace Impl
                 throw Exception("");
             toks.pop_front();
 
-            ret[std::move(left)] = right;
+            auto it = ret.find(left);
+            if(it == ret.end() || !right->IsGroup() || !it->second->IsGroup())
+                ret[std::move(left)] = right;
+            else
+                dynamic_cast<ConfigGroup*>(it->second)->Expand(right->AsGroup().GetChildren());
         }
 
         return ret;

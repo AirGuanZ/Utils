@@ -62,13 +62,25 @@ public:
  */
 class ConfigGroup : public ConfigNode
 {
-    std::unordered_map<Str8, const ConfigNode*> children_;
+    std::unordered_map<Str8, ConfigNode*> children_;
 
     const ConfigNode *FindSection(const StrView8 &k) const;
 
 public:
 
-    explicit ConfigGroup(std::unordered_map<Str8, const ConfigNode*> &&children);
+    explicit ConfigGroup(std::unordered_map<Str8, ConfigNode*> &&children);
+
+    /**
+     * 扩充内容
+     * 
+     * - 若more中内容和children_无名字相同者，则直接合并
+     * - 对名字相同者，若两个都是group，则递归地扩充该group
+     * - 对其他情况，用more中的同名ConfigNode覆盖children_中的
+     */
+    void Expand(const std::unordered_map<Str8, ConfigNode*> &more);
+
+    //! 取得所有内容
+    const std::unordered_map<Str8, ConfigNode*> GetChildren() const { return children_; }
 
 	/**
 	 * 查找具有指定路径的配置参数值

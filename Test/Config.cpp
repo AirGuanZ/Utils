@@ -31,6 +31,12 @@ Others =
     Strings = ("1", "2", "3");
     Integer = 27;
 };
+
+Window = 
+{
+    Bordered = True;
+    Visible = False;
+};
 )___";
 
 TEST_CASE("Config")
@@ -45,6 +51,8 @@ TEST_CASE("Config")
             auto &root = config.Root();
             REQUIRE(root.Find("Window.Title")->AsValue() == "AGZ Application");
             REQUIRE(root.Find("Others.Integer")->AsValue().Parse<int>() == 27);
+            REQUIRE(root["Window.Bordered"].AsValue() == "True");
+            REQUIRE(root["Window.Visible"].AsValue() == "False");
         }
     }
 }
