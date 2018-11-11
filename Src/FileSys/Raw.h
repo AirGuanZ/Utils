@@ -18,9 +18,9 @@ AGZ_FORCEINLINE void DefaultlyReleaseRawBinaryFileContent(unsigned char *ptr);
 inline bool WriteBinaryFileRaw(
 	const WStr &filename, const unsigned char *data, size_t len);
 
-inline bool ReadTextFileRaw(const WStr &filename, WStr *str);
+inline bool ReadTextFileRaw(const WStr &filename, Str8 *str);
 
-inline bool WriteTextFileRaw(const WStr &filename, const WStr &str);
+inline bool WriteTextFileRaw(const WStr &filename, const Str8 &str);
 
 /**
  * @brief 对整个文件一次进行读写的便利操作
@@ -77,7 +77,7 @@ public:
 	 *
 	 * @return 读取失败时返回false
 	 */
-	static bool ReadText(const WStr &filename, WStr *str)
+	static bool ReadText(const WStr &filename, Str8 *str)
 	{
 		return ReadTextFileRaw(filename, str);
 	}
@@ -90,7 +90,7 @@ public:
 	 *
 	 * @return 若写入遇到错误，返回false
 	 */
-	static bool WriteText(const WStr &filename, const WStr &str)
+	static bool WriteText(const WStr &filename, const Str8 &str)
 	{
 		return WriteTextFileRaw(filename, str);
 	}
@@ -133,23 +133,23 @@ inline bool WriteBinaryFileRaw(
     return true;
 }
 
-inline bool ReadTextFileRaw(const WStr &filename, WStr *str)
+inline bool ReadTextFileRaw(const WStr &filename, Str8 *str)
 {
-    std::wifstream fin(filename.ToPlatformString(), std::ios_base::in);
+    std::ifstream fin(filename.ToPlatformString(), std::ios_base::in);
     if(!fin)
         return false;
-	std::wstringstream sst;
+	std::stringstream sst;
 	sst << fin.rdbuf();
 	*str = sst.str();
     return true;
 }
 
-inline bool WriteTextFileRaw(const WStr &filename, const WStr &str)
+inline bool WriteTextFileRaw(const WStr &filename, const Str8 &str)
 {
-    std::wofstream fout(filename.ToPlatformString(), std::ios_base::out | std::ios_base::trunc);
+    std::ofstream fout(filename.ToPlatformString(), std::ios_base::out | std::ios_base::trunc);
     if(!fout)
         return false;
-    fout << str.ToStdWString();
+    fout << str.ToStdString();
     return true;
 }
 

@@ -349,11 +349,10 @@ inline bool Config::LoadFromMemory(const Str8 &src)
 
 inline bool Config::LoadFromFile(const Str8 &filename)
 {
-    WStr content;
+    Str8 content;
     if(!FileSys::ReadTextFileRaw(filename.ToStdWString(), &content))
         return false;
-
-    return LoadFromMemory(Str8(content));
+    return LoadFromMemory(content);
 }
 
 inline bool Config::IsAvailable() const

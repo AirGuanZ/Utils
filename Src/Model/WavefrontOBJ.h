@@ -115,11 +115,11 @@ public:
 	 * 
 	 * @return 加载成功时返回true
 	 */
-    static bool LoadFromMemory(const WStr &content, WavefrontObj *objs, bool ignoreUnknownLine = true);
+    static bool LoadFromMemory(const Str8 &content, WavefrontObj *objs, bool ignoreUnknownLine = true);
 
 private:
 
-    static WavefrontObj::Index ParseIndex(const WStrView &str);
+    static WavefrontObj::Index ParseIndex(const StrView8 &str);
 };
 
 inline GeometryMesh WavefrontObj::Obj::ToGeometryMesh(bool reverseNor, bool reverseTex) const
@@ -188,14 +188,14 @@ inline bool WavefrontObjFile::LoadFromObjFile(const WStr &filename, WavefrontObj
 {
     AGZ_ASSERT(objs && objs->Empty());
 
-    WStr content;
+    Str8 content;
     if(!FileSys::ReadTextFileRaw(filename, &content))
         return false;
 
     return LoadFromMemory(content, objs, ignoreUnknownLine);
 }
 
-inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *objs, bool ignoreUnknownLine)
+inline bool WavefrontObjFile::LoadFromMemory(const Str8 &content, WavefrontObj *objs, bool ignoreUnknownLine)
 {
     AGZ_ASSERT(objs && objs->Empty());
 
@@ -210,24 +210,24 @@ inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *
     try
     {
         auto lines = content.Split("\n")
-            | FilterMap([](const WStr &line) -> std::optional<WStr>
+            | FilterMap([](const Str8 &line) -> std::optional<Str8>
               {
-                  WStr ret = line.Trim();
+                  Str8 ret = line.Trim();
                   if(ret.Empty() || ret.StartsWith("#"))
                       return std::nullopt;
                   return ret;
               })
-            | Collect<std::vector<WStr>>();
+            | Collect<std::vector<Str8>>();
 
-        for(const WStr &line : lines)
+        for(const auto &line : lines)
         {
-            static thread_local WRegex oReg(
+            static thread_local Regex8 oReg(
                 R"___(o\s+&@{!\s}+&\s*)___");
-            static thread_local WRegex vReg(
+            static thread_local Regex8 vReg(
                 R"___(v\s+&@{!\s}+&\s+&@{!\s}+&\s+&@{!\s}+&(\s+@{!\s}+)?&\s*)___");
-            static thread_local WRegex vtReg(
+            static thread_local Regex8 vtReg(
                 R"___(vt\s+&@{!\s}+&\s+&@{!\s}+&(\s+@{!\s}+)?&\s*)___");
-            static thread_local WRegex vnReg(
+            static thread_local Regex8 vnReg(
                 R"___(vn\s+&@{!\s}+&\s+&@{!\s}+&\s+&@{!\s}+&\s*)___");
 
             if(auto m = oReg.Match(line); m)
@@ -309,18 +309,18 @@ inline bool WavefrontObjFile::LoadFromMemory(const WStr &content, WavefrontObj *
     return true;
 }
 
-inline WavefrontObj::Index WavefrontObjFile::ParseIndex(const WStrView &str)
+inline WavefrontObj::Index WavefrontObjFile::ParseIndex(const StrView8 &str)
 {
     WavefrontObj::Index ret = { -1, -1, -1 };
 
-    static thread_local WRegex reg0(R"___(\d+)___");
+    static thread_local Regex8 reg0(R"___(\d+)___");
     if(auto m = reg0.Match(str); m)
     {
         ret.vtx = str.Parse<int32_t>() - 1;
         return ret;
     }
 
-    static thread_local WRegex reg1(R"___(&\d+&/&\d+&)___");
+    static thread_local Regex8 reg1(R"___(&\d+&/&\d+&)___");
     if(auto m = reg1.Match(str); m)
     {
         ret.vtx = m(0, 1).Parse<int32_t>() - 1;
@@ -328,7 +328,7 @@ inline WavefrontObj::Index WavefrontObjFile::ParseIndex(const WStrView &str)
         return ret;
     }
 
-    static thread_local WRegex reg2(R"___(&\d+&/&\d*&/&\d+&)___");
+    static thread_local Regex8 reg2(R"___(&\d+&/&\d*&/&\d+&)___");
     if(auto m = reg2.Match(str); m)
     {
         ret.vtx = m(0, 1).Parse<int32_t>() - 1;

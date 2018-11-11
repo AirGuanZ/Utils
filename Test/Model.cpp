@@ -9,7 +9,7 @@ TEST_CASE("Model")
 {
     SECTION("WavefrontOBJ")
     {
-        WStr content =
+        Str8 content =
 R"___(
 # this is a comment
 # this is another comment
