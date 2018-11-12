@@ -21,14 +21,14 @@ class UniformOnUnitDisk
 {
 public:
 
-	/** 采样结果 */
+    /** 采样结果 */
     struct Result
     {
-        Vec2<T> sample;	///< 采样点
-        T pdf;			///< 采样点所对应的概率密度函数值
+        Vec2<T> sample;    ///< 采样点
+        T pdf;            ///< 采样点所对应的概率密度函数值
     };
 
-	/** 把一对[0, 1]间的随机数转换为在单位圆内的均匀采样 */
+    /** 把一对[0, 1]间的随机数转换为在单位圆内的均匀采样 */
     static Result Transform(const Vec2<T> &u)
     {
         T r = Sqrt(u.u);
@@ -36,7 +36,7 @@ public:
         return { { r * Cos(theta), r*  Sin(theta) }, PI<T> };
     }
 
-	/** 概率密度函数值 */
+    /** 概率密度函数值 */
     static T PDF()
     {
         return PI<T>;
@@ -51,14 +51,14 @@ class UniformOnUnitHemisphere
 {
 public:
 
-	/** 采样结果 */
+    /** 采样结果 */
     struct Result
     {
         Vec3<T> sample; ///< 采样点
-        T pdf;			///< 采样点对应的概率密度函数值
+        T pdf;            ///< 采样点对应的概率密度函数值
     };
 
-	/** 把一对[0, 1]间的随机数转换为单位半球面上的均匀采样 */
+    /** 把一对[0, 1]间的随机数转换为单位半球面上的均匀采样 */
     static Result Transform(const Vec2<T> &u)
     {
         T z = u.u;
@@ -69,7 +69,7 @@ public:
         return { { x, y, z }, Inv2PI<T> };
     }
 
-	/** 概率密度函数值 */
+    /** 概率密度函数值 */
     static T PDF()
     {
         return Inv2PI<T>;
@@ -84,14 +84,14 @@ class UniformOnUnitSphere
 {
 public:
 
-	/** 采样结果 */
+    /** 采样结果 */
     struct Result
     {
         Vec3<T> sample; ///< 采样点
-        T pdf;			///< 采样点对应的概率密度函数值
+        T pdf;            ///< 采样点对应的概率密度函数值
     };
 
-	/** 把一对[0, 1]间的随机数转换为单位球面上的均匀采样 */
+    /** 把一对[0, 1]间的随机数转换为单位球面上的均匀采样 */
     static Result Transform(const Vec2<T> &u)
     {
         T z = 1 - 2 * u.u;
@@ -102,7 +102,7 @@ public:
         return { { x, y, z }, Inv4PI<T> };
     }
 
-	/** 概率密度函数值 */
+    /** 概率密度函数值 */
     static T PDF()
     {
         return Inv4PI<T>;
@@ -117,14 +117,14 @@ class ZWeightedOnUnitHemisphere
 {
 public:
 
-	/** 采样结果 */
+    /** 采样结果 */
     struct Result
     {
         Vec3<T> sample; ///< 采样点
-		T pdf;			///< 采样点对应的概率密度函数值
+        T pdf;            ///< 采样点对应的概率密度函数值
     };
 
-	/** 把一对[0, 1]间的随机数转换为单位半球面上的Cos-weighed采样 */
+    /** 把一对[0, 1]间的随机数转换为单位半球面上的Cos-weighed采样 */
     static Result Transform(Vec2<T> u)
     {
         Vec2<T> sam;
@@ -149,7 +149,7 @@ public:
         return { { sam.x, sam.y, z }, z * InvPI<T> };
     }
 
-	/** 给定采样点，返回它在该采样策略中的概率密度函数值 */
+    /** 给定采样点，返回它在该采样策略中的概率密度函数值 */
     static T PDF(const Vec3<T> &sample)
     {
         return sample.z * InvPI<T>;
@@ -164,7 +164,7 @@ class UniformOnTriangle
 {
 public:
 
-	/** 将一对[0, 1]间的随机数转换为三角坐标均匀采样 */
+    /** 将一对[0, 1]间的随机数转换为三角坐标均匀采样 */
     static Vec2<T> Transform(const Vec2<T> &u)
     {
         T t = Sqrt(u.u);
@@ -180,17 +180,17 @@ class UniformOnCone
 {
 public:
 
-	/** 采样结果 */
+    /** 采样结果 */
     struct Result
     {
         Vec3<T> sample; ///< 采样点
-		T pdf;			///< 采样点对应的概率密度函数值
+        T pdf;            ///< 采样点对应的概率密度函数值
     };
 
-	/**
-	 * 把一对[0, 1]间的随机数转换为以maxCosTheta为顶角的单位球面上的锥体内的方向采样，
-	 * 且在立体角意义上是均匀的
-	 */
+    /**
+     * 把一对[0, 1]间的随机数转换为以maxCosTheta为顶角的单位球面上的锥体内的方向采样，
+     * 且在立体角意义上是均匀的
+     */
     Result Transform(T maxCosTheta, const Vec2<T> &u)
     {
         T cosTheta = (1 - u.u) + u.u * maxCosTheta;
@@ -202,7 +202,7 @@ public:
         };
     }
 
-	/** 概率密度函数值 */
+    /** 概率密度函数值 */
     static T PDF(T maxCosTheta)
     {
         return 1 / (2 * PI<T> * (1 - maxCosTheta));

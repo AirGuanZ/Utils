@@ -32,100 +32,100 @@ public:
     using Component = float;
     using Self = F32x4;
 
-	/** 所有元素默认初始化为0 */
+    /** 所有元素默认初始化为0 */
     F32x4()
         : d(_mm_setzero_ps())
     {
         
     }
 
-	/** 不对元素进行初始化 */
+    /** 不对元素进行初始化 */
     explicit F32x4(Uninitialized_t)
     {
         
     }
 
-	/** 分别初始化四个元素 */
+    /** 分别初始化四个元素 */
     F32x4(float x, float y, float z, float w)
         : d(_mm_set_ps(w, z, y, x))
     {
         
     }
 
-	/** 将所有元素初始化为同一个值 */
+    /** 将所有元素初始化为同一个值 */
     explicit F32x4(float v)
         : d(_mm_set_ps1(v))
     {
         
     }
 
-	/** 提供指向初始化数据的指针 */
+    /** 提供指向初始化数据的指针 */
     explicit F32x4(const float *data)
         : d(_mm_load_ps(data))
     {
         
     }
 
-	/** 从__m128初始化 */
+    /** 从__m128初始化 */
     explicit F32x4(const __m128 other)
         : d(other)
     {
         
     }
 
-	/** 从Vec4f初始化 */
+    /** 从Vec4f初始化 */
     explicit F32x4(const Vec4f &v)
         : d(_mm_load_ps(&v.x))
     {
 
     }
 
-	/** 值复制 */
+    /** 值复制 */
     F32x4(const Self &other)
         : d(other.d)
     {
 
     }
 
-	/** 转换为Vec4f */
-	explicit operator Vec4f() const
-	{
-		return AsVec();
-	}
+    /** 转换为Vec4f */
+    explicit operator Vec4f() const
+    {
+        return AsVec();
+    }
 
-	/** 转换为Vec4f */
+    /** 转换为Vec4f */
     Vec4f AsVec() const
     {
         return Vec4f(data);
     }
 
-	/** 值复制 */
+    /** 值复制 */
     Self &operator=(const Self &other)
     {
         d = other.d;
         return *this;
     }
 
-	/** 按下标取元素，下标范围[0, 4) */
+    /** 按下标取元素，下标范围[0, 4) */
     float &operator[](size_t idx) { AGZ_ASSERT(idx < 4); return data[idx]; }
-	/** 按下标取元素，下标范围[0, 4) */
+    /** 按下标取元素，下标范围[0, 4) */
     float operator[](size_t idx) const { AGZ_ASSERT(idx < 4); return data[idx]; }
 
-	/** 每个元素分别相加 */
+    /** 每个元素分别相加 */
     Self operator+(const Self &rhs) const { return Self(_mm_add_ps(d, rhs.d)); }
-	/** 每个元素分别相减 */
+    /** 每个元素分别相减 */
     Self operator-(const Self &rhs) const { return Self(_mm_sub_ps(d, rhs.d)); }
-	/** 每个元素分别相乘 */
+    /** 每个元素分别相乘 */
     Self operator*(const Self &rhs) const { return Self(_mm_mul_ps(d, rhs.d)); }
-	/** 每个元素分别相除 */
+    /** 每个元素分别相除 */
     Self operator/(const Self &rhs) const { return Self(_mm_div_ps(d, rhs.d)); }
 
-	/** 是否每个元素严格相等 */
-	bool operator==(const Self &rhs) const { return _mm_movemask_ps(_mm_cmpeq_ps(d, rhs.d)) == 0x0f; }
-	/** 是否存在不相等的对应元素 */
-	bool operator!=(const Self &rhs) const { return !(*this == rhs); }
+    /** 是否每个元素严格相等 */
+    bool operator==(const Self &rhs) const { return _mm_movemask_ps(_mm_cmpeq_ps(d, rhs.d)) == 0x0f; }
+    /** 是否存在不相等的对应元素 */
+    bool operator!=(const Self &rhs) const { return !(*this == rhs); }
 
-	/** 是否每个元素都比rhs的对应元素小 */
+    /** 是否每个元素都比rhs的对应元素小 */
     bool ElemwiseLessThan(const Self &rhs) const { return _mm_movemask_ps(_mm_cmplt_ps(d, rhs.d)) == 0x0f; }
 };
 

@@ -86,51 +86,51 @@ public:
         return *this;
     }
 
-	/**
-	 * @brief 匹配/搜索操作是否成功
-	 * 
-	 * @note 只有该函数结果为true时，其他的内容查询操作才合法
-	 */
+    /**
+     * @brief 匹配/搜索操作是否成功
+     * 
+     * @note 只有该函数结果为true时，其他的内容查询操作才合法
+     */
     bool Valid() const
     {
         return interval_.second <= whole_.Length();
     }
 
-	//! @copydoc Match<CS>::Valid
+    //! @copydoc Match<CS>::Valid
     operator bool() const
     {
         return Valid();
     }
 
-	//! 取得第idx个保存点所记录的码元位置
+    //! 取得第idx个保存点所记录的码元位置
     size_t operator[](size_t idx) const
     {
         AGZ_ASSERT(Valid() && idx < savePoints_.size());
         return savePoints_[idx];
     }
 
-	//! 搜索得到的子串的第一个码元的位置
+    //! 搜索得到的子串的第一个码元的位置
     size_t GetMatchedStart() const
     {
         AGZ_ASSERT(Valid());
         return interval_.first;
     }
 
-	//! 搜索得到的子串的结尾的下一个码元位置
+    //! 搜索得到的子串的结尾的下一个码元位置
     size_t GetMatchedEnd() const
     {
         AGZ_ASSERT(Valid());
         return interval_.second;
     }
 
-	//! 搜索得到的子串的码元下标范围
+    //! 搜索得到的子串的码元下标范围
     std::pair<size_t, size_t> GetMatchedInterval() const
     {
         AGZ_ASSERT(Valid());
         return interval_;
     }
 
-	//! 取得一对保存点所记录的位置间的子串
+    //! 取得一对保存点所记录的位置间的子串
     StringView<CS> operator()(size_t firstSavePoint, size_t secondSavePoint) const
     {
         AGZ_ASSERT(Valid());
@@ -140,7 +140,7 @@ public:
                             savePoints_[secondSavePoint]);
     }
 
-	//! 共定义了多少个保存点
+    //! 共定义了多少个保存点
     size_t SavePointCount() const
     {
         return savePoints_.size();
@@ -208,19 +208,19 @@ public:
 
     ~Regex() = default;
 
-	//! 用该表达式匹配整个目标字符串
+    //! 用该表达式匹配整个目标字符串
     AGZ_FORCEINLINE Result Match(const String<CS> &dst) const
     {
         return this->Match(dst.AsView());
     }
 
-	//! 在目标串中搜寻能和该表达式匹配的子串
+    //! 在目标串中搜寻能和该表达式匹配的子串
     AGZ_FORCEINLINE Result Search(const String<CS> &dst) const
     {
         return this->Search(dst.AsView());
     }
 
-	//! 用该表达式匹配整个目标字符串
+    //! 用该表达式匹配整个目标字符串
     Result Match(const StringView<CS> &dst) const
     {
         auto rt = engine_->Match(dst);
@@ -229,7 +229,7 @@ public:
         return Result(dst, { 0, dst.Length() }, std::move(rt.value()));
     }
 
-	//! 在目标串中搜寻能和该表达式匹配的子串
+    //! 在目标串中搜寻能和该表达式匹配的子串
     Result Search(const StringView<CS> &dst) const
     {
         auto rt = engine_->Search(dst);
@@ -238,7 +238,7 @@ public:
         return Result(dst, rt.value().first, std::move(rt.value().second));
     }
 
-	//! 搜索能匹配该表达式的目标串前缀
+    //! 搜索能匹配该表达式的目标串前缀
     Result SearchPrefix(const StringView<CS> &dst) const
     {
         auto rt = engine_->SearchPrefix(dst);
@@ -247,7 +247,7 @@ public:
         return Result(dst, rt.value().first, std::move(rt.value().second));
     }
 
-	//! 搜索能匹配该表达式的目标串后缀
+    //! 搜索能匹配该表达式的目标串后缀
     Result SearchSuffix(const StringView<CS> &dst) const
     {
         auto rt = engine_->SearchSuffix(dst);

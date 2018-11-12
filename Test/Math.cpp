@@ -110,18 +110,18 @@ TEST_CASE("Math")
                          1e-5f));
     }
 #if defined(AGZ_USE_AVX)
-	SECTION("D64x4")
-	{
-		D64x4 a(1.0, 2.0, 3.0, 4.0);
-		D64x4 b(2.0, 3.0, 4.0, 5.0);
+    SECTION("D64x4")
+    {
+        D64x4 a(1.0, 2.0, 3.0, 4.0);
+        D64x4 b(2.0, 3.0, 4.0, 5.0);
 
-		REQUIRE(ApproxEq(a + b, D64x4(3.0, 5.0, 7.0, 9.0), 1e-7));
+        REQUIRE(ApproxEq(a + b, D64x4(3.0, 5.0, 7.0, 9.0), 1e-7));
 
-		REQUIRE(ApproxEq(Sqrt(D64x4(4.0, 3.0, 2.0, 1.0)).AsVec(),
-						 Vec4d(4.0, 3.0, 2.0, 1.0).Map(
-							[](double x) { return Sqrt(x); }),
-						 1e-5));
-	}
+        REQUIRE(ApproxEq(Sqrt(D64x4(4.0, 3.0, 2.0, 1.0)).AsVec(),
+                         Vec4d(4.0, 3.0, 2.0, 1.0).Map(
+                            [](double x) { return Sqrt(x); }),
+                         1e-5));
+    }
 #endif
     SECTION("Quaternion")
     {

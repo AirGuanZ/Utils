@@ -13,11 +13,11 @@ namespace AGZ::Math {
 
 namespace Impl
 {
-	template<typename T> struct Abs_impl;
-	template<>           struct Abs_impl<float> { static float  Abs(float v) { return std::abs(v); } };
-	template<>           struct Abs_impl<double> { static double Abs(double v) { return std::fabs(v); } };
-	template<typename T> struct Abs_impl<Rad<T>> { static Rad<T> Abs(Rad<T> v) { return Rad<T>{ Abs_impl<T>::Abs(v.value) }; } };
-	template<typename T> struct Abs_impl<Deg<T>> { static Deg<T> Abs(Deg<T> v) { return Deg<T>{ Abs_impl<T>::Abs(v.value) }; } };
+    template<typename T> struct Abs_impl;
+    template<>           struct Abs_impl<float> { static float  Abs(float v) { return std::abs(v); } };
+    template<>           struct Abs_impl<double> { static double Abs(double v) { return std::fabs(v); } };
+    template<typename T> struct Abs_impl<Rad<T>> { static Rad<T> Abs(Rad<T> v) { return Rad<T>{ Abs_impl<T>::Abs(v.value) }; } };
+    template<typename T> struct Abs_impl<Deg<T>> { static Deg<T> Abs(Deg<T> v) { return Deg<T>{ Abs_impl<T>::Abs(v.value) }; } };
 }
 
 template<typename T> T Abs(T v) { return Impl::Abs_impl<T>::Abs(v); }
@@ -115,71 +115,71 @@ public:
     constexpr FP(F v) : float_(v) { }
     explicit FP(Uninitialized_t) { }
 
-	/**
-	 * 正无穷
-	 */
+    /**
+     * 正无穷
+     */
     static Self Infinity() { return Bits2Value(EXPT_BIT_MASK); }
     
-	/**
-	 * 最大值
-	 */
-	static Self Max()      { return (std::numeric_limits<ValueType>::max)(); }
+    /**
+     * 最大值
+     */
+    static Self Max()      { return (std::numeric_limits<ValueType>::max)(); }
     
-	/**
-	 * 最小值
-	 */
-	static Self Min()      { return (std::numeric_limits<ValueType>::lowest()); }
+    /**
+     * 最小值
+     */
+    static Self Min()      { return (std::numeric_limits<ValueType>::lowest()); }
 
-	/**
-	 * 取得浮点值
-	 */
+    /**
+     * 取得浮点值
+     */
     ValueType Value()   const { return float_; }
 
-	/**
-	 * 取得无符号整数表示
-	 */
+    /**
+     * 取得无符号整数表示
+     */
     InternalUInt Bits() const { return uint_; }
 
-	/**
-	 * 取得尾数
-	 */
+    /**
+     * 取得尾数
+     */
     InternalUInt ExptBits() const { return EXPT_BIT_MASK & uint_; }
     
-	/**
-	 * 取得阶码
-	 */
-	InternalUInt FracBits() const { return FRAC_BIT_MASK & uint_; }
+    /**
+     * 取得阶码
+     */
+    InternalUInt FracBits() const { return FRAC_BIT_MASK & uint_; }
     
-	/**
-	 * 取得符号位
-	 */
-	InternalUInt SignBit()  const { return SIGN_BIT_MASK & uint_; }
+    /**
+     * 取得符号位
+     */
+    InternalUInt SignBit()  const { return SIGN_BIT_MASK & uint_; }
 
     operator ValueType() const { return Value(); }
 
-	/**
-	 * 是否是NAN
-	 */
+    /**
+     * 是否是NAN
+     */
     bool IsNAN()      const { return ExptBits() == EXPT_BIT_MASK && FracBits(); }
     
-	/**
-	 * 是否是正无穷或负无穷
-	 */
-	bool IsInfinity() const { return ExptBits() == EXPT_BIT_MASK && !FracBits(); }
+    /**
+     * 是否是正无穷或负无穷
+     */
+    bool IsInfinity() const { return ExptBits() == EXPT_BIT_MASK && !FracBits(); }
     
-	/**
-	 * 是否是负数/-0
-	 */
-	bool IsNegative() const { return SignBit() != 0; }
+    /**
+     * 是否是负数/-0
+     */
+    bool IsNegative() const { return SignBit() != 0; }
 
     static constexpr size_t DefaultEqEpsilon() { return DEFAULT_MAX_ULP; }
 
-	/**
-	 * 是否和另一个数近似相等
-	 * 
-	 * @param rhs 进行近似比较的数值
-	 * @param maxULPs 近似阈值，以两个数之间最大容许的可能的取值数量表示
-	 */
+    /**
+     * 是否和另一个数近似相等
+     * 
+     * @param rhs 进行近似比较的数值
+     * @param maxULPs 近似阈值，以两个数之间最大容许的可能的取值数量表示
+     */
     bool ApproxEq(Self rhs, size_t maxULPs = DEFAULT_MAX_ULP) const
     {
         if(IsNegative() != rhs.IsNegative())

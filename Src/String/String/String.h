@@ -90,11 +90,11 @@ class Storage
     CU *GetSmallMutableData();
     CU *GetLargeMutableData();
 
-	bool IsSmallStorage() const;
-	bool IsLargeStorage() const;
+    bool IsSmallStorage() const;
+    bool IsLargeStorage() const;
 
-	size_t GetSmallLength() const;
-	size_t GetLargeLength() const;
+    size_t GetSmallLength() const;
+    size_t GetLargeLength() const;
 
 public:
 
@@ -102,14 +102,14 @@ public:
 
     static_assert(std::is_trivially_copyable_v<CU>);
 
-	//! 取得可变缓存指针，仅限String内部使用
+    //! 取得可变缓存指针，仅限String内部使用
     CU *GetMutableData();
 
-	//! 准备长度为len的缓存，但不初始化其内容
+    //! 准备长度为len的缓存，但不初始化其内容
     explicit Storage(size_t len);
-	//! 准备长度为len的缓存，并用data初始化它
+    //! 准备长度为len的缓存，并用data初始化它
     Storage(const CU *data, size_t len);
-	//! 准备合适长度的缓存，保存[beg, end)间的内容
+    //! 准备合适长度的缓存，保存[beg, end)间的内容
     Storage(const CU *beg, const CU *end);
 
     Storage(const Self &copyFrom);
@@ -121,12 +121,12 @@ public:
     Self &operator=(const Self &copyFrom);
     Self &operator=(Self &&moveFrom) noexcept;
 
-	//! 取得缓存大小
+    //! 取得缓存大小
     size_t GetLength() const;
 
-	//! 取得首元素指针
+    //! 取得首元素指针
     const CU *Begin() const;
-	//! 取得最后一个元素的下一个元素的指针
+    //! 取得最后一个元素的下一个元素的指针
     const CU *End() const;
 
     std::pair<const CU*, size_t> BeginAndLength() const;
@@ -200,17 +200,17 @@ public:
     using CodePoint = typename CS::CodePoint;
     using Iterator  = GetIteratorType<CS>;
 
-	//! 用beg和end初始化该range，此时range中仅保存首尾指针
+    //! 用beg和end初始化该range，此时range中仅保存首尾指针
     CodePointRange(const CodeUnit *beg, const CodeUnit *end);
 
-	//! range中会保存整个字符串的内容
+    //! range中会保存整个字符串的内容
     CodePointRange(const String<CS> &str, const CodeUnit *beg,
                                           const CodeUnit *end);
 
     Iterator begin() const;
     Iterator end()   const;
 
-	//! 给定码点迭代器，求它的第一个码元在该range的码元中的下标
+    //! 给定码点迭代器，求它的第一个码元在该range的码元中的下标
     size_t CodeUnitIndex(const Iterator &it) const
     {
         return CS::CodeUnitsBeginFromCodePointIterator(it) - beg_;
@@ -229,9 +229,9 @@ class StringView
 
 public:
 
-	/**
-	 * @brief 可以以小字符串的形式遍历整个字符串中单个字符（码点）的range对象
-	 */
+    /**
+     * @brief 可以以小字符串的形式遍历整个字符串中单个字符（码点）的range对象
+     */
     class CharRange
     {
         using InIt = GetIteratorType<CS>;
@@ -290,171 +290,171 @@ public:
 
     static constexpr size_t NPOS = std::numeric_limits<size_t>::max();
 
-	//! 取某个字符串的视图
+    //! 取某个字符串的视图
     StringView(const Str &str);
-	//! 取某字符串的子串视图，并将该串缓存到视图中
+    //! 取某字符串的子串视图，并将该串缓存到视图中
     StringView(const Str &str, const CodeUnit *beg, size_t len);
-	//! 取某字符串的子串视图，并将该串缓存到视图中
+    //! 取某字符串的子串视图，并将该串缓存到视图中
     StringView(const Str &str, size_t begIdx, size_t endIdx);
 
-    StringView()				  = delete;
-    StringView(const Self &)	  = default;
-    ~StringView()				  = default;
+    StringView()                  = delete;
+    StringView(const Self &)      = default;
+    ~StringView()                  = default;
     Self &operator=(const Self &) = default;
 
-	//! 转换为对应的String
+    //! 转换为对应的String
     Str AsString() const;
 
-	//! 取得内部保存的码元数据
+    //! 取得内部保存的码元数据
     const CodeUnit *Data() const;
-	//! 取得内部保存的码元数据以及长度
+    //! 取得内部保存的码元数据以及长度
     std::pair<const CodeUnit*, size_t> DataAndLength() const;
 
-	//! 码元数量
+    //! 码元数量
     size_t Length() const;
-	//! 是否为空串
+    //! 是否为空串
     bool Empty()    const;
 
-	//! 以给定进制转换为指定类型的整数
+    //! 以给定进制转换为指定类型的整数
     template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
     T Parse(unsigned base = 10) const;
 
-	//! 转换为指定类型的浮点数
+    //! 转换为指定类型的浮点数
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
     T Parse() const;
 
-	//! 返回消除左侧空白字符后的字符串
+    //! 返回消除左侧空白字符后的字符串
     Self Trim()      const;
-	//! 返回消除右侧空白字符后的字符串
+    //! 返回消除右侧空白字符后的字符串
     Self TrimLeft()  const;
-	//! 返回消除两侧空白字符后的字符串
+    //! 返回消除两侧空白字符后的字符串
     Self TrimRight() const;
 
-	//! 返回从以begIdx为下标的码元开始，直到结尾的子串
+    //! 返回从以begIdx为下标的码元开始，直到结尾的子串
     Self Slice(size_t begIdx)                const;
-	//! 返回下标范围位于[begIdx, endIdx)间的码元构成的子串
+    //! 返回下标范围位于[begIdx, endIdx)间的码元构成的子串
     Self Slice(size_t begIdx, size_t endIdx) const;
 
-	//! 返回前n个码元构成的子串
+    //! 返回前n个码元构成的子串
     Self Prefix(size_t n) const;
-	//! 返回后n个码元构成的子串
+    //! 返回后n个码元构成的子串
     Self Suffix(size_t n) const;
 
-	//! 是否以给定的字符串开头
+    //! 是否以给定的字符串开头
     bool StartsWith(const Self &s) const;
-	//! 是否以给定的字符串开头
+    //! 是否以给定的字符串开头
     bool StartsWith(const Str &s)  const { return StartsWith(s.AsView()); }
 
-	//! 是否以给定的字符串结尾
+    //! 是否以给定的字符串结尾
     bool EndsWith(const Self &s) const;
-	//! 是否以给定的字符串结尾
+    //! 是否以给定的字符串结尾
     bool EndsWith(const Str &s)  const { return EndsWith(s.AsView()); }
 
-	//! 是否是单个数字字符
+    //! 是否是单个数字字符
     bool IsDigit(unsigned int base = 10)  const;
-	//! 是否是数字串
+    //! 是否是数字串
     bool IsDigits(unsigned int base = 10) const;
 
-	//! 是否是单个英文字母
+    //! 是否是单个英文字母
     bool IsAlpha()  const;
-	//! 是否是英文字母串
+    //! 是否是英文字母串
     bool IsAlphas() const;
 
-	//! 是否是单个数字/英文字母
+    //! 是否是单个数字/英文字母
     bool IsAlnum(unsigned int base = 10)  const;
-	//! 是否是数字/英文字母串
+    //! 是否是数字/英文字母串
     bool IsAlnums(unsigned int base = 10) const;
 
-	//! 是否是单个大写英文字母
+    //! 是否是单个大写英文字母
     bool IsUpper()  const;
-	//! 是否是大写字母串
+    //! 是否是大写字母串
     bool IsUppers() const;
 
-	//! 是否是单个小写字母
+    //! 是否是单个小写字母
     bool IsLower()  const;
-	//! 是否是小写字母串
+    //! 是否是小写字母串
     bool IsLowers() const;
 
-	//! 是否是单个空白字符
+    //! 是否是单个空白字符
     bool IsWhitespace()  const;
-	//! 是否是空白字符串
+    //! 是否是空白字符串
     bool IsWhitespaces() const;
 
-	//! 是否是ASCII字符串
+    //! 是否是ASCII字符串
     bool IsASCII() const;
 
-	//! 将小写英文字母转换为大写，其余字符不变
+    //! 将小写英文字母转换为大写，其余字符不变
     Str ToUpper()  const;
-	//! 将大写英文字母转换为小写，其余字符不变
+    //! 将大写英文字母转换为小写，其余字符不变
     Str ToLower()  const;
-	//! 将英文字母大小写互换，其余字符不变
+    //! 将英文字母大小写互换，其余字符不变
     Str SwapCase() const;
 
-	//! 以空白字符为分隔符拆分此串
+    //! 以空白字符为分隔符拆分此串
     std::vector<Self> Split()                    const;
-	//! 以给定的字符串为分隔符拆分此串
+    //! 以给定的字符串为分隔符拆分此串
     std::vector<Self> Split(const Self &spliter) const;
-	//! 以给定的字符串为分隔符拆分此串
+    //! 以给定的字符串为分隔符拆分此串
     std::vector<Self> Split(const Str &spliter)  const { return Split(spliter.AsView()); }
 
-	//! 以给定的字符串集合中的任意一个为分隔符拆分此串
+    //! 以给定的字符串集合中的任意一个为分隔符拆分此串
     template<typename C, std::enable_if_t<!std::is_array_v<C>, int> = 0,
                          typename = std::void_t<decltype(std::declval<C>().begin())>>
     std::vector<Self> Split(const C &spliters) const;
 
-	//! 以自己为分隔符连接一个字符串range中的所有元素
+    //! 以自己为分隔符连接一个字符串range中的所有元素
     template<typename R>
     Str Join(R &&strRange) const;
 
-	/**
-	 * @brief 从以begIdx为下标的码元开始查找子串
-	 * 
-	 * @return 查找失败时返回NPOS
-	 */
+    /**
+     * @brief 从以begIdx为下标的码元开始查找子串
+     * 
+     * @return 查找失败时返回NPOS
+     */
     size_t Find(const Self &dst, size_t begIdx = 0) const;
-	//! @copydoc StringView<CS>::Find(const StringView<CS>&, size_t) const
+    //! @copydoc StringView<CS>::Find(const StringView<CS>&, size_t) const
     size_t Find(const Str &dst, size_t begIdx = 0)  const { return Find(dst.AsView(), begIdx); }
 
-	/**
-	 * @brief 查找第一个满足给定谓词的码点的第一个码元的下标
-	 * 
-	 * @return 查找失败时返回NPOS
-	 */
+    /**
+     * @brief 查找第一个满足给定谓词的码点的第一个码元的下标
+     * 
+     * @return 查找失败时返回NPOS
+     */
     template<typename F>
     size_t FindCPIf(F &&f) const;
 
-	//! 用于遍历码点的range对象
+    //! 用于遍历码点的range对象
     CodePointRange<CS> CodePoints() const &  { return CodePointRange<CS>(beg_, beg_ + len_); }
-	//! 用于遍历码点的range对象
-	CodePointRange<CS> CodePoints() const && { return CodePointRange<CS>(*str_, beg_, beg_ + len_); }
+    //! 用于遍历码点的range对象
+    CodePointRange<CS> CodePoints() const && { return CodePointRange<CS>(*str_, beg_, beg_ + len_); }
 
-	//! 用于以子串形式遍历字符串中每个字符的range对象
+    //! 用于以子串形式遍历字符串中每个字符的range对象
     CharRange Chars() const &  { return CharRange(beg_, beg_ + len_); }
-	//! 用于以子串形式遍历字符串中每个字符的range对象
+    //! 用于以子串形式遍历字符串中每个字符的range对象
     CharRange Chars() const && { return CharRange(*str_, beg_, beg_ + len_); }
 
-	//! 转换为指定编码的std::string，默认使用UTF-8
+    //! 转换为指定编码的std::string，默认使用UTF-8
     std::string ToStdString(NativeCharset cs = NativeCharset::UTF8)  const;
     //! 转换为宽字符串，默认编码和平台有关
-	std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const;
+    std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const;
 
 #if defined(AGZ_OS_WIN32)
-	//! 转换为平台默认使用的字符串
+    //! 转换为平台默认使用的字符串
     std::wstring ToPlatformString() const { return ToStdWString(); }
 #else
-	//! 转换为平台默认使用的字符串
+    //! 转换为平台默认使用的字符串
     std::string ToPlatformString() const { return ToStdString(); }
 #endif
 
-	//! 用于码元遍历的头部迭代器
+    //! 用于码元遍历的头部迭代器
     Iterator begin() const;
-	//! 用于码元遍历的尾部迭代器
+    //! 用于码元遍历的尾部迭代器
     Iterator end()   const;
 
-	//! 和其他字符串连接产生新串
+    //! 和其他字符串连接产生新串
     Str operator+(const Self &rhs) const;
 
-	/** 逐码元严格相等 */
+    /** 逐码元严格相等 */
     bool operator==(const Self &rhs) const;
     bool operator!=(const Self &rhs) const;
     bool operator< (const Self &rhs) const;
@@ -490,12 +490,12 @@ class String
 
 public:
 
-    using Charset   = CS;					  ///< 字符编码方案
+    using Charset   = CS;                      ///< 字符编码方案
     using CodeUnit  = typename CS::CodeUnit;  ///< 码元类型
     using CodePoint = typename CS::CodePoint; ///< 码点类型
-    using Builder   = StringBuilder<CS>;	  ///< 字符串构造器
-    using View      = StringView<CS>;		  ///< 视图类型
-    using Self      = String<CS>;			  ///< 自身类型
+    using Builder   = StringBuilder<CS>;      ///< 字符串构造器
+    using View      = StringView<CS>;          ///< 视图类型
+    using Self      = String<CS>;              ///< 自身类型
 
     using CharRange = typename View::CharRange; ///< 以字符形式遍历码点的range类型
 
@@ -505,36 +505,36 @@ public:
 
     String();
 
-	//! 将字符串初始化为n个相同字符
+    //! 将字符串初始化为n个相同字符
     explicit String(CodePoint cp, size_t count = 1);
-	//! 从视图构造字符串
+    //! 从视图构造字符串
     String(const View &view);
-	//! 用给定的一段码元初始化字符串
+    //! 用给定的一段码元初始化字符串
     String(const CodeUnit *beg, size_t len);
-	//! 用给定的一段码元初始化字符串
+    //! 用给定的一段码元初始化字符串
     String(const CodeUnit *beg, const CodeUnit *end);
-	//! 以另一个字符串中的一段码元初始化字符串
+    //! 以另一个字符串中的一段码元初始化字符串
     String(const Self &copyFrom, size_t begIdx, size_t endIdx);
 
-	//! 从C-style字符串中初始化，缺省认为输入串使用UTF-8编码
+    //! 从C-style字符串中初始化，缺省认为输入串使用UTF-8编码
     String(const char *cstr, NativeCharset cs = NativeCharset::UTF8);
-	//! 从std::string中初始化，缺省认为输入串使用UTF-8编码
+    //! 从std::string中初始化，缺省认为输入串使用UTF-8编码
     String(const std::string &cppStr, NativeCharset cs = NativeCharset::UTF8);
 
-	//! 从C-style宽字符串中初始化，缺省认为输入串使用WUTF编码
+    //! 从C-style宽字符串中初始化，缺省认为输入串使用WUTF编码
     String(const wchar_t *cstr, NativeCharset cs = NativeCharset::WUTF);
-	//! 从std::wstring中初始化，缺省认为输入串使用WUTF编码
+    //! 从std::wstring中初始化，缺省认为输入串使用WUTF编码
     String(const std::wstring &cppStr, NativeCharset cs = NativeCharset::WUTF);
 
     String(const Self &copyFrom);
     String(Self &&moveFrom) noexcept;
 
-	//! 从使用其他编码方案的字符串中初始化，会自动进行编码转换
+    //! 从使用其他编码方案的字符串中初始化，会自动进行编码转换
     template<typename OCS, std::enable_if_t<!std::is_same_v<CS, OCS>, int> = 0>
     explicit String(const StringView<OCS> &convertFrom);
 
-	//! 从使用其他编码方案的字符串中初始化，会自动进行编码转换
-	template<typename OCS, std::enable_if_t<!std::is_same_v<CS, OCS>, int> = 0>
+    //! 从使用其他编码方案的字符串中初始化，会自动进行编码转换
+    template<typename OCS, std::enable_if_t<!std::is_same_v<CS, OCS>, int> = 0>
     explicit String(const String<OCS> &convertFrom): Self(convertFrom.AsView()) {  }
 
     ~String() = default;
@@ -542,70 +542,70 @@ public:
     Self &operator=(const Self &copyFrom);
     Self &operator=(Self &&moveFrom) noexcept;
 
-	/**
-	 * @brief 将整数转换为字符串
-	 * 
-	 * @param v 待转换的整数值
-	 * @param base 转换所使用的进制，缺省为10
-	 */
+    /**
+     * @brief 将整数转换为字符串
+     * 
+     * @param v 待转换的整数值
+     * @param base 转换所使用的进制，缺省为10
+     */
     static Self From(char               v, unsigned int base = 10);
-	/**
-	 * 见 String<CS>::From(char, unsigned int)
-	 */
+    /**
+     * 见 String<CS>::From(char, unsigned int)
+     */
     static Self From(signed char        v, unsigned int base = 10);
-	/**
-	 * 见 String::From(char, unsigned int)
-	 */
+    /**
+     * 见 String::From(char, unsigned int)
+     */
     static Self From(unsigned char      v, unsigned int base = 10);
-	/**
-	 * 见 String<CS>::From(char, unsigned int)
-	 */
+    /**
+     * 见 String<CS>::From(char, unsigned int)
+     */
     static Self From(short              v, unsigned int base = 10);
-	/**
-	 * 见 String<CS>::From(char, unsigned int)
-	 */
+    /**
+     * 见 String<CS>::From(char, unsigned int)
+     */
     static Self From(unsigned short     v, unsigned int base = 10);
-	/**
-	 * 见 String<CS>::From(char, unsigned int)
-	 */
+    /**
+     * 见 String<CS>::From(char, unsigned int)
+     */
     static Self From(int                v, unsigned int base = 10);
-	/**
-	 * 见 String<CS>::From(char, unsigned int)
-	 */
+    /**
+     * 见 String<CS>::From(char, unsigned int)
+     */
     static Self From(unsigned int       v, unsigned int base = 10);
-	/**
-	 * 见 String<CS>::From(char, unsigned int)
-	 */
+    /**
+     * 见 String<CS>::From(char, unsigned int)
+     */
     static Self From(long               v, unsigned int base = 10);
-	/**
-	 * 见 String<CS>::From(char, unsigned int)
-	 */
+    /**
+     * 见 String<CS>::From(char, unsigned int)
+     */
     static Self From(unsigned long      v, unsigned int base = 10);
-	/**
-	 * 见 String<CS>::From(char, unsigned int)
-	 */
+    /**
+     * 见 String<CS>::From(char, unsigned int)
+     */
     static Self From(long long          v, unsigned int base = 10);
-	/**
-	 * 见 String<CS>::From(char, unsigned int)
-	 */
+    /**
+     * 见 String<CS>::From(char, unsigned int)
+     */
     static Self From(unsigned long long v, unsigned int base = 10);
 
-	/**
-	 * @brief 将字符串转换为整数值
-	 * 
-	 * @param base 转换所使用的进制，缺省为10
-	 */
+    /**
+     * @brief 将字符串转换为整数值
+     * 
+     * @param base 转换所使用的进制，缺省为10
+     */
     template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
     T Parse(unsigned int base = 10) const { return AsView().template Parse<T>(base); }
 
-	//! 将字符串转换为浮点数
+    //! 将字符串转换为浮点数
     template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
     T Parse() const { return AsView().template Parse<T>(); }
 
-	//! 取得自己的视图
+    //! 取得自己的视图
     View AsView() const;
 
-	//! 取得自己所存储的码元指针和数量
+    //! 取得自己所存储的码元指针和数量
     const CodeUnit *Data() const;
     std::pair<const CodeUnit*, size_t> DataAndLength() const;
 
@@ -737,33 +737,33 @@ public:
 
     using Self = StringBuilder<CS>;
 
-	/**
-	 * @brief 将给定视图的内容追加到正在构建的字符串末尾
-	 * 
-	 * @param view 被追加的视图
-	 * @param n 追加重复次数，缺省为1
-	 */
+    /**
+     * @brief 将给定视图的内容追加到正在构建的字符串末尾
+     * 
+     * @param view 被追加的视图
+     * @param n 追加重复次数，缺省为1
+     */
     Self &Append(const StringView<CS> &view, size_t n = 1);
-	/**
-	 * @brief 将给定字符串追加到正在构建的字符串末尾
-	 *
-	 * @param str 被追加的字符串
-	 * @param n 追加重复次数，缺省为1
-	 */
+    /**
+     * @brief 将给定字符串追加到正在构建的字符串末尾
+     *
+     * @param str 被追加的字符串
+     * @param n 追加重复次数，缺省为1
+     */
     Self &Append(const String<CS> &str, size_t n = 1);
 
-	//! 将给定视图的内容追加到正在构建的字符串末尾
+    //! 将给定视图的内容追加到正在构建的字符串末尾
     Self &operator<<(const StringView<CS> &view);
-	//! 将给定字符串追加到正在构建的字符串末尾
-	Self &operator<<(const String<CS> &view) { return *this << view.AsView(); }
+    //! 将给定字符串追加到正在构建的字符串末尾
+    Self &operator<<(const String<CS> &view) { return *this << view.AsView(); }
 
-	//! 取得被构建的字符串
+    //! 取得被构建的字符串
     String<CS> Get() const;
 
-	//! 是否包含任何正在被构建的字符串
+    //! 是否包含任何正在被构建的字符串
     bool Empty() const { return strs_.empty(); }
 
-	//! 清空正在被构建的字符串
+    //! 清空正在被构建的字符串
     void Clear() { strs_.clear(); }
 };
 
@@ -774,11 +774,11 @@ class CharsetConvertor
 {
 public:
 
-	//! 将以SCS方案编码的字符串视图转换为以DCS方案编码的字符串
+    //! 将以SCS方案编码的字符串视图转换为以DCS方案编码的字符串
     template<typename DCS, typename SCS>
     static String<DCS> Convert(const typename String<SCS>::View &src);
 
-	//! 将以SCS方案编码的字符串转换为以DCS方案编码的字符串
+    //! 将以SCS方案编码的字符串转换为以DCS方案编码的字符串
     template<typename DCS, typename SCS>
     static String<DCS> Convert(const String<SCS> &src) { return Convert<DCS, SCS>(src.AsView()); }
 };
@@ -801,15 +801,15 @@ using Str8  = String<UTF8<>>;  ///< 以UTF-8编码的字符串
 using Str16 = String<UTF16<>>; ///< 以UTF-16编码的字符串
 using Str32 = String<UTF32<>>; ///< 以UTF-32编码的字符串
 using AStr  = String<ASCII<>>; ///< 以ASCII编码的字符串
-using WStr  = String<WUTF>;	   ///< 以宽字符编码（平台相关）的字符串
-using PStr  = String<PUTF>;	   ///< 平台缺省使用的字符串
+using WStr  = String<WUTF>;       ///< 以宽字符编码（平台相关）的字符串
+using PStr  = String<PUTF>;       ///< 平台缺省使用的字符串
 
 using StrView8  = StringView<UTF8<>>;  ///< 以UTF-8编码的字符串视图
 using StrView16 = StringView<UTF16<>>; ///< 以UTF-16编码的字符串视图
 using StrView32 = StringView<UTF32<>>; ///< 以UTF-32编码的字符串视图
 using AStrView  = StringView<ASCII<>>; ///< 以ASCII编码的字符串视图
-using WStrView  = StringView<WUTF>;	   ///< 以宽字符编码（平台相关）的字符串视图
-using PStrView  = StringView<PUTF>;	   ///< 平台缺省使用的字符串视图
+using WStrView  = StringView<WUTF>;       ///< 以宽字符编码（平台相关）的字符串视图
+using PStrView  = StringView<PUTF>;       ///< 平台缺省使用的字符串视图
 
 using CSConv = StrImpl::CharsetConvertor;
 

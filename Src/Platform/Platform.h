@@ -11,9 +11,9 @@ class Platform
 {
 public:
 
-	/**
-	 * 取得当前工作目录（绝对路径）
-	 */
+    /**
+     * 取得当前工作目录（绝对路径）
+     */
     static WStr GetWorkingDirectory();
 };
 

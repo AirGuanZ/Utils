@@ -9,31 +9,31 @@ namespace AGZ::Math {
 
 namespace Impl
 {
-	template<typename T> struct PI_impl;
-	template<>           struct PI_impl<float> { static constexpr float  PI() { return 3.141592653589793238462643383f; } };
-	template<>           struct PI_impl<double> { static constexpr double PI() { return 3.141592653589793238462643383; } };
-	template<typename T> struct PI_impl<Rad<T>> { static constexpr Rad<T> PI() { return Rad<T>{ PI_impl<T>::PI() }; } };
-	template<typename T> struct PI_impl<Deg<T>> { static constexpr Deg<T> PI() { return Deg<T>{ T(180.0) }; } };
+    template<typename T> struct PI_impl;
+    template<>           struct PI_impl<float> { static constexpr float  PI() { return 3.141592653589793238462643383f; } };
+    template<>           struct PI_impl<double> { static constexpr double PI() { return 3.141592653589793238462643383; } };
+    template<typename T> struct PI_impl<Rad<T>> { static constexpr Rad<T> PI() { return Rad<T>{ PI_impl<T>::PI() }; } };
+    template<typename T> struct PI_impl<Deg<T>> { static constexpr Deg<T> PI() { return Deg<T>{ T(180.0) }; } };
 
-	template<typename T> T Sin_rawimpl(T);
-	template<>           AGZ_INLINE float  Sin_rawimpl<float>(float rad) { return std::sin(rad); }
-	template<>           AGZ_INLINE double Sin_rawimpl<double>(double rad) { return std::sin(rad); }
+    template<typename T> T Sin_rawimpl(T);
+    template<>           AGZ_INLINE float  Sin_rawimpl<float>(float rad) { return std::sin(rad); }
+    template<>           AGZ_INLINE double Sin_rawimpl<double>(double rad) { return std::sin(rad); }
 
-	template<typename T> T Cos_rawimpl(T);
-	template<>           AGZ_INLINE float  Cos_rawimpl<float>(float rad) { return std::cos(rad); }
-	template<>           AGZ_INLINE double Cos_rawimpl<double>(double rad) { return std::cos(rad); }
+    template<typename T> T Cos_rawimpl(T);
+    template<>           AGZ_INLINE float  Cos_rawimpl<float>(float rad) { return std::cos(rad); }
+    template<>           AGZ_INLINE double Cos_rawimpl<double>(double rad) { return std::cos(rad); }
 
-	template<typename T> struct Sin_impl;
-	template<>           struct Sin_impl<float> { static auto Sin(float rad)   { return Sin_rawimpl<float>(rad); } };
-	template<>           struct Sin_impl<double> { static auto Sin(double rad) { return Sin_rawimpl<double>(rad); } };
-	template<typename T> struct Sin_impl<Rad<T>> { static auto Sin(Rad<T> rad) { return Sin_rawimpl<T>(rad.value); } };
-	template<typename T> struct Sin_impl<Deg<T>> { static auto Sin(Deg<T> deg) { return Sin_rawimpl<T>(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
+    template<typename T> struct Sin_impl;
+    template<>           struct Sin_impl<float> { static auto Sin(float rad)   { return Sin_rawimpl<float>(rad); } };
+    template<>           struct Sin_impl<double> { static auto Sin(double rad) { return Sin_rawimpl<double>(rad); } };
+    template<typename T> struct Sin_impl<Rad<T>> { static auto Sin(Rad<T> rad) { return Sin_rawimpl<T>(rad.value); } };
+    template<typename T> struct Sin_impl<Deg<T>> { static auto Sin(Deg<T> deg) { return Sin_rawimpl<T>(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
 
-	template<typename T> struct Cos_impl;
-	template<>           struct Cos_impl<float> { static auto Cos(float rad) { return Cos_rawimpl<float>(rad); } };
-	template<>           struct Cos_impl<double> { static auto Cos(double rad) { return Cos_rawimpl<double>(rad); } };
-	template<typename T> struct Cos_impl<Rad<T>> { static auto Cos(Rad<T> rad) { return Cos_rawimpl<T>(rad.value); } };
-	template<typename T> struct Cos_impl<Deg<T>> { static auto Cos(Deg<T> deg) { return Cos_rawimpl<T>(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
+    template<typename T> struct Cos_impl;
+    template<>           struct Cos_impl<float> { static auto Cos(float rad) { return Cos_rawimpl<float>(rad); } };
+    template<>           struct Cos_impl<double> { static auto Cos(double rad) { return Cos_rawimpl<double>(rad); } };
+    template<typename T> struct Cos_impl<Rad<T>> { static auto Cos(Rad<T> rad) { return Cos_rawimpl<T>(rad.value); } };
+    template<typename T> struct Cos_impl<Deg<T>> { static auto Cos(Deg<T> deg) { return Cos_rawimpl<T>(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
 }
 
 template<typename T> constexpr auto Deg2Rad(Deg<T> deg) { return Rad<T> { deg.value * (Impl::PI_impl<T>::PI() / T(180.0)) }; }

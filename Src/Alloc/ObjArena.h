@@ -90,11 +90,11 @@ class ObjArena : public Uncopiable
 
 public:
 
-	/**
-	 * @param chunkDataSize 每次预分配块中有多少可用字节，默认为1024
-	 * 
-	 * @exception ArgumentException 参数非法时抛出
-	 */
+    /**
+     * @param chunkDataSize 每次预分配块中有多少可用字节，默认为1024
+     * 
+     * @exception ArgumentException 参数非法时抛出
+     */
     explicit ObjArena(size_t chunkDataSize = 1025 - sizeof(ChunkHead))
         : chunkEntry_(nullptr), curChunkTop_(nullptr), curChunkRest_(0),
           nodeEntry_(nullptr), chunkDataSize_(chunkDataSize), usedBytes_(0)
@@ -108,26 +108,26 @@ public:
         Clear();
     }
 
-	/**
-	 * @brief 取得目前已使用的总字节数，包括簿记内存，但不包含预分配但未使用的内存
-	 */
+    /**
+     * @brief 取得目前已使用的总字节数，包括簿记内存，但不包含预分配但未使用的内存
+     */
     size_t GetUsedBytes() const
     {
         return usedBytes_;
     }
 
-	/**
-	 * @brief 快速创建指定类型的对象
-	 * 
-	 * 如果对象过大，会将内存分配直接转发给Alloc；
-	 * 否则会尝试从预分配空间中取得内存。
-	 * 若预分配空间不足，会向Alloc申请更多的预分配内存。
-	 * 
-	 * @param args 被创建对象的构造函数参数
-	 * @return 指向被创建对象的指针
-	 * 
-	 * @exception std::bad_alloc 向Alloc请求更多内存空间失败时抛出
-	 */
+    /**
+     * @brief 快速创建指定类型的对象
+     * 
+     * 如果对象过大，会将内存分配直接转发给Alloc；
+     * 否则会尝试从预分配空间中取得内存。
+     * 若预分配空间不足，会向Alloc申请更多的预分配内存。
+     * 
+     * @param args 被创建对象的构造函数参数
+     * @return 指向被创建对象的指针
+     * 
+     * @exception std::bad_alloc 向Alloc请求更多内存空间失败时抛出
+     */
     template<typename T, typename...Args>
     T *Create(Args&&...args)
     {
@@ -183,9 +183,9 @@ public:
         return reinterpret_cast<T*>(obj);
     }
 
-	/**
-	 * @brief 析构从上一次调用Clear以来所有用该分配器创建的对象，并释放它们的内存空间
-	 */
+    /**
+     * @brief 析构从上一次调用Clear以来所有用该分配器创建的对象，并释放它们的内存空间
+     */
     void Clear()
     {
         // 析构所有已分配的对象

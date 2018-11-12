@@ -15,7 +15,7 @@ class TextureFile
 {
 public:
 
-	//! 可选的保存格式
+    //! 可选的保存格式
     enum class WriteFormat
     {
         PNG,
@@ -23,11 +23,11 @@ public:
         BMP
     };
 
-	/**
-	 * @brief 从文件中加载一个二维RGB纹理对象
-	 * 
-	 * @exception FileException 加载失败时抛出
-	 */
+    /**
+     * @brief 从文件中加载一个二维RGB纹理对象
+     * 
+     * @exception FileException 加载失败时抛出
+     */
     static TextureCore<2, Math::Color3b> LoadRGBFromFile(
         const WStr &filename);
 

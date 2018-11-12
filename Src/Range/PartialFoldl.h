@@ -106,7 +106,7 @@ namespace RangeAux
 /**
  * @brief 对一个range进行前缀foldl操作
  * 
- * 比如令init为0，令func为整数乘法，则相当于求一个整数序列的前缀和
+ * 比如令init为0，令func为整数加法，则相当于求一个整数序列的前缀和
  */
 template<typename I, typename F>
 auto PartialFoldl(I init, F func)

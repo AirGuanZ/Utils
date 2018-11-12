@@ -13,7 +13,7 @@ void Gen(const WStr &str)
 {
     size_t slotCount;
     (void)StrImpl::PikeVM::Backend<WUTF>().Generate(
-		StrImpl::PikeVM::Parser<WUTF>().Parse(str), &slotCount);
+        StrImpl::PikeVM::Parser<WUTF>().Parse(str), &slotCount);
 }
 
 TEST_CASE("VMEngEx")

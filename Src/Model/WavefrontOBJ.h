@@ -19,30 +19,30 @@ class WavefrontObj
 {
 public:
 
-    using Vertex = Math::Vec4<double>;	 ///< 顶点类型
+    using Vertex = Math::Vec4<double>;     ///< 顶点类型
     using TexCoord = Math::Vec3<double>; ///< 纹理坐标类型
     using Normal = Math::Vec3<double>;   ///< 法线类型
 
-	/**
-	 * 顶点索引
-	 */
+    /**
+     * 顶点索引
+     */
     struct Index
     {
         int32_t vtx, tex, nor;
     };
 
-	/**
-	 * 包含三个点的面为三角形，四个点则是四边形
-	 */
+    /**
+     * 包含三个点的面为三角形，四个点则是四边形
+     */
     struct Face
     {
         // -1 means this index is inavailable
         Index indices[4];
     };
 
-	/**
-	 * @brief Obj模型数据
-	 */
+    /**
+     * @brief Obj模型数据
+     */
     struct Obj
     {
         std::vector<Vertex> vertices;
@@ -64,25 +64,25 @@ public:
 
     std::map<Str8, Obj> objs;
 
-	/**
-	 * 是否不包含任何模型
-	 */
+    /**
+     * 是否不包含任何模型
+     */
     bool Empty() const
     {
         return objs.empty();
     }
 
-	/**
-	 * 清空所有加载的数据
-	 */
+    /**
+     * 清空所有加载的数据
+     */
     void Clear()
     {
         objs.clear();
     }
 
-	/**
-	 * 转换为 GeometryMeshGroup
-	 */
+    /**
+     * 转换为 GeometryMeshGroup
+     */
     GeometryMeshGroup ToGeometryMeshGroup(bool reverseNor = false, bool reverseTex = false) const;
 };
 
@@ -95,26 +95,26 @@ class WavefrontObjFile
 {
 public:
 
-	/**
-	 * 从文件中加载
-	 * 
-	 * @param filename 文件路径
-	 * @param objs 输出模型，不得为空
-	 * @param ignoreUnknownLine 是否忽略无法识别的行，缺省为true
-	 * 
-	 * @return 加载成功时返回true
-	 */
+    /**
+     * 从文件中加载
+     * 
+     * @param filename 文件路径
+     * @param objs 输出模型，不得为空
+     * @param ignoreUnknownLine 是否忽略无法识别的行，缺省为true
+     * 
+     * @return 加载成功时返回true
+     */
     static bool LoadFromObjFile(const WStr &filename, WavefrontObj *objs, bool ignoreUnknownLine = true);
 
-	/**
-	 * 从文本中加载
-	 * 
-	 * @param content OBJ格式的文本字符串
-	 * @param objs 输出模型，不得为空
-	 * @param ignoreUnknownLine 是否忽略无法识别的行，缺省为true
-	 * 
-	 * @return 加载成功时返回true
-	 */
+    /**
+     * 从文本中加载
+     * 
+     * @param content OBJ格式的文本字符串
+     * @param objs 输出模型，不得为空
+     * @param ignoreUnknownLine 是否忽略无法识别的行，缺省为true
+     * 
+     * @return 加载成功时返回true
+     */
     static bool LoadFromMemory(const Str8 &content, WavefrontObj *objs, bool ignoreUnknownLine = true);
 
 private:

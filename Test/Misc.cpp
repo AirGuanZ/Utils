@@ -9,14 +9,14 @@ using namespace TypeOpr;
 
 TEST_CASE("Misc")
 {
-	SECTION("Either")
-	{
-		Either<int, float> intOrFloat = 4;
-		REQUIRE(intOrFloat.IsLeft());
-		REQUIRE(!intOrFloat.IsRight());
-		REQUIRE(intOrFloat.GetLeft() == 4);
-		REQUIRE_THROWS(intOrFloat.GetRight());
-	}
+    SECTION("Either")
+    {
+        Either<int, float> intOrFloat = 4;
+        REQUIRE(intOrFloat.IsLeft());
+        REQUIRE(!intOrFloat.IsRight());
+        REQUIRE(intOrFloat.GetLeft() == 4);
+        REQUIRE_THROWS(intOrFloat.GetRight());
+    }
 
     SECTION("Endian")
     {

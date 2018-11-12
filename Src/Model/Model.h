@@ -26,11 +26,11 @@ struct GeometryMesh
 
     std::vector<Vertex> vertices;
 
-	/**
-	 * @brief 自动平滑模型法线
-	 * 
-	 * @warning 算法非常糙，慎用
-	 */
+    /**
+     * @brief 自动平滑模型法线
+     * 
+     * @warning 算法非常糙，慎用
+     */
     GeometryMesh &SmoothenNormals();
 };
 
@@ -41,17 +41,17 @@ struct GeometryMeshGroup
 {
     std::map<Str8, GeometryMesh> submeshes;
 
-	/**
-	 * @brief 自动平滑模型法线
-	 *
-	 * @warning 算法非常糙，慎用
-	 */
+    /**
+     * @brief 自动平滑模型法线
+     *
+     * @warning 算法非常糙，慎用
+     */
     GeometryMeshGroup &SmoothenNormals();
 
-	/**
-	 * @brief 把submeshes合并成一个mesh并返回
-	 */
-	GeometryMesh MergeAllSubmeshes() const;
+    /**
+     * @brief 把submeshes合并成一个mesh并返回
+     */
+    GeometryMesh MergeAllSubmeshes() const;
 };
 
 inline GeometryMesh &GeometryMesh::SmoothenNormals()
@@ -95,14 +95,14 @@ inline GeometryMeshGroup &GeometryMeshGroup::SmoothenNormals()
 
 inline GeometryMesh GeometryMeshGroup::MergeAllSubmeshes() const
 {
-	GeometryMesh ret;
-	for(auto &it : submeshes)
-	{
-		auto &sm = it.second;
-		std::copy(std::begin(sm.vertices), std::end(sm.vertices),
-				  std::back_inserter(ret.vertices));
-	}
-	return ret;
+    GeometryMesh ret;
+    for(auto &it : submeshes)
+    {
+        auto &sm = it.second;
+        std::copy(std::begin(sm.vertices), std::end(sm.vertices),
+                  std::back_inserter(ret.vertices));
+    }
+    return ret;
 }
 
 } // namespace AGZ::Model

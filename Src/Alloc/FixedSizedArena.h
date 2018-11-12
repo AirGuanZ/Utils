@@ -43,27 +43,27 @@ class FixedSizedArena
 
 public:
 
-	/**
-	 * @brief 指定以后每次分配的内存块大小
-	 * 
-	 * 默认每个Chunk包含32个node
-	 *
-	 * @param nodeSize 以后可分配的内存块大小
-	 */
+    /**
+     * @brief 指定以后每次分配的内存块大小
+     * 
+     * 默认每个Chunk包含32个node
+     *
+     * @param nodeSize 以后可分配的内存块大小
+     */
     explicit FixedSizedArena(size_t nodeSize)
         : FixedSizedArena(nodeSize, 32)
     {
 
     }
 
-	/**
-	 * @brief 指定以后每次分配的内存块大小，以及预分配的粒度
-	 * 
-	 * @param nodeSize 每次分配的内存块字节数
-	 * @param chunkNodeCount 每个Chunk包含多少个node
-	 * 
-	 * @exception ArgumentException 参数非法时抛出
-	 */
+    /**
+     * @brief 指定以后每次分配的内存块大小，以及预分配的粒度
+     * 
+     * @param nodeSize 每次分配的内存块字节数
+     * @param chunkNodeCount 每个Chunk包含多少个node
+     * 
+     * @exception ArgumentException 参数非法时抛出
+     */
     FixedSizedArena(size_t nodeSize, size_t chunkNodeCount)
         : nodeSize_(nodeSize), chunkSize_(nodeSize * chunkNodeCount + sizeof(Chunk*)),
           freeNodes_(nullptr), chunkEntry_(nullptr)
@@ -80,13 +80,13 @@ public:
         FreeAllImpl();
     }
 
-	/**
-	 * @brief 快速取得一块固定大小的内存
-	 * 
-	 * 大部分情况下会从预分配的空间中取出内存块，当预分配空间不足时会用BaseAlloc扩大预分配空间
-	 * 
-	 * @exception std::bad_alloc 预分配空间不足且扩充失败时抛出
-	 */
+    /**
+     * @brief 快速取得一块固定大小的内存
+     * 
+     * 大部分情况下会从预分配的空间中取出内存块，当预分配空间不足时会用BaseAlloc扩大预分配空间
+     * 
+     * @exception std::bad_alloc 预分配空间不足且扩充失败时抛出
+     */
     void *Alloc()
     {
         if(freeNodes_)
@@ -111,13 +111,13 @@ public:
         return Alloc();
     }
 
-	/**
-	 * @brief 释放一块由Alloc返回的内存
-	 * 
-	 * 这块内存不会被返还给操作系统，而是在以后调用Alloc时优先使用
-	 * 
-	 * @param ptr 待释放内存块的首字节地址
-	 */
+    /**
+     * @brief 释放一块由Alloc返回的内存
+     * 
+     * 这块内存不会被返还给操作系统，而是在以后调用Alloc时优先使用
+     * 
+     * @param ptr 待释放内存块的首字节地址
+     */
     void Free(void *ptr)
     {
         auto *n = reinterpret_cast<Node*>(ptr);
@@ -125,11 +125,11 @@ public:
         freeNodes_ = n;
     }
 
-	/**
-	 * @brief 释放所有预分配空间
-	 * 
-	 * @warning 这一操作会使得所有由Alloc返回的内存块失效
-	 */
+    /**
+     * @brief 释放所有预分配空间
+     * 
+     * @warning 这一操作会使得所有由Alloc返回的内存块失效
+     */
     void FreeAll()
     {
         FreeAllImpl();

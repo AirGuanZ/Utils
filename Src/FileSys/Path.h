@@ -18,32 +18,32 @@ class Path
 {
 public:
 
-    using Charset = CS;				///< 所使用的字符编码方案
-    using Str     = String<CS>;		///< 所使用的字符串类型
-    using StrView = StringView<CS>;	///< 所使用的字符串视图类型
-    using Self    = Path<CS>;		///< 自身类型
+    using Charset = CS;                ///< 所使用的字符编码方案
+    using Str     = String<CS>;        ///< 所使用的字符串类型
+    using StrView = StringView<CS>;    ///< 所使用的字符串视图类型
+    using Self    = Path<CS>;        ///< 自身类型
 
-	/** 不同操作系统下的路径风格 */
+    /** 不同操作系统下的路径风格 */
     enum SeperatorStyle
     {
-        Linux,				///< *nix风格，以“/”作为唯一分隔符，绝对路径以根目录“/”开头
-        Windows,			///< Window风格，以“/”或“\”作为分隔符，绝对路径以盘符开头
+        Linux,                ///< *nix风格，以“/”作为唯一分隔符，绝对路径以根目录“/”开头
+        Windows,            ///< Window风格，以“/”或“\”作为分隔符，绝对路径以盘符开头
 #if defined(AGZ_OS_WIN32)
-        Native = Windows,	///< 由编译器自动根据所在平台判断应该使用哪种路径风格
+        Native = Windows,    ///< 由编译器自动根据所在平台判断应该使用哪种路径风格
 #else
-        Native = Linux,		///< 由编译器自动根据所在平台判断应该使用哪种路径风格
+        Native = Linux,        ///< 由编译器自动根据所在平台判断应该使用哪种路径风格
 #endif
     };
 
     Path() : abs_(false) { }
 
-	/**
-	 * @param s 用字符串表示的路径
-	 * @param mayHasFilename 该值为true时，形如“.../A/B”的s被认为是文件名，否则被认为是目录名
-	 * @param style 用哪种路径风格来解析s
-	 * 
-	 * @exception ArgumentException 路径格式不合法时抛出
-	 */
+    /**
+     * @param s 用字符串表示的路径
+     * @param mayHasFilename 该值为true时，形如“.../A/B”的s被认为是文件名，否则被认为是目录名
+     * @param style 用哪种路径风格来解析s
+     * 
+     * @exception ArgumentException 路径格式不合法时抛出
+     */
     Path(const StrView &s, bool mayHasFilename, SeperatorStyle style = Native)
     {
         bool hasFilename;
@@ -75,21 +75,21 @@ public:
         }
     }
 
-	/** 同 Path::Path(const StrView&, bool, SeperatorStyle) ，取mayHasFilename为true */
+    /** 同 Path::Path(const StrView&, bool, SeperatorStyle) ，取mayHasFilename为true */
     Path(const StrView &s, SeperatorStyle style = Native)
         : Path(s, true, style)
     {
 
     }
 
-	//! @copydoc Path::Path(const StrView&, bool, SeperatorStyle)
+    //! @copydoc Path::Path(const StrView&, bool, SeperatorStyle)
     Path(const Str &s, bool mayHasFilename, SeperatorStyle style = Native)
         : Path(s.AsView(), mayHasFilename, style)
     {
 
     }
 
-	/** 同 Path::Path(const Str&, bool, SeperatorStyle) ，取mayHasFilename为true */
+    /** 同 Path::Path(const Str&, bool, SeperatorStyle) ，取mayHasFilename为true */
     Path(const Str &s, SeperatorStyle style = Native)
         : Path(s.AsView(), style)
     {
@@ -116,27 +116,27 @@ public:
     Self &operator=(const Self &copyFrom) = default;
     ~Path()                               = default;
 
-	/**
-	 * 是否是一个绝对路径
-	 * 
-	 * @note 空路径被认为是相对路径
-	 */
+    /**
+     * 是否是一个绝对路径
+     * 
+     * @note 空路径被认为是相对路径
+     */
     bool IsAbsolute() const { return abs_; }
 
-	/**
-	 * 是否是一个相对路径
-	 * 
-	 * @note 空路径被认为是相对路径
-	 */
+    /**
+     * 是否是一个相对路径
+     * 
+     * @note 空路径被认为是相对路径
+     */
     bool IsRelative() const { return !IsAbsolute(); }
 
-	/** 是否是一个常规文件 */
+    /** 是否是一个常规文件 */
     bool HasFilename() const { return !filename_.Empty(); }
 
-	/** 是否是一个目录 */
+    /** 是否是一个目录 */
     bool IsDirectory() const { return !HasFilename(); }
 
-	/** 是否有父目录 */
+    /** 是否有父目录 */
     bool HasParent() const
     {
         if(HasFilename())
@@ -144,7 +144,7 @@ public:
         return dirs_.size() >= 2;
     }
 
-	/** 是否是另一个路径的前缀 */
+    /** 是否是另一个路径的前缀 */
     bool IsPrefixOf(const Self &parent) const
     {
         if(HasFilename())
@@ -159,63 +159,63 @@ public:
         return true;
     }
 
-	/**
-	 * 常规文件的文件名本身
-	 * 
-	 * @warning 对目录路径调用该方法会造成UB
-	 */
+    /**
+     * 常规文件的文件名本身
+     * 
+     * @warning 对目录路径调用该方法会造成UB
+     */
     StrView GetFilename() const
     {
         AGZ_ASSERT(HasFilename());
         return filename_;
     }
 
-	/**
-	 * 本路径的字符串表示
-	 * 
-	 * @param style 转换时使用的路径风格，缺省由编译器自动判断
-	 */
+    /**
+     * 本路径的字符串表示
+     * 
+     * @param style 转换时使用的路径风格，缺省由编译器自动判断
+     */
     Str ToStr(SeperatorStyle style = Native)
     {
         return GetDirectoryStr(style) + filename_;
     }
 
-	/**
-	 * 本路径的目录的字符串表示
-	 * 
-	 * @param style 转换时使用的路径风格，缺省由编译器自动判断
-	 * 
-	 * @return 若*this为目录，将返回字符串表示的目录；若*this为文件，会返回它所在的目录的字符串
-	 */
+    /**
+     * 本路径的目录的字符串表示
+     * 
+     * @param style 转换时使用的路径风格，缺省由编译器自动判断
+     * 
+     * @return 若*this为目录，将返回字符串表示的目录；若*this为文件，会返回它所在的目录的字符串
+     */
     Str GetDirectoryStr(SeperatorStyle style = Native)
     {
         auto s = style == Windows ? "\\" : "/";
         return Str(s).Join(dirs_) + s;
     }
 
-	/**
-	 * 对目录调用该方法会将其转换为文件路径，对文件路径调用该方法则会在不改变父目录的情况下更换文件名。
-	 * 
-	 * @warning 若filename不是一个合法的文件名（如“A/B”），则会造成后续操作UB
-	 */
+    /**
+     * 对目录调用该方法会将其转换为文件路径，对文件路径调用该方法则会在不改变父目录的情况下更换文件名。
+     * 
+     * @warning 若filename不是一个合法的文件名（如“A/B”），则会造成后续操作UB
+     */
     Self &SetFilename(const StrView &filename)
     {
         filename_ = filename;
         return *this;
     }
 
-	//! @copydoc Path::SetFilename(const StrView &)
+    //! @copydoc Path::SetFilename(const StrView &)
     Self &SetFilename(const Str &filename = Str())
     {
         filename_ = filename;
         return *this;
     }
 
-	/**
-	 * 取得文件扩展名，不包含“.”
-	 * 
-	 * @warning *this不是文件路径会造成UB
-	 */
+    /**
+     * 取得文件扩展名，不包含“.”
+     * 
+     * @warning *this不是文件路径会造成UB
+     */
     Str GetExtension() const
     {
         AGZ_ASSERT(HasFilename());
@@ -223,20 +223,20 @@ public:
         return m ? Str(m(1, 2)) : Str();
     }
 
-	/**
-	 * 设置文件扩展名
-	 * 
-	 * @param ext 新扩展名，如“txt”、“rar”等
-	 * 
-	 * @warning *this不是文件路径会造成UB
-	 */
+    /**
+     * 设置文件扩展名
+     * 
+     * @param ext 新扩展名，如“txt”、“rar”等
+     * 
+     * @warning *this不是文件路径会造成UB
+     */
     Self &SetExtension(const Str &ext)
     {
         SetExtension(ext.AsView());
         return *this;
     }
 
-	//! @copydoc Path::SetExtension(const Str &)
+    //! @copydoc Path::SetExtension(const Str &)
     Self &SetExtension(const StrView &ext)
     {
         AGZ_ASSERT(HasFilename());
@@ -248,13 +248,13 @@ public:
         return *this;
     }
 
-	/**
-	 * 将一个相对路径追加到本路径后方
-	 * 
-	 * @param tail 被追加的相对路径
-	 * 
-	 * @exception ArgumentException 本路径为文件路径或追加路径为绝对路径时抛出
-	 */
+    /**
+     * 将一个相对路径追加到本路径后方
+     * 
+     * @param tail 被追加的相对路径
+     * 
+     * @exception ArgumentException 本路径为文件路径或追加路径为绝对路径时抛出
+     */
     Self &Append(const Self &tail)
     {
         if(HasFilename())
@@ -270,11 +270,11 @@ public:
         return *this;
     }
 
-	/**
-	 * 将本路径转换为绝对路径的结果
-	 * 
-	 * @note 若本路径已经是绝对路径，则返回值与本路径相同
-	 */
+    /**
+     * 将本路径转换为绝对路径的结果
+     * 
+     * @note 若本路径已经是绝对路径，则返回值与本路径相同
+     */
     Self &ToAbsolute(SeperatorStyle style = Native)
     {
         if(IsAbsolute())
@@ -283,11 +283,11 @@ public:
                      + *this;
     }
 
-	/**
-	 * 将本路径转换为相对路径的结果
-	 * 
-	 * @note 若本路径已经是相对路径，则返回值与本路径相同
-	 */
+    /**
+     * 将本路径转换为相对路径的结果
+     * 
+     * @note 若本路径已经是相对路径，则返回值与本路径相同
+     */
     Self &ToRelative(SeperatorStyle style = Native)
     {
         if(IsRelative())
@@ -303,11 +303,11 @@ public:
         return *this;
     }
 
-	/**
-	 * 将本路径转换为目录的结果（去掉文件名）
-	 * 
-	 * @note 若本路径已经是目录，则返回值与本路径相同
-	 */
+    /**
+     * 将本路径转换为目录的结果（去掉文件名）
+     * 
+     * @note 若本路径已经是目录，则返回值与本路径相同
+     */
     Self &ToDirectory()
     {
         if(HasFilename())
@@ -315,11 +315,11 @@ public:
         return *this;
     }
 
-	/**
-	 * 返回本路径的父目录
-	 * 
-	 * 若本路径为目录，则返回其上一级目录；若本路径为文件路径，则返回文件所处目录。
-	 */
+    /**
+     * 返回本路径的父目录
+     * 
+     * 若本路径为目录，则返回其上一级目录；若本路径为文件路径，则返回文件所处目录。
+     */
     Self &ToParent()
     {
         if(HasFilename())
@@ -332,7 +332,7 @@ public:
         return *this;
     }
 
-	/** 两个路径严格相等 */
+    /** 两个路径严格相等 */
     bool operator==(const Self &rhs) const
     {
         if(dirs_.size() != rhs.dirs_.size())
@@ -345,13 +345,13 @@ public:
         return filename_ == rhs.filename_;
     }
 
-	/** 两个路径间存在差异 */
+    /** 两个路径间存在差异 */
     bool operator!=(const Self &rhs) const
     {
         return !(*this == rhs);
     }
 
-	//! @copydoc Path::Append(const Self &)
+    //! @copydoc Path::Append(const Self &)
     Self operator+(const Self &rhs) const
     {
         Self ret = *this;
@@ -359,7 +359,7 @@ public:
         return ret;
     }
 
-	/** 将rhs以 Path<CS>::Append 的方式追加到本路径后方  */
+    /** 将rhs以 Path<CS>::Append 的方式追加到本路径后方  */
     Self &operator+=(const Self &rhs) const
     {
         return Append(rhs);
@@ -367,7 +367,7 @@ public:
 
 private:
 
-	using Regexp = Regex<CS>;
+    using Regexp = Regex<CS>;
 
     const Regexp &ExtRegex() const
     {

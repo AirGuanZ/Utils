@@ -36,11 +36,11 @@ public:
         
     }
 
-	/**
-	 * @param args 转发给内部对象构造函数的参数
-	 * 
-	 * @exception std::bad_alloc 内存分配失败时抛出
-	 */
+    /**
+     * @param args 转发给内部对象构造函数的参数
+     * 
+     * @exception std::bad_alloc 内存分配失败时抛出
+     */
     template<typename...Args>
     explicit COWObject(Args&&...args)
     {
@@ -93,7 +93,7 @@ public:
         return *this;
     }
 
-	/** 释放自己所持有的共享所有权，若自己是最后一个持有者，销毁内部对象 */
+    /** 释放自己所持有的共享所有权，若自己是最后一个持有者，销毁内部对象 */
     void Release()
     {
         if(storage_ && !--storage_->refs_)
@@ -104,53 +104,53 @@ public:
         }
     }
 
-	/** 内部对象共享所有权的持有者数量 */
+    /** 内部对象共享所有权的持有者数量 */
     RefCounter Refs() const
     {
         return storage_ ? storage_->refs_ : 0;
     }
 
-	/** 是否持有某个对象的所有权 */
+    /** 是否持有某个对象的所有权 */
     bool IsAvailable() const
     {
         return storage_ != nullptr;
     }
 
-	/** 是否持有某个对象的所有权 */
+    /** 是否持有某个对象的所有权 */
     operator bool() const
     {
         return IsAvailable();
     }
 
-	/** 取得内部对象的常量引用 */
+    /** 取得内部对象的常量引用 */
     const T &operator*() const
     {
         AGZ_ASSERT(storage_);
         return storage_->obj;
     }
 
-	/** 将调用转发给内部对象 */
+    /** 将调用转发给内部对象 */
     const T *operator->() const
     {
         AGZ_ASSERT(storage_);
         return &storage_->obj;
     }
 
-	/**
-	 * 取得内部对象的可变指针
-	 * 
-	 * @note 若内部对象持有者数量大于1，则该操作会将内部对象复制一份，并持有复制出的新对象
-	 */
+    /**
+     * 取得内部对象的可变指针
+     * 
+     * @note 若内部对象持有者数量大于1，则该操作会将内部对象复制一份，并持有复制出的新对象
+     */
     T *MutablePtr()
     {
         return &Mutable();
     }
 
-	/**
-	 * 取得内部对象的可变引用
-	 * 
-	 * @note 若内部对象持有者数量大于1，则该操作会将内部对象复制一份，并持有复制出的新对象
-	 */
+    /**
+     * 取得内部对象的可变引用
+     * 
+     * @note 若内部对象持有者数量大于1，则该操作会将内部对象复制一份，并持有复制出的新对象
+     */
     T &Mutable()
     {
         AGZ_ASSERT(storage_);
