@@ -1,4 +1,19 @@
-## AGZ::Math
+# AGZ Utils
+
+- [x] Math: common mathematical tools for graphics using
+- [x] Range: range objects and transformers. May be deprecated after C++ 20
+- [x] String: immutable encoding-aware string
+- [x] Regex: regular expression with my favourite features
+- [x] Texture: texture loading/saving/sampling
+- [x] Arena: fast object pool
+- [x] Path: cross-platform file/directory path management
+- [x] Config: configuration parsing tool
+- [x] WavefrontOBJ: wavefront OBJ file loader
+- [x] Others: Endian, COWObject, TypeOpr (for TMP), Singleton, Uncopiable, Platform, Timer...
+
+I'll always keep this library using the latest C++ standard.
+
+## Math
 
 Basic mathematical tools. Mainly used for graphics.
 
@@ -75,7 +90,7 @@ auto [sample, pdf] = UniformOnHemisphere<double>::Transform({ u0, u1 });
 REQUIRE(ApproxEq(pdf, Inv2PI<double>, 1e-5));
 ```
 
-## Buffer
+## COWObject
 
 ```c++
 // COW (Copy-On-Write) Object
@@ -87,7 +102,7 @@ s1.Mutable() = "Dark Souls";
 REQUIRE((s0.Refs() == 1 && s1.Refs() == 1));
 ```
 
-## AGZ::Endian
+## Endian
 
 ```c++
 if constexpr(IS_LITTLE_ENDIAN)
@@ -102,7 +117,7 @@ assert(v1 == Native2Little(v1)); // Native-to-native calling does nothing
 assert(Big2Little(v1) == 0x12345678);
 ```
 
-## AGZ::Range
+## Range
 
 ### Features
 
@@ -166,7 +181,7 @@ REQUIRE((Seq(1) | TakeWhile(isLessThan10) | Collect<vector<int>>())
      == vector<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 ```
 
-## AGZ::String
+## String
 
 A non-null-terminated immutable string class...Just for fun.
 
@@ -205,7 +220,7 @@ REQUIRE((Str8(u8"Mine cr aft ").Split()
      == vector<Str8>{ u8"Mine", u8"cr", u8"aft" });
 ```
 
-## AGZ::Regex
+## Regex
 
 ### Features
 
@@ -251,7 +266,7 @@ REQUIRE(result(1, 2) == "ddee0099ff44");
 REQUIRE(result(0, 2) == "abcddee0099ff44");
 ```
 
-## AGZ::Tex
+## Texture
 
 ```cpp
 // Load an image from "tex.png"
@@ -264,7 +279,7 @@ for(int x = 0; x < 10; ++x)
 TextureFile::WriteRGBToPNG(L"output.png", tex);
 ```
 
-## AGZ::Alloc::ObjArena
+## ObjArena
 
 * Allocate objects in a fast memory pool
 * Call destructor automatically when destroyed
@@ -276,7 +291,7 @@ auto *pInt = arena.Create<int>(4);
 arena.Clear(); // Destructor of pStr is automatically called
 ```
 
-## AGZ::FileSys
+## FileSys
 
 ### Path
 
@@ -309,7 +324,7 @@ ReadTextFileRaw(const WStr &filename, WStr *str);
 WriteTextFileRaw(const WStr &filename, const WStr &str);
 ```
 
-## AGZ::Config
+## Config
 
 Easy-use Configuration parser
 
