@@ -1,5 +1,10 @@
 ﻿#pragma once
 
+/**
+ * @file Math/Mat4.h
+ * @brief 4x4数值矩阵类，主要用于图形学中的几何变换
+ */
+
 #include <algorithm>
 #include <cstring>
 #include <type_traits>
@@ -134,9 +139,11 @@ public:
     Self Inverse() const;
 };
 
+/** 求给定矩阵的转置 */
 template<typename T>
 Mat4<T> Transpose(const Mat4<T> &m);
 
+/** 求给定矩阵的逆矩阵。若原矩阵不可逆，则UB。 */
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 Mat4<T> Inverse(const Mat4<T> &m);
 

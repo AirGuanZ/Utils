@@ -32,26 +32,23 @@ class Match
 {
 public:
 
+    template<typename OCS, typename Eng>
+    friend class Regex;
+
     using Interval = std::pair<size_t, size_t>;
     using Self = Match<CS>;
 
+    /**
+     * 默认初始化为无效对象
+     */
     Match()
         : interval_(0, std::numeric_limits<size_t>::max())
     {
 
     }
 
-    Match(const StringView<CS> &whole,
-          const Interval &interval,
-          std::vector<size_t> &&savePoints)
-        : whole_(whole),
-          interval_(interval),
-          savePoints_(std::move(savePoints))
-    {
-
-    }
-
-    Match(const Self &copyFrom)
+    /** 复制Match对象 */
+    Match(const Match<CS> &copyFrom)
         : whole_(copyFrom.whole_),
           interval_(copyFrom.interval_),
           savePoints_(copyFrom.savePoints_)
@@ -59,7 +56,8 @@ public:
 
     }
 
-    Match(Self &&moveFrom) noexcept
+    /** 移动Match对象 */
+    Match(Match<CS> &&moveFrom) noexcept
         : whole_(std::move(moveFrom.whole_)),
           interval_(moveFrom.interval_),
           savePoints_(std::move(moveFrom.savePoints_))
@@ -69,7 +67,8 @@ public:
 
     ~Match() = default;
 
-    Self &operator=(const Self &copyFrom)
+    /** 赋值Match对象 */
+    Match<CS> &operator=(const Self &copyFrom)
     {
         whole_ = copyFrom.whole_;
         interval_ = copyFrom.interval_;
@@ -77,7 +76,8 @@ public:
         return *this;
     }
 
-    Self &operator=(Self &&moveFrom) noexcept
+    /** 移动赋值Match对象 */
+    Match<CS> &operator=(Self &&moveFrom) noexcept
     {
         whole_ = std::move(moveFrom.whole_);
         interval_ = moveFrom.interval_;
@@ -148,6 +148,16 @@ public:
 
 private:
 
+    Match(const StringView<CS> &whole,
+        const Interval &interval,
+        std::vector<size_t> &&savePoints)
+        : whole_(whole),
+        interval_(interval),
+        savePoints_(std::move(savePoints))
+    {
+
+    }
+
     String<CS> whole_;
     std::pair<size_t, size_t> interval_;
     std::vector<size_t> savePoints_;
@@ -155,6 +165,7 @@ private:
 
 /**
  * @brief 正则表达式类，表达式语法与所用的引擎有关，缺省使用PikeVM引擎
+ * @warning PikeVM引擎不是线程安全的
  */
 template<typename CS, typename Eng = StrImpl::PikeVM::Machine<CS>>
 class Regex
@@ -168,39 +179,55 @@ public:
     using Result    = Match<CS>;
     using Self      = Regex<CS, Eng>;
 
-    Regex() = default;
-
+    /**
+     * 用给定的字符串初始化正则表达式
+     */
     Regex(const StringView<CS> &regex)
         : engine_(std::make_shared<Engine>(regex))
     {
 
     }
 
+    /**
+     * 用给定的字符串初始化正则表达式
+     */
     Regex(const String<CS> &regex)
         : Regex(regex.AsView())
     {
 
     }
 
+    /**
+     * 复制正则表达式
+     */
     Regex(const Self &copyFrom)
         : engine_(copyFrom.engine_)
     {
 
     }
 
+    /**
+     * 移动正则表达式
+     */
     Regex(Self &&moveFrom) noexcept
         : engine_(std::move(moveFrom.engine_))
     {
 
     }
 
-    Self &operator=(const Self &copyFrom)
+    /**
+     * 赋值正则表达式
+     */
+    Regex<CS, Eng> &operator=(const Regex<CS, Eng> &copyFrom)
     {
         engine_ = copyFrom.engine_;
         return *this;
     }
 
-    Self &operator=(Self &&moveFrom) noexcept
+    /**
+     * 移动赋值正则表达式
+     */
+    Regex<CS, Eng> &operator=(Regex<CS, Eng> &&moveFrom) noexcept
     {
         engine_ = std::move(moveFrom.engine_);
         return *this;

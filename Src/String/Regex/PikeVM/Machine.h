@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * @cond
+ */
+
 #include <limits>
 #include <optional>
 #include <utility>
@@ -565,3 +569,7 @@ private:
 };
 
 } // namespace AGZ::PikeVM
+
+/**
+ * @endcond
+ */

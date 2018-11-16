@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * @cond
+ */
+
 #include <type_traits>
 
 #include "../../../Misc/Common.h"
@@ -86,3 +90,7 @@ static_assert(sizeof(Inst<char16_t>) == 4 * sizeof(int32_t));
 static_assert(sizeof(Inst<char32_t>) == 4 * sizeof(int32_t));
 
 } // namespace AGZ::PikeVM
+
+/**
+ * @endcond
+ */

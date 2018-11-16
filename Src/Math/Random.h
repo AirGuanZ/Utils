@@ -1,14 +1,29 @@
 ﻿#pragma once
 
+/**
+ * @file Math/Random.h
+ * @brief 简化std::random中部分组件的使用
+ * 
+ * 分为三个层次：随机数引擎，随机数生成器，随机数函数
+ * 
+ * - 随机数引擎：符合std中的random_engine标准的随机数发生引擎
+ * - 随机数生成器：将随机数引擎包装成随机数生成器，供随机数函数使用
+ * - 随机数函数：用随机数生成器产生满足指定分布的随机数，默认使用的生成器是线程安全的
+ * 
+ * 一般来说，只需要直接调用随机数函数即可。有特殊需求时，可自行定义随机数生成器作为随机数函数的参数。
+ */
+
 #include <cstdint>
 #include <ctime>
 #include <random>
 
 namespace AGZ::Math::Random {
 
-using DefaultSharedEngine = std::default_random_engine;
+/** @brief 默认内部随机数引擎 */
+using DefaultInternalEngine = std::default_random_engine;
 
-template<typename Engine = DefaultSharedEngine>
+/** @brief 默认随机数生成器类型，使用当前时间来作为随机数引擎的种子 */
+template<typename Engine = DefaultInternalEngine>
 struct SharedRandomEngine_t
 {
     SharedRandomEngine_t()
@@ -20,6 +35,10 @@ struct SharedRandomEngine_t
     auto &GetEng() { return eng; }
     Engine eng;
 };
+
+/**
+ * @cond
+ */
 
 template<typename T, typename S> struct IntUniform_t
 {
@@ -73,27 +92,32 @@ MAKE_REAL_NORMAL_T(double);
 #undef MAKE_REAL_UNIFORM_T
 #undef MAKE_REAL_NORMAL_T
 
+/**
+ * @endcond
+ */
+
+/** @brief 单个线程内部共享使用的随机数生成器 */
 template<typename Engine>
 inline thread_local SharedRandomEngine_t<Engine> SHARED_RNG;
 
 /**
- * [min, max]上的均匀分布
+ * @brief [min, max]上的均匀分布
  * 
  * @note 该函数是线程安全的
  */
 template<typename T, typename S = SharedRandomEngine_t<>>
-T Uniform(T min, T max, S &rng = SHARED_RNG<DefaultSharedEngine>)
+T Uniform(T min, T max, S &rng = SHARED_RNG<DefaultInternalEngine>)
 {
     return Uniform_t<T, S>::Eval(min, max, rng);
 }
 
 /**
- * 以mean为均值、以stddev为标准差的正态分布
+ * @brief 以mean为均值、以stddev为标准差的正态分布
  * 
  * @note 该函数是线程安全的
  */
 template<typename T, typename S = SharedRandomEngine_t<>>
-T Normal(T mean, T stddev, S &rng = SHARED_RNG<DefaultSharedEngine>)
+T Normal(T mean, T stddev, S &rng = SHARED_RNG<DefaultInternalEngine>)
 {
     return Normal_t<T, S>::Eval(mean, stddev, rng);
 }

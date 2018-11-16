@@ -1,5 +1,10 @@
 ﻿#pragma once
 
+/**
+ * @file Math/D64x4.h
+ * @brief 定义了使用AVX加速的四维double向量，仅在定义了AGZ_USE_AUX宏时有效
+ */
+
 #include "../Misc/Common.h"
 #include "../Misc/Config.h"
 

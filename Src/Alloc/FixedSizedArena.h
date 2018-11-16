@@ -1,5 +1,10 @@
 ﻿#pragma once
 
+/**
+ * @file Alloc/FixedSizedArena.h
+ * @brief 定义了用于分配固定大小内存快的内存池
+ */
+
 #include "../Misc/Exception.h"
 #include "Alloc.h"
 

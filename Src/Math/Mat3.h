@@ -1,5 +1,10 @@
 ﻿#pragma once
 
+/**
+ * @file Math/Mat3.h
+ * @brief 功能非常受限的3x3数值矩阵类
+ */
+
 #include <type_traits>
 
 #include "../Misc/Common.h"

@@ -9,26 +9,26 @@ namespace AGZ {
 /**
  * @brief 仅用于计时的时钟类
  */
-class Timer
+class Clock
 {
-    using Clock = std::chrono::high_resolution_clock;
+    using InternalClock = std::chrono::high_resolution_clock;
 
-    std::chrono::time_point<Clock> start_;
+    std::chrono::time_point<InternalClock> start_;
 
 public:
 
     //! 被创建时会自动开始计时
-    Timer() { Restart(); }
+    Clock() { Restart(); }
 
     //! 重新开始计时
-    void Restart() { start_ = Clock::now(); }
+    void Restart() { start_ = InternalClock::now(); }
 
     //! 从上一次开始计时起过了多少秒
     uint64_t Seconds() const
     {
         return std::chrono::duration_cast<
                     std::chrono::seconds>
-                        (Clock::now() - start_).count();
+                        (InternalClock::now() - start_).count();
     }
 
     //! 从上一次开始计时起过了多少毫秒
@@ -36,7 +36,7 @@ public:
     {
         return std::chrono::duration_cast<
                     std::chrono::milliseconds>
-                        (Clock::now() - start_).count();
+                        (InternalClock::now() - start_).count();
     }
 
     //! 从上一次开始计时起过了多少微秒
@@ -44,7 +44,7 @@ public:
     {
         return std::chrono::duration_cast<
                     std::chrono::microseconds>
-                        (Clock::now() - start_).count();
+                        (InternalClock::now() - start_).count();
     }
 };
 

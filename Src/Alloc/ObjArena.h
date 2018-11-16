@@ -1,5 +1,10 @@
 ﻿#pragma once
 
+/**
+ * @file Alloc/ObjArena.h
+ * @brief 定义了快速分配小对象的内存池ObjArena
+ */
+
 #include "../Misc/Common.h"
 #include "../Misc/Exception.h"
 #include "../Misc/Uncopiable.h"

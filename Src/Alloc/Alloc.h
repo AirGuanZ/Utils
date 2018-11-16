@@ -1,5 +1,10 @@
 ﻿#pragma once
 
+/**
+ * @file Alloc/Alloc.h
+ * @brief 定义了基于C runtime的缺省内存分配器
+ */
+
 #include <cstdlib>
 
 #include "Malloc.h"

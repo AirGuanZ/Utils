@@ -9,7 +9,7 @@
 - [x] Path: cross-platform file/directory path management
 - [x] Config: configuration parsing tool
 - [x] WavefrontOBJ: wavefront OBJ file loader
-- [x] Others: Endian, COWObject, TypeOpr (for TMP), Singleton, Uncopiable, Platform, Timer...
+- [x] Others: Endian, COWObject, TypeOpr (for TMP), Singleton, Uncopiable, Platform, Clock...
 
 I'll always keep this library using the latest C++ standard.
 

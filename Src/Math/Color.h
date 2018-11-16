@@ -1,6 +1,10 @@
 ﻿#pragma once
 
-#include "../Misc/Common.h"
+/**
+ * @file Math/Color.h
+ * @brief RGB(A)颜色类型以及基本的颜色常量
+ */
+
 #include "Vec3.h"
 #include "Vec4.h"
 

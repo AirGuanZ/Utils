@@ -265,9 +265,6 @@
     <ClInclude Include="..\Src\Range\FilterMap.h">
       <Filter>Range</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Time\Timer.h">
-      <Filter>Time</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Utils\Time.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -306,6 +303,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\Config\Config.inl">
       <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Time\Clock.h">
+      <Filter>Time</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

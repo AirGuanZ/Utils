@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * @cond
+ */
+
 #include <type_traits>
 
 #include "../../../Alloc/ObjArena.h"
@@ -808,3 +812,7 @@ private:
 };
 
 } // namespace AGZ::PikeVM
+
+/*
+ * @endcond
+ */

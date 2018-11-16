@@ -89,7 +89,7 @@
     <ClInclude Include="..\Src\Texture\Sampler.h" />
     <ClInclude Include="..\Src\Texture\Texture.h" />
     <ClInclude Include="..\Src\Texture\TextureFile.h" />
-    <ClInclude Include="..\Src\Time\Timer.h" />
+    <ClInclude Include="..\Src\Time\Clock.h" />
     <ClInclude Include="..\Src\Utils.h" />
     <ClInclude Include="..\Src\Utils\Alloc.h" />
     <ClInclude Include="..\Src\Utils\Buffer.h" />

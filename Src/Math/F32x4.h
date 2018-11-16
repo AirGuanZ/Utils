@@ -1,5 +1,10 @@
 ﻿#pragma once
 
+/**
+ * @file Math/F32x4.h
+ * @brief 定义了使用SSE加速的四维float向量，仅在定义了AGZ_USE_SSE2宏时有效
+ */
+
 #include "../Misc/Common.h"
 #include "../Misc/Config.h"
 

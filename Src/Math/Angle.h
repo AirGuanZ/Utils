@@ -1,8 +1,27 @@
 ﻿#pragma once
 
+/**
+ * @file Math/Angle.h
+ * @brief 将rad/deg两种单位的区别以类型的方式给出
+ * 
+ * 提供Rad<T>和Deg<T>两种类型，它们之间可以自由地进行转换，转换时会根据类型所代表的单位自动调整内部的值
+ */
+
 #include "../Misc/Common.h"
 
 namespace AGZ::Math {
+
+/**
+ * @brief 角度的公共基类，可用该类型结合SFINAE来过滤角度类型
+ * @see IsAngleType_v
+ */
+struct AngleBase { };
+
+/**
+ * @brief 某个类型是否是Rad/Deg类型
+ */
+template<typename T>
+constexpr bool IsAngleType_v = std::is_base_of_v<AngleBase, T>;
 
 template<typename T>
 struct Deg;
@@ -10,32 +29,40 @@ struct Deg;
 /**
  * @brief 弧度值
  * 
- * 可进行基本的算术运算和三角函数运算，与角度值间可自动转换
+ * 可进行基本的算术运算和三角函数运算
  */
 template<typename T>
-struct Rad
+struct Rad : AngleBase
 {
     T value;
-    
+
+    /** 默认初始化为零 */
     constexpr Rad() : value(T(0)) { }
+    /** 初始化为指定的弧度值 */
     explicit constexpr Rad(T v) : value(v) { }
+    /** 不初始化内部值 */
     explicit constexpr Rad(Uninitialized_t) { }
+    /** 从角度转换而来 */
     constexpr Rad(const Deg<T> &d);
 };
 
 /**
  * @brief 角度值
  * 
- * 可进行基本的算术运算和三角函数运算，与弧度值间可自动转换
+ * 可进行基本的算术运算和三角函数运算
  */
 template<typename T>
-struct Deg
+struct Deg : AngleBase
 {
     T value;
 
+    /** 默认初始化为零 */
     constexpr Deg() : value(T(0)) { }
+    /** 初始化为指定的角度值 */
     explicit constexpr Deg(T v) : value(v) { }
+    /** 不初始化内部值 */
     explicit constexpr Deg(Uninitialized_t) { }
+    /** 从弧度转换而来 */
     constexpr Deg(Rad<T> r)
         : value(T(180) / T(3.141592653589793238462643383) * r.value) { }
 };
@@ -63,6 +90,8 @@ constexpr Rad<T>::Rad(const Deg<T> &d)
 
 ANGLE_OPERATORS(Rad)
 ANGLE_OPERATORS(Deg)
+
+#undef ANGLE_OPERATORS
 
 using Degf = Deg<float>;
 using Degd = Deg<double>;
