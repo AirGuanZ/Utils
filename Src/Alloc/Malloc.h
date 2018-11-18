@@ -5,13 +5,7 @@
  * @brief 一些常用的内存分配辅助函数
  */
 
-#include <functional>
-
-#if defined(_MSC_VER)
-#include <malloc.h>
-#else
 #include <cstdlib>
-#endif
 
 #include "../Misc/Common.h"
 

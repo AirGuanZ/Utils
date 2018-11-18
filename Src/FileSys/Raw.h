@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <fstream>
-#include <iterator>
 #include <sstream>
 
 #include "../Misc/Common.h"

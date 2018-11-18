@@ -40,19 +40,29 @@ class RefCountedBuf
 
 public:
 
-    using Self = RefCountedBuf<E>;
+    /** 创建一块含有n个可用字节的引用计数缓存 */
+    static RefCountedBuf<E> *New(size_t n);
 
-    static Self *New(size_t n);
+    /** 不允许默认构造，只能通过 RefCountedBuf<E>::New 来创建 */
+    RefCountedBuf()                                      = delete;
+    /** 不允许复制，只能通过指针共享 */
+    RefCountedBuf(const RefCountedBuf<E>&)               = delete;
+    /** 不允许用户析构，只能使用引用计数自动管理 */
+    ~RefCountedBuf()                                     = delete;
+    /** 不允许赋值，只能通过指针共享 */
+    RefCountedBuf<E> &operator=(const RefCountedBuf<E>&) = delete;
 
-    RefCountedBuf()              = delete;
-    RefCountedBuf(const Self&)   = delete;
-    ~RefCountedBuf()             = delete;
-    Self &operator=(const Self&) = delete;
-
+    /** 将引用计数增加1 */
     void IncRef();
+    /** 将引用计数减少1，如减少后计数为0，则释放缓存及元数据 */
     void DecRef();
 
+    /** 取得引用计数数量 */
+    size_t GetRefCount() const { return refs_; }
+
+    /** 取得缓存区域指针 */
     E *GetData();
+    /** 取得缓存区域指针 */
     const E *GetData() const;
 };
 
@@ -98,11 +108,16 @@ class Storage
 
 public:
 
+    /** 自身类型 */
     using Self = Storage<CU>;
 
     static_assert(std::is_trivially_copyable_v<CU>);
 
-    //! 取得可变缓存指针，仅限String内部使用
+    /**
+     * @brief 以可变方式取得内部首元素地址
+     * 
+     * 前置条件：IsSmallStorage或RefCount = 1
+     */
     CU *GetMutableData();
 
     //! 准备长度为len的缓存，但不初始化其内容
@@ -112,14 +127,25 @@ public:
     //! 准备合适长度的缓存，保存[beg, end)间的内容
     Storage(const CU *beg, const CU *end);
 
+    /**
+     * 复制copyFrom的内容。若copyFrom长度较小，则逐字节拷贝数据；否则共享引用计数
+     */
     Storage(const Self &copyFrom);
+    /**
+     * 复制copyFrom中下标范围为[begIdx, endIdx)的码元子串
+     * 若子串长度较小，则逐字节拷贝数据；否则共享引用计数
+     */
     Storage(const Self &copyFrom, size_t begIdx, size_t endIdx);
+    /** 取得其他Storage对象中的数据 */
     Storage(Self &&moveFrom) noexcept;
 
+    /** 销毁时，若内部持有子串的方式是引用计数，则令计数减1 */
     ~Storage();
 
-    Self &operator=(const Self &copyFrom);
-    Self &operator=(Self &&moveFrom) noexcept;
+    /** 销毁自身并重新调用拷贝构造 */
+    Storage<CU> &operator=(const Self &copyFrom);
+    /** 销毁自身并原地调用移动构造 */
+    Storage<CU> &operator=(Self &&moveFrom) noexcept;
 
     //! 取得缓存大小
     size_t GetLength() const;
@@ -129,7 +155,9 @@ public:
     //! 取得最后一个元素的下一个元素的指针
     const CU *End() const;
 
+    //! 同时取得首元素地址和内部存储的串长度
     std::pair<const CU*, size_t> BeginAndLength() const;
+    //! 同时取得首元素地址和末元素下一个元素的地址
     std::pair<const CU*, const CU*> BeginAndEnd() const;
 };
 
@@ -147,10 +175,12 @@ class Storage_NoSSO
 
 public:
 
+    /** 自身类型 */
     using Self = Storage_NoSSO<CU>;
 
     static_assert(std::is_trivially_copyable_v<CU>);
 
+    //! 以可变方式取得内部数据
     CU *GetMutableData();
 
     explicit Storage_NoSSO(size_t len);
@@ -163,8 +193,8 @@ public:
 
     ~Storage_NoSSO();
 
-    Self &operator=(const Self &copyFrom);
-    Self &operator=(Self &&moveFrom) noexcept;
+    Storage_NoSSO<CU> &operator=(const Self &copyFrom);
+    Storage_NoSSO<CU> &operator=(Self &&moveFrom) noexcept;
 
     size_t GetLength() const;
 
@@ -196,9 +226,9 @@ class CodePointRange
 
 public:
 
-    using CodeUnit  = typename CS::CodeUnit;
-    using CodePoint = typename CS::CodePoint;
-    using Iterator  = GetIteratorType<CS>;
+    using CodeUnit  = typename CS::CodeUnit;  ///< 码元类型
+    using CodePoint = typename CS::CodePoint; ///< 码点类型
+    using Iterator  = GetIteratorType<CS>;    ///< 码元迭代器类型
 
     //! 用beg和end初始化该range，此时range中仅保存首尾指针
     CodePointRange(const CodeUnit *beg, const CodeUnit *end);
@@ -207,7 +237,9 @@ public:
     CodePointRange(const String<CS> &str, const CodeUnit *beg,
                                           const CodeUnit *end);
 
+    //! 取得头部码元迭代器
     Iterator begin() const;
+    //! 取得尾部码元迭代器
     Iterator end()   const;
 
     //! 给定码点迭代器，求它的第一个码元在该range的码元中的下标
@@ -215,6 +247,60 @@ public:
     {
         return CS::CodeUnitsBeginFromCodePointIterator(it) - beg_;
     }
+};
+
+/**
+* @brief 以子串的形式遍历整个字符串中单个字符（码点）的range对象
+*/
+template<typename CS>
+class CharRange
+{
+    using InIt = GetIteratorType<CS>;
+
+    CodePointRange<CS> CPR_;
+
+public:
+
+    using CodeUnit = typename CS::CodeUnit;   ///< 码元类型
+    using CodePoint = typename CS::CodePoint; ///< 码点类型
+
+    /**
+     * 迭代器类型
+     */
+    class Iterator
+    {
+        InIt it_;
+
+    public:
+
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type = String<CS>;
+        using difference_type =
+            typename std::iterator_traits<InIt>::difference_type;
+        using pointer = ValuePointer<value_type>;
+        using reference = value_type & ;
+
+        using Self = Iterator;
+
+        explicit Iterator(InIt it);
+
+        value_type operator*() const;
+        pointer operator->() const;
+
+        Self &operator++();
+        Self operator++(int);
+        Self &operator--();
+        Self operator--(int);
+
+        bool operator==(const Self &rhs) const;
+        bool operator!=(const Self &rhs) const;
+    };
+
+    CharRange(const CodeUnit *beg, const CodeUnit *end);
+    CharRange(const String<CS> &str, const CodeUnit *beg, const CodeUnit *end);
+
+    Iterator begin() const;
+    Iterator end()   const;
 };
 
 /**
@@ -229,65 +315,15 @@ class StringView
 
 public:
 
-    /**
-     * @brief 可以以小字符串的形式遍历整个字符串中单个字符（码点）的range对象
-     */
-    class CharRange
-    {
-        using InIt = GetIteratorType<CS>;
+    using Charset = CS;                       ///< 字符编码方案
+    using CodeUnit = typename CS::CodeUnit;   ///< 码元类型
+    using CodePoint = typename CS::CodePoint; ///< 码点类型
+    using Self = StringView<CS>;              ///< 自身类型
+    using Str = String<CS>;                   ///< 对应的字符串类型
 
-        CodePointRange<CS> CPR_;
+    using Iterator = const CodeUnit*; ///! 用于遍历码元的迭代器类型
 
-    public:
-
-        using CodeUnit  = typename CS::CodeUnit;
-        using CodePoint = typename CS::CodePoint;
-
-        class Iterator
-        {
-            InIt it_;
-
-        public:
-
-            using iterator_category = std::bidirectional_iterator_tag;
-            using value_type        = String<CS>;
-            using difference_type   =
-                typename std::iterator_traits<InIt>::difference_type;
-            using pointer           = ValuePointer<value_type>;
-            using reference         = value_type&;
-
-            using Self = Iterator;
-
-            explicit Iterator(InIt it);
-
-            value_type operator*() const;
-            pointer operator->() const;
-
-            Self &operator++();
-            Self operator++(int);
-            Self &operator--();
-            Self operator--(int);
-
-            bool operator==(const Self &rhs) const;
-            bool operator!=(const Self &rhs) const;
-        };
-
-        CharRange(const CodeUnit *beg, const CodeUnit *end);
-        CharRange(const String<CS> &str, const CodeUnit *beg,
-                                         const CodeUnit *end);
-
-        Iterator begin() const;
-        Iterator end()   const;
-    };
-
-    using Charset = CS;
-    using CodeUnit = typename CS::CodeUnit;
-    using CodePoint = typename CS::CodePoint;
-    using Self = StringView<CS>;
-    using Str = String<CS>;
-
-    using Iterator = const CodeUnit*;
-
+    //! 用于标记查找失败等特殊情形的下标，语义上表示+infinity
     static constexpr size_t NPOS = std::numeric_limits<size_t>::max();
 
     //! 取某个字符串的视图
@@ -297,10 +333,14 @@ public:
     //! 取某字符串的子串视图，并将该串缓存到视图中
     StringView(const Str &str, size_t begIdx, size_t endIdx);
 
+    /** 不允许自行构造，只能从 String<CS> 获得 */
     StringView()                  = delete;
+    /** 拷贝构造 */
     StringView(const Self &)      = default;
-    ~StringView()                  = default;
-    Self &operator=(const Self &) = default;
+    /** 默认析构 */
+    ~StringView()                 = default;
+    /** 拷贝赋值 */
+    StringView<CS> &operator=(const Self &) = default;
 
     //! 转换为对应的String
     Str AsString() const;
@@ -429,9 +469,9 @@ public:
     CodePointRange<CS> CodePoints() const && { return CodePointRange<CS>(*str_, beg_, beg_ + len_); }
 
     //! 用于以子串形式遍历字符串中每个字符的range对象
-    CharRange Chars() const &  { return CharRange(beg_, beg_ + len_); }
+    CharRange<CS> Chars() const &  { return CharRange(beg_, beg_ + len_); }
     //! 用于以子串形式遍历字符串中每个字符的range对象
-    CharRange Chars() const && { return CharRange(*str_, beg_, beg_ + len_); }
+    CharRange<CS> Chars() const && { return CharRange(*str_, beg_, beg_ + len_); }
 
     //! 转换为指定编码的std::string，默认使用UTF-8
     std::string ToStdString(NativeCharset cs = NativeCharset::UTF8)  const;
@@ -454,19 +494,22 @@ public:
     //! 和其他字符串连接产生新串
     Str operator+(const Self &rhs) const;
 
-    /** 逐码元严格相等 */
+    /** 字典序等于 */
     bool operator==(const Self &rhs) const;
+    /** 字典序不等于 */
     bool operator!=(const Self &rhs) const;
+    /** 字典序小于 */
     bool operator< (const Self &rhs) const;
+    /** 字段序大于 */
     bool operator> (const Self &rhs) const;
+    /** 字典序小于等于 */
     bool operator<=(const Self &rhs) const;
+    /** 字段序大于等于 */
     bool operator>=(const Self &rhs) const;
 };
 
 /**
  * @brief 不可变的字符串类
- * 
- * 大部分访问功能应参考 @class StringView
  */
 template<typename CS>
 class String
@@ -491,18 +534,18 @@ class String
 public:
 
     using Charset   = CS;                      ///< 字符编码方案
-    using CodeUnit  = typename CS::CodeUnit;  ///< 码元类型
-    using CodePoint = typename CS::CodePoint; ///< 码点类型
-    using Builder   = StringBuilder<CS>;      ///< 字符串构造器
+    using CodeUnit  = typename CS::CodeUnit;   ///< 码元类型
+    using CodePoint = typename CS::CodePoint;  ///< 码点类型
+    using Builder   = StringBuilder<CS>;       ///< 字符串构造器
     using View      = StringView<CS>;          ///< 视图类型
     using Self      = String<CS>;              ///< 自身类型
 
-    using CharRange = typename View::CharRange; ///< 以字符形式遍历码点的range类型
+    using Iterator = const CodeUnit*; ///< 遍历码元的迭代器类型
 
-    using Iterator = const CodeUnit*; ///< 遍历码元的range类型
-
+    //! 用于标记查找失败等特殊情形的下标，语义上表示+infinity
     static constexpr size_t NPOS = View::NPOS;
 
+    //! 默认初始化为空串
     String();
 
     //! 将字符串初始化为n个相同字符
@@ -526,7 +569,9 @@ public:
     //! 从std::wstring中初始化，缺省认为输入串使用WUTF编码
     String(const std::wstring &cppStr, NativeCharset cs = NativeCharset::WUTF);
 
+    /** 拷贝构造 */
     String(const Self &copyFrom);
+    /** 移动构造 */
     String(Self &&moveFrom) noexcept;
 
     //! 从使用其他编码方案的字符串中初始化，会自动进行编码转换
@@ -537,10 +582,13 @@ public:
     template<typename OCS, std::enable_if_t<!std::is_same_v<CS, OCS>, int> = 0>
     explicit String(const String<OCS> &convertFrom): Self(convertFrom.AsView()) {  }
 
+    /** 默认析构 */
     ~String() = default;
 
-    Self &operator=(const Self &copyFrom);
-    Self &operator=(Self &&moveFrom) noexcept;
+    /** 拷贝赋值 */
+    String<CS> &operator=(const Self &copyFrom);
+    /** 移动赋值 */
+    String<CS> &operator=(Self &&moveFrom) noexcept;
 
     /**
      * @brief 将整数转换为字符串
@@ -549,45 +597,25 @@ public:
      * @param base 转换所使用的进制，缺省为10
      */
     static Self From(char               v, unsigned int base = 10);
-    /**
-     * 见 String<CS>::From(char, unsigned int)
-     */
+    /** 见 String<CS>::From(char, unsigned int) */
     static Self From(signed char        v, unsigned int base = 10);
-    /**
-     * 见 String::From(char, unsigned int)
-     */
+    /** 见 String::From(char, unsigned int) */
     static Self From(unsigned char      v, unsigned int base = 10);
-    /**
-     * 见 String<CS>::From(char, unsigned int)
-     */
+    /** 见 String<CS>::From(char, unsigned int) */
     static Self From(short              v, unsigned int base = 10);
-    /**
-     * 见 String<CS>::From(char, unsigned int)
-     */
+    /** 见 String<CS>::From(char, unsigned int) */
     static Self From(unsigned short     v, unsigned int base = 10);
-    /**
-     * 见 String<CS>::From(char, unsigned int)
-     */
+    /** 见 String<CS>::From(char, unsigned int) */
     static Self From(int                v, unsigned int base = 10);
-    /**
-     * 见 String<CS>::From(char, unsigned int)
-     */
+    /** 见 String<CS>::From(char, unsigned int) */
     static Self From(unsigned int       v, unsigned int base = 10);
-    /**
-     * 见 String<CS>::From(char, unsigned int)
-     */
+    /** 见 String<CS>::From(char, unsigned int) */
     static Self From(long               v, unsigned int base = 10);
-    /**
-     * 见 String<CS>::From(char, unsigned int)
-     */
+    /** 见 String<CS>::From(char, unsigned int) */
     static Self From(unsigned long      v, unsigned int base = 10);
-    /**
-     * 见 String<CS>::From(char, unsigned int)
-     */
+    /** 见 String<CS>::From(char, unsigned int) */
     static Self From(long long          v, unsigned int base = 10);
-    /**
-     * 见 String<CS>::From(char, unsigned int)
-     */
+    /** 见 String<CS>::From(char, unsigned int) */
     static Self From(unsigned long long v, unsigned int base = 10);
 
     /**
@@ -609,7 +637,9 @@ public:
     const CodeUnit *Data() const;
     std::pair<const CodeUnit*, size_t> DataAndLength() const;
 
+    //! 取得码元数量
     size_t Length() const;
+    //! 是否是空串
     bool Empty()    const;
 
     View Trim()                                     const { return AsView().Trim();                          }
@@ -667,8 +697,8 @@ public:
     CodePointRange<CS> CodePoints() const &  { return CodePointRange<CS>(begin(), end()); }
     CodePointRange<CS> CodePoints() const && { return CodePointRange<CS>(*this, begin(), end()); }
 
-    CharRange Chars() const &  { return CharRange(begin(), end()); }
-    CharRange Chars() const && { return CharRange(*this, begin(), end()); }
+    CharRange<CS> Chars() const &  { return CharRange(begin(), end()); }
+    CharRange<CS> Chars() const && { return CharRange(*this, begin(), end()); }
 
     std::pair<const CodeUnit*, const CodeUnit*> BeginAndEnd() const { return storage_.BeginAndEnd(); }
 
@@ -677,29 +707,27 @@ public:
     Self &operator+=(const RHS &rhs) { return *this = *this + rhs; }
 };
 
-/**
- * @brief 将某个字符串重复R次
- */
+//! 复读机
 template<typename CS>
-String<CS> operator*(const String<CS> &L, size_t R);
-//! @copydoc operator*(const String<CS>&, size_t)
-template<typename CS>
+String<CS> operator*(const String<CS> &lhs, size_t rhs);
+//! 复读机
+    template<typename CS>
 String<CS> operator*(size_t L, const String<CS> &R) { return R * L; }
-//! @copydoc operator*(const String<CS>&, size_t)
+//! 复读机
 template<typename CS>
 String<CS> operator*(const StringView<CS> &L, size_t R) { return L.AsString() * R; }
-//! @copydoc operator*(const String<CS>&, size_t)
+//! 复读机
 template<typename CS>
 String<CS> operator*(size_t L, const StringView<CS> &R) { return R * L; }
 
 #define AGZ_WRAP_STR_COMP(LHS, RHS, LOP, ROP) \
-    template<typename CS> String<CS> operator+(const LHS lhs, const RHS rhs) { return LOP + ROP; } \
-    template<typename CS> bool operator==(const LHS lhs, const RHS rhs) { return LOP == ROP; } \
-    template<typename CS> bool operator!=(const LHS lhs, const RHS rhs) { return LOP != ROP; } \
-    template<typename CS> bool operator< (const LHS lhs, const RHS rhs) { return LOP < ROP; } \
-    template<typename CS> bool operator> (const LHS lhs, const RHS rhs) { return LOP > ROP; } \
-    template<typename CS> bool operator<=(const LHS lhs, const RHS rhs) { return LOP <= ROP; } \
-    template<typename CS> bool operator>=(const LHS lhs, const RHS rhs) { return LOP >= ROP; }
+    template<typename CS> String<CS> operator+(const LHS lhs, const RHS rhs) { return (LOP) + (ROP); } \
+    template<typename CS> bool operator==(const LHS lhs, const RHS rhs) { return (LOP) == (ROP); } \
+    template<typename CS> bool operator!=(const LHS lhs, const RHS rhs) { return (LOP) != (ROP); } \
+    template<typename CS> bool operator< (const LHS lhs, const RHS rhs) { return (LOP) < (ROP); } \
+    template<typename CS> bool operator> (const LHS lhs, const RHS rhs) { return (LOP) > (ROP); } \
+    template<typename CS> bool operator<=(const LHS lhs, const RHS rhs) { return (LOP) <= (ROP); } \
+    template<typename CS> bool operator>=(const LHS lhs, const RHS rhs) { return (LOP) >= (ROP); }
 
 AGZ_WRAP_STR_COMP(String<CS>&,     String<CS>&,     lhs.AsView(),             rhs.AsView())
 AGZ_WRAP_STR_COMP(String<CS>&,     StringView<CS>&, lhs.AsView(),             rhs)

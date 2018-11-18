@@ -3,7 +3,6 @@
 #include <cmath>
 #include <algorithm>
 #include <limits>
-#include <type_traits>
 
 #include "../Misc/Common.h"
 #include "../Misc/TypeOpr.h"

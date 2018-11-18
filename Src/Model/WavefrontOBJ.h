@@ -4,10 +4,10 @@
 #include <vector>
 
 #include "../Misc/Exception.h"
+#include "../Utils/FileSys.h"
 #include "../Utils/Math.h"
 #include "../Utils/Range.h"
 #include "../Utils/String.h"
-#include "../Utils/FileSys.h"
 #include "Model.h"
 
 namespace AGZ::Model {
@@ -28,7 +28,9 @@ public:
      */
     struct Index
     {
-        int32_t vtx, tex, nor;
+        int32_t vtx; ///< 位置索引
+        int32_t tex; ///< 纹理坐标索引
+        int32_t nor; ///< 法线索引
     };
 
     /**
@@ -36,7 +38,10 @@ public:
      */
     struct Face
     {
-        // -1 means this index is inavailable
+        /**
+         * 三角形三个顶点数据或四边形四个顶点的数据
+         * 若indices[3].vtx < 0，则为三角形；否则为四边形
+         */
         Index indices[4];
     };
 
@@ -45,11 +50,11 @@ public:
      */
     struct Obj
     {
-        std::vector<Vertex> vertices;
-        std::vector<TexCoord> texCoords;
-        std::vector<Normal> normals;
+        std::vector<Vertex> vertices;       ///< 顶点数组
+        std::vector<TexCoord> texCoords;    ///< 纹理坐标数组
+        std::vector<Normal> normals;        ///< 法线数组
 
-        std::vector<Face> faces;
+        std::vector<Face> faces;            ///< 面元数组
 
         /**
          * 转换为 GeometryMesh

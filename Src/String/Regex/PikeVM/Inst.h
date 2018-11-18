@@ -1,12 +1,12 @@
 #pragma once
 
-/**
- * @cond
- */
-
 #include <type_traits>
 
 #include "../../../Misc/Common.h"
+
+/**
+ * @cond
+ */
 
 namespace AGZ::StrImpl::PikeVM {
 

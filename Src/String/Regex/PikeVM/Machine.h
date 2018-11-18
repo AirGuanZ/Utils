@@ -1,9 +1,5 @@
 #pragma once
 
-/**
- * @cond
- */
-
 #include <limits>
 #include <optional>
 #include <utility>
@@ -12,6 +8,10 @@
 #include "../../../Misc/Common.h"
 #include "Syntax.h"
 #include "Backend.h"
+
+/**
+ * @cond
+ */
 
 namespace AGZ::StrImpl::PikeVM {
 

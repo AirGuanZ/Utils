@@ -1,16 +1,15 @@
 #pragma once
 
-/**
- * @cond
- */
-
 #include <type_traits>
 
-#include "../../../Alloc/ObjArena.h"
 #include "../../../Misc/Common.h"
 #include "../../../Misc/Exception.h"
 #include "Inst.h"
 #include "Syntax.h"
+
+/**
+ * @cond
+ */
 
 namespace AGZ::StrImpl::PikeVM {
 
@@ -124,7 +123,7 @@ public:
         moveFrom.relativeOffsetCount_ = 0;
     }
 
-    Self &operator=(Self &&moveFrom) noexcept
+    Program<CP> &operator=(Self &&moveFrom) noexcept
     {
         Release();
 

@@ -1,9 +1,5 @@
 #pragma once
 
-/**
- * @cond
- */
-
 #include <optional>
 
 #include "../../../Alloc/ObjArena.h"
@@ -11,6 +7,10 @@
 #include "../../../Misc/Exception.h"
 #include "../../String/StrAlgo.h"
 #include "../../String/String.h"
+
+/**
+ * @cond
+ */
 
 /*
     ab                    concatenation

@@ -177,7 +177,7 @@ public:
         new(obj) T(std::forward<Args>(args)...);
         new(destructor) Destructor<T>();
 
-        NodeHead *newNode = reinterpret_cast<NodeHead*>(data);
+        auto newNode = reinterpret_cast<NodeHead*>(data);
         newNode->nextNode = nodeEntry_;
         nodeEntry_ = newNode;
 

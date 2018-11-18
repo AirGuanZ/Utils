@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef __BYTE_ORDER__
 #include "../Misc/Common.h"
+#endif
 
 namespace AGZ::Endian {
 

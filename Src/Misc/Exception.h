@@ -3,8 +3,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "Common.h"
-
 namespace AGZ {
 
 /**

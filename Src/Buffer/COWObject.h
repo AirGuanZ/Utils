@@ -27,9 +27,10 @@ class COWObject
 
 public:
 
-    using Self   = COWObject<T, Alloc>;
-    using Object = T;
+    using Self   = COWObject<T, Alloc>; ///< 自身类型
+    using Object = T;                   ///< 内部存储的对象类型
 
+    /** 默认不存储任何对象 */
     COWObject()
         : storage_(nullptr)
     {
@@ -58,6 +59,7 @@ public:
         }
     }
 
+    /** 共享copyFrom所持有的对象的所有权 */
     COWObject(const Self &copyFrom)
         : storage_(copyFrom.storage_)
     {
@@ -65,18 +67,21 @@ public:
             ++storage_->refs_;
     }
 
+    /** 攫取moveFrom所持有的所有权 */
     COWObject(Self &&moveFrom) noexcept
         : storage_(moveFrom.storage_)
     {
         moveFrom.storage_ = nullptr;
     }
 
+    /** 释放持有的对象的所有权 */
     ~COWObject()
     {
         Release();
     }
 
-    Self &operator=(const Self &copyFrom)
+    /** 放弃原本持有对象的所有权，共享copyFrom持有对象的所有权 */
+    COWObject<T, Alloc> &operator=(const Self &copyFrom)
     {
         Release();
         storage_ = copyFrom.storage_;
@@ -84,8 +89,9 @@ public:
             ++storage_->refs_;
         return *this;
     }
-
-    Self &operator=(Self &&moveFrom)
+    
+    /** 放弃原本持有对象的所有权，攫取moveFrom持有对象的所有权 */
+    COWObject<T, Alloc> &operator=(Self &&moveFrom) noexcept
     {
         Release();
         storage_ = moveFrom.storage_;

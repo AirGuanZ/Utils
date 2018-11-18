@@ -23,8 +23,8 @@ void Copy(const E *src, size_t cnt, E *dst)
 template<typename E>
 RefCountedBuf<E> *RefCountedBuf<E>::New(size_t n)
 {
-    size_t allocSize = (sizeof(Self) - sizeof(E)) + n * sizeof(E);
-    Self *ret = alloc_throw<Self>(std::malloc, allocSize);
+    size_t allocSize = (sizeof(RefCountedBuf<E>) - sizeof(E)) + n * sizeof(E);
+    auto *ret = alloc_throw<RefCountedBuf<E>>(std::malloc, allocSize);
     ret->refs_ = 1;
     return ret;
 }
@@ -88,6 +88,7 @@ CU *Storage<CU>::GetLargeMutableData()
 template<typename CU>
 CU *Storage<CU>::GetMutableData()
 {
+    AGZ_ASSERT(IsSmallStorage() || large_.buf->GetRefCount() == 1);
     return IsSmallStorage() ? GetSmallMutableData() :
                               GetLargeMutableData();
 }
@@ -325,7 +326,7 @@ Storage_NoSSO<CU>::~Storage_NoSSO()
 }
 
 template<typename CU>
-typename Storage_NoSSO<CU>::Self &Storage_NoSSO<CU>::operator=(const Self &copyFrom)
+Storage_NoSSO<CU> &Storage_NoSSO<CU>::operator=(const Self &copyFrom)
 {
     if(buf_)
         buf_->DecRef();
@@ -334,7 +335,7 @@ typename Storage_NoSSO<CU>::Self &Storage_NoSSO<CU>::operator=(const Self &copyF
 }
 
 template<typename CU>
-typename Storage_NoSSO<CU>::Self &Storage_NoSSO<CU>::operator=(Self &&moveFrom) noexcept
+Storage_NoSSO<CU> &Storage_NoSSO<CU>::operator=(Self &&moveFrom) noexcept
 {
     if(buf_)
         buf_->DecRef();
@@ -403,36 +404,33 @@ typename CodePointRange<CS>::Iterator CodePointRange<CS>::end() const
 }
 
 template<typename CS>
-StringView<CS>::CharRange::Iterator::Iterator(InIt it)
+CharRange<CS>::Iterator::Iterator(InIt it)
     : it_(it)
 {
 
 }
 
 template<typename CS>
-String<CS> StringView<CS>::CharRange::Iterator::operator*() const
+String<CS> CharRange<CS>::Iterator::operator*() const
 {
     return String<CS>(*it_);
 }
 
 template<typename CS>
-typename StringView<CS>::CharRange::Iterator::pointer
-StringView<CS>::CharRange::Iterator::operator->() const
+typename CharRange<CS>::Iterator::pointer CharRange<CS>::Iterator::operator->() const
 {
     return pointer(**this);
 }
 
 template<typename CS>
-typename StringView<CS>::CharRange::Iterator &
-StringView<CS>::CharRange::Iterator::operator++()
+typename CharRange<CS>::Iterator & CharRange<CS>::Iterator::operator++()
 {
     ++it_;
     return *this;
 }
 
 template<typename CS>
-typename StringView<CS>::CharRange::Iterator
-StringView<CS>::CharRange::Iterator::operator++(int)
+typename CharRange<CS>::Iterator CharRange<CS>::Iterator::operator++(int)
 {
     auto ret = *this;
     ++*this;
@@ -440,16 +438,14 @@ StringView<CS>::CharRange::Iterator::operator++(int)
 }
 
 template<typename CS>
-typename StringView<CS>::CharRange::Iterator &
-StringView<CS>::CharRange::Iterator::operator--()
+typename CharRange<CS>::Iterator & CharRange<CS>::Iterator::operator--()
 {
     --it_;
     return *this;
 }
 
 template<typename CS>
-typename StringView<CS>::CharRange::Iterator
-StringView<CS>::CharRange::Iterator::operator--(int)
+typename CharRange<CS>::Iterator CharRange<CS>::Iterator::operator--(int)
 {
     auto ret = *this;
     --*this;
@@ -457,42 +453,39 @@ StringView<CS>::CharRange::Iterator::operator--(int)
 }
 
 template<typename CS>
-bool StringView<CS>::CharRange::Iterator::operator==(const Self &rhs) const
+bool CharRange<CS>::Iterator::operator==(const Self &rhs) const
 {
     return it_ == rhs.it_;
 }
 
 template<typename CS>
-bool StringView<CS>::CharRange::Iterator::operator!=(const Self &rhs) const
+bool CharRange<CS>::Iterator::operator!=(const Self &rhs) const
 {
     return !(*this == rhs);
 }
 
 template<typename CS>
-StringView<CS>::CharRange::CharRange(const CodeUnit *beg, const CodeUnit *end)
+CharRange<CS>::CharRange(const CodeUnit *beg, const CodeUnit *end)
     : CPR_(beg, end)
 {
 
 }
 
 template<typename CS>
-StringView<CS>::CharRange::CharRange(const String<CS> &str, const CodeUnit *beg,
-                                                            const CodeUnit *end)
+CharRange<CS>::CharRange(const String<CS> &str, const CodeUnit *beg, const CodeUnit *end)
     : CPR_(str, beg, end)
 {
 
 }
 
 template<typename CS>
-typename StringView<CS>::CharRange::Iterator
-StringView<CS>::CharRange::begin() const
+typename CharRange<CS>::Iterator CharRange<CS>::begin() const
 {
     return Iterator(CPR_.begin());
 }
 
 template<typename CS>
-typename StringView<CS>::CharRange::Iterator
-StringView<CS>::CharRange::end() const
+typename CharRange<CS>::Iterator CharRange<CS>::end() const
 {
     return Iterator(CPR_.end());
 }

@@ -96,7 +96,11 @@ public:
      * @exception ConfigNodeKeyNotFound 参数路径不存在时抛出
      */
     const ConfigNode &operator[](const Str8 &k) const;
-    //! @copydoc ConfigGroup::operator[](const Str8 &k) const
+    /**
+     * @copydoc ConfigGroup::Find(const Str8&) const
+     *
+     * @exception ConfigNodeKeyNotFound 参数路径不存在时抛出
+     */
     const ConfigNode &operator[](const StrView8 &k) const;
 
     /**

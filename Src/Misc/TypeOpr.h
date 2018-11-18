@@ -3,8 +3,6 @@
 #include <tuple>
 #include <variant>
 
-#include "../Misc/Common.h"
-
 namespace AGZ::TypeOpr {
 
 template<typename...TypeList>
