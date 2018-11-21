@@ -307,6 +307,9 @@
     <ClInclude Include="..\Src\Time\Clock.h">
       <Filter>Time</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\Texture\CubeMap.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\Math\SwizzleVec4.inl">
