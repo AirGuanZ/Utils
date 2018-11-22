@@ -130,7 +130,7 @@ namespace RangeAux
 
             value_type operator[](difference_type n) const
             {
-                return (*f)(*it);
+                return (*f)(*(it + n));
             }
 
             friend Iterator operator+(Iterator i, difference_type n)

@@ -738,7 +738,7 @@ template<typename CS>
 bool StringView<CS>::IsAlnum(unsigned int base) const
 {
     auto [d, l] = DataAndLength();
-    return l == 1 && ByteIden(d[0]) < 36;
+    return l == 1 && ByteIden(d[0]) < base;
 }
 
 template<typename CS>
@@ -747,7 +747,7 @@ bool StringView<CS>::IsAlnums(unsigned int base) const
     auto [d, l] = DataAndLength();
     for(size_t i = 0; i < l; ++i)
     {
-        if(ByteIden(d[i]) >= 36)
+        if(ByteIden(d[i]) >= base)
             return false;
     }
     return true;
