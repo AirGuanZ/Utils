@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 #include "../Utils/Math.h"
 
 namespace AGZ {
 
 /**
- * @brief Á¢·½ÎÆÀíÓ³Éä
+ * @brief ç«‹æ–¹çº¹ç†æ˜ å°„
  */
 template<typename T>
 class CubeMapper
@@ -13,7 +13,7 @@ class CubeMapper
 public:
 
     /**
-     * Ãæ±àºÅ£¬±íÊ¾·½Ïò±»Ó³ÉäÖÁÄÄ¸öÃæËù¶ÔÓ¦µÄÎÆÀí
+     * é¢ç¼–å·ï¼Œè¡¨ç¤ºæ–¹å‘è¢«æ˜ å°„è‡³å“ªä¸ªé¢æ‰€å¯¹åº”çš„çº¹ç†
      */
     enum FaceIndex
     {
@@ -26,16 +26,16 @@ public:
     };
 
     /**
-     * Ó³Éä½á¹û
+     * æ˜ å°„ç»“æœ
      */
     struct MapResult
     {
-        FaceIndex face;   // ¸ø¶¨·½Ïò±»Ó³ÉäÖÁÄÄ¸öÃæ
-        Math::Vec2<T> uv; // Õâ¸öÃæÉÏµÄuvÖµ
+        FaceIndex face;   // ç»™å®šæ–¹å‘è¢«æ˜ å°„è‡³å“ªä¸ªé¢
+        Math::Vec2<T> uv; // è¿™ä¸ªé¢ä¸Šçš„uvå€¼
     };
 
     /**
-     * ½«·½ÏòÏòÁ¿Ó³ÉäÖÁÁ¢·½ÎÆÀí×ø±ê
+     * å°†æ–¹å‘å‘é‡æ˜ å°„è‡³ç«‹æ–¹çº¹ç†åæ ‡
      */
     static MapResult Map(const Math::Vec3<T> &xyz);
 };
@@ -55,8 +55,9 @@ namespace Impl
             t = T(-1) / dir[Axis];
 
         auto p = t * dir;
-        if(Abs(p[(Axis + 1) % 3]) > T(1) ||
-           Abs(p[(Axis + 2) % 3]) > T(1))
+        if(t < 0 ||
+           Math::Abs(p[(Axis + 1) % 3]) > T(1) ||
+           Math::Abs(p[(Axis + 2) % 3]) > T(1))
             return None;
 
         return p;
@@ -94,7 +95,7 @@ typename CubeMapper<T>::MapResult CubeMapper<T>::Map(const Math::Vec3<T> &dir)
         if(neg)
         {
             T u = Clamp(T(0.5) - T(0.5) * op->y, T(0), T(1));
-            T v = Clamp(T(0.5) - T(0.5) * op->z, T(0), T(1));
+            T v = Clamp(T(0.5) * op->z + T(0.5), T(0), T(1));
             return { NEG_X, { u, v } };
         }
         else
@@ -113,7 +114,7 @@ typename CubeMapper<T>::MapResult CubeMapper<T>::Map(const Math::Vec3<T> &dir)
         else
         {
             T u = Clamp(T(0.5) - T(0.5) * op->x, T(0), T(1));
-            T v = Clamp(T(0.5) - T(0.5) * op->z, T(0), T(1));
+            T v = Clamp(T(0.5) * op->z + T(0.5), T(0), T(1));
             return { POS_Y, { u, v } };
         }
     case Z:
@@ -121,7 +122,7 @@ typename CubeMapper<T>::MapResult CubeMapper<T>::Map(const Math::Vec3<T> &dir)
         {
             T u = Clamp(T(0.5) - T(0.5) * op->x, T(0), T(1));
             T v = Clamp(T(0.5) - T(0.5) * op->y, T(0), T(1));
-            return { NEG_Z, { u, v } };
+            return { NEG_Z, { 1 - u, v } };
         }
         else
         {
