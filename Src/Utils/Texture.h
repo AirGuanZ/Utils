@@ -4,3 +4,4 @@
 #include "../Texture/Texture.h"
 #include "../Texture/TextureFile.h"
 #include "../Texture/Sampler.h"
+#include "../Texture/SphereMap.h"

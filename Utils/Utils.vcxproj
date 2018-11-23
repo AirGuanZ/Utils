@@ -88,6 +88,7 @@
     <ClInclude Include="..\Src\String\String\String.h" />
     <ClInclude Include="..\Src\Texture\CubeMap.h" />
     <ClInclude Include="..\Src\Texture\Sampler.h" />
+    <ClInclude Include="..\Src\Texture\SphereMap.h" />
     <ClInclude Include="..\Src\Texture\Texture.h" />
     <ClInclude Include="..\Src\Texture\TextureFile.h" />
     <ClInclude Include="..\Src\Time\Clock.h" />
