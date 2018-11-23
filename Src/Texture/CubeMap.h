@@ -6,6 +6,8 @@ namespace AGZ {
 
 /**
  * @brief 立方纹理映射
+ * 
+ * 并不支持对立方体纹理坐标进行各种旋转、翻转的倒腾，自己试吧……
  */
 template<typename T>
 class CubeMapper
@@ -37,7 +39,7 @@ public:
     /**
      * 将方向向量映射至立方纹理坐标
      */
-    static MapResult Map(const Math::Vec3<T> &xyz);
+    static MapResult Map(const Math::Vec3<T> &dir);
 };
 
 namespace Impl
@@ -135,4 +137,4 @@ typename CubeMapper<T>::MapResult CubeMapper<T>::Map(const Math::Vec3<T> &dir)
     }
 }
 
-}
+} // namespace AGZ
