@@ -70,8 +70,8 @@ inline const ConfigGroup &ConfigGroup::AsGroup() const
     return *this;
 }
 
-inline ConfigArray::ConfigArray(std::vector<const ConfigNode*> &&content)
-    : array_(std::move(content))
+inline ConfigArray::ConfigArray(std::vector<const ConfigNode*> &&content, Str8 tag)
+    : array_(std::move(content)), tag_(std::move(tag))
 {
     
 }
@@ -207,7 +207,7 @@ namespace Impl
 
         auto tidx = src.FindCPIf([](auto c)
         {
-            return StrAlgo::IsUnicodeWhitespace(c) || c == ',' || c == '=' || c == ';' || c == ')';
+            return StrAlgo::IsUnicodeWhitespace(c) || c == ',' || c == '=' || c == ';' || c == ')' || c == '(';
         });
         if(!tidx)
             return None;
@@ -239,7 +239,25 @@ namespace Impl
             return arena.Create<ConfigGroup>(std::move(content));
         }
 
-        if(t.type == TokenType::LeftPara)
+        Str8 arrTag;
+
+        if(t.type == TokenType::Name)
+        {
+            auto name = std::move(t.str);
+            toks.pop_front();
+
+            if(toks.empty() || toks.front().type != TokenType::LeftPara)
+                return arena.Create<ConfigValue>(std::move(name));
+            arrTag = std::move(name);
+        }
+        else if(t.type == TokenType::String)
+        {
+            auto ret = arena.Create<ConfigValue>(std::move(t.str));
+            toks.pop_front();
+            return ret;
+        }
+
+        if(toks.front().type == TokenType::LeftPara)
         {
             toks.pop_front();
 
@@ -251,7 +269,7 @@ namespace Impl
             if(toks.front().type == TokenType::RightPara)
             {
                 toks.pop_front();
-                return arena.Create<ConfigArray>(std::move(content));
+                return arena.Create<ConfigArray>(std::move(content), std::move(arrTag));
             }
 
             content.push_back(ParseItemRight(toks, arena));
@@ -262,6 +280,9 @@ namespace Impl
                     throw Exception("");
                 toks.pop_front();
 
+                if(toks.empty() || toks.front().type == TokenType::RightPara)
+                    break;
+
                 content.push_back(ParseItemRight(toks, arena));
             }
 
@@ -269,14 +290,7 @@ namespace Impl
                 throw Exception("");
             toks.pop_front();
 
-            return arena.Create<ConfigArray>(std::move(content));
-        }
-
-        if(t.type == TokenType::String || t.type == TokenType::Name)
-        {
-            auto ret = arena.Create<ConfigValue>(std::move(t.str));
-            toks.pop_front();
-            return ret;
+            return arena.Create<ConfigArray>(std::move(content), std::move(arrTag));
         }
 
         throw Exception("");

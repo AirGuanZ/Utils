@@ -80,7 +80,7 @@ public:
     void Expand(const std::unordered_map<Str8, ConfigNode*> &more);
 
     //! 取得所有内容
-    const std::unordered_map<Str8, ConfigNode*> GetChildren() const { return children_; }
+    const std::unordered_map<Str8, ConfigNode*> &GetChildren() const { return children_; }
 
     /**
      * 查找具有指定路径的配置参数值
@@ -119,10 +119,11 @@ public:
 class ConfigArray : public ConfigNode
 {
     std::vector<const ConfigNode*> array_;
+    Str8 tag_;
 
 public:
 
-    explicit ConfigArray(std::vector<const ConfigNode*> &&content);
+    ConfigArray(std::vector<const ConfigNode*> &&content, Str8 tag);
 
     /**
      * 取得指定位置的元素
@@ -144,6 +145,9 @@ public:
 
     /** 取得数组元素数量 */
     size_t Size() const;
+
+    /** 取得数组tag名字，若未给出则为空字符串 */
+    const Str8 &GetTag() const { return tag_; }
 
     /**
      * 返回作为ConfigArray的this指针
@@ -206,6 +210,7 @@ books = (
     title = "XiXi";
     author = "Li4";
 });
+tagged_array = F(1, 2, 3);
 @endcode
  * 整个文件内容构成一个匿名参数集合，其中：
  * - window这个名字被映射到另一个参数集合
