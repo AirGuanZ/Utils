@@ -20,36 +20,20 @@ public:
     /**
      * 求能给出沿着-dir方向的环境光的texel对应的uv坐标，(0, 0)对应左上角
      * 
-     * 假设是沿着+x方向看的球体，球体充斥了整个画面，和图像的四个边缘都正好相切
+     * 假设是沿着-x方向看的球体，球体充斥了整个画面，和图像的四个边缘都正好相切
      */
     static Math::Vec2<T> Map(const Math::Vec3<T> &dir);
-
-    /**
-     * 给定SphereMap上的uv坐标，求其对应的dir
-     */
-    static Math::Vec3<T> InvMap(const Math::Vec2<T> &uv);
 };
 
 template<typename T>
 Math::Vec2<T> SphereMapper<T>::Map(const Math::Vec3<T> &dir)
 {
-    auto nor = (dir.Normalize() - Math::Vec3<T>::UNIT_X()).Normalize();
-    T u = Math::Clamp<T>(1 - T(0.5) * nor.y, T(0), T(1));
-    T v = Math::Clamp<T>(1 - T(0.5) * nor.z, T(0), T(1));
+    auto nor = (dir.Normalize() + Math::Vec3<T>::UNIT_X()).Normalize();
+    if(Math::FP<T>(nor.y).ApproxEq(T(0)) && Math::FP<T>(nor.z).ApproxEq(T(0)))
+        return { T(1), T(0.5) };
+    T u = Math::Clamp<T>(T(0.5) + T(0.5) * nor.y, T(0), T(1));
+    T v = Math::Clamp<T>(T(0.5) - T(0.5) * nor.z, T(0), T(1));
     return { u, v };
-}
-
-template<typename T>
-Math::Vec3<T> SphereMapper<T>::InvMap(const Math::Vec2<T> &uv)
-{
-    T ny = 1 - 2 * uv.u;
-    T nz = 1 - 2 * uv.v;
-    T nx = Math::Sqrt<T>(Math::Max<T>(T(0), 1 - ny * ny - nz * nz));
-    
-    auto a = -Math::Vec3<T>::UNIT_X();
-    auto n = Math::Vec3<T>(nx ,ny, nz);
-
-    return 2 * Math::Dot(a, n) * n - a;
 }
 
 } // namespace AGZ
