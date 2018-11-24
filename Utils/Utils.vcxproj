@@ -37,6 +37,7 @@
     <ClInclude Include="..\Src\Math\DistributionTransform.h" />
     <ClInclude Include="..\Src\Math\Scalar.h" />
     <ClInclude Include="..\Src\Math\F32x4.h" />
+    <ClInclude Include="..\Src\Math\SH.h" />
     <ClInclude Include="..\Src\Math\Tri.h" />
     <ClInclude Include="..\Src\Math\Vec.h" />
     <ClInclude Include="..\Src\Math\Vec2.h" />
@@ -91,6 +92,7 @@
     <ClInclude Include="..\Src\Texture\SphereMap.h" />
     <ClInclude Include="..\Src\Texture\Texture.h" />
     <ClInclude Include="..\Src\Texture\TextureFile.h" />
+    <ClInclude Include="..\Src\Thread\StaticTaskDispatcher.h" />
     <ClInclude Include="..\Src\Time\Clock.h" />
     <ClInclude Include="..\Src\Utils.h" />
     <ClInclude Include="..\Src\Utils\Alloc.h" />
@@ -104,6 +106,7 @@
     <ClInclude Include="..\Src\Utils\Range.h" />
     <ClInclude Include="..\Src\Utils\String.h" />
     <ClInclude Include="..\Src\Utils\Texture.h" />
+    <ClInclude Include="..\Src\Utils\Thread.h" />
     <ClInclude Include="..\Src\Utils\Time.h" />
   </ItemGroup>
   <ItemGroup>

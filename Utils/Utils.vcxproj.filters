@@ -52,6 +52,9 @@
     <Filter Include="Config">
       <UniqueIdentifier>{1618bb83-3dd2-4098-92c2-9e803689af30}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Thread">
+      <UniqueIdentifier>{08b201c1-09a0-4ad8-ac14-5a74f5f561e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Math\Scalar.h">
@@ -312,6 +315,15 @@
     </ClInclude>
     <ClInclude Include="..\Src\Texture\SphereMap.h">
       <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Math\SH.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Thread\StaticTaskDispatcher.h">
+      <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Thread.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
