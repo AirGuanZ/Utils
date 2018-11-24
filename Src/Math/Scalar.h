@@ -12,9 +12,7 @@ namespace AGZ::Math {
 
 namespace Impl
 {
-    template<typename T> struct Abs_impl;
-    template<>           struct Abs_impl<float> { static float  Abs(float v) { return std::abs(v); } };
-    template<>           struct Abs_impl<double> { static double Abs(double v) { return std::fabs(v); } };
+    template<typename T> struct Abs_impl { static T Abs(T v) { return std::abs(v); } };
     template<typename T> struct Abs_impl<Rad<T>> { static Rad<T> Abs(Rad<T> v) { return Rad<T>{ Abs_impl<T>::Abs(v.value) }; } };
     template<typename T> struct Abs_impl<Deg<T>> { static Deg<T> Abs(Deg<T> v) { return Deg<T>{ Abs_impl<T>::Abs(v.value) }; } };
 }
