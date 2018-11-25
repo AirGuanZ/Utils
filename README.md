@@ -4,11 +4,12 @@
 - [x] Range: range objects and transformers. May be deprecated after C++ 20
 - [x] String: immutable encoding-aware string
 - [x] Regex: regular expression with my favourite features
-- [x] Texture: texture loading/saving/sampling
+- [x] Texture: texture loading/saving/sampling, cube/sphere mapping
 - [x] Arena: fast object pool
 - [x] Path: cross-platform file/directory path management
 - [x] Config: configuration parsing tool
 - [x] WavefrontOBJ: wavefront OBJ file loader
+- [x] Thread: static task dispatcher
 - [x] Others: Endian, COWObject, TypeOpr (for TMP), Singleton, Uncopiable, Platform, Clock...
 
 I'll always keep this library using the latest C++ standard.
