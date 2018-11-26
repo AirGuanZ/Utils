@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <type_traits>
 #include <vector>
 
@@ -155,6 +156,24 @@ public:
     size_t GetByteSize() const { return dataStream_.size(); }
 
     const char *GetData() const { return dataStream_.data(); }
+};
+
+/**
+ * @brief 二进制标准流序列化器，将对象序列化至std::ostream
+ */
+class BinaryOStreamSerializer : public BinarySerializer, public Uncopiable
+{
+    std::ostream &os_;
+
+    bool WriteImpl(const void *ptr, size_t byteSize) override
+    {
+        AGZ_ASSERT(ptr);
+        return static_cast<bool>(os_.write((const char*)ptr, byteSize));
+    }
+
+public:
+
+    BinaryOStreamSerializer(std::ostream &os) : os_(os) { }
 };
 
 }

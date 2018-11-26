@@ -1,5 +1,6 @@
 #pragma once
 
+#include <istream>
 #include <type_traits>
 
 #include "../Misc/Common.h"
@@ -117,6 +118,9 @@ public:
     virtual bool End() = 0;
 };
 
+/**
+ * @brief 二进制内存反序列化器，即将从内存反序列化得到对象的BinaryDeserializer
+ */
 class BinaryMemoryDeserializer : public BinaryDeserializer, public AGZ::Uncopiable
 {
     const char *pData_, *pEnd_;
@@ -145,6 +149,24 @@ public:
     size_t RemainingByteSize() const { return pEnd_ - pData_; }
 
     bool End() override { return pData_ >= pEnd_; }
+};
+
+/**
+ * @brief 二进制标准流反序列化器，即将从std::istream中反序列化得到对象的BinaryDeserializer
+ */
+class BinaryIStreamDeserializer : public BinaryDeserializer, public Uncopiable
+{
+    std::istream &is_;
+
+    bool ReadImpl(void *output, size_t byteSize) override
+    {
+        AGZ_ASSERT(output);
+        return static_cast<bool>(is_.read((char*)output, byteSize));
+    }
+
+public:
+
+    BinaryIStreamDeserializer(std::istream &is) : is_(is) { }
 };
 
 }
