@@ -25,7 +25,7 @@ class BinaryDeserializer
     struct HasDeserialize<
         T, std::void_t<decltype(
             std::declval<T>().Deserialize(
-                std::declval<BinaryDeserializer>()))>>
+                *((BinaryDeserializer*)(nullptr))))>>
         : std::true_type { };
     
     template<typename T, typename = void>

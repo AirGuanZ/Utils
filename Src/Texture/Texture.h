@@ -3,6 +3,7 @@
 #include <type_traits>
 
 #include "../Utils/Math.h"
+#include "../Utils/Serialize.h"
 
 namespace AGZ {
 
@@ -215,6 +216,37 @@ public:
             newData[i] = func(data_[i]);
         
         return ret;
+    }
+
+    bool Serialize(BinarySerializer &serializer) const
+    {
+        serializer.Serialize(size_);
+
+        for(uint32_t i = 0; i < cnt_; ++i)
+        {
+            if(!serializer.Serialize(data_[i]))
+                return false;
+        }
+
+        return serializer.Ok();
+    }
+
+    bool Deserialize(BinaryDeserializer &deserializer)
+    {
+        if(IsAvailable())
+            UncheckedRelease();
+        
+        Coord size;
+        deserializer.Deserialize(size);
+        
+        new(this) Self(size);
+        for(uint32_t i = 0; i < cnt_; ++i)
+        {
+            if(!deserializer.Deserialize(data_[i]))
+                return false;
+        }
+        
+        return deserializer.Ok();
     }
 };
 

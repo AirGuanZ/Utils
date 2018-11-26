@@ -26,4 +26,15 @@ TEST_CASE("Texture2D")
     tex0.Clear(COLOR::RED);
     auto tex1 = tex0.Map([](const Color3f &c) { return c / 2.0f; });
     REQUIRE(ApproxEq(Float(tex1(5, 5).x), Float(0.5f)));
+
+    BinaryMemorySerializer serializer;
+    serializer.Serialize(tex1);
+
+    BinaryMemoryDeserializer deserializer(serializer.GetData(), serializer.GetByteSize());
+    Texture2D<Color3f> tex2;
+    deserializer.Deserialize(tex2);
+
+    REQUIRE(tex2.GetWidth() == 640);
+    REQUIRE(tex2.GetHeight() == 480);
+    REQUIRE(ApproxEq(tex2(5, 5).x, 0.5f, 1e-4f));
 }
