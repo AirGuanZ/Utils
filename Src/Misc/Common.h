@@ -174,4 +174,6 @@ inline size_t CombineHash(size_t fst, size_t snd)
     return fst ^ (snd + 0x9e3779b9 + (fst << 6) + (fst >> 2));
 }
 
+using std::size_t;
+
 } // namespace AGZ

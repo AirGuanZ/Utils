@@ -9,6 +9,7 @@
 #include "Utils/Model.h"
 #include "Utils/Platform.h"
 #include "Utils/Range.h"
+#include "Utils/Serialize.h"
 #include "Utils/String.h"
 #include "Utils/Texture.h"
 #include "Utils/Thread.h"
