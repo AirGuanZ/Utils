@@ -31,7 +31,7 @@ class BinarySerializer
     struct HasSerialize<
         T, std::void_t<decltype(
                 std::declval<T>().Serialize(
-                    *((BinarySerializer*)(nullptr))))>>
+                    DeclLRef<BinarySerializer>()))>>
         : std::true_type { };
 
     template<typename T, typename = void>
@@ -41,7 +41,7 @@ class BinarySerializer
     struct HasLeftShift<
         T, std::void_t<decltype(
                 BinarySerializeImplementator<T>::Serialize(
-                    *((BinarySerializer*)(nullptr)),
+                    DeclLRef<BinarySerializer>(),
                     std::declval<T>()))>>
         : std::true_type { };
 

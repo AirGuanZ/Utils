@@ -26,7 +26,7 @@ class BinaryDeserializer
     struct HasDeserialize<
         T, std::void_t<decltype(
             std::declval<T>().Deserialize(
-                *((BinaryDeserializer*)(nullptr))))>>
+                DeclLRef<BinaryDeserializer>()))>>
         : std::true_type { };
     
     template<typename T, typename = void>
@@ -36,8 +36,8 @@ class BinaryDeserializer
     struct HasRightShift<
         T, std::void_t<decltype(
             BinaryDeserializeImplementator<T>::Deserialize(
-                *((BinaryDeserializer*)(nullptr)),
-                *((remove_rcv_t<T>*)(nullptr))))>>
+                DeclLRef<BinaryDeserializer>(),
+                DeclLRef<T>()))>>
         : std::true_type { };
 
     template<typename T, bool HasRightShift>
@@ -167,6 +167,8 @@ class BinaryIStreamDeserializer : public BinaryDeserializer, public Uncopiable
 public:
 
     BinaryIStreamDeserializer(std::istream &is) : is_(is) { }
+
+    bool End() override { return is_.eof(); }
 };
 
 }

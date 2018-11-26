@@ -9,6 +9,7 @@
 - [x] Path: cross-platform file/directory path management
 - [x] Config: configuration parsing tool
 - [x] WavefrontOBJ: wavefront OBJ file loader
+- [x] Serialize: Binary memory/std::stream serializer/deserializer
 - [x] Thread: static task dispatcher
 - [x] Others: Endian, COWObject, TypeOpr (for TMP), Singleton, Uncopiable, Platform, Clock...
 
