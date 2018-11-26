@@ -95,7 +95,7 @@ public:
 
         Params params = { sharedParam, tasks, taskMut, exceptions_, exceptionMut };
 
-        for(int i = 1; i < workerCount_; ++i)
+        for(int i = 0; i < workerCount_; ++i)
             workers.emplace_back(&Worker<Func>, func, params);
         Worker(func, params);
 
