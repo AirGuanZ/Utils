@@ -13,6 +13,7 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Serialize.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Catch.hpp" />

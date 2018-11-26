@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <ostream>
 #include <type_traits>
@@ -31,7 +31,7 @@ class BinarySerializer
     struct HasSerialize<
         T, std::void_t<decltype(
                 std::declval<T>().Serialize(
-                    DeclLRef<BinarySerializer>()))>>
+                    *static_cast<BinarySerializer*>(nullptr)))>>
         : std::true_type { };
 
     template<typename T, typename = void>
@@ -41,7 +41,7 @@ class BinarySerializer
     struct HasLeftShift<
         T, std::void_t<decltype(
                 BinarySerializeImplementator<T>::Serialize(
-                    DeclLRef<BinarySerializer>(),
+                    *static_cast<BinarySerializer*>(nullptr),
                     std::declval<T>()))>>
         : std::true_type { };
 
