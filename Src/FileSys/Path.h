@@ -175,7 +175,7 @@ public:
      * 
      * @param style 转换时使用的路径风格，缺省由编译器自动判断
      */
-    Str ToStr(SeperatorStyle style = Native)
+    Str ToStr(SeperatorStyle style = Native) const
     {
         return GetDirectoryStr(style) + filename_;
     }
@@ -187,7 +187,7 @@ public:
      * 
      * @return 若*this为目录，将返回字符串表示的目录；若*this为文件，会返回它所在的目录的字符串
      */
-    Str GetDirectoryStr(SeperatorStyle style = Native)
+    Str GetDirectoryStr(SeperatorStyle style = Native) const
     {
         auto s = style == Windows ? "\\" : "/";
         return Str(s).Join(dirs_) + s;

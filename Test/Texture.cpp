@@ -38,3 +38,10 @@ TEST_CASE("Texture2D")
     REQUIRE(tex2.GetHeight() == 480);
     REQUIRE(ApproxEq(tex2(5, 5).x, 0.5f, 1e-4f));
 }
+
+TEST_CASE("SphereMapper")
+{
+    using S = SphereMapper<double>;
+
+    REQUIRE(ApproxEq(S::InvMap(S::Map(Vec3d(1.0, 2.0, 3.0))), Vec3d(1.0, 2.0, 3.0).Normalize(), 1e-4));
+}

@@ -23,6 +23,8 @@ public:
      * 假设是沿着-x方向看的球体，球体充斥了整个画面，和图像的四个边缘都正好相切
      */
     static Math::Vec2<T> Map(const Math::Vec3<T> &dir);
+
+    static Math::Vec3<T> InvMap(const Math::Vec2<T> &uv);
 };
 
 template<typename T>
@@ -34,6 +36,16 @@ Math::Vec2<T> SphereMapper<T>::Map(const Math::Vec3<T> &dir)
     T u = Math::Clamp<T>(T(0.5) + T(0.5) * nor.y, T(0), T(1));
     T v = Math::Clamp<T>(T(0.5) - T(0.5) * nor.z, T(0), T(1));
     return { u, v };
+}
+
+template<typename T>
+Math::Vec3<T> SphereMapper<T>::InvMap(const Math::Vec2<T> &uv)
+{
+    auto ny = T(2) * uv.u - T(1);
+    auto nz = T(1) - T(2) * uv.v;
+    auto nx = Math::Sqrt(Math::Max(T(0), T(1) - ny * ny - nz * nz));
+    Math::Vec3<T> nor = Math::Vec3<T>(nx, ny, nz).Normalize();
+    return T(2) * Dot(nor, Math::Vec3<T>::UNIT_X()) * nor - Math::Vec3<T>::UNIT_X();
 }
 
 } // namespace AGZ

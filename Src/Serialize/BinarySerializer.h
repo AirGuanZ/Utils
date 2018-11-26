@@ -13,7 +13,7 @@ namespace AGZ {
  * @brief 外部序列化设置器
  * 
  * 对任意类型T，若T未实现Serialize，则只需要实现特化类BinarySerializeImplementator<T>中的成员函数：
- *  bool BinarySerializeImplementator<T>::Serialize(BinarySerializer&, T&)
+ *  bool BinarySerializeImplementator<T>::Serialize(BinarySerializer&, const T&)
  * 即可让BinarySerializer::Serialize用该实现来进行T的反序列化
  */
 template<typename T>

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "../Misc/Common.h"
 #include "Tri.h"
@@ -116,9 +116,9 @@ namespace SHImpl
  */
 
 /**
- * @brief ÈıÎ¬Å·ÊÏ×ø±êÏµÏÂµÄÇòĞ³º¯Êı£¬Ö»¶¨Òåµ½3½×
+ * @brief ä¸‰ç»´æ¬§æ°åæ ‡ç³»ä¸‹çš„çƒè°å‡½æ•°ï¼Œåªå®šä¹‰åˆ°3é˜¶
  * 
- * @param dir µ¥Î»·½ÏòÏòÁ¿
+ * @param dir å•ä½æ–¹å‘å‘é‡
  */
 template<typename T, int L, int M>
 T SH(const Vec3<T> &dir)
@@ -128,9 +128,9 @@ T SH(const Vec3<T> &dir)
 }
 
 /**
- * @brief ¸ø¶¨LºÍM£¬È¡µÃSHº¯ÊıÖ¸Õë
+ * @brief ç»™å®šLå’ŒMï¼Œå–å¾—SHå‡½æ•°æŒ‡é’ˆ
  * 
- * ¶Ô³¬³öÊµÏÖ·¶Î§µÄLºÍMÖµ£¬·µ»ØÁãº¯Êı
+ * å¯¹è¶…å‡ºå®ç°èŒƒå›´çš„Lå’ŒMå€¼ï¼Œè¿”å›é›¶å‡½æ•°
  */
 template<typename T>
 auto GetSHByLM(int L, int M)
