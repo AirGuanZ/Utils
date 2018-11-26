@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <mutex>
 #include <queue>
@@ -8,16 +8,16 @@
 namespace AGZ {
 
 /**
- * @brief ¶Ô²»°üº¬ÈÎºÎ¹²Ïí²ÎÊıµÄÈÎÎñ·ÖÅä£¬¿ÉÒÔ´Ë×÷Îªdummy parameter
+ * @brief å¯¹ä¸åŒ…å«ä»»ä½•å…±äº«å‚æ•°çš„ä»»åŠ¡åˆ†é…ï¼Œå¯ä»¥æ­¤ä½œä¸ºdummy parameter
  */
 inline struct NoSharedParam_t { } NO_SHARED_PARAM;
     
 /**
- * @brief ¾²Ì¬ÈÎÎñ·ÖÅÉÆ÷
+ * @brief é™æ€ä»»åŠ¡åˆ†æ´¾å™¨
  * 
- * ½«Ò»×é¸ø¶¨µÄÈÎÎñ·ÖÅä¸øÒ»¶¨ÊıÁ¿µÄÏß³ÌÍê³É
+ * å°†ä¸€ç»„ç»™å®šçš„ä»»åŠ¡åˆ†é…ç»™ä¸€å®šæ•°é‡çš„çº¿ç¨‹å®Œæˆ
  * 
- * ÔÚ´Ë¹ı³ÌÖĞ²»¿É¶¯Ì¬Ìí¼Ó»òÉ¾³ıÈÎÎñ£¬ÈÎÎñÖ®¼äµÄË³ĞòºÍ²¢ĞĞĞÔÒ²²»µÃµ½ÈÎºÎ±£Ö¤
+ * åœ¨æ­¤è¿‡ç¨‹ä¸­ä¸å¯åŠ¨æ€æ·»åŠ æˆ–åˆ é™¤ä»»åŠ¡ï¼Œä»»åŠ¡ä¹‹é—´çš„é¡ºåºå’Œå¹¶è¡Œæ€§ä¹Ÿä¸å¾—åˆ°ä»»ä½•ä¿è¯
  */
 template<typename TaskType, typename SharedParamType>
 class StaticTaskDispatcher
@@ -70,7 +70,7 @@ class StaticTaskDispatcher
 public:
 
     /**
-     * @param workerCount Íê³ÉÈÎÎñµÄ¹¤×÷Ïß³ÌÊıÁ¿£¬Îª·ÇÕıÊıÊ±Ê¹ÓÃÓ²¼şÏß³ÌÊı
+     * @param workerCount å®Œæˆä»»åŠ¡çš„å·¥ä½œçº¿ç¨‹æ•°é‡ï¼Œä¸ºéæ­£æ•°æ—¶ä½¿ç”¨ç¡¬ä»¶çº¿ç¨‹æ•°
      */
     explicit StaticTaskDispatcher(int workerCount)
     {
@@ -80,10 +80,10 @@ public:
     }
 
     /**
-     * @brief Íê³É¸ø¶¨µÄÒ»×éÈÎÎñ£¬»áÇå¿ÕÖ®Ç°µ÷ÓÃÊ±²úÉúµÄÒì³£ÁĞ±í
+     * @brief å®Œæˆç»™å®šçš„ä¸€ç»„ä»»åŠ¡ï¼Œä¼šæ¸…ç©ºä¹‹å‰è°ƒç”¨æ—¶äº§ç”Ÿçš„å¼‚å¸¸åˆ—è¡¨
      * 
-     * @return ÈôÍê³ÉÈÎÎñµÄ¹ı³ÌÖĞÃ»ÓĞÅ×³öÈÎºÎÒì³££¬Ôò·µ»Øtrue£»·ñÔò·µ»Øfalse¡£
-     *         ·µ»ØfalseÊ±¿ÉÍ¨¹ı GetExceptions ²é¿´Òì³£ÁĞ±í
+     * @return è‹¥å®Œæˆä»»åŠ¡çš„è¿‡ç¨‹ä¸­æ²¡æœ‰æŠ›å‡ºä»»ä½•å¼‚å¸¸ï¼Œåˆ™è¿”å›trueï¼›å¦åˆ™è¿”å›falseã€‚
+     *         è¿”å›falseæ—¶å¯é€šè¿‡ GetExceptions æŸ¥çœ‹å¼‚å¸¸åˆ—è¡¨
      */
     template<typename Func>
     bool Run(const Func &func, const SharedParamType &sharedParam, std::queue<TaskType> &tasks)
@@ -106,7 +106,7 @@ public:
     }
 
     /**
-     * @brief È¡µÃÉÏÒ»´Îµ÷ÓÃ Run Ê±²úÉúµÄÒì³£ÁĞ±í
+     * @brief å–å¾—ä¸Šä¸€æ¬¡è°ƒç”¨ Run æ—¶äº§ç”Ÿçš„å¼‚å¸¸åˆ—è¡¨
      */
     const std::vector<std::exception> &GetExceptions() const
     {
