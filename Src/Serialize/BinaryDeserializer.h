@@ -93,7 +93,7 @@ public:
      */
     bool Read(void *output, size_t byteSize)
     {
-        return (ok_ = ReadImpl(output, byteSize));
+        return (ok_ &= ReadImpl(output, byteSize));
     }
 
     /**
