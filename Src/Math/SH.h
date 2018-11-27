@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "../Misc/Common.h"
+#include "Mat3.h"
 #include "Tri.h"
 #include "Vec3.h"
 
@@ -109,6 +110,22 @@ namespace SHImpl
             return COEF * (dir.x * dir.x - dir.y * dir.y);
         }
     };
+
+    template<typename T, int L> struct PAux { };
+
+    template<typename T> struct PAux<T, 1>
+    {
+        static Vec3<T> Eval(const Vec3<T> &dir)
+        {
+            static const T C = Sqrt(3 / (4 * PI<T>));
+            auto r = dir.Length();
+            return Vec3<T>(
+                C * dir.y / r,
+                C * dir.z / r,
+                C * dir.x / r
+            );
+        }
+    };
 }
 
 /**
@@ -152,6 +169,49 @@ auto GetSHByLM(int L, int M)
     if(idx >= 9 || Abs(M) > L)
         return &SHImpl::Zero<T>;
     return FUNC_PTR[idx];
+}
+
+/**
+ * @brief 旋转l=0对应的SH函数系数
+ * 
+ * @param M 旋转矩阵
+ * @param SHCoef 待修改的系数
+ */
+template<typename T>
+void RotateSH_L0([[maybe_unused]] const Mat3<T> &M, [[maybe_unused]] T *SHCoef)
+{
+    AGZ_ASSERT(SHCoef);
+    // l=0对应的SH是常量函数，其系数不受旋转的影响
+}
+
+/**
+ * @brief 旋转l=1对应的SH函数系数
+ * 
+ * 推导见 https://airguanz.github.io/2018/11/20/SH-PRT.html
+ * 
+ * @param M 旋转矩阵
+ * @param SHCoef 待修改的系数，应包含3个元素
+ */
+template<typename T>
+void RotateSH_L1(const Mat3<T> &M, T *SHCoef)
+{
+    static const T C     = Sqrt(3 / (4 * PI<T>));
+    static const T INV_C = Sqrt(4 * PI<T> / 3);
+
+    static const Mat3<T> INV_A(T(0),  T(0),  INV_C,
+                               INV_C, T(0),  T(0),
+                               T(0),  INV_C, T(0));
+    
+    // 由于N_i被选取为各轴上的方向向量，故M * Ni就是M的第i列
+
+    auto PMN0 = SHImpl::PAux<T, 1>::Eval(M.GetCol(0));
+    auto PMN1 = SHImpl::PAux<T, 1>::Eval(M.GetCol(1));
+    auto PMN2 = SHImpl::PAux<T, 1>::Eval(M.GetCol(2));
+
+    auto S = Mat3<T>::FromCols(PMN0, PMN1, PMN2);
+    Vec3<T> x(SHCoef[0], SHCoef[1], SHCoef[2]);
+
+    return S * (INV_A * x);
 }
 
 } // namespace AGZ::Math
