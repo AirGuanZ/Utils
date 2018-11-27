@@ -55,6 +55,9 @@
     <Filter Include="Thread">
       <UniqueIdentifier>{08b201c1-09a0-4ad8-ac14-5a74f5f561e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Serialize">
+      <UniqueIdentifier>{6787a653-a0f1-4624-9d6e-e33759b98633}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Math\Scalar.h">
@@ -323,6 +326,15 @@
       <Filter>Thread</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\Utils\Thread.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Serialize\BinaryDeserializer.h">
+      <Filter>Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Serialize\BinarySerializer.h">
+      <Filter>Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Serialize.h">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>

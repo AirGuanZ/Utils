@@ -73,6 +73,8 @@
     <ClInclude Include="..\Src\Range\Take.h" />
     <ClInclude Include="..\Src\Range\Transform.h" />
     <ClInclude Include="..\Src\Range\Each.h" />
+    <ClInclude Include="..\Src\Serialize\BinaryDeserializer.h" />
+    <ClInclude Include="..\Src\Serialize\BinarySerializer.h" />
     <ClInclude Include="..\Src\String\Charset\ASCII.h" />
     <ClInclude Include="..\Src\String\Charset\Charset.h" />
     <ClInclude Include="..\Src\String\Charset\UTF.h" />
@@ -104,6 +106,7 @@
     <ClInclude Include="..\Src\Utils\Model.h" />
     <ClInclude Include="..\Src\Utils\Platform.h" />
     <ClInclude Include="..\Src\Utils\Range.h" />
+    <ClInclude Include="..\Src\Utils\Serialize.h" />
     <ClInclude Include="..\Src\Utils\String.h" />
     <ClInclude Include="..\Src\Utils\Texture.h" />
     <ClInclude Include="..\Src\Utils\Thread.h" />

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <istream>
 #include <type_traits>
@@ -26,7 +26,7 @@ class BinaryDeserializer
     struct HasDeserialize<
         T, std::void_t<decltype(
             std::declval<T>().Deserialize(
-                DeclLRef<BinaryDeserializer>()))>>
+                *static_cast<BinaryDeserializer*>(nullptr)))>>
         : std::true_type { };
     
     template<typename T, typename = void>
@@ -36,8 +36,8 @@ class BinaryDeserializer
     struct HasRightShift<
         T, std::void_t<decltype(
             BinaryDeserializeImplementator<T>::Deserialize(
-                DeclLRef<BinaryDeserializer>(),
-                DeclLRef<T>()))>>
+                *static_cast<BinaryDeserializer*>(nullptr),
+                *static_cast<T*>(nullptr)))>>
         : std::true_type { };
 
     template<typename T, bool HasRightShift>
@@ -82,6 +82,8 @@ class BinaryDeserializer
     virtual bool ReadImpl(void *output, size_t byteSize) = 0;
 
 public:
+
+    virtual ~BinaryDeserializer() = default;
 
     /**
      * @brief 从Serializer中读取一定量的二进制数据
