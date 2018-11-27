@@ -249,7 +249,7 @@ void RotateSH_L2(const Mat3<T> &M, T *SHCoef)
     static const Vec3<T> N4(T(0), K, K);
 
     constexpr T K0 = T(0.91529123286551084);
-    constexpr T K1 = T(2 * 0.91529123286551084);
+    constexpr T K1 = T(1.83058246573102168);
     constexpr T K2 = T(1.5853309190550713);
 
     // 计算A^{-1}x
