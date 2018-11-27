@@ -133,7 +133,7 @@ TEST_CASE("VMEngEx")
 
         {
             Regex8 regex(R"__(&(\w|-)+&)__");
-
+        
             Str8 s0 = "-_abcdefg  xsz0-";
             REQUIRE(!regex.Match(s0));
             REQUIRE(regex.SearchPrefix(s0)(0, 1) == "-_abcdefg");
