@@ -35,18 +35,18 @@ class BinarySerializer
         : std::true_type { };
 
     template<typename T, typename = void>
-    struct HasLeftShift : std::false_type { };
+    struct HasExternalImplementation : std::false_type { };
 
     template<typename T>
-    struct HasLeftShift<
+    struct HasExternalImplementation<
         T, std::void_t<decltype(
                 BinarySerializeImplementator<T>::Serialize(
                     *static_cast<BinarySerializer*>(nullptr),
                     std::declval<T>()))>>
         : std::true_type { };
 
-    template<typename T, bool HasLeftShift>
-    struct CallLeftShiftImpl
+    template<typename T, bool HasExternalImplementation>
+    struct TryExternalImplementation
     {
         static bool Call(const T &v, BinarySerializer &serializer)
         {
@@ -55,7 +55,7 @@ class BinarySerializer
     };
 
     template<typename T>
-    struct CallLeftShiftImpl<T, false>
+    struct TryExternalImplementation<T, false>
     {
         static bool Call(const T &v, BinarySerializer &serializer)
         {
@@ -65,7 +65,7 @@ class BinarySerializer
     };
 
     template<typename T, bool HasSerialize>
-    struct CallSerializeImpl
+    struct TrySerializeImpl
     {
         static bool Call(const T &v, BinarySerializer &serializer)
         {
@@ -74,11 +74,11 @@ class BinarySerializer
     };
 
     template<typename T>
-    struct CallSerializeImpl<T, false>
+    struct TrySerializeImpl<T, false>
     {
         static bool Call(const T &v, BinarySerializer &serializer)
         {
-            return CallLeftShiftImpl<T, HasLeftShift<T>::value>::Call(v, serializer);
+            return TryExternalImplementation<T, HasExternalImplementation<T>::value>::Call(v, serializer);
         }
     };
 
@@ -111,7 +111,7 @@ public:
     template<typename T>
     bool Serialize(const T &v)
     {
-        return (ok_ &= CallSerializeImpl<T, HasSerialize<T>::value>::Call(v, *this));
+        return (ok_ &= TrySerializeImpl<T, HasSerialize<T>::value>::Call(v, *this));
     }
 
     /**

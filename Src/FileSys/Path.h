@@ -4,9 +4,9 @@
 
 #include "../Misc/Common.h"
 #include "../Misc/Exception.h"
-#include "../Utils/Platform.h"
 #include "../Utils/Range.h"
 #include "../Utils/String.h"
+#include "File.h"
 
 namespace AGZ::FileSys {
 
@@ -18,20 +18,20 @@ class Path
 {
 public:
 
-    using Charset = CS;                ///< 所使用的字符编码方案
-    using Str     = String<CS>;        ///< 所使用的字符串类型
-    using StrView = StringView<CS>;    ///< 所使用的字符串视图类型
-    using Self    = Path<CS>;        ///< 自身类型
+    using Charset = CS;             ///< 所使用的字符编码方案
+    using Str     = String<CS>;     ///< 所使用的字符串类型
+    using StrView = StringView<CS>; ///< 所使用的字符串视图类型
+    using Self    = Path<CS>;       ///< 自身类型
 
     /** 不同操作系统下的路径风格 */
     enum SeperatorStyle
     {
-        Linux,                ///< *nix风格，以“/”作为唯一分隔符，绝对路径以根目录“/”开头
-        Windows,            ///< Window风格，以“/”或“\”作为分隔符，绝对路径以盘符开头
+        Linux,            ///< *nix风格，以“/”作为唯一分隔符，绝对路径以根目录“/”开头
+        Windows,          ///< Window风格，以“/”或“\”作为分隔符，绝对路径以盘符开头
 #if defined(AGZ_OS_WIN32)
-        Native = Windows,    ///< 由编译器自动根据所在平台判断应该使用哪种路径风格
+        Native = Windows, ///< 由编译器自动根据所在平台判断应该使用哪种路径风格
 #else
-        Native = Linux,        ///< 由编译器自动根据所在平台判断应该使用哪种路径风格
+        Native = Linux,   ///< 由编译器自动根据所在平台判断应该使用哪种路径风格
 #endif
     };
 
@@ -181,7 +181,7 @@ public:
     }
 
     /**
-     * 本路径的目录的字符串表示
+     * 本路径的目录的字符串表示，末尾一定是“\”或“/”
      * 
      * @param style 转换时使用的路径风格，缺省由编译器自动判断
      * 
@@ -279,7 +279,7 @@ public:
     {
         if(IsAbsolute())
             return *this;
-        return *this = Self(Platform::GetWorkingDirectory(), false, style)
+        return *this = Self(File::GetWorkingDirectory(), false, style)
                      + *this;
     }
 
@@ -293,7 +293,7 @@ public:
         if(IsRelative())
             return *this;
 
-        Self wd(Platform::GetWorkingDirectory(), false, style);
+        Self wd(Str(File::GetWorkingDirectory()), false, style);
         if(wd.IsPrefixOf(*this))
         {
             dirs_ = std::vector<Str>(dirs_.begin() + wd.dirs_.size(),
@@ -306,7 +306,7 @@ public:
     /**
      * 将本路径转换为目录的结果（去掉文件名）
      * 
-     * @note 若本路径已经是目录，则返回值与本路径相同
+     * @note 若本路径已经是目录，则不变
      */
     Self &ToDirectory()
     {
@@ -330,6 +330,36 @@ public:
                 dirs_.pop_back();
         }
         return *this;
+    }
+
+    /** 分为多少节，每级目录为一节，文件名也算一节 */
+    size_t GetSectionCount() const
+    {
+        return dirs_.size() + !filename_.Empty();
+    }
+
+    /** 取得指定下标的节名，文件名算作最后一节 */
+    const Str &GetSection(size_t sectionIdx) const
+    {
+        AGZ_ASSERT(sectionIdx < GetSectionCount());
+        return sectionIdx < dirs_.size() ? dirs_[sectionIdx] : filename_;
+    }
+
+    /** 取得具有指定数量的节的前缀 */
+    Self GetPrefix(size_t length) const
+    {
+        if(!length)
+            return Self();
+
+        Self ret;
+        size_t dlen = dirs_.size() < length ? dirs_.size() : length;
+        for(size_t i = 0; i < dlen; ++i)
+            ret += GetSection(i);
+        if(length > dirs_.size())
+            ret.filename_ = filename_;
+        ret.abs_ = abs_;
+
+        return ret;
     }
 
     /** 两个路径严格相等 */
@@ -360,9 +390,15 @@ public:
     }
 
     /** 将rhs以 Path<CS>::Append 的方式追加到本路径后方  */
-    Self &operator+=(const Self &rhs) const
+    Self &operator+=(const Self &rhs)
     {
         return Append(rhs);
+    }
+
+    /** 将rhs作为目录名以 Path<CS>::Append 的方式追加到本路径后方  */
+    Self &operator+=(const Str &rhs)
+    {
+        return Append(Self(rhs, false));
     }
 
 private:
@@ -383,6 +419,7 @@ private:
 using Path8  = Path<UTF8<>>;
 using Path16 = Path<UTF16<>>;
 using Path32 = Path<UTF32<>>;
+using PPath  = Path<PUTF>;
 using WPath  = Path<WUTF>;
 using APath  = Path<ASCII<>>;
 

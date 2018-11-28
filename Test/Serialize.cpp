@@ -8,28 +8,6 @@
 using namespace AGZ;
 using namespace std;
 
-template<> struct BinarySerializeImplementator<Str8>
-{
-    static bool Serialize(BinarySerializer &serializer, const Str8 &s)
-    {
-        serializer.Serialize(s.Length());
-        return serializer.Write(s.Data(), s.Length() * sizeof(Str8::CodeUnit));
-    }
-};
-
-template<> struct BinaryDeserializeImplementator<Str8>
-{
-    static bool Deserialize(BinaryDeserializer &deserializer, Str8 &s)
-    {
-        size_t len;
-        deserializer.Deserialize(len);
-        std::vector<Str8::CodeUnit> data(len);
-        deserializer.Read(data.data(), len * sizeof(Str8::CodeUnit));
-        s = Str8(data.data(), len);
-        return deserializer.Ok();
-    }
-};
-
 struct A
 {
     int x = 0;

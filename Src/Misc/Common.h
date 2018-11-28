@@ -69,6 +69,10 @@
 #define AGZ_TEXTURE_FILE_IMPL
 #endif
 
+#if not defined(AGZ_FILE_IMPL)
+#define AGZ_FILE_IMPL
+#endif
+
 #endif
 
 namespace AGZ {

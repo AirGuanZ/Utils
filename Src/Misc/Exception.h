@@ -11,6 +11,7 @@ namespace AGZ {
 class Exception : public std::runtime_error
 {
 public:
+
     explicit Exception(const std::string &err) : runtime_error(err) { }
 };
 

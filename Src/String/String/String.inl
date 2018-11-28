@@ -1373,6 +1373,26 @@ typename String<CS>::Iterator String<CS>::end() const
 }
 
 template<typename CS>
+bool String<CS>::Serialize(BinarySerializer &serializer) const
+{
+    return serializer.Serialize(Length()) &&
+           serializer.Write(Data(), Length());
+}
+
+template<typename CS>
+bool String<CS>::Deserialize(BinaryDeserializer &deserializer)
+{
+    size_t length;
+    if(!deserializer.Deserialize(length))
+        return false;
+    std::vector<CodeUnit> codeUnits(length);
+    if(!deserializer.Read(codeUnits.data(), sizeof(CodeUnit) * length))
+        return false;
+    *this = String<CS>(codeUnits.data(), length);
+    return true;
+}
+
+template<typename CS>
 String<CS> operator*(const String<CS> &lhs, size_t rhs)
 {
     StringBuilder<CS> b;

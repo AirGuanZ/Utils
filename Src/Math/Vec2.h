@@ -4,6 +4,7 @@
 #include <type_traits>
 
 #include "../Misc/Common.h"
+#include "../Utils/Serialize.h"
 #include "Scalar.h"
 
 namespace AGZ::Math {
@@ -105,6 +106,9 @@ public:
     Self Normalize()         const;
     Self Clamp(T min, T max) const;
     Self Sqrt()              const;
+
+    bool Serialize(BinarySerializer &serializer) const;
+    bool Deserialize(BinaryDeserializer &deserializer);
 };
 
 template<typename T>
@@ -195,6 +199,20 @@ template<typename T>
 Vec2<T> Vec2<T>::Sqrt() const
 {
     return ::AGZ::Math::Sqrt(*this);
+}
+
+template<typename T>
+bool Vec2<T>::Serialize(BinarySerializer &serializer) const
+{
+    return serializer.Serialize(x) &&
+           serializer.Serialize(y);
+}
+
+template<typename T>
+bool Vec2<T>::Deserialize(BinaryDeserializer &deserializer)
+{
+    return deserializer.Deserialize(x) &&
+           deserializer.Deserialize(y);
 }
 
 using Vec2f = Vec2<float>;

@@ -11,6 +11,7 @@
 #include "../../Misc/Common.h"
 #include "../../Misc/Config.h"
 #include "../../Range/Iterator.h"
+#include "../../Utils/Serialize.h"
 #include "../Charset/ASCII.h"
 #include "../Charset/UTF.h"
 
@@ -705,6 +706,12 @@ public:
     //! 将其他字符串追加到末尾
     template<typename RHS>
     Self &operator+=(const RHS &rhs) { return *this = *this + rhs; }
+
+    //! 二进制序列化
+    bool Serialize(BinarySerializer &serialize) const;
+
+    //! 二进制反序列化
+    bool Deserialize(BinaryDeserializer &deserialize);
 };
 
 //! 复读机
@@ -831,6 +838,8 @@ using Str32 = String<UTF32<>>; ///< 以UTF-32编码的字符串
 using AStr  = String<ASCII<>>; ///< 以ASCII编码的字符串
 using WStr  = String<WUTF>;       ///< 以宽字符编码（平台相关）的字符串
 using PStr  = String<PUTF>;       ///< 平台缺省使用的字符串
+
+using StdPStr = decltype(std::declval<Str8>().ToPlatformString());
 
 using StrView8  = StringView<UTF8<>>;  ///< 以UTF-8编码的字符串视图
 using StrView16 = StringView<UTF16<>>; ///< 以UTF-16编码的字符串视图

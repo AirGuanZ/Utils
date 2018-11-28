@@ -15,6 +15,18 @@ TEST_CASE("BinaryView")
 
 TEST_CASE("FileSys")
 {
+    SECTION("File")
+    {
+        REQUIRE(!File::GetWorkingDirectory().Empty());
+        REQUIRE(WPath(File::GetWorkingDirectory()).IsAbsolute());
+        REQUIRE(!WPath(File::GetWorkingDirectory()).HasFilename());
+    }
+
+    SECTION("FileCache")
+    {
+        REQUIRE(BinaryFileCache::AutoCacheName("./Minecraft/xyz.txt") == "./.agz.cache/./Minecraft/xyz.txt");
+    }
+
     SECTION("Path")
     {
         REQUIRE(Path8("C:\\Minecraft/XYZ", Path8::Windows).IsAbsolute());
@@ -65,18 +77,9 @@ TEST_CASE("FileSys")
         
         REQUIRE(WPath(L"A/B/C/D").ToParent() == WPath(L"A/B/C/"));
         REQUIRE(WPath(L"A/B/C/D/").ToParent() == WPath(L"A/B/C/"));
-    }
-}
 
-/*
-TEST_CASE("Raw")
-{
-    SECTION("Text")
-    {
-        WriteTextFileRaw("rawTextFile.txt", u8"今天天气minecraft真不错啊");
-        WStr output;
-        ReadTextFileRaw("rawTextFile.txt", &output);
-        REQUIRE(output == u8"今天天气minecraft真不错啊");
+        REQUIRE(Path8("A/B/C/D").GetPrefix(2) == Path8("A/B/"));
+        REQUIRE(Path8("A/B/C/D").GetPrefix(4) == Path8("A/B/C/D"));
+        REQUIRE(Path8("A/B/C/D").GetPrefix(3).IsRelative());
     }
 }
-*/

@@ -30,18 +30,18 @@ class BinaryDeserializer
         : std::true_type { };
     
     template<typename T, typename = void>
-    struct HasRightShift : std::false_type { };
+    struct HasExternalImplementation : std::false_type { };
 
     template<typename T>
-    struct HasRightShift<
+    struct HasExternalImplementation<
         T, std::void_t<decltype(
             BinaryDeserializeImplementator<T>::Deserialize(
                 *static_cast<BinaryDeserializer*>(nullptr),
                 *static_cast<T*>(nullptr)))>>
         : std::true_type { };
 
-    template<typename T, bool HasRightShift>
-    struct CallRightShiftImpl
+    template<typename T, bool HasExternalImplementation>
+    struct TryExternalImplementation
     {
         static bool Call(T &v, BinaryDeserializer &deserializer)
         {
@@ -50,7 +50,7 @@ class BinaryDeserializer
     };
 
     template<typename T>
-    struct CallRightShiftImpl<T, false>
+    struct TryExternalImplementation<T, false>
     {
         static bool Call(T &v, BinaryDeserializer &deserializer)
         {
@@ -60,7 +60,7 @@ class BinaryDeserializer
     };
 
     template<typename T, bool HasDeserialize>
-    struct CallDeserializeImpl
+    struct TryDeserializeImpl
     {
         static bool Call(T &v, BinaryDeserializer &deserializer)
         {
@@ -69,11 +69,11 @@ class BinaryDeserializer
     };
 
     template<typename T>
-    struct CallDeserializeImpl<T, false>
+    struct TryDeserializeImpl<T, false>
     {
         static bool Call(T &v, BinaryDeserializer &deserializer)
         {
-            return CallRightShiftImpl<T, HasRightShift<T>::value>::Call(v, deserializer);
+            return TryExternalImplementation<T, HasExternalImplementation<T>::value>::Call(v, deserializer);
         }
     };
 
@@ -106,7 +106,7 @@ public:
     template<typename T>
     bool Deserialize(T &v)
     {
-        return (ok_ &= CallDeserializeImpl<T, HasDeserialize<T>::value>::Call(v, *this));
+        return (ok_ &= TryDeserializeImpl<T, HasDeserialize<T>::value>::Call(v, *this));
     }
 
     /**
