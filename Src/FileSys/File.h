@@ -5,6 +5,9 @@
 
 namespace AGZ::FileSys {
 
+/**
+ * @brief 文件系统时间戳
+ */
 struct FileTime
 {
     int32_t year   = 0;

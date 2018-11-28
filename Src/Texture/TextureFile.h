@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "../Misc/Common.h"
-#include "../Misc/Exception.h"
 #include "../Utils/Math.h"
 #include "../Utils/String.h"
 #include "Texture.h"
@@ -120,6 +118,8 @@ public:
 
 #include <vector>
 
+#include "../Misc/Common.h"
+#include "../Misc/Exception.h"
 #include "../Utils/FileSys.h"
 
 #define STB_IMAGE_IMPLEMENTATION

@@ -836,8 +836,8 @@ using Str8  = String<UTF8<>>;  ///< 以UTF-8编码的字符串
 using Str16 = String<UTF16<>>; ///< 以UTF-16编码的字符串
 using Str32 = String<UTF32<>>; ///< 以UTF-32编码的字符串
 using AStr  = String<ASCII<>>; ///< 以ASCII编码的字符串
-using WStr  = String<WUTF>;       ///< 以宽字符编码（平台相关）的字符串
-using PStr  = String<PUTF>;       ///< 平台缺省使用的字符串
+using WStr  = String<WUTF>;    ///< 以宽字符编码（平台相关）的字符串
+using PStr  = String<PUTF>;    ///< 平台缺省使用的字符串
 
 using StdPStr = decltype(std::declval<Str8>().ToPlatformString());
 
@@ -845,8 +845,8 @@ using StrView8  = StringView<UTF8<>>;  ///< 以UTF-8编码的字符串视图
 using StrView16 = StringView<UTF16<>>; ///< 以UTF-16编码的字符串视图
 using StrView32 = StringView<UTF32<>>; ///< 以UTF-32编码的字符串视图
 using AStrView  = StringView<ASCII<>>; ///< 以ASCII编码的字符串视图
-using WStrView  = StringView<WUTF>;       ///< 以宽字符编码（平台相关）的字符串视图
-using PStrView  = StringView<PUTF>;       ///< 平台缺省使用的字符串视图
+using WStrView  = StringView<WUTF>;    ///< 以宽字符编码（平台相关）的字符串视图
+using PStrView  = StringView<PUTF>;    ///< 平台缺省使用的字符串视图
 
 using CSConv = StrImpl::CharsetConvertor;
 

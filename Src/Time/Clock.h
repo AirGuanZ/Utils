@@ -2,8 +2,6 @@
 
 #include <chrono>
 
-#include "../Misc/Common.h"
-
 namespace AGZ {
 
 /**

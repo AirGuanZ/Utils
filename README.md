@@ -6,12 +6,12 @@
 - [x] Regex: regular expression with my favourite features
 - [x] Texture: texture loading/saving/sampling, cube/sphere mapping
 - [x] Arena: fast object pool
-- [x] Path: cross-platform file/directory path management
+- [x] FileSys: cross-platform file/directory path, disk cache management
 - [x] Config: configuration parsing tool
 - [x] WavefrontOBJ: wavefront OBJ file loader
 - [x] Serialize: Binary memory/std::stream serializer/deserializer
 - [x] Thread: static task dispatcher
-- [x] Others: Endian, COWObject, TypeOpr (for TMP), Singleton, Uncopiable, Platform, Clock...
+- [x] Others: Endian, COWObject, TypeOpr (for TMP), Singleton, Uncopiable, Clock...
 
 I'll always keep this library using the latest C++ standard.
 
