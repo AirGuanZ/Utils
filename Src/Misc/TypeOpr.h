@@ -8,6 +8,9 @@ namespace AGZ::TypeOpr {
 template<typename...TypeList>
 constexpr size_t TypeListLength_v = std::tuple_size_v<std::tuple<TypeList...>>;
 
+template<size_t Index, typename...TypeList>
+using SelectInTypeList_t = std::tuple_element_t<Index, std::tuple<TypeList...>>;
+
 template<template<typename> typename FuncClass>
 constexpr bool Any() { return false; }
 

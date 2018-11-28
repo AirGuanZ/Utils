@@ -130,11 +130,8 @@ bool File::CreateDirectory(const PStr &directory)
     Path8 p(directory, false);
     AGZ_ASSERT(p.IsDirectory());
     size_t sc = p.GetSectionCount();
-    for(size_t i = 0; i <= sc; ++i)
-    {
-        if(mkdir(directory.ToStdString().c_str(), S_IRUSR | S_IWUSR))
-            return false;
-    }
+    for(size_t i = 1; i <= sc; ++i)
+        mkdir(p.GetPrefix(i).ToStr().ToPlatformString().c_str(), S_IRWXU);
     return true;
 }
 

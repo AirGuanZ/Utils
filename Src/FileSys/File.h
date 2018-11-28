@@ -13,6 +13,9 @@ struct FileTime
     int32_t hour;
     int32_t minute;
     int32_t second;
+
+    bool operator==(const FileTime &rhs) const { return std::memcmp(this, &rhs, sizeof(FileTime)) == 0; }
+    bool operator!=(const FileTime &rhs) const { return !(*this == rhs); }
 };
 
 /**

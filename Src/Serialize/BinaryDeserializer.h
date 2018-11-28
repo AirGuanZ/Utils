@@ -30,18 +30,18 @@ class BinaryDeserializer
         : std::true_type { };
     
     template<typename T, typename = void>
-    struct HasExternalImplementation : std::false_type { };
+    struct HasExternalDeserialize : std::false_type { };
 
     template<typename T>
-    struct HasExternalImplementation<
+    struct HasExternalDeserialize<
         T, std::void_t<decltype(
             BinaryDeserializeImplementator<T>::Deserialize(
                 *static_cast<BinaryDeserializer*>(nullptr),
                 *static_cast<T*>(nullptr)))>>
         : std::true_type { };
 
-    template<typename T, bool HasExternalImplementation>
-    struct TryExternalImplementation
+    template<typename T, bool HasExternalDeserialize>
+    struct TryExternalDeserialize
     {
         static bool Call(T &v, BinaryDeserializer &deserializer)
         {
@@ -50,7 +50,7 @@ class BinaryDeserializer
     };
 
     template<typename T>
-    struct TryExternalImplementation<T, false>
+    struct TryExternalDeserialize<T, false>
     {
         static bool Call(T &v, BinaryDeserializer &deserializer)
         {
@@ -73,7 +73,7 @@ class BinaryDeserializer
     {
         static bool Call(T &v, BinaryDeserializer &deserializer)
         {
-            return TryExternalImplementation<T, HasExternalImplementation<T>::value>::Call(v, deserializer);
+            return TryExternalDeserialize<T, HasExternalDeserialize<T>::value>::Call(v, deserializer);
         }
     };
 
