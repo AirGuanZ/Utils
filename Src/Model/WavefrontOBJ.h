@@ -109,7 +109,7 @@ public:
      * 
      * @return 加载成功时返回true
      */
-    static bool LoadFromObjFile(const WStr &filename, WavefrontObj *objs, bool ignoreUnknownLine = true);
+    static bool LoadFromObjFile(const Str8 &filename, WavefrontObj *objs, bool ignoreUnknownLine = true);
 
     /**
      * 从文本中加载
@@ -189,7 +189,7 @@ inline GeometryMeshGroup WavefrontObj::ToGeometryMeshGroup(bool reverseNor, bool
     return GeometryMeshGroup{ submeshes };
 }
 
-inline bool WavefrontObjFile::LoadFromObjFile(const WStr &filename, WavefrontObj *objs, bool ignoreUnknownLine)
+inline bool WavefrontObjFile::LoadFromObjFile(const Str8 &filename, WavefrontObj *objs, bool ignoreUnknownLine)
 {
     AGZ_ASSERT(objs && objs->Empty());
 

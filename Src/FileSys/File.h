@@ -7,12 +7,12 @@ namespace AGZ::FileSys {
 
 struct FileTime
 {
-    int32_t year;
-    int32_t month;
-    int32_t day;
-    int32_t hour;
-    int32_t minute;
-    int32_t second;
+    int32_t year   = 0;
+    int32_t month  = 0;
+    int32_t day    = 0;
+    int32_t hour   = 0;
+    int32_t minute = 0;
+    int32_t second = 0;
 
     bool operator==(const FileTime &rhs) const { return std::memcmp(this, &rhs, sizeof(FileTime)) == 0; }
     bool operator!=(const FileTime &rhs) const { return !(*this == rhs); }
@@ -28,13 +28,13 @@ public:
     static FileTime GetCurrentFileTime();
 
     //! 取得用本地时间表示的最后修改时间
-    static Option<FileTime> GetLastWriteTime(const PStr &filename);
+    static Option<FileTime> GetLastWriteTime(const Str8 &filename);
 
     //! 取得当前工作目录（绝对路径）
-    static WStr GetWorkingDirectory();
+    static Str8 GetWorkingDirectory();
 
     //! 创建指定目录
-    static bool CreateDirectory(const PStr &directory);
+    static bool CreateDirectoryRecursively(const Str8 &directory);
 };
 
 } // namespace AGZ::FileSys

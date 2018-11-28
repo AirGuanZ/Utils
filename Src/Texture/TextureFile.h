@@ -29,7 +29,7 @@ public:
      * @exception FileException 加载失败时抛出
      */
     static TextureCore<2, Math::Color3b> LoadRGBFromFile(
-        const WStr &filename);
+        const Str8 &filename);
 
     /**
      * @brief 从文件中加载一个二维RGBA纹理对象
@@ -37,7 +37,7 @@ public:
      * @exception FileException 加载失败时抛出
      */
     static TextureCore<2, Math::Color4b> LoadRGBAFromFile(
-        const WStr &filename);
+        const Str8 &filename);
 
     /**
      * @brief 将一个二维RGB纹理对象写入到指定格式的文件
@@ -45,7 +45,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteTo(
-        const WStr &filename,
+        const Str8 &filename,
         const TextureCore<2, Math::Color3b> &tex,
         WriteFormat format);
 
@@ -55,7 +55,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteTo(
-        const WStr &filename,
+        const Str8 &filename,
         const TextureCore<2, Math::Color4b> &tex,
         WriteFormat format);
 
@@ -65,7 +65,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBToPNG(
-        const WStr &filename,
+        const Str8 &filename,
         const TextureCore<2, Math::Color3b> &tex);
 
     /**
@@ -74,7 +74,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBAToPNG(
-        const WStr &filename,
+        const Str8 &filename,
         const TextureCore<2, Math::Color4b> &tex);
 
     /**
@@ -83,7 +83,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBToJPG(
-        const WStr &filename,
+        const Str8 &filename,
         const TextureCore<2, Math::Color3b> &tex);
 
     /**
@@ -92,7 +92,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBAToJPG(
-        const WStr &filename,
+        const Str8 &filename,
         const TextureCore<2, Math::Color4b> &tex);
 
     /**
@@ -101,7 +101,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBToBMP(
-        const WStr &filename,
+        const Str8 &filename,
         const TextureCore<2, Math::Color3b> &tex);
 
     /**
@@ -110,7 +110,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBAToBMP(
-        const WStr &filename,
+        const Str8 &filename,
         const TextureCore<2, Math::Color4b> &tex);
 };
 
@@ -135,7 +135,7 @@ public:
 namespace AGZ {
 
 TextureCore<2, Math::Color3b> TextureFile::LoadRGBFromFile(
-    const WStr &filename)
+    const Str8 &filename)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
@@ -172,7 +172,7 @@ TextureCore<2, Math::Color3b> TextureFile::LoadRGBFromFile(
 }
 
 TextureCore<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
-    const WStr &filename)
+    const Str8 &filename)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
@@ -210,7 +210,7 @@ TextureCore<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
 }
 
 void TextureFile::WriteTo(
-    const WStr &filename,
+    const Str8 &filename,
     const TextureCore<2, Math::Color3b> &tex,
     WriteFormat format)
 {
@@ -228,7 +228,7 @@ void TextureFile::WriteTo(
 }
 
 void TextureFile::WriteTo(
-    const WStr &filename,
+    const Str8 &filename,
     const TextureCore<2, Math::Color4b> &tex,
     WriteFormat format)
 {
@@ -263,7 +263,7 @@ namespace
 }
 
 void TextureFile::WriteRGBToPNG(
-    const WStr &filename,
+    const Str8 &filename,
     const TextureCore<2, Math::Color3b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());
@@ -283,7 +283,7 @@ void TextureFile::WriteRGBToPNG(
 }
 
 void TextureFile::WriteRGBAToPNG(
-    const WStr &filename,
+    const Str8 &filename,
     const TextureCore<2, Math::Color4b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());
@@ -303,7 +303,7 @@ void TextureFile::WriteRGBAToPNG(
 }
 
 void TextureFile::WriteRGBToJPG(
-    const WStr &filename,
+    const Str8 &filename,
     const TextureCore<2, Math::Color3b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());
@@ -323,7 +323,7 @@ void TextureFile::WriteRGBToJPG(
 }
 
 void TextureFile::WriteRGBAToJPG(
-    const WStr &filename,
+    const Str8 &filename,
     const TextureCore<2, Math::Color4b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());
@@ -343,7 +343,7 @@ void TextureFile::WriteRGBAToJPG(
 }
 
 void TextureFile::WriteRGBToBMP(
-    const WStr &filename,
+    const Str8 &filename,
     const TextureCore<2, Math::Color3b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());
@@ -363,7 +363,7 @@ void TextureFile::WriteRGBToBMP(
 }
 
 void TextureFile::WriteRGBAToBMP(
-    const WStr &filename,
+    const Str8 &filename,
     const TextureCore<2, Math::Color4b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());

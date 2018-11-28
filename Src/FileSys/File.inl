@@ -1,12 +1,12 @@
-#pragma once
-
-namespace AGZ::FileSys {
+﻿#pragma once
 
 #ifdef AGZ_FILE_IMPL
 
 #if defined(AGZ_OS_WIN32)
 
 #include <Windows.h>
+
+namespace AGZ::FileSys {
 
 FileTime File::GetCurrentFileTime()
 {
@@ -24,7 +24,7 @@ FileTime File::GetCurrentFileTime()
     return ret;
 }
 
-Option<FileTime> File::GetLastWriteTime(const PStr &filename)
+Option<FileTime> File::GetLastWriteTime(const Str8 &filename)
 {
     WIN32_FIND_DATA findData;
 
@@ -48,7 +48,7 @@ Option<FileTime> File::GetLastWriteTime(const PStr &filename)
     return ret;
 }
 
-WStr File::GetWorkingDirectory()
+Str8 File::GetWorkingDirectory()
 {
     DWORD len = GetCurrentDirectory(0, NULL);
     std::vector<wchar_t> buf(len + 1);
@@ -58,17 +58,24 @@ WStr File::GetWorkingDirectory()
         if(buf[len - 1] != '\\' && buf[len - 1] != '/')
         {
             buf[len] = '\\';
-            return WStr(buf.data(), len + 1);
+            return Str8(WStr(buf.data(), len + 1));
         }
-        return WStr(buf.data(), len);
+        return Str8(WStr(buf.data(), len));
     }
     throw OSException("Failed to get the working directory");
 }
 
-bool File::CreateDirectory(const PStr &direcotry)
+bool File::CreateDirectoryRecursively(const Str8 &directory)
 {
-    #warning "File::CreateDirectory unimeplemented"
+    Path8 p(directory, false);
+    AGZ_ASSERT(p.IsDirectory());
+    size_t sc = p.GetSectionCount();
+    for(size_t i = 1; i <= sc; ++i)
+        ::CreateDirectoryW(p.GetPrefix(i).ToStr().ToPlatformString().c_str(), nullptr);
+    return true;
 }
+
+} // namespace AGZ::FileSys
 
 #elif defined(AGZ_OS_LINUX)
 
@@ -76,6 +83,8 @@ bool File::CreateDirectory(const PStr &direcotry)
 #include <limits.h>
 #include <time.h>
 #include <unistd.h>
+
+namespace AGZ::FileSys {
 
 FileTime File::GetCurrentFileTime()
 {
@@ -94,7 +103,7 @@ FileTime File::GetCurrentFileTime()
     return ret;
 }
 
-Option<FileTime> File::GetLastWriteTime(const PStr &filename)
+Option<FileTime> File::GetLastWriteTime(const Str8 &filename)
 {
     struct stat buf;
     if(stat(filename.ToStdString().c_str(), &buf))
@@ -115,17 +124,17 @@ Option<FileTime> File::GetLastWriteTime(const PStr &filename)
     return ret;
 }
 
-WStr File::GetWorkingDirectory()
+Str8 File::GetWorkingDirectory()
 {
     char buf[PATH_MAX + 1];
     if(!getcwd(buf, PATH_MAX))
         throw OSException("Failed to get the working directory");
     
-    auto w = WStr(buf);
-    return w.EndsWith(L"/") ? std::move(w) : w + L"/";
+    auto w = Str8(buf);
+    return w.EndsWith("/") ? std::move(w) : w + "/";
 }
 
-bool File::CreateDirectory(const PStr &directory)
+bool File::CreateDirectoryRecursively(const Str8 &directory)
 {
     Path8 p(directory, false);
     AGZ_ASSERT(p.IsDirectory());
@@ -135,6 +144,8 @@ bool File::CreateDirectory(const PStr &directory)
     return true;
 }
 
+} // namespace AGZ::FileSys
+
 #else
 
 #warning "OS File unimplementated"
@@ -142,5 +153,3 @@ bool File::CreateDirectory(const PStr &directory)
 #endif
 
 #endif // #ifdef AGZ_FILE_IMPL
-
-} // namespace AGZ::FileSys

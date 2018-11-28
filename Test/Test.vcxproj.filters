@@ -8,7 +8,6 @@
     <ClCompile Include="Range.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="FileSys.cpp" />
-    <ClCompile Include="Platform.cpp" />
     <ClCompile Include="PikeVM.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Model.cpp" />

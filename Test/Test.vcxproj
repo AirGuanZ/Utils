@@ -26,7 +26,6 @@
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="FileSys.cpp" />
     <ClCompile Include="Model.cpp" />
-    <ClCompile Include="Platform.cpp" />
     <ClCompile Include="Range.cpp" />
     <ClCompile Include="PikeVM.cpp" />
     <ClCompile Include="Serialize.cpp" />

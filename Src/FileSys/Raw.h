@@ -10,16 +10,16 @@ namespace AGZ::FileSys {
 
 template<typename AllocFunc = void*(*)(size_t)>
 std::pair<size_t, unsigned char*> ReadBinaryFileRaw(
-    const WStr &filename, AllocFunc &&func = &(std::malloc));
+    const Str8 &filename, AllocFunc &&func = &(std::malloc));
 
 AGZ_FORCEINLINE void DefaultlyReleaseRawBinaryFileContent(unsigned char *ptr);
 
 inline bool WriteBinaryFileRaw(
-    const WStr &filename, const unsigned char *data, size_t len);
+    const Str8 &filename, const unsigned char *data, size_t len);
 
-inline bool ReadTextFileRaw(const WStr &filename, Str8 *str);
+inline bool ReadTextFileRaw(const Str8 &filename, Str8 *str);
 
-inline bool WriteTextFileRaw(const WStr &filename, const Str8 &str);
+inline bool WriteTextFileRaw(const Str8 &filename, const Str8 &str);
 
 /**
  * @brief 对整个文件一次进行读写的便利操作
@@ -40,7 +40,7 @@ public:
      */
     template<typename AllocFunc = void*(*)(size_t)>
     std::pair<size_t, unsigned char*> ReadBinary(
-        const WStr &filename, AllocFunc &&func = &(std::malloc))
+        const Str8 &filename, AllocFunc &&func = &(std::malloc))
     {
         return ReadBinaryFileRaw(filename, std::forward<AllocFunc>(func));
     }
@@ -63,7 +63,7 @@ public:
      * @return 若写入遇到错误，返回false
      */
     static bool WriteBinaryFile(
-        const WStr &filename, const unsigned char *data, size_t len)
+        const Str8 &filename, const unsigned char *data, size_t len)
     {
         return WriteBinaryFileRaw(filename, data, len);
     }
@@ -76,7 +76,7 @@ public:
      *
      * @return 读取失败时返回false
      */
-    static bool ReadText(const WStr &filename, Str8 *str)
+    static bool ReadText(const Str8 &filename, Str8 *str)
     {
         return ReadTextFileRaw(filename, str);
     }
@@ -89,7 +89,7 @@ public:
      *
      * @return 若写入遇到错误，返回false
      */
-    static bool WriteText(const WStr &filename, const Str8 &str)
+    static bool WriteText(const Str8 &filename, const Str8 &str)
     {
         return WriteTextFileRaw(filename, str);
     }
@@ -97,7 +97,7 @@ public:
 
 template<typename AllocFunc>
 std::pair<size_t, unsigned char*> ReadBinaryFileRaw(
-    const WStr &filename, AllocFunc &&func)
+    const Str8 &filename, AllocFunc &&func)
 {
     std::ifstream fin(filename.ToPlatformString().c_str(),
                       std::ios::in | std::ios::binary);
@@ -121,7 +121,7 @@ AGZ_FORCEINLINE void DefaultlyReleaseRawBinaryFileContent(unsigned char *ptr)
 }
 
 inline bool WriteBinaryFileRaw(
-    const WStr &filename, const unsigned char *data, size_t len)
+    const Str8 &filename, const unsigned char *data, size_t len)
 {
     std::ofstream fout(filename.ToPlatformString().c_str(),
                        std::ios::binary | std::ios::trunc);
@@ -132,7 +132,7 @@ inline bool WriteBinaryFileRaw(
     return true;
 }
 
-inline bool ReadTextFileRaw(const WStr &filename, Str8 *str)
+inline bool ReadTextFileRaw(const Str8 &filename, Str8 *str)
 {
     std::ifstream fin(filename.ToPlatformString(), std::ios_base::in);
     if(!fin)
@@ -143,7 +143,7 @@ inline bool ReadTextFileRaw(const WStr &filename, Str8 *str)
     return true;
 }
 
-inline bool WriteTextFileRaw(const WStr &filename, const Str8 &str)
+inline bool WriteTextFileRaw(const Str8 &filename, const Str8 &str)
 {
     std::ofstream fout(filename.ToPlatformString(), std::ios_base::out | std::ios_base::trunc);
     if(!fout)

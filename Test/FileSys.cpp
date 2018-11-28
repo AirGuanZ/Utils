@@ -18,13 +18,8 @@ TEST_CASE("FileSys")
     SECTION("File")
     {
         REQUIRE(!File::GetWorkingDirectory().Empty());
-        REQUIRE(WPath(File::GetWorkingDirectory()).IsAbsolute());
-        REQUIRE(!WPath(File::GetWorkingDirectory()).HasFilename());
-    }
-
-    SECTION("FileCache")
-    {
-        REQUIRE(BinaryFileCache::AutoCacheName("./Minecraft/xyz.txt") == "./.agz.cache/./Minecraft/xyz.txt");
+        REQUIRE(Path8(File::GetWorkingDirectory()).IsAbsolute());
+        REQUIRE(!Path8(File::GetWorkingDirectory()).HasFilename());
     }
 
     SECTION("Path")

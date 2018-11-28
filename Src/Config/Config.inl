@@ -364,7 +364,7 @@ inline bool Config::LoadFromMemory(const Str8 &src)
 inline bool Config::LoadFromFile(const Str8 &filename)
 {
     Str8 content;
-    if(!FileSys::ReadTextFileRaw(filename.ToStdWString(), &content))
+    if(!FileSys::ReadTextFileRaw(filename, &content))
         return false;
     return LoadFromMemory(content);
 }

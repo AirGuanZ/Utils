@@ -12,16 +12,16 @@ namespace PrettyTypeNameImpl
     template<typename T>
     struct Impl
     {
-        static WStr Name()
+        static Str8 Name()
         {
-            return WStr(typeid(T).name());
+            return Str8(typeid(T).name());
         }
     };
 
     template<typename T>
     struct Impl<const T>
     {
-        static WStr Name()
+        static Str8 Name()
         {
             return "const " + Impl<T>::Name();
         }
@@ -30,7 +30,7 @@ namespace PrettyTypeNameImpl
     template<typename T>
     struct Impl<T&>
     {
-        static WStr Name()
+        static Str8 Name()
         {
             return "lref-to " + Impl<T>::Name();
         }
@@ -39,7 +39,7 @@ namespace PrettyTypeNameImpl
     template<typename T>
     struct Impl<volatile T>
     {
-        static WStr Name()
+        static Str8 Name()
         {
             return "vol " + Impl<T>::Name();
         }
@@ -48,7 +48,7 @@ namespace PrettyTypeNameImpl
     template<typename T>
     struct Impl<T*>
     {
-        static WStr Name()
+        static Str8 Name()
         {
             return "ptr-to " + Impl<T>::Name();
         }
@@ -57,35 +57,35 @@ namespace PrettyTypeNameImpl
     template<typename T>
     struct Impl<T&&>
     {
-        static WStr Name()
+        static Str8 Name()
         {
             return "rref-to " + Impl<T>::Name();
         }
     };
 
     template<bool Start>
-    AGZ_FORCEINLINE WStr GetArgListName()
+    AGZ_FORCEINLINE Str8 GetArgListName()
     {
-        return L"";
+        return Str8();
     }
 
     template<bool Start, typename T, typename...Args>
-    AGZ_FORCEINLINE WStr GetArgListName()
+    AGZ_FORCEINLINE Str8 GetArgListName()
     {
         if constexpr(Start)
             return Impl<T>::Name() + GetArgListName<false, Args...>();
         else
-            return L", " + Impl<T>::Name() + GetArgListName<false, Args...>();
+            return ", " + Impl<T>::Name() + GetArgListName<false, Args...>();
     }
 
     template<typename R, typename...Args>
     struct Impl<R(Args...)>
     {
-        static WStr Name()
+        static Str8 Name()
         {
-            StringBuilder<WUTF> b;
-            b << WStr(L"(") << GetArgListName<true, Args...>()
-              << WStr(L") -> ") << Impl<R>::Name();
+            StringBuilder<UTF8<>> b;
+            b << Str8("(") << GetArgListName<true, Args...>()
+              << Str8(") -> ") << Impl<R>::Name();
             return b.Get();
         }
     };
@@ -94,7 +94,7 @@ namespace PrettyTypeNameImpl
     template<> \
     struct Impl<TYPE> \
     { \
-        static WStr Name() \
+        static Str8 Name() \
         { \
             return #NAME; \
         } \
@@ -120,7 +120,7 @@ PREDEFINED_PRETTY_TYPENAME(long double, ldouble);
 }
 
 template<typename T>
-WStr PrettyTypeName()
+Str8 PrettyTypeName()
 {
     return PrettyTypeNameImpl::Impl<T>::Name();
 }

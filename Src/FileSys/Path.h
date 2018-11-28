@@ -279,7 +279,7 @@ public:
     {
         if(IsAbsolute())
             return *this;
-        return *this = Self(File::GetWorkingDirectory(), false, style)
+        return *this = Self(Str(File::GetWorkingDirectory()), false, style)
                      + *this;
     }
 

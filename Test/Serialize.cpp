@@ -51,16 +51,55 @@ TEST_CASE("Serialize")
         Variant<int, float, Str8> v0 = Str8("abc");
         Variant<int, float, Str8> v1 = 2;
 
+        std::vector<float> vec = { 1.0f, 2.0f, 3.0f, 4.0f };
+
         BinaryMemorySerializer serializer;
         serializer.Serialize(v0);
         serializer.Serialize(v1);
+        serializer.Serialize(vec);
+        serializer.Serialize(vec);
 
         Variant<int, float, Str8> v2;
         BinaryMemoryDeserializer deserializer(
             serializer.GetData(), serializer.GetByteSize());
+
         deserializer.Deserialize(v2);
         REQUIRE(std::get<Str8>(v2) == "abc");
+
         deserializer.Deserialize(v2);
         REQUIRE(std::get<int>(v2) == 2);
+
+        vec.clear();
+        deserializer.Deserialize(vec);
+        REQUIRE(vec == std::vector<float>{ 1.0f, 2.0f, 3.0f, 4.0f });
+
+        vec.clear();
+        deserializer.Deserialize(vec);
+        REQUIRE(vec == std::vector<float>{ 1.0f, 2.0f, 3.0f, 4.0f });
+    }
+
+    SECTION("2")
+    {
+        using namespace TypeOpr;
+
+        using V = Variant<int, Str8>;
+
+        std::vector<V> vec = { 0, "abc", 4, "minecraft" };
+
+        BinaryMemorySerializer serializer;
+        serializer.Serialize(vec);
+        serializer.Serialize(vec);
+
+        BinaryMemoryDeserializer deserializer(
+            serializer.GetData(), serializer.GetByteSize());
+        vec.clear();
+
+        vec.clear();
+        deserializer.Deserialize(vec);
+        REQUIRE(vec == std::vector<V>{ 0, "abc", 4, "minecraft" });
+
+        vec.clear();
+        deserializer.Deserialize(vec);
+        REQUIRE(vec == std::vector<V>{ 0, "abc", 4, "minecraft" });
     }
 }

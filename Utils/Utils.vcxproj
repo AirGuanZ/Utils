@@ -25,6 +25,8 @@
     <ClInclude Include="..\Src\Alloc\FixedSizedArena.h" />
     <ClInclude Include="..\Src\Buffer\COWObject.h" />
     <ClInclude Include="..\Src\Config\Config.h" />
+    <ClInclude Include="..\Src\FileSys\File.h" />
+    <ClInclude Include="..\Src\FileSys\FileCache.h" />
     <ClInclude Include="..\Src\FileSys\Path.h" />
     <ClInclude Include="..\Src\FileSys\Raw.h" />
     <ClInclude Include="..\Src\Math\Angle.h" />
@@ -54,7 +56,6 @@
     <ClInclude Include="..\Src\Misc\Uncopiable.h" />
     <ClInclude Include="..\Src\Model\Model.h" />
     <ClInclude Include="..\Src\Model\WavefrontOBJ.h" />
-    <ClInclude Include="..\Src\Platform\Platform.h" />
     <ClInclude Include="..\Src\Range\Aggregate.h" />
     <ClInclude Include="..\Src\Range\All.h" />
     <ClInclude Include="..\Src\Range\Any.h" />
@@ -75,6 +76,7 @@
     <ClInclude Include="..\Src\Range\Each.h" />
     <ClInclude Include="..\Src\Serialize\BinaryDeserializer.h" />
     <ClInclude Include="..\Src\Serialize\BinarySerializer.h" />
+    <ClInclude Include="..\Src\Serialize\Predefined.h" />
     <ClInclude Include="..\Src\String\Charset\ASCII.h" />
     <ClInclude Include="..\Src\String\Charset\Charset.h" />
     <ClInclude Include="..\Src\String\Charset\UTF.h" />
@@ -113,6 +115,7 @@
     <ClInclude Include="..\Src\Utils\Time.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Src\FileSys\File.inl" />
     <None Include="..\Src\Math\SwizzleVec2.inl" />
     <None Include="..\Src\Math\SwizzleVec3.inl" />
     <None Include="..\Src\Math\SwizzleVec4.inl" />

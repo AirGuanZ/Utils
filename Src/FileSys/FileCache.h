@@ -1,8 +1,7 @@
-#pragma once
+﻿#pragma once
 
 #include <fstream>
 
-#include "../Misc/Common.h"
 #include "../Utils/Serialize.h"
 #include "../Utils/String.h"
 #include "File.h"
@@ -16,14 +15,14 @@ namespace AGZ::FileSys {
 class BinaryFileCache
 {
     template<typename CacheBuilder>
-    static auto Build(const StdPStr &cacheFilename, CacheBuilder &&cacheBuilder)
+    static auto Build(const Str8 &cacheFilename, CacheBuilder &&cacheBuilder)
     {
-        PPath path(cacheFilename);
-        File::CreateDirectory(path.ToDirectory().ToStr());
+        Path8 path(cacheFilename);
+        File::CreateDirectoryRecursively(path.ToDirectory().ToStr());
 
-        std::ofstream fout(cacheFilename.c_str(), std::ios::binary | std::ios::trunc);
+        std::ofstream fout(cacheFilename.ToPlatformString(), std::ios::binary | std::ios::trunc);
         if(!fout)
-            throw FileException("BinaryFileCache: failed to open new cache file: " + cacheFilename);
+            throw FileException(("BinaryFileCache: failed to open new cache file: " + Str8(cacheFilename)).ToStdString());
         BinaryOStreamSerializer serializer(fout);
         return cacheBuilder(serializer);
     }
@@ -52,9 +51,8 @@ public:
     template<typename CacheBuilder, typename CacheValidator, typename CacheLoader>
     static auto Cache(const Str8 &cacheFilename, CacheBuilder &&builder, CacheValidator &&validator, CacheLoader &&loader)
     {
-        auto platformFilename = cacheFilename.ToPlatformString();
         {
-            std::ifstream fin(platformFilename, std::ios::binary);
+            std::ifstream fin(cacheFilename.ToPlatformString(), std::ios::binary);
             if(fin)
             {
                 BinaryIStreamDeserializer deserializer(fin);
@@ -62,7 +60,7 @@ public:
                     return loader(deserializer);
             }
         }
-        return Build(platformFilename, std::forward<CacheBuilder>(builder));
+        return Build(cacheFilename, std::forward<CacheBuilder>(builder));
     }
 };
 
