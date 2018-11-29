@@ -201,9 +201,9 @@ public:
             auto destructor = reinterpret_cast<DestructorInterface*>(
                 reinterpret_cast<char*>(nodeHead) + sizeof(NodeHead));
             destructor->Destruct();
+            size_t nodeSize = destructor->NodeSize();
             destructor->~DestructorInterface();
-
-            if(destructor->NodeSize() > chunkDataSize_)
+            if(nodeSize > chunkDataSize_)
                 Alloc::Free(nodeHead);
         }
 
