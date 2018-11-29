@@ -53,8 +53,10 @@
 
 #if defined(_MSC_VER)
     #define AGZ_CC_MSVC
+#elif defined(__clang__)
+    #define AGZ_CC_CLANG
 #elif defined(__GUNC__)
-    #define AGZ_CC_GUNC
+    #define AGZ_CC_GCC
 #endif
 
 // ============================= implementation flag =============================
