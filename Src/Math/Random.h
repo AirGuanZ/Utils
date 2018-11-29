@@ -96,9 +96,23 @@ MAKE_REAL_NORMAL_T(double);
  * @endcond
  */
 
-/** @brief 单个线程内部共享使用的随机数生成器 */
-template<typename Engine>
+/**
+ * @brief 返回单个线程内共享使用的随机数生成器
+ * 
+ * 我本来是这么写的：
+@code
+template<typename Engine = DefaultInternalEngine>
 inline thread_local SharedRandomEngine_t<Engine> SHARED_RNG;
+@endcode
+ * 但是g++有个bug会导致这个SHARED_RNG的构造函数没运行，进而导致RNG内部可能出现非法状态。
+ * 这个问题坑掉了我整整一个下午，有必要在这记一笔。
+ */
+template<typename Engine = DefaultInternalEngine>
+SharedRandomEngine_t<Engine> &GetDefaultSharedRNG()
+{
+    static thread_local SharedRandomEngine_t<Engine> ret;
+    return ret;
+}
 
 /**
  * @brief [min, max]上的均匀分布
@@ -106,7 +120,7 @@ inline thread_local SharedRandomEngine_t<Engine> SHARED_RNG;
  * @note 该函数是线程安全的
  */
 template<typename T, typename S = SharedRandomEngine_t<>>
-T Uniform(T min, T max, S &rng = SHARED_RNG<DefaultInternalEngine>)
+T Uniform(T min, T max, S &rng = GetDefaultSharedRNG<>())
 {
     return Uniform_t<T, S>::Eval(min, max, rng);
 }
@@ -117,7 +131,7 @@ T Uniform(T min, T max, S &rng = SHARED_RNG<DefaultInternalEngine>)
  * @note 该函数是线程安全的
  */
 template<typename T, typename S = SharedRandomEngine_t<>>
-T Normal(T mean, T stddev, S &rng = SHARED_RNG<DefaultInternalEngine>)
+T Normal(T mean, T stddev, S &rng = GetDefaultSharedRNG<>())
 {
     return Normal_t<T, S>::Eval(mean, stddev, rng);
 }
