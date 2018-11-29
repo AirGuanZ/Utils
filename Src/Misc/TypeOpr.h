@@ -60,13 +60,10 @@ using Variant = std::variant<Ts...>;
 template<typename E, typename...Vs>
 auto MatchVar(E &&e, Vs...vs)
 {
-    struct overloaded : Vs...
+    struct overloaded : public Vs...
     {
-        explicit overloaded(Vs...vss)
-            : Vs(vss)...
-        {
-
-        }
+        explicit overloaded(Vs...vss) : Vs(vss)... { }
+        using Vs::operator()...;
     };
 
     return std::visit(overloaded(vs...), std::forward<E>(e));

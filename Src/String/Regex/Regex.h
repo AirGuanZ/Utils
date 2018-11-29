@@ -28,7 +28,7 @@ namespace AGZ {
  * @brief 正则表达式匹配/搜索结果
  */
 template<typename CS>
-class Match
+class MatchResult
 {
 public:
 
@@ -36,19 +36,19 @@ public:
     friend class Regex;
 
     using Interval = std::pair<size_t, size_t>;
-    using Self = Match<CS>;
+    using Self = MatchResult<CS>;
 
     /**
      * 默认初始化为无效对象
      */
-    Match()
+    MatchResult()
         : interval_(0, std::numeric_limits<size_t>::max())
     {
 
     }
 
-    /** 复制Match对象 */
-    Match(const Match<CS> &copyFrom)
+    /** 复制MatchResult对象 */
+    MatchResult(const MatchResult<CS> &copyFrom)
         : whole_(copyFrom.whole_),
           interval_(copyFrom.interval_),
           savePoints_(copyFrom.savePoints_)
@@ -56,8 +56,8 @@ public:
 
     }
 
-    /** 移动Match对象 */
-    Match(Match<CS> &&moveFrom) noexcept
+    /** 移动MatchResult对象 */
+    MatchResult(MatchResult<CS> &&moveFrom) noexcept
         : whole_(std::move(moveFrom.whole_)),
           interval_(moveFrom.interval_),
           savePoints_(std::move(moveFrom.savePoints_))
@@ -65,10 +65,10 @@ public:
         moveFrom.interval_.second = std::numeric_limits<size_t>::max();
     }
 
-    ~Match() = default;
+    ~MatchResult() = default;
 
-    /** 赋值Match对象 */
-    Match<CS> &operator=(const Self &copyFrom)
+    /** 赋值MatchResult对象 */
+    MatchResult<CS> &operator=(const Self &copyFrom)
     {
         whole_ = copyFrom.whole_;
         interval_ = copyFrom.interval_;
@@ -76,8 +76,8 @@ public:
         return *this;
     }
 
-    /** 移动赋值Match对象 */
-    Match<CS> &operator=(Self &&moveFrom) noexcept
+    /** 移动赋值MatchResult对象 */
+    MatchResult<CS> &operator=(Self &&moveFrom) noexcept
     {
         whole_ = std::move(moveFrom.whole_);
         interval_ = moveFrom.interval_;
@@ -96,7 +96,7 @@ public:
         return interval_.second <= whole_.Length();
     }
 
-    //! @copydoc Match<CS>::Valid
+    //! @copydoc MatchResult<CS>::Valid
     operator bool() const
     {
         return Valid();
@@ -148,7 +148,7 @@ public:
 
 private:
 
-    Match(const StringView<CS> &whole,
+    MatchResult(const StringView<CS> &whole,
         const Interval &interval,
         std::vector<size_t> &&savePoints)
         : whole_(whole),
@@ -176,7 +176,7 @@ public:
     using CodePoint = typename CS::CodePoint;
     using CodeUnit  = typename CS::CodeUnit;
     using Engine    = Eng;
-    using Result    = Match<CS>;
+    using Result    = MatchResult<CS>;
     using Self      = Regex<CS, Eng>;
 
     /**

@@ -55,7 +55,7 @@ TEST_CASE("Misc")
         auto v = MatchVar(tu,
             [](float f) { return f; },
             [](int x) { return x + 2.0f; },
-            []([[maybe_unused]] auto v) { return 0.0f; });
+            [](auto) { return 0.0f; });
         REQUIRE(v == 7);
     }
 

@@ -120,7 +120,7 @@ size_t UTF16Core<T>::CU2CP(const CodeUnit *cu, CodePoint *cp)
     {
         char32_t low = static_cast<char32_t>(*++cu);
         if(low <= 0xdfff)
-            return 0x10000 + ((high & 0x3ff) << 10) | (low & 0x3ff);
+            return 0x10000 + (((high & 0x3ff) << 10) | (low & 0x3ff));
         return 0;
     }
 
@@ -189,7 +189,7 @@ UTF16Core<T>::Iterator::Iterator(const T *cur)
 template<typename T>
 char32_t UTF16Core<T>::Iterator::operator*() const
 {
-    char32_t ret;
+    char32_t ret = 0;
     if(!UTF16Core<T>::CU2CP(cur, &ret))
         throw CharsetException("Invalid UTF-16 sequence");
     return ret;
