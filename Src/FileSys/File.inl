@@ -1,9 +1,12 @@
 ﻿#pragma once
 
+#include "../Misc/Common.h"
+
 #ifdef AGZ_FILE_IMPL
 
-#if defined(AGZ_OS_WIN32)
+#if defined(AGZ_CC_MSVC)
 
+#include <filesystem>
 #include <Windows.h>
 
 namespace AGZ::FileSys {
@@ -67,12 +70,18 @@ Str8 File::GetWorkingDirectory()
 
 bool File::CreateDirectoryRecursively(const Str8 &directory)
 {
-    Path8 p(directory, false);
-    AGZ_ASSERT(p.IsDirectory());
-    size_t sc = p.GetSectionCount();
-    for(size_t i = 1; i <= sc; ++i)
-        ::CreateDirectoryW(p.GetPrefix(i).ToStr().ToPlatformString().c_str(), nullptr);
-    return true;
+    return std::filesystem::create_directories(directory.ToStdString());
+}
+
+bool File::IsRegularFile(const Str8 &filename)
+{
+    return std::filesystem::is_regular_file(filename.ToStdString());
+}
+
+bool File::DeleteFile(const Str8 &filename)
+{
+    auto s = filename.ToStdString();
+    return IsRegularFile(s) && std::filesystem::remove(s);
 }
 
 } // namespace AGZ::FileSys
@@ -144,11 +153,26 @@ bool File::CreateDirectoryRecursively(const Str8 &directory)
     return true;
 }
 
+bool File::IsRegularFile(const Str8 &filename)
+{
+    struct stat buf;
+    if(stat(filename.ToStdString().c_str(), &buf))
+        return false;
+    return static_cast<bool>(S_ISREG(buf.st_mode));
+}
+
+bool File::DeleteFile(const Str8 &filename)
+{
+    if(!IsRegularFile(filename))
+        return false;
+    return !remove(filename.ToStdString().c_str());
+}
+
 } // namespace AGZ::FileSys
 
 #else
 
-#warning "OS File unimplementated"
+#error "OS File unimplementated"
 
 #endif
 

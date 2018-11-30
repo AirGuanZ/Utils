@@ -38,6 +38,12 @@ public:
 
     //! 创建指定目录
     static bool CreateDirectoryRecursively(const Str8 &directory);
+
+    //! 查询一个路径是否是regular file
+    static bool IsRegularFile(const Str8 &filename);
+
+    //! 删除指定文件
+    static bool DeleteFile(const Str8 &filename);
 };
 
 } // namespace AGZ::FileSys

@@ -8,7 +8,7 @@ CPP_FILES = $(shell find ./Test/ -name "*.cpp")
 OPP_FILES = $(patsubst %.cpp, %.o, $(CPP_FILES))
 DPP_FILES = $(patsubst %.cpp, %.d, $(CPP_FILES))
 
-TARGET = ./Build/test
+TARGET = ./testProg
 
 $(TARGET) : $(OPP_FILES)
 	$(CPPC) $(CPPC_FLAGS) $^ -o $@
@@ -25,8 +25,8 @@ $(DPP_FILES) : %.d : %.cpp
 
 -include $(DPP_FILES)
 
-.PHONY : run
-run :
+.PHONY : test
+test :
 	make $(TARGET)
 	$(TARGET)
 

@@ -47,14 +47,14 @@ f 6//4 7//4 3//4
 f 3//5 7//5 8//5
 f 1//6 4//6 8//6
 )___";
-        WavefrontObj obj;
-        REQUIRE(WavefrontObjFile::LoadFromMemory(content, &obj));
+        WavefrontObj<double> obj;
+        REQUIRE(WavefrontObjFile<double>::LoadFromMemory(content, &obj));
         auto meshGroup = obj.ToGeometryMeshGroup();
         REQUIRE(meshGroup.submeshes.find("Cube") != meshGroup.submeshes.end());
 
         {
-            WavefrontObj obj2;
-            REQUIRE(!WavefrontObjFile::LoadFromMemory(content, &obj2, false));
+            WavefrontObj<double> obj2;
+            REQUIRE(!WavefrontObjFile<double>::LoadFromMemory(content, &obj2, false));
         }
 
         REQUIRE(meshGroup.submeshes["Cube"].vertices.size() == 36);

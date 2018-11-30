@@ -15,13 +15,14 @@ namespace AGZ::Model {
 /**
  * @brief 简单的几何模型，仅包含顶点位置、纹理坐标以及法线
  */
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 struct GeometryMesh
 {
     struct Vertex
     {
-        Math::Vec3d pos;
-        Math::Vec3d tex;
-        Math::Vec3d nor;
+        Math::Vec3<T> pos;
+        Math::Vec3<T> tex;
+        Math::Vec3<T> nor;
     };
 
     std::vector<Vertex> vertices;
@@ -31,36 +32,38 @@ struct GeometryMesh
      * 
      * @warning 算法非常糙，慎用
      */
-    GeometryMesh &SmoothenNormals();
+    GeometryMesh<T> &SmoothenNormals();
 };
 
 /**
  * @brief 简单的几何模型组，为从名字到几何模型的映射
  */
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 struct GeometryMeshGroup
 {
-    std::map<Str8, GeometryMesh> submeshes;
+    std::map<Str8, GeometryMesh<T>> submeshes;
 
     /**
      * @brief 自动平滑模型法线
      *
      * @warning 算法非常糙，慎用
      */
-    GeometryMeshGroup &SmoothenNormals();
+    GeometryMeshGroup<T> &SmoothenNormals();
 
     /**
      * @brief 把submeshes合并成一个mesh并返回
      */
-    GeometryMesh MergeAllSubmeshes() const;
+    GeometryMesh<T> MergeAllSubmeshes() const;
 };
 
-inline GeometryMesh &GeometryMesh::SmoothenNormals()
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
+inline GeometryMesh<T> &GeometryMesh<T, DN>::SmoothenNormals()
 {
     // IMPROVE
 
-    struct CompVec3d
+    struct CompVec3
     {
-        bool operator()(const Math::Vec3d &lhs, const Math::Vec3d &rhs) const
+        bool operator()(const Math::Vec3<T> &lhs, const Math::Vec3<T> &rhs) const
         {
             return lhs.x < rhs.x ||
                   (lhs.x == rhs.x && lhs.y < rhs.y) ||
@@ -68,15 +71,15 @@ inline GeometryMesh &GeometryMesh::SmoothenNormals()
         }
     };
 
-    std::map<Math::Vec3d, std::set<size_t>, CompVec3d> vtx2Nors;
+    std::map<Math::Vec3<T>, std::set<size_t>, CompVec3> vtx2Nors;
     for(size_t i = 0; i < vertices.size(); ++i)
         vtx2Nors[vertices[i].pos].insert(i);
 
     for(auto &p : vtx2Nors)
     {
-        auto avgNor = std::accumulate(p.second.begin(), p.second.end(), Math::Vec3d(0.0),
-            [=](const Math::Vec3d &L, size_t R) { return L + this->vertices[R].nor; });
-        if(avgNor.LengthSquare() < 0.001)
+        auto avgNor = std::accumulate(p.second.begin(), p.second.end(), Math::Vec3<T>(0.0),
+            [=](const Math::Vec3<T> &L, size_t R) { return L + this->vertices[R].nor; });
+        if(avgNor.LengthSquare() < T(0.001))
             continue;
         avgNor = avgNor.Normalize();
         for(auto i : p.second)
@@ -86,16 +89,18 @@ inline GeometryMesh &GeometryMesh::SmoothenNormals()
     return *this;
 }
 
-inline GeometryMeshGroup &GeometryMeshGroup::SmoothenNormals()
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
+inline GeometryMeshGroup<T> &GeometryMeshGroup<T, DN>::SmoothenNormals()
 {
     for(auto &p : submeshes)
         p.second.SmoothenNormals();
     return *this;
 }
 
-inline GeometryMesh GeometryMeshGroup::MergeAllSubmeshes() const
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
+inline GeometryMesh<T> GeometryMeshGroup<T, DN>::MergeAllSubmeshes() const
 {
-    GeometryMesh ret;
+    GeometryMesh<T> ret;
     for(auto &it : submeshes)
     {
         auto &sm = it.second;

@@ -19,12 +19,26 @@ class BinaryFileCache
     {
         Path8 path(cacheFilename);
         File::CreateDirectoryRecursively(path.ToDirectory().ToStr());
-
         std::ofstream fout(cacheFilename.ToPlatformString(), std::ios::binary | std::ios::trunc);
         if(!fout)
             throw FileException(("BinaryFileCache: failed to open new cache file: " + Str8(cacheFilename)).ToStdString());
         BinaryOStreamSerializer serializer(fout);
-        return cacheBuilder(serializer);
+        try
+        {
+            auto ret = cacheBuilder(serializer);
+            if(!serializer.Ok())
+            {
+                throw FileException(
+                    ("BinaryFileCache: failed to deserialize cache file: " + Str8(cacheFilename)).ToStdString());
+            }
+            return ret;
+        }
+        catch(...)
+        {
+            fout.close();
+            File::DeleteFile(cacheFilename);
+            throw;
+        }
     }
 
 public:

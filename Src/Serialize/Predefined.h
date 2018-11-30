@@ -6,6 +6,11 @@
 #include "BinaryDeserializer.h"
 #include "BinarySerializer.h"
 
+#define IMPL_MEMCPY_SERIALIZE \
+    bool Serialize(::AGZ::BinarySerializer &s) const { return s.Write(this, sizeof(*this)); }
+#define IMPL_MEMCPY_DESERIALIZE \
+    bool Deserialize(::AGZ::BinaryDeserializer &d) { return d.Read(this, sizeof(*this)); }
+
 namespace AGZ {
 
 template<typename T>
@@ -90,7 +95,7 @@ private:
         TypeOpr::SelectInTypeList_t<Index, Ts...> tv;
         if(!deserializer.Deserialize(tv))
             return false;
-        v = tv;
+        v = std::move(tv);
         return true;
     }
 
@@ -104,8 +109,3 @@ private:
 };
 
 }
-
-#define IMPL_MEMCPY_SERIALIZE \
-    bool Serialize(::AGZ::BinarySerializer &s) const { return s.Write(this, sizeof(*this)); }
-#define IMPL_MEMCPY_DESERIALIZE \
-    bool Deserialize(::AGZ::BinaryDeserializer &d) { return d.Read(this, sizeof(*this)); }

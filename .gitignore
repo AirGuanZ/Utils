@@ -25,7 +25,7 @@ bld/
 *.o
 *.d
 *.dtmp
-Build/
+testProg
 Doc/
 .vscode/
 

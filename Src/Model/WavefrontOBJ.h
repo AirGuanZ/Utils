@@ -15,13 +15,14 @@ namespace AGZ::Model {
 /**
  * @brief Wavefront OBJ模型加载结果
  */
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 class WavefrontObj
 {
 public:
 
-    using Vertex = Math::Vec4<double>;     ///< 顶点类型
-    using TexCoord = Math::Vec3<double>; ///< 纹理坐标类型
-    using Normal = Math::Vec3<double>;   ///< 法线类型
+    using Vertex   = Math::Vec4<T>; ///< 顶点类型
+    using TexCoord = Math::Vec3<T>; ///< 纹理坐标类型
+    using Normal   = Math::Vec3<T>; ///< 法线类型
 
     /**
      * 顶点索引
@@ -50,11 +51,10 @@ public:
      */
     struct Obj
     {
-        std::vector<Vertex> vertices;       ///< 顶点数组
-        std::vector<TexCoord> texCoords;    ///< 纹理坐标数组
-        std::vector<Normal> normals;        ///< 法线数组
-
-        std::vector<Face> faces;            ///< 面元数组
+        std::vector<Vertex>   vertices;  ///< 顶点数组
+        std::vector<TexCoord> texCoords; ///< 纹理坐标数组
+        std::vector<Normal>   normals;   ///< 法线数组
+        std::vector<Face> faces;         ///< 面元数组
 
         /**
          * 转换为 GeometryMesh
@@ -64,7 +64,7 @@ public:
          * Missing texcoods will be filled with B <- (1, 0) and C <- (0, 1)
          *      Specify reverseTex = true to use B <- (0, 1) and C <- (1, 0)
          */
-        GeometryMesh ToGeometryMesh(bool reverseNor = false, bool reverseTex = false) const;
+        GeometryMesh<T> ToGeometryMesh(bool reverseNor = false, bool reverseTex = false) const;
     };
 
     std::map<Str8, Obj> objs;
@@ -88,7 +88,7 @@ public:
     /**
      * 转换为 GeometryMeshGroup
      */
-    GeometryMeshGroup ToGeometryMeshGroup(bool reverseNor = false, bool reverseTex = false) const;
+    GeometryMeshGroup<T> ToGeometryMeshGroup(bool reverseNor = false, bool reverseTex = false) const;
 };
 
 /**
@@ -96,6 +96,7 @@ public:
  * 
  * 见https://en.wikipedia.org/wiki/Wavefront_.obj_file
  */
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 class WavefrontObjFile
 {
 public:
@@ -109,7 +110,7 @@ public:
      * 
      * @return 加载成功时返回true
      */
-    static bool LoadFromObjFile(const Str8 &filename, WavefrontObj *objs, bool ignoreUnknownLine = true);
+    static bool LoadFromObjFile(const Str8 &filename, WavefrontObj<T> *objs, bool ignoreUnknownLine = true);
 
     /**
      * 从文本中加载
@@ -120,18 +121,19 @@ public:
      * 
      * @return 加载成功时返回true
      */
-    static bool LoadFromMemory(const Str8 &content, WavefrontObj *objs, bool ignoreUnknownLine = true);
+    static bool LoadFromMemory(const Str8 &content, WavefrontObj<T> *objs, bool ignoreUnknownLine = true);
 
 private:
 
-    static WavefrontObj::Index ParseIndex(const StrView8 &str);
+    static typename WavefrontObj<T>::Index ParseIndex(const StrView8 &str);
 };
 
-inline GeometryMesh WavefrontObj::Obj::ToGeometryMesh(bool reverseNor, bool reverseTex) const
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
+inline GeometryMesh<T> WavefrontObj<T, DN>::Obj::ToGeometryMesh(bool reverseNor, bool reverseTex) const
 {
-    std::vector<GeometryMesh::Vertex> vtces;
+    std::vector<typename GeometryMesh<T>::Vertex> vtces;
 
-    TexCoord tB(1.0, 0.0, 0.0), tC(0.0, 1.0, 0.0);
+    TexCoord tB(T(1), T(0), T(0)), tC(T(0), T(1), T(0));
     if(reverseTex)
         std::swap(tB, tC);
 
@@ -165,7 +167,7 @@ inline GeometryMesh WavefrontObj::Obj::ToGeometryMesh(bool reverseNor, bool reve
         }
         else
         {
-            vtces[i].tex = TexCoord(0.0);
+            vtces[i].tex = TexCoord(T(0));
             vtces[i + 1].tex = tB;
             vtces[i + 2].tex = tC;
         }
@@ -178,18 +180,20 @@ inline GeometryMesh WavefrontObj::Obj::ToGeometryMesh(bool reverseNor, bool reve
             addTri(f, { 0, 2, 3 });
     }
 
-    return GeometryMesh{ vtces };
+    return GeometryMesh<T>{ vtces };
 }
 
-inline GeometryMeshGroup WavefrontObj::ToGeometryMeshGroup(bool reverseNor, bool reverseTex) const
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
+inline GeometryMeshGroup<T> WavefrontObj<T, DN>::ToGeometryMeshGroup(bool reverseNor, bool reverseTex) const
 {
-    std::map<Str8, GeometryMesh> submeshes;
+    std::map<Str8, GeometryMesh<T>> submeshes;
     for(auto p : objs)
         submeshes[p.first] = p.second.ToGeometryMesh(reverseNor, reverseTex);
-    return GeometryMeshGroup{ submeshes };
+    return GeometryMeshGroup<T>{ submeshes };
 }
 
-inline bool WavefrontObjFile::LoadFromObjFile(const Str8 &filename, WavefrontObj *objs, bool ignoreUnknownLine)
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
+inline bool WavefrontObjFile<T, DN>::LoadFromObjFile(const Str8 &filename, WavefrontObj<T> *objs, bool ignoreUnknownLine)
 {
     AGZ_ASSERT(objs && objs->Empty());
 
@@ -200,11 +204,12 @@ inline bool WavefrontObjFile::LoadFromObjFile(const Str8 &filename, WavefrontObj
     return LoadFromMemory(content, objs, ignoreUnknownLine);
 }
 
-inline bool WavefrontObjFile::LoadFromMemory(const Str8 &content, WavefrontObj *objs, bool ignoreUnknownLine)
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
+inline bool WavefrontObjFile<T, DN>::LoadFromMemory(const Str8 &content, WavefrontObj<T> *objs, bool ignoreUnknownLine)
 {
     AGZ_ASSERT(objs && objs->Empty());
 
-    WavefrontObj::Obj *cur = nullptr;
+    typename WavefrontObj<T>::Obj *cur = nullptr;
     auto checkCur = [&]()
     {
         if(!cur)
@@ -245,31 +250,31 @@ inline bool WavefrontObjFile::LoadFromMemory(const Str8 &content, WavefrontObj *
 
             if(auto m = vReg.Match(line); m)
             {
-                WavefrontObj::Vertex vtx;
-                vtx.x = m(0, 1).Parse<double>();
-                vtx.y = m(2, 3).Parse<double>();
-                vtx.z = m(4, 5).Parse<double>();
-                vtx.w = m(5, 6).Empty() ? 1.0 : m(5, 6).TrimLeft().Parse<double>();
+                typename WavefrontObj<T>::Vertex vtx;
+                vtx.x = m(0, 1).template Parse<T>();
+                vtx.y = m(2, 3).template Parse<T>();
+                vtx.z = m(4, 5).template Parse<T>();
+                vtx.w = m(5, 6).Empty() ? 1.0 : m(5, 6).TrimLeft().template Parse<T>();
                 checkCur()->vertices.push_back(vtx);
                 continue;
             }
 
             if(auto m = vtReg.Match(line); m)
             {
-                WavefrontObj::TexCoord texCoord;
-                texCoord.u = m(0, 1).Parse<double>();
-                texCoord.v = m(2, 3).Parse<double>();
-                texCoord.m = m(3, 4).Empty() ? 0.0 : m(3, 4).TrimLeft().Parse<double>();
+                typename WavefrontObj<T>::TexCoord texCoord;
+                texCoord.u = m(0, 1).template Parse<T>();
+                texCoord.v = m(2, 3).template Parse<T>();
+                texCoord.m = m(3, 4).Empty() ? 0.0 : m(3, 4).TrimLeft().template Parse<T>();
                 checkCur()->texCoords.push_back(texCoord);
                 continue;
             }
 
             if(auto m = vnReg.Match(line); m)
             {
-                WavefrontObj::Normal nor;
-                nor.x = m(0, 1).Parse<double>();
-                nor.y = m(2, 3).Parse<double>();
-                nor.z = m(4, 5).Parse<double>();
+                typename WavefrontObj<T>::Normal nor;
+                nor.x = m(0, 1).template Parse<T>();
+                nor.y = m(2, 3).template Parse<T>();
+                nor.z = m(4, 5).template Parse<T>();
                 checkCur()->normals.push_back(nor.Normalize());
                 continue;
             }
@@ -283,7 +288,7 @@ inline bool WavefrontObjFile::LoadFromMemory(const Str8 &content, WavefrontObj *
                     return false;
                 }
 
-                WavefrontObj::Face face;
+                typename  WavefrontObj<T>::Face face;
                 for(size_t i = 0; i < indices.size(); ++i)
                     face.indices[i] = ParseIndex(indices[i]);
 
@@ -314,9 +319,10 @@ inline bool WavefrontObjFile::LoadFromMemory(const Str8 &content, WavefrontObj *
     return true;
 }
 
-inline WavefrontObj::Index WavefrontObjFile::ParseIndex(const StrView8 &str)
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
+inline typename WavefrontObj<T>::Index WavefrontObjFile<T, DN>::ParseIndex(const StrView8 &str)
 {
-    WavefrontObj::Index ret = { -1, -1, -1 };
+    typename WavefrontObj<T>::Index ret = { -1, -1, -1 };
 
     static thread_local Regex8 reg0(R"___(\d+)___");
     if(auto m = reg0.Match(str); m)
