@@ -55,7 +55,7 @@
     #define AGZ_CC_MSVC
 #elif defined(__clang__)
     #define AGZ_CC_CLANG
-#elif defined(__GUNC__)
+#elif defined(__GNUC__)
     #define AGZ_CC_GCC
 #endif
 
@@ -95,7 +95,7 @@ constexpr std::nullopt_t None = std::nullopt;
 {
 #if defined(_MSC_VER)
     __assume(0);
-#elif defined(__GUNC__)
+#elif defined(__GNUC__)
     __builtin_unreachable();
 #endif
     std::terminate();
