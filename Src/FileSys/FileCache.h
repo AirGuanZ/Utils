@@ -36,7 +36,7 @@ class BinaryFileCache
         catch(...)
         {
             fout.close();
-            File::DeleteFile(cacheFilename);
+            File::DeleteRegularFile(cacheFilename);
             throw;
         }
     }

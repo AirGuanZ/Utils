@@ -43,7 +43,7 @@ public:
     static bool IsRegularFile(const Str8 &filename);
 
     //! 删除指定文件
-    static bool DeleteFile(const Str8 &filename);
+    static bool DeleteRegularFile(const Str8 &filename);
 };
 
 } // namespace AGZ::FileSys

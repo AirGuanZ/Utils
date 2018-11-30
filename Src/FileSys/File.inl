@@ -78,7 +78,7 @@ bool File::IsRegularFile(const Str8 &filename)
     return std::filesystem::is_regular_file(filename.ToStdString());
 }
 
-bool File::DeleteFile(const Str8 &filename)
+bool File::DeleteRegularFile(const Str8 &filename)
 {
     auto s = filename.ToStdString();
     return IsRegularFile(s) && std::filesystem::remove(s);
@@ -161,7 +161,7 @@ bool File::IsRegularFile(const Str8 &filename)
     return static_cast<bool>(S_ISREG(buf.st_mode));
 }
 
-bool File::DeleteFile(const Str8 &filename)
+bool File::DeleteRegularFile(const Str8 &filename)
 {
     if(!IsRegularFile(filename))
         return false;
