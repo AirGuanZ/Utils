@@ -3,6 +3,8 @@
 #include <tuple>
 #include <utility>
 
+#include "../Misc/Common.h"
+
 namespace AGZ {
 
 namespace RangeAux
@@ -22,13 +24,16 @@ namespace RangeAux
         auto Eval(R &&range)
         {
 #ifdef AGZ_CC_GCC
-            return std::apply<decltype(&RHS::template Eval<R>)>(&RHS::template Eval<R>,
+            return std::apply<decltype(&RHS::template Eval<R>)>(
+                                        &RHS::template Eval<R>,
+                                        std::tuple_cat(std::make_tuple<R>(
+                                            std::forward<R>(range)), args));
 #else
             return std::apply(&RHS::template Eval<R>,
-#endif
                               std::tuple_cat(
                                   std::make_tuple<R>(std::forward<R>(range)),
                                   args));
+#endif
         }
     };
 
