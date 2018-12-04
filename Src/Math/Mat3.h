@@ -86,6 +86,8 @@ public:
     /** 求行列式的值 */
     T Determinant() const;
 
+    Self Transpose() const;
+
     /** 取得指定列 */
     Vec3<T> GetCol(size_t colIdx) const;
 };
@@ -233,6 +235,14 @@ T Mat3<T>::Determinant() const
     Vec3<T> b(m[0][1], m[1][1], m[2][1]);
     Vec3<T> c(m[0][2], m[1][2], m[2][2]);
     return Dot(Cross(c, a), b);
+}
+
+template<typename T>
+typename Mat3<T>::Self Mat3<T>::Transpose() const
+{
+    return Mat3<T>(m[0][0], m[1][0], m[2][0],
+                   m[0][1], m[1][1], m[2][1],
+                   m[0][2], m[1][2], m[2][2]);
 }
 
 template<typename T>
