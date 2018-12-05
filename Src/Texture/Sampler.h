@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "../Misc/TypeOpr.h"
 #include "Texture.h"
 
 namespace AGZ {
@@ -17,14 +18,14 @@ public:
      * @param tex 纹理对象
      * @param texCoord 纹理坐标，取值范围为[0, 1]^2，(0, 0)对应纹理左上角
      */
-    template<typename PT, typename E>
-    static auto Sample(const Texture2D<PT> &tex, const Math::Vec2<E> &texCoord)
+    template<typename PT, typename E, typename TexelCaster = decltype(&TypeOpr::StaticCaster<PT, PT>)>
+    static auto Sample(const Texture2D<PT> &tex, const Math::Vec2<E> &texCoord, TexelCaster &&texelCaster = &TypeOpr::StaticCaster<PT, PT>)
     {
-        return tex(
+        return texelCaster(tex(
             Math::Clamp(static_cast<int>(texCoord.u * tex.GetWidth()),
                         0, static_cast<int>(tex.GetWidth()  - 1)),
             Math::Clamp(static_cast<int>(texCoord.v * tex.GetHeight()),
-                        0, static_cast<int>(tex.GetHeight() - 1)));
+                        0, static_cast<int>(tex.GetHeight() - 1))));
     }
 };
 
@@ -50,8 +51,8 @@ public:
      * @param tex 纹理对象
      * @param texCoord 纹理坐标，取值范围为[0, 1]^2，(0, 0)对应纹理左上角
      */
-    template<typename PT, typename E>
-    static auto Sample(const Texture2D<PT> &tex, const Math::Vec2<E> &texCoord)
+    template<typename PT, typename E, typename TexelCaster = decltype(&TypeOpr::StaticCaster<PT, PT>)>
+    static auto Sample(const Texture2D<PT> &tex, const Math::Vec2<E> &texCoord, TexelCaster &&texelCaster = &TypeOpr::StaticCaster<PT, PT>)
     {
         auto fu = static_cast<E>(texCoord.u * tex.GetWidth());
         auto fv = static_cast<E>(texCoord.v * tex.GetHeight());
@@ -68,7 +69,11 @@ public:
         E du = Math::Min(Math::Abs(fu - pu - E(0.5)), E(1));
         E dv = Math::Min(Math::Abs(fv - pv - E(0.5)), E(1));
 
-        return Interpolate(tex(pu, pv), tex(apu, pv), tex(pu, apv), tex(apu, apv), du, dv);
+        return Interpolate(
+            texelCaster(tex(pu, pv)),
+            texelCaster(tex(apu, pv)),
+            texelCaster(tex(pu, apv)),
+            texelCaster(tex(apu, apv)), du, dv);
     }
 };
 

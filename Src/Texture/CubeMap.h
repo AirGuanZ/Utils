@@ -97,39 +97,39 @@ typename CubeMapper<T>::MapResult CubeMapper<T>::Map(const Math::Vec3<T> &dir)
         if(neg)
         {
             T u = Clamp(T(0.5) - T(0.5) * op->y, T(0), T(1));
-            T v = Clamp(T(0.5) * op->z + T(0.5), T(0), T(1));
+            T v = Clamp(T(0.5) - T(0.5) * op->z, T(0), T(1));
             return { NEG_X, { u, v } };
         }
         else
         {
             T u = Clamp(T(0.5) * op->y + T(0.5), T(0), T(1));
-            T v = Clamp(T(0.5) * op->z + T(0.5), T(0), T(1));
+            T v = Clamp(T(0.5) - T(0.5) * op->z, T(0), T(1));
             return { POS_X, { u, v } };
         }
     case Y:
         if(neg)
         {
             T u = Clamp(T(0.5) * op->x + T(0.5), T(0), T(1));
-            T v = Clamp(T(0.5) * op->z + T(0.5), T(0), T(1));
+            T v = Clamp(T(0.5) - T(0.5) * op->z, T(0), T(1));
             return { NEG_Y, { u, v } };
         }
         else
         {
             T u = Clamp(T(0.5) - T(0.5) * op->x, T(0), T(1));
-            T v = Clamp(T(0.5) * op->z + T(0.5), T(0), T(1));
+            T v = Clamp(T(0.5) - T(0.5) * op->z, T(0), T(1));
             return { POS_Y, { u, v } };
         }
     case Z:
         if(neg)
         {
             T u = Clamp(T(0.5) - T(0.5) * op->x, T(0), T(1));
-            T v = Clamp(T(0.5) - T(0.5) * op->y, T(0), T(1));
+            T v = Clamp(T(0.5) + T(0.5) * op->y, T(0), T(1));
             return { NEG_Z, { 1 - u, v } };
         }
         else
         {
             T u = Clamp(T(0.5) * op->x + T(0.5), T(0), T(1));
-            T v = Clamp(T(0.5) * op->y + T(0.5), T(0), T(1));
+            T v = Clamp(T(0.5) - T(0.5) * op->y, T(0), T(1));
             return { POS_Z, { u, v } };
         }
     default:
