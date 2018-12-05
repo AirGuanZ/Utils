@@ -136,6 +136,8 @@ public:
     template<typename T, typename...Args>
     T *Create(Args&&...args)
     {
+        // IMPROVE：对trivially_destructible的T，不需要Destructor
+
         size_t nodeSize = ObjSize2NodeSize<T>();
 
         // 过大的对象直接用Alloc::Malloc分配
