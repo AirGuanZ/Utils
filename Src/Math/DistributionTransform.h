@@ -45,13 +45,13 @@ public:
     {
         T r = Sqrt(u.u);
         T theta = 2 * PI<T> * u.v;
-        return { { r * Cos(theta), r*  Sin(theta) }, PI<T> };
+        return { { r * Cos(theta), r*  Sin(theta) }, InvPI<T> };
     }
 
     /** 概率密度函数值 */
     static T PDF()
     {
-        return PI<T>;
+        return InvPI<T>;
     }
 };
 
