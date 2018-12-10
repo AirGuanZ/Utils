@@ -17,28 +17,38 @@ namespace Impl
     template<typename T> struct Abs_impl<Deg<T>> { static Deg<T> Abs(Deg<T> v) { return Deg<T>{ Abs_impl<T>::Abs(v.value) }; } };
 }
 
-template<typename T> T Abs(T v) { return Impl::Abs_impl<T>::Abs(v); }
+template<typename T>
+T Abs(T v) { return Impl::Abs_impl<T>::Abs(v); }
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+auto Reciprocate(T value) { return T(1) / value; }
+
+template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 auto Sqrt(T value) { return std::sqrt(value); }
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 auto Exp(T value) { return std::exp(value); }
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 auto Log_e(T value) { return std::log(value); }
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 auto Log_2(T value) { return std::log2(value); }
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 auto Log_10(T value) { return std::log10(value); }
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 auto Pow(T x, T y) { return std::pow(x, y); }
 
 template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 T Clamp(T v, T minv, T maxv) { return (std::max)((std::min)(v, maxv), minv); }
+
+template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+T ClampToPositive(T v) { return (std::max)(T(0), v); }
+
+template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+T Saturate(T v) { return Clamp<T>(v, 0, 1); }
 
 template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 T Min(T lhs, T rhs) { return (std::min)(lhs, rhs); }
