@@ -10,7 +10,7 @@
 #include <type_traits>
 
 #include "../Misc/Common.h"
-#include "Tri.h"
+#include "Scalar.h"
 #include "Vec3.h"
 #include "Vec4.h"
 

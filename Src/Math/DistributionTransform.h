@@ -12,7 +12,7 @@
  * - 将[0, 1]^2上的均匀分布转换为锥形立体角上的均匀分布
  */
 
-#include "Tri.h"
+#include "Scalar.h"
 #include "Vec2.h"
 #include "Vec3.h"
 

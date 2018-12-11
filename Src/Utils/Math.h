@@ -12,7 +12,6 @@
 #include "../Math/Rect.h"
 #include "../Math/Scalar.h"
 #include "../Math/SH.h"
-#include "../Math/Tri.h"
 #include "../Math/Vec.h"
 #include "../Math/Vec2.h"
 #include "../Math/Vec3.h"

@@ -9,7 +9,7 @@
 
 #include "../Misc/Common.h"
 #include "Angle.h"
-#include "Tri.h"
+#include "Scalar.h"
 #include "Vec3.h"
 
 namespace AGZ::Math {
