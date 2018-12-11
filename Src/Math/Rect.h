@@ -13,6 +13,16 @@ public:
 
     Vec2<T> low, high;
 
+    auto GetDeltaX() const noexcept
+    {
+        return high.x - low.x;
+    }
+
+    auto GetDeltaY() const noexcept
+    {
+        return high.y - low.y;
+    }
+
     auto GetArea() const noexcept
     {
         auto delta = high - low;
