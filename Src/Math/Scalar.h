@@ -69,6 +69,19 @@ AGZ_FORCEINLINE bool ApproxEq(T lhs, T rhs, U epsilon)
     return Abs(lhs - rhs) <= epsilon;
 }
 
+namespace Impl
+{
+    template<typename T> struct OneMinusEpsilonImpl { };
+    template<> struct OneMinusEpsilonImpl<float>
+    {
+        static constexpr float Value = 0x1.fffffep-1;
+    };
+    template<> struct OneMinusEpsilonImpl<double>
+    {
+        static constexpr double Value = 0x1.fffffffffffffp-1;
+    };
+}
+
 /**
  * @brief IEEE754 floating-poing number
  * 
@@ -127,6 +140,11 @@ public:
      */
     static Self Infinity() { return Bits2Value(EXPT_BIT_MASK); }
     
+    /**
+     * 比1略小的值
+     */
+    static Self OneMinusEpsilon() { return Impl::OneMinusEpsilonImpl<F>::Value; }
+
     /**
      * 最大值
      */

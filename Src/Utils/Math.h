@@ -9,6 +9,7 @@
 #include "../Math/Mat4.h"
 #include "../Math/Quaternion.h"
 #include "../Math/Random.h"
+#include "../Math/Rect.h"
 #include "../Math/Scalar.h"
 #include "../Math/SH.h"
 #include "../Math/Tri.h"
