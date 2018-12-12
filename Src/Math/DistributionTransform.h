@@ -10,7 +10,10 @@
  * - 将[0, 1]^2上的均匀分布转换为半立体角上的Z线性加权分布
  * - 将[0, 1]^2上的均匀分布转换为三角形上的均匀分布
  * - 将[0, 1]^2上的均匀分布转换为锥形立体角上的均匀分布
+ * - 从[0, 1]上的均匀分布中额外抽出一个整型随机数
  */
+
+#include <type_traits>
 
 #include "Scalar.h"
 #include "Vec2.h"
@@ -18,17 +21,18 @@
 
 namespace AGZ::Math::DistributionTransform {
 
-template<typename T> class UniformOnUnitDisk;
-template<typename T> class UniformOnUnitHemisphere;
-template<typename T> class UniformOnUnitSphere;
-template<typename T> class ZWeightedOnUnitHemisphere;
-template<typename T> class UniformOnTriangle;
-template<typename T> class UniformOnCone;
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnUnitDisk;
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnUnitHemisphere;
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnUnitSphere;
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class ZWeightedOnUnitHemisphere;
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnTriangle;
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnCone;
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class SampleExtractor;
 
 /**
  * @brief 在单位圆内均匀采样
  */
-template<typename T>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 class UniformOnUnitDisk
 {
 public:
@@ -36,8 +40,8 @@ public:
     /** 采样结果 */
     struct Result
     {
-        Vec2<T> sample;    ///< 采样点
-        T pdf;            ///< 采样点所对应的概率密度函数值
+        Vec2<T> sample; ///< 采样点
+        T pdf;          ///< 采样点所对应的概率密度函数值
     };
 
     /** 把一对[0, 1]间的随机数转换为在单位圆内的均匀采样 */
@@ -58,7 +62,7 @@ public:
 /**
  * @brief 在单位半球面上均匀采样
  */
-template<typename T>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 class UniformOnUnitHemisphere
 {
 public:
@@ -67,7 +71,7 @@ public:
     struct Result
     {
         Vec3<T> sample; ///< 采样点
-        T pdf;            ///< 采样点对应的概率密度函数值
+        T pdf;          ///< 采样点对应的概率密度函数值
     };
 
     /** 把一对[0, 1]间的随机数转换为单位半球面上的均匀采样 */
@@ -91,7 +95,7 @@ public:
 /**
  * @brief 在单位球面上均匀采样
  */
-template<typename T>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 class UniformOnUnitSphere
 {
 public:
@@ -100,7 +104,7 @@ public:
     struct Result
     {
         Vec3<T> sample; ///< 采样点
-        T pdf;            ///< 采样点对应的概率密度函数值
+        T pdf;          ///< 采样点对应的概率密度函数值
     };
 
     /** 把一对[0, 1]间的随机数转换为单位球面上的均匀采样 */
@@ -124,7 +128,7 @@ public:
 /**
  * @brief 在单位半球面上进行Cos-weighed采样
  */
-template<typename T>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 class ZWeightedOnUnitHemisphere
 {
 public:
@@ -133,7 +137,7 @@ public:
     struct Result
     {
         Vec3<T> sample; ///< 采样点
-        T pdf;            ///< 采样点对应的概率密度函数值
+        T pdf;          ///< 采样点对应的概率密度函数值
     };
 
     /** 把一对[0, 1]间的随机数转换为单位半球面上的Cos-weighed采样 */
@@ -171,7 +175,7 @@ public:
 /**
  * @brief 在三角形上均匀采样
  */
-template<typename T>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 class UniformOnTriangle
 {
 public:
@@ -187,7 +191,7 @@ public:
 /**
  * @brief 在单位球面上具有一定顶角的范围内采样，且在立体角意义上是均匀的
  */
-template<typename T>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 class UniformOnCone
 {
 public:
@@ -218,6 +222,25 @@ public:
     static T PDF(T maxCosTheta)
     {
         return 1 / (2 * PI<T> * (1 - maxCosTheta));
+    }
+};
+
+/**
+ * @brief 随机数萃取器，将一个[0, 1]间的均匀随机数转换为一个整数和一个随机数
+ */
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+class SampleExtractor
+{
+public:
+
+    template<typename I, std::enable_if_t<std::is_integral_v<I>, int> = 0>
+    static std::tuple<I, T> ExtractInteger(T u, I begin, I end) noexcept
+    {
+        AGZ_ASSERT(begin < end);
+        I delta = end - begin;
+        I integer = begin + (std::min<I>)(u * delta, delta - 1);
+        T real = (std::min<T>)(u * delta - integer, 1);
+        return { integer, real };
     }
 };
 
