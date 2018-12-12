@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <type_traits>
+
 #include "../Utils/Math.h"
 
 namespace AGZ {
@@ -9,7 +11,7 @@ namespace AGZ {
  * 
  * 并不支持对立方体纹理坐标进行各种旋转、翻转的倒腾，自己试吧……
  */
-template<typename T>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 class CubeMapper
 {
 public:
@@ -66,8 +68,8 @@ namespace Impl
     }
 }
 
-template <typename T>
-typename CubeMapper<T>::MapResult CubeMapper<T>::Map(const Math::Vec3<T> &dir)
+template <typename T, std::enable_if_t<std::is_floating_point_v<T>, int> N>
+typename CubeMapper<T, N>::MapResult CubeMapper<T, N>::Map(const Math::Vec3<T> &dir)
 {
     using Math::Clamp;
 

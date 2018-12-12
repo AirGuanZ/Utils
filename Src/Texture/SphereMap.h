@@ -12,7 +12,7 @@ namespace AGZ {
  * 
  * 不过话说回来，直接把(theta, phi)归一化之后编码成uv有什么不好，搞不懂这个SphereMap有什么意义。
  */
-template<typename T>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 class SphereMapper
 {
 public:
@@ -27,8 +27,8 @@ public:
     static Math::Vec3<T> InvMap(const Math::Vec2<T> &uv);
 };
 
-template<typename T>
-Math::Vec2<T> SphereMapper<T>::Map(const Math::Vec3<T> &dir)
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> N>
+Math::Vec2<T> SphereMapper<T, N>::Map(const Math::Vec3<T> &dir)
 {
     auto nor = (dir.Normalize() + Math::Vec3<T>::UNIT_X()).Normalize();
     if(Math::FP<T>(nor.y).ApproxEq(T(0)) && Math::FP<T>(nor.z).ApproxEq(T(0)))
@@ -38,8 +38,8 @@ Math::Vec2<T> SphereMapper<T>::Map(const Math::Vec3<T> &dir)
     return { u, v };
 }
 
-template<typename T>
-Math::Vec3<T> SphereMapper<T>::InvMap(const Math::Vec2<T> &uv)
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> N>
+Math::Vec3<T> SphereMapper<T, N>::InvMap(const Math::Vec2<T> &uv)
 {
     auto ny = T(2) * uv.u - T(1);
     auto nz = T(1) - T(2) * uv.v;
