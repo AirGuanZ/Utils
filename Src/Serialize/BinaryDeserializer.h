@@ -73,7 +73,69 @@ class BinaryDeserializer
     {
         static bool Call(T &v, BinaryDeserializer &deserializer)
         {
-            return TryExternalDeserialize<T, HasExternalDeserialize<T>::value>::Call(v, deserializer);
+            return TryExternalDeserialize<T, HasExternalDeserialize<T>::value>
+                        ::Call(v, deserializer);
+        }
+    };
+
+    template<typename T, typename = void>
+    struct HasExternalDeserializeFromScratch : std::false_type { };
+
+    template<typename T>
+    struct HasExternalDeserializeFromScratch<
+        T, std::void_t<decltype(
+            BinaryDeserializeImplementator<T>::DeserializeFromScratch(
+                *static_cast<BinaryDeserializer*>(nullptr)))>>
+        : std::true_type { };
+
+    template<typename T, typename = void>
+    struct HasDeserializeFromScratch : std::false_type { };
+
+    template<typename T>
+    struct HasDeserializeFromScratch<
+        T, std::void_t<decltype(T::DeserializeFromScratch(
+            *static_cast<BinaryDeserializer*>(nullptr)))>>
+        : std::true_type { };
+
+    template<typename T, bool HasExternalDeserializeFromScratch>
+    struct TryExternalDeserializeFromStratch
+    {
+        static auto Call(BinaryDeserializer &deserializer)
+        {
+            return BinaryDeserializeImplementator<T>
+                    ::DeserializeFromScratch(deserializer);
+        }
+    };
+
+    template<typename T>
+    struct TryExternalDeserializeFromStratch<T, false>
+    {
+        static auto Call(BinaryDeserializer &deserializer)
+        {
+            T ret;
+            if(deserializer.Deserialize(ret))
+                return Some(std::move(ret));
+            return Option<T>(None);
+        }
+    };
+    
+    template<typename T, bool HasDeserializeFromScratch>
+    struct TryDeserializeFromScratch
+    {
+        static auto Call(BinaryDeserializer &deserializer)
+        {
+            return T::DeserializeFromScratch(deserializer);
+        }
+    };
+
+    template<typename T>
+    struct TryDeserializeFromScratch<T, false>
+    {
+        static auto Call(BinaryDeserializer &deserializer)
+        {
+            return TryExternalDeserializeFromStratch<
+                        T, HasExternalDeserializeFromScratch<T>::value>
+                            ::Call(deserializer);
         }
     };
 
@@ -107,6 +169,19 @@ public:
     bool Deserialize(T &v)
     {
         return (ok_ &= TryDeserializeImpl<T, HasDeserialize<T>::value>::Call(v, *this));
+    }
+
+    /**
+     * @brief 尝试直接反序列化并构造出一个T对象
+     * 
+     * - 若T::Deserialize(*this)是一个合法表达式，则返回T::Deserialize(*this)
+     * - 否则，若BinaryDeserializeImplementator<T>::Deserialize(*this)是一个合法表达式，则返回其调用结果
+     * - 否则，若T::T()是一个合法表达式，则用其构造一个T的实例t后返回this->Deserialize(t)
+     */
+    template<typename T>
+    auto DeserializeFromScratch()
+    {
+        return TryDeserializeFromScratch<T, HasDeserializeFromScratch<T>::value>::Call(*this);
     }
 
     /**

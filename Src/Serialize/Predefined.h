@@ -41,10 +41,10 @@ struct BinaryDeserializeImplementator<std::vector<T>>
         v.reserve(size);
         for(size_t i = 0; i < size; ++i)
         {
-            T t;
-            if(!deserializer.Deserialize(t))
+            auto t = deserializer.DeserializeFromScratch<T>();
+            if(!t)
                 return false;
-            v.push_back(std::move(t));
+            v.push_back(std::move(*t));
         }
         return true;
     }
@@ -92,10 +92,10 @@ private:
     {
         if(index != Index)
             return false;
-        TypeOpr::SelectInTypeList_t<Index, Ts...> tv;
-        if(!deserializer.Deserialize(tv))
+        auto tv = deserializer.DeserializeFromScratch<TypeOpr::SelectInTypeList_t<Index, Ts...>>();
+        if(!tv)
             return false;
-        v = std::move(tv);
+        v = std::move(*tv);
         return true;
     }
 

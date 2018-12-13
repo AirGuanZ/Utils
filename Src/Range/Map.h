@@ -25,8 +25,8 @@ namespace RangeAux
             friend class MapImpl;
 
             using _value_type =
-                decltype(std::declval<F>()(std::declval<
-                        typename std::iterator_traits<InIt>::value_type>()));
+                decltype(std::declval<F>()(*static_cast<
+                        typename std::iterator_traits<InIt>::value_type*>(nullptr)));
 
             InIt it;
             F *f;

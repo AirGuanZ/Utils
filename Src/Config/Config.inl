@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "../FileSys/Raw.h"
+#include "../Range/Map.h"
 #include "Config.h"
 
 namespace AGZ {
@@ -52,6 +53,64 @@ inline const ConfigNode *ConfigGroup::Find(const StrView8 &k) const
     return grp->FindSection(sections.back());
 }
 
+inline const ConfigArray *ConfigGroup::FindArray(const Str8 &k) const
+{
+    auto node = Find(k);
+    if(!node)
+        return nullptr;
+    return node->IsArray() ? &node->AsArray() : nullptr;
+}
+
+inline const ConfigGroup *ConfigGroup::FindGroup(const Str8 &k) const
+{
+    auto node = Find(k);
+    if(!node)
+        return nullptr;
+    return node->IsGroup() ? &node->AsGroup() : nullptr;
+}
+
+inline const Str8 *ConfigGroup::FindValue(const Str8 &k) const
+{
+    auto node = Find(k);
+    if(!node)
+        return nullptr;
+    return node->IsValue() ? &node->AsValue() : nullptr;
+}
+
+template<typename T, typename A>
+Option<T> ConfigGroup::FindAndParse(const Str8 &k, A &&parseParam) const
+{
+    if(auto v = FindValue(k))
+    {
+        try
+        {
+            return Some(v->Parse<T>(std::forward<A>(parseParam)));
+        }
+        catch(...)
+        {
+            return None;
+        }
+    }
+    return None;
+}
+
+template<typename T>
+Option<T> ConfigGroup::FindAndParse(const Str8 &k) const
+{
+    if(auto v = FindValue(k))
+    {
+        try
+        {
+            return Some(v->Parse<T>());
+        }
+        catch(...)
+        {
+            return None;
+        }
+    }
+    return None;
+}
+
 inline const ConfigNode &ConfigGroup::operator[](const Str8 &k) const
 {
     return (*this)[k.AsView()];
@@ -68,6 +127,17 @@ inline const ConfigNode &ConfigGroup::operator[](const StrView8 &k) const
 inline const ConfigGroup &ConfigGroup::AsGroup() const
 {
     return *this;
+}
+
+inline Str8 ConfigGroup::ToString() const
+{
+    StringBuilder<UTF8<>> b;
+    b << "{";
+    b << Str8("").Join(
+        children_ |
+        Map([](auto &p){ return p.first + "=" + p.second->ToString(); }));
+    b << "}";
+    return b.Get();
 }
 
 inline ConfigArray::ConfigArray(std::vector<const ConfigNode*> &&content, Str8 tag)
@@ -96,6 +166,17 @@ inline const ConfigArray &ConfigArray::AsArray() const
     return *this;
 }
 
+inline Str8 ConfigArray::ToString() const
+{
+    StringBuilder<UTF8<>> b;
+    b << tag_ << "(";
+    b << Str8(",").Join(
+        array_ |
+        AGZ::Map([](auto node){ return node->ToString(); }));
+    b << ")";
+    return b.Get();
+}
+
 inline ConfigValue::ConfigValue(Str8 &&str)
     : str_(std::move(str))
 {
@@ -115,6 +196,11 @@ inline const Str8 &ConfigValue::operator*() const
 inline const Str8 &ConfigValue::AsValue() const
 {
     return str_;
+}
+
+inline Str8 ConfigValue::ToString() const
+{
+    return "\"" + str_ + "\"";
 }
 
 namespace Impl

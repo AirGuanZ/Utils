@@ -984,10 +984,10 @@ template<typename CS>
 template<typename R>
 String<CS> StringView<CS>::Join(R &&strRange) const
 {
-    if(strRange.empty())
-        return Str();
-    StringBuilder<CS> builder;
     auto beg = std::begin(strRange), end = std::end(strRange);
+    if(beg == end)
+        return Str();   
+    StringBuilder<CS> builder;
     builder.Append(*beg++);
     while(beg != end)
         builder.Append(*this).Append(*beg++);

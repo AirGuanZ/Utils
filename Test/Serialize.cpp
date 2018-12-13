@@ -17,6 +17,15 @@ struct A
     {
         return s.Serialize(x + 1);
     }
+
+    static Option<A> DeserializeFromScratch(BinaryDeserializer &ds)
+    {
+        if(auto i = ds.DeserializeFromScratch<int>())
+        {
+            return A { *i + 1 };
+        }
+        return None;
+    }
 };
 
 TEST_CASE("Serialize")
@@ -101,5 +110,18 @@ TEST_CASE("Serialize")
         vec.clear();
         deserializer.Deserialize(vec);
         REQUIRE(vec == std::vector<V>{ 0, "abc", 4, "minecraft" });
+    }
+
+    SECTION("3")
+    {
+        BinaryMemorySerializer serializer;
+        
+        A a = { 4 };
+
+        serializer.Serialize(a);
+
+        BinaryMemoryDeserializer deserializer(
+            serializer.GetData(), serializer.GetByteSize());\
+        REQUIRE(deserializer.DeserializeFromScratch<A>()->x == 6);
     }
 }
