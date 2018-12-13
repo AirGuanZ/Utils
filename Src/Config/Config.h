@@ -49,12 +49,44 @@ public:
      */
     virtual const Str8 &AsValue() const { throw ConfigNodeInvalidCasting("ConfigASTNode: invalid casting"); }
 
+    /**
+     * 转为value并parse
+     */
+    template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+    T Parse() const { return AsValue().Parse<T>(); }
+
+    /**
+     * 转为value并parse
+     */
+    template<typename T, typename A, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+    T Parse(A &&param) const { return AsValue().Parse<T>(std::forward<A>(param)); }
+
+    /**
+     * 尝试将this转换为参数集合，类型不匹配时返回nullptr
+     */
+    virtual const ConfigGroup *TryAsGroup() const noexcept { return nullptr; }
+
+    /**
+     * 尝试将this转换为参数数组，类型不匹配时返回nullptr
+     */
+    virtual const ConfigArray *TryAsArray() const noexcept { return nullptr; }
+
+    /**
+     * 尝试将this转换为参数值，类型不匹配时返回nullptr
+     */
+    virtual const Str8 *TryAsValue() const noexcept { return nullptr; }
+
     //! 是否是Group类型
-    virtual bool IsGroup() const { return false; }
+    virtual bool IsGroup() const noexcept { return false; }
     //! 是否是Array类型
-    virtual bool IsArray() const { return false; }
+    virtual bool IsArray() const noexcept { return false; }
     //! 是否是Value类型
-    virtual bool IsValue() const { return false; }
+    virtual bool IsValue() const noexcept { return false; }
+
+    /**
+     * 转换为描述性字符串
+     */
+    virtual Str8 ToString() const = 0;
 };
 
 /**
@@ -88,14 +120,53 @@ public:
      * @param k 带查找的参数路径，用“.”作为路径分隔符
      */
     const ConfigNode *Find(const Str8 &k) const;
+
     //! @copydoc ConfigGroup::Find(const Str8&) const
     const ConfigNode *Find(const StrView8 &k) const;
+
+    /**
+     * 查找具有指定路径的array，路径不存在或类型不正确时返回nullptr
+     */
+    const ConfigArray *FindArray(const Str8 &k) const;
+
+    /**
+     * 查找具有指定路径的group，路径不存在或类型不正确时返回nullptr
+     */
+    const ConfigGroup *FindGroup(const Str8 &k) const;
+
+    /**
+     * 查找具有指定路径的value，路径不存在或类型不正确时返回nullptr
+     */
+    const Str8 *FindValue(const Str8 &k) const;
+
+    /**
+     * 查找指定路径中的值，并parse为数值类型
+     * 
+     * @param k 查找路径
+     * @param parseParam parse用的参数
+     * 
+     * 查找失败或parse失败时返回None
+     */
+    template<typename T, typename A>
+    Option<T> FindAndParse(const Str8 &k, A &&parseParam) const;
+
+    /**
+     * 查找指定路径中的值，并parse为数值类型
+     * 
+     * @param k 查找路径
+     * 
+     * 查找失败或parse失败时返回None
+     */
+    template<typename T>
+    Option<T> FindAndParse(const Str8 &k) const;
+
     /**
      * @copydoc ConfigGroup::Find(const Str8&) const
      *
      * @exception ConfigNodeKeyNotFound 参数路径不存在时抛出
      */
     const ConfigNode &operator[](const Str8 &k) const;
+
     /**
      * @copydoc ConfigGroup::Find(const Str8&) const
      *
@@ -110,7 +181,11 @@ public:
      */
     const ConfigGroup &AsGroup() const override;
 
-    bool IsGroup() const override { return true; }
+    const ConfigGroup *TryAsGroup() const noexcept override { return this; }
+
+    bool IsGroup() const noexcept override { return true; }
+
+    Str8 ToString() const override;
 };
 
 /**
@@ -156,7 +231,11 @@ public:
      */
     const ConfigArray &AsArray() const override;
 
-    bool IsArray() const override { return true; }
+    const ConfigArray *TryAsArray() const noexcept override { return this; }
+
+    bool IsArray() const noexcept override { return true; }
+
+    Str8 ToString() const override;
 };
 
 /**
@@ -183,7 +262,11 @@ public:
      */
     const Str8 &AsValue() const override;
 
-    bool IsValue() const override { return true; }
+    const Str8 *TryAsValue() const noexcept override { return &str_; }
+
+    bool IsValue() const noexcept override { return true; }
+
+    Str8 ToString() const override;
 };
 
 /**
