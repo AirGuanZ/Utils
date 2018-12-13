@@ -5,7 +5,7 @@
 
 #include "../Misc/Common.h"
 #include "../Misc/Uncopiable.h"
-
+#include<iostream>
 namespace AGZ {
 
 /**
@@ -88,14 +88,26 @@ class BinaryDeserializer
                 *static_cast<BinaryDeserializer*>(nullptr)))>>
         : std::true_type { };
 
-    template<typename T, typename = void>
+    /*template<typename T, typename = void>
     struct HasDeserializeFromScratch : std::false_type { };
+
+
 
     template<typename T>
     struct HasDeserializeFromScratch<
-        T, std::void_t<decltype(T::DeserializeFromScratch(
-            *static_cast<BinaryDeserializer*>(nullptr)))>>
-        : std::true_type { };
+        T, std::void_t<decltype(
+            T::DeserializeFromScratch(
+                *static_cast<BinaryDeserializer*>(nullptr)))>>
+        : std::true_type { };*/
+
+    template<typename T>
+    struct HasDeserializeFromScratch
+    {
+        template<typename U> struct Helper { };
+        template<typename U> static uint8_t Check(decltype(&U::DeserializeFromScratch)*);
+        template<typename U> static uint16_t Check(...);
+        static constexpr bool value = sizeof(Check<T>(nullptr)) == sizeof(uint8_t);
+    };
 
     template<typename T, bool HasExternalDeserializeFromScratch>
     struct TryExternalDeserializeFromStratch
