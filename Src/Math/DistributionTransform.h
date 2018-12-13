@@ -238,8 +238,8 @@ public:
     {
         AGZ_ASSERT(begin < end);
         I delta = end - begin;
-        I integer = begin + (std::min<I>)(u * delta, delta - 1);
-        T real = (std::min<T>)(u * delta - integer, 1);
+        I integer = begin + (std::min<I>)(I(u * delta), delta - 1);
+        T real = (std::min<T>)(begin + u * delta - integer, 1);
         return { integer, real };
     }
 };
