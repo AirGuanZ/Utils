@@ -254,7 +254,7 @@ inline bool WavefrontObjFile<T, DN>::LoadFromMemory(const Str8 &content, Wavefro
                 vtx.x = m(0, 1).template Parse<T>();
                 vtx.y = m(2, 3).template Parse<T>();
                 vtx.z = m(4, 5).template Parse<T>();
-                vtx.w = m(5, 6).Empty() ? 1.0 : m(5, 6).TrimLeft().template Parse<T>();
+                vtx.w = m(5, 6).Empty() ? T(1) : m(5, 6).TrimLeft().template Parse<T>();
                 checkCur()->vertices.push_back(vtx);
                 continue;
             }
@@ -264,7 +264,7 @@ inline bool WavefrontObjFile<T, DN>::LoadFromMemory(const Str8 &content, Wavefro
                 typename WavefrontObj<T>::TexCoord texCoord;
                 texCoord.u = m(0, 1).template Parse<T>();
                 texCoord.v = m(2, 3).template Parse<T>();
-                texCoord.m = m(3, 4).Empty() ? 0.0 : m(3, 4).TrimLeft().template Parse<T>();
+                texCoord.m = m(3, 4).Empty() ? T(0) : m(3, 4).TrimLeft().template Parse<T>();
                 checkCur()->texCoords.push_back(texCoord);
                 continue;
             }

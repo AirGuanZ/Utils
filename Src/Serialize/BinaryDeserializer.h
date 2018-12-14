@@ -5,7 +5,7 @@
 
 #include "../Misc/Common.h"
 #include "../Misc/Uncopiable.h"
-#include<iostream>
+
 namespace AGZ {
 
 /**
