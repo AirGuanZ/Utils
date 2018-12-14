@@ -88,26 +88,15 @@ class BinaryDeserializer
                 *static_cast<BinaryDeserializer*>(nullptr)))>>
         : std::true_type { };
 
-    /*template<typename T, typename = void>
+    template<typename T, typename = std::void_t<>>
     struct HasDeserializeFromScratch : std::false_type { };
-
-
 
     template<typename T>
     struct HasDeserializeFromScratch<
         T, std::void_t<decltype(
             T::DeserializeFromScratch(
-                *static_cast<BinaryDeserializer*>(nullptr)))>>
-        : std::true_type { };*/
-
-    template<typename T>
-    struct HasDeserializeFromScratch
-    {
-        template<typename U> struct Helper { };
-        template<typename U> static uint8_t Check(decltype(&U::DeserializeFromScratch)*);
-        template<typename U> static uint16_t Check(...);
-        static constexpr bool value = sizeof(Check<T>(nullptr)) == sizeof(uint8_t);
-    };
+                std::declval<BinaryDeserializer&>()))>>
+        : std::true_type { };
 
     template<typename T, bool HasExternalDeserializeFromScratch>
     struct TryExternalDeserializeFromStratch
@@ -219,7 +208,7 @@ class BinaryMemoryDeserializer : public BinaryDeserializer, public AGZ::Uncopiab
         if(RemainingByteSize() < byteSize)
             return false;
 
-        char *outputData = reinterpret_cast<char*>(output);
+        auto *outputData = reinterpret_cast<char*>(output);
         while(byteSize-- > 0)
             *outputData++ = *pData_++;
 
@@ -255,7 +244,7 @@ class BinaryIStreamDeserializer : public BinaryDeserializer, public Uncopiable
 
 public:
 
-    BinaryIStreamDeserializer(std::istream &is) : is_(is) { }
+    explicit BinaryIStreamDeserializer(std::istream &is) : is_(is) { }
 
     bool End() override { return is_.eof(); }
 };
