@@ -172,7 +172,7 @@ inline Str8 ConfigArray::ToString() const
     b << tag_ << "(";
     b << Str8(",").Join(
         array_ |
-        AGZ::Map([](auto node){ return node->ToString(); }));
+        ::AGZ::Map([](auto node){ return node->ToString(); }));
     b << ")";
     return b.Get();
 }
@@ -231,9 +231,17 @@ namespace Impl
         while(true)
         {
             src = src.TrimLeft();
-            if(src.StartsWith("#"))
+            if(src.StartsWith("###"))
             {
-                auto t = src.Find("\n");
+                auto t = src.Find("###", 3);
+                if(t == StrView8::NPOS)
+                    return None;
+                else
+                    src = src.Slice(t + 3);
+            }
+            else if(src.StartsWith("#"))
+            {
+                auto t = src.Find("\n", 1);
                 if(t == StrView8::NPOS)
                     src = src.Slice(0, 0);
                 else
@@ -293,7 +301,7 @@ namespace Impl
 
         auto tidx = src.FindCPIf([](auto c)
         {
-            return StrAlgo::IsUnicodeWhitespace(c) || c == ',' || c == '=' || c == ';' || c == ')' || c == '(';
+            return StrAlgo::IsUnicodeWhitespace(c) || c == ',' || c == '=' || c == ';' || c == ')' || c == '(' || c == '#';
         });
         if(!tidx)
             return None;

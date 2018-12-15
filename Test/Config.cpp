@@ -25,6 +25,12 @@ Students = ({
         Age = 21;
     });
 
+###
+This is a comment block
+LaLaLa
+今天天气不错啊 {)
+###
+
 Others =
 {
     PI = 3.141592654;

@@ -279,11 +279,15 @@ public:
  * 
  * 以下是一个简单的配置文件示例：
 @code
+# This is a comment
 window =
 {
     title = "AGZ Application";
-    size = { w = 640; h = 480; };
+    size = { w = 640; h = 480; }; # This is another comment
 };
+###
+    This is a comment block
+###
 books = (
 {
     title = "HaHa";
@@ -297,8 +301,9 @@ tagged_array = F(1, 2, 3);
 @endcode
  * 整个文件内容构成一个匿名参数集合，其中：
  * - window这个名字被映射到另一个参数集合
- * - book这个名字被映射到一个列表，而列表元素的类型是参数集合
+ * - book这个名字被映射到一个列表，这个列表的tag为空，元素类型为别的参数集合。列表元素类型不一定要一致
  * - window.size中的x被映射到参数值“640”
+ * - tagged_array被映射到一个列表，这个列表的tag为F，元素类型为value
  * 
  * 要访问某个特定的元素，可以通过对应的路径来完成。比如：
 @code
