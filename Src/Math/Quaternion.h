@@ -47,8 +47,11 @@ public:
     static Self Rotate(const Vec3<T> &axis, U angle)
     {
         auto a = T(0.5) * angle;
-        return Quaternion<T>(Sin(a) * axis, Cos(a));
+        return Quaternion<T>(Sin(a) * axis.Normalize(), Cos(a));
     }
+
+    /** 将旋转作用到给定向量上 */
+    Vec3<T> Apply(const Vec3<T> &v) const noexcept;
 
     /** 逐元素相加 */
     Self operator+(const Self &rhs) const { return Self(u + rhs.u, w + rhs.w); }
@@ -110,6 +113,12 @@ template<typename T>
 Vec3<T> Apply(const Quaternion<T> &q, const Vec3<T> &v)
 {
     return (q * Quaternion<T>(v, T(0)) * Conjugate(q)).u;
+}
+
+template <typename T>
+Vec3<T> Quaternion<T>::Apply(const Vec3<T> &v) const noexcept
+{
+    return ::AGZ::Math::Apply(*this, v);
 }
 
 using Quaternionf = Quaternion<float>;
