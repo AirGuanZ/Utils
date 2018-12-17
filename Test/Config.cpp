@@ -1,4 +1,4 @@
-#include <Utils/Config.h>
+ï»¿#include <Utils/Config.h>
 
 #include "Catch.hpp"
 
@@ -28,7 +28,7 @@ Students = ({
 ###
 This is a comment block
 LaLaLa
-½ñÌìÌìÆø²»´í°¡ {)
+ä»Šå¤©å¤©æ°”ä¸é”™{)
 ###
 
 Others =
