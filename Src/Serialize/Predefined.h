@@ -18,7 +18,7 @@ struct BinarySerializeImplementator<std::vector<T>>
 {
     static bool Serialize(BinarySerializer &serializer, const std::vector<T> &v)
     {
-        if(!serializer.Serialize(v.size()))
+        if(!serializer.Serialize(uint64_t(v.size())))
             return false;
         for(auto &x : v)
         {
@@ -35,10 +35,10 @@ struct BinaryDeserializeImplementator<std::vector<T>>
     static bool Deserialize(BinaryDeserializer &deserializer, std::vector<T> &v)
     {
         v.clear();
-        typename std::vector<T>::size_type size;
+        uint64_t size;
         if(!deserializer.Deserialize(size))
             return false;
-        v.reserve(size);
+        v.reserve(size_t(size));
         for(size_t i = 0; i < size; ++i)
         {
             auto t = deserializer.DeserializeFromScratch<T>();
