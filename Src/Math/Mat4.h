@@ -31,45 +31,45 @@ public:
     Data m;
 
     /** 初始化为单位矩阵 */
-    Mat4() : Mat4(T(1)) { }
+    Mat4() noexcept: Mat4(T(1)) { }
 
     /** 不初始化任何元素 */
-    explicit Mat4(Uninitialized_t) { }
+    explicit Mat4(Uninitialized_t) noexcept { }
 
     /** 初始化为对角阵，对角元素值为v */
-    explicit Mat4(T v);
+    explicit Mat4(T v) noexcept;
 
     /** 从4x4数组中取得初始化数据 */
-    explicit Mat4(const Data &_m);
+    explicit Mat4(const Data &_m) noexcept;
 
     /** 逐个指定每个元素的值，mij代表第i行第j列 */
     Mat4(T m00, T m01, T m02, T m03,
          T m10, T m11, T m12, T m13,
          T m20, T m21, T m22, T m23,
-         T m30, T m31, T m32, T m33);
+         T m30, T m31, T m32, T m33) noexcept;
 
     /** 将所有元素设置为v */
-    static Self All(T v);
+    static Self All(T v) noexcept;
 
     /** 返回一个单位矩阵 */
-    static const Self &IDENTITY();
+    static const Self &IDENTITY() noexcept;
 
-    bool operator==(const Self &other) const;
+    bool operator==(const Self &other) const noexcept;
 
-    bool operator!=(const Self &other) const;
+    bool operator!=(const Self &other) const noexcept;
 
     /** 矩阵-矩阵乘法 */
-    Self operator*(const Self &rhs) const;
+    Self operator*(const Self &rhs) const noexcept;
 
     /** 矩阵-向量乘法 */
-    Vec4<T> operator*(const Vec4<T> &p) const;
+    Vec4<T> operator*(const Vec4<T> &p) const noexcept;
 
     /**
      * 构造平移矩阵
      * 
      * @param v 平移向量
      */
-    static Self Translate(const Vec3<T> &v);
+    static Self Translate(const Vec3<T> &v) noexcept;
 
     /**
      * 构造绕指定轴的旋转矩阵
@@ -78,22 +78,22 @@ public:
      * @param angle 旋转角。为Deg/Rad时会自动进行单位转换，为float/double时单位为弧度
      */
     template<typename U>
-    static Self Rotate(const Vec3<T> &_axis, U angle);
+    static Self Rotate(const Vec3<T> &_axis, U angle) noexcept;
 
     /** 构造绕X轴的旋转矩阵 */
     template<typename U>
-    static Self RotateX(U angle);
+    static Self RotateX(U angle) noexcept;
 
     /** 构造绕Y轴的旋转矩阵 */
     template<typename U>
-    static Self RotateY(U angle);
+    static Self RotateY(U angle) noexcept;
 
     /** 构造绕Z轴的旋转矩阵 */
     template<typename U>
-    static Self RotateZ(U angle);
+    static Self RotateZ(U angle) noexcept;
 
     /** 构造缩放矩阵 */
-    static Self Scale(const Vec3<T> &s);
+    static Self Scale(const Vec3<T> &s) noexcept;
 
     /**
      * 构造透视投影矩阵
@@ -104,7 +104,7 @@ public:
      * @param _far 远截面和视点的距离
      */
     template<typename U>
-    static Self Perspective(U fovY, T ratio, T _near, T _far);
+    static Self Perspective(U fovY, T ratio, T _near, T _far) noexcept;
 
     /**
      * 构造视点矩阵
@@ -113,39 +113,39 @@ public:
      * @param dst 目标点位置
      * @param up 用来确定视野侧向倾斜角度的up向量
      */
-    static Self LookAt(const Vec3<T> &src, const Vec3<T> &dst, const Vec3<T> &up);
+    static Self LookAt(const Vec3<T> &src, const Vec3<T> &dst, const Vec3<T> &up) noexcept;
 
     /** 将矩阵变换作用在点上并进行齐次坐标归一化 */
-    Vec4<T> ApplyToPoint(const Vec4<T> &p) const;
+    Vec4<T> ApplyToPoint(const Vec4<T> &p) const noexcept;
     //! @copydoc Mat4<T>::ApplyToPoint(const Vec4<T> &) const
-    Vec3<T> ApplyToPoint(const Vec3<T> &p) const;
+    Vec3<T> ApplyToPoint(const Vec3<T> &p) const noexcept;
 
     /** 将矩阵变换作用在方向上 */
-    Vec4<T> ApplyToVector(const Vec4<T> &p) const;
+    Vec4<T> ApplyToVector(const Vec4<T> &p) const noexcept;
     //! @copydoc Mat4<T>::ApplyToVector(const Vec4<T> &) const
-    Vec3<T> ApplyToVector(const Vec3<T> &p) const;
+    Vec3<T> ApplyToVector(const Vec3<T> &p) const noexcept;
 
     /** 将逆变换作用在法线上 */
-    Vec3<T> ApplyInverseToNormal(const Vec3<T> &n) const;
+    Vec3<T> ApplyInverseToNormal(const Vec3<T> &n) const noexcept;
 
     /** 转置矩阵 */
-    Self Transpose() const;
+    Self Transpose() const noexcept;
 
     /**
      * 逆矩阵
      * 
      * @warning 若原矩阵不可逆，会造成UB
      */
-    Self Inverse() const;
+    Self Inverse() const noexcept;
 };
 
 /** 求给定矩阵的转置 */
 template<typename T>
-Mat4<T> Transpose(const Mat4<T> &m);
+Mat4<T> Transpose(const Mat4<T> &m) noexcept;
 
 /** 求给定矩阵的逆矩阵。若原矩阵不可逆，则UB。 */
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
-Mat4<T> Inverse(const Mat4<T> &m);
+Mat4<T> Inverse(const Mat4<T> &m) noexcept;
 
 using Mat4f = Mat4<float>;
 using Mat4d = Mat4<double>;
@@ -153,7 +153,7 @@ using Mat4d = Mat4<double>;
 //===================================================== Implementations =====================================================
 
 template<typename T>
-Mat4<T>::Mat4(T v)
+Mat4<T>::Mat4(T v) noexcept
 {
     m[0][1] = m[0][2] = m[0][3] =
     m[1][0] = m[1][2] = m[1][3] =
@@ -163,7 +163,7 @@ Mat4<T>::Mat4(T v)
 }
 
 template<typename T>
-Mat4<T>::Mat4(const Data &_m)
+Mat4<T>::Mat4(const Data &_m) noexcept
 {
     static_assert(std::is_trivially_copyable_v<Component>);
     std::memcpy(m, _m, sizeof(m));
@@ -173,7 +173,7 @@ template<typename T>
 Mat4<T>::Mat4(T m00, T m01, T m02, T m03,
     T m10, T m11, T m12, T m13,
     T m20, T m21, T m22, T m23,
-    T m30, T m31, T m32, T m33)
+    T m30, T m31, T m32, T m33) noexcept
 {
     m[0][0] = m00; m[0][1] = m01; m[0][2] = m02; m[0][3] = m03;
     m[1][0] = m10; m[1][1] = m11; m[1][2] = m12; m[1][3] = m13;
@@ -182,7 +182,7 @@ Mat4<T>::Mat4(T m00, T m01, T m02, T m03,
 }
 
 template<typename T>
-Mat4<T> Mat4<T>::All(T v)
+Mat4<T> Mat4<T>::All(T v) noexcept
 {
     Self ret(UNINITIALIZED);
     ret.m[0][0] = ret.m[0][1] = ret.m[0][2] = ret.m[0][3] =
@@ -193,14 +193,14 @@ Mat4<T> Mat4<T>::All(T v)
 }
 
 template<typename T>
-const Mat4<T> &Mat4<T>::IDENTITY()
+const Mat4<T> &Mat4<T>::IDENTITY() noexcept
 {
     static const Self ret(T(1));
     return ret;
 }
 
 template<typename T>
-bool Mat4<T>::operator==(const Self &other) const
+bool Mat4<T>::operator==(const Self &other) const noexcept
 {
     for(int c = 0; c < 4; ++c)
     {
@@ -214,7 +214,7 @@ bool Mat4<T>::operator==(const Self &other) const
 }
 
 template<typename T>
-bool Mat4<T>::operator!=(const Self &other) const
+bool Mat4<T>::operator!=(const Self &other) const noexcept
 {
     for(int c = 0; c < 4; ++c)
     {
@@ -228,7 +228,7 @@ bool Mat4<T>::operator!=(const Self &other) const
 }
 
 template<typename T>
-typename Mat4<T>::Self Mat4<T>::operator*(const Self &rhs) const
+typename Mat4<T>::Self Mat4<T>::operator*(const Self &rhs) const noexcept
 {
     Self ret(UNINITIALIZED);
     for(int r = 0; r < 4; ++r)
@@ -245,7 +245,7 @@ typename Mat4<T>::Self Mat4<T>::operator*(const Self &rhs) const
 }
 
 template<typename T>
-Vec4<T> Mat4<T>::operator*(const Vec4<T> &p) const
+Vec4<T> Mat4<T>::operator*(const Vec4<T> &p) const noexcept
 {
     return Vec4<T>(m[0][0] * p.x + m[0][1] * p.y + m[0][2] * p.z + m[0][3] * p.w,
                    m[1][0] * p.x + m[1][1] * p.y + m[1][2] * p.z + m[1][3] * p.w,
@@ -254,7 +254,7 @@ Vec4<T> Mat4<T>::operator*(const Vec4<T> &p) const
 }
 
 template<typename T>
-typename Mat4<T>::Self Mat4<T>::Translate(const Vec3<T> &v)
+typename Mat4<T>::Self Mat4<T>::Translate(const Vec3<T> &v) noexcept
 {
     constexpr T I = T(1), O = T(0);
     return Self(I, O, O, v.x,
@@ -265,7 +265,7 @@ typename Mat4<T>::Self Mat4<T>::Translate(const Vec3<T> &v)
 
 template<typename T>
 template<typename U>
-typename Mat4<T>::Self Mat4<T>::Rotate(const Vec3<T> &_axis, U angle)
+typename Mat4<T>::Self Mat4<T>::Rotate(const Vec3<T> &_axis, U angle) noexcept
 {
     T m[4][4];
     Vec3<T> axis = Normalize(_axis);
@@ -298,7 +298,7 @@ typename Mat4<T>::Self Mat4<T>::Rotate(const Vec3<T> &_axis, U angle)
 
 template<typename T>
 template<typename U>
-typename Mat4<T>::Self Mat4<T>::RotateX(U angle)
+typename Mat4<T>::Self Mat4<T>::RotateX(U angle) noexcept
 {
     constexpr T I = T(1), O = T(0);
     const auto S = Sin(angle), C = Cos(angle);
@@ -310,7 +310,7 @@ typename Mat4<T>::Self Mat4<T>::RotateX(U angle)
 
 template <typename T>
 template <typename U>
-typename Mat4<T>::Self Mat4<T>::RotateY(U angle)
+typename Mat4<T>::Self Mat4<T>::RotateY(U angle) noexcept
 {
     constexpr T I = T(1), O = T(0);
     const auto S = Sin(angle), C = Cos(angle);
@@ -322,7 +322,7 @@ typename Mat4<T>::Self Mat4<T>::RotateY(U angle)
 
 template <typename T>
 template <typename U>
-typename Mat4<T>::Self Mat4<T>::RotateZ(U angle)
+typename Mat4<T>::Self Mat4<T>::RotateZ(U angle) noexcept
 {
     constexpr T I = T(1), O = T(0);
     const auto S = Sin(angle), C = Cos(angle);
@@ -333,7 +333,7 @@ typename Mat4<T>::Self Mat4<T>::RotateZ(U angle)
 }
 
 template<typename T>
-typename Mat4<T>::Self Mat4<T>::Scale(const Vec3<T> &s)
+typename Mat4<T>::Self Mat4<T>::Scale(const Vec3<T> &s) noexcept
 {
     constexpr T I = T(1), O = T(0);
     return Self(s.x, O, O, O,
@@ -344,7 +344,7 @@ typename Mat4<T>::Self Mat4<T>::Scale(const Vec3<T> &s)
 
 template<typename T>
 template<typename U>
-typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T _near, T _far)
+typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T _near, T _far) noexcept
 {
     T invDis = T(1) / (_far - _near);
     constexpr T I = T(1), O = T(0);
@@ -356,7 +356,7 @@ typename Mat4<T>::Self Mat4<T>::Perspective(U fovY, T ratio, T _near, T _far)
 }
 
 template<typename T>
-typename Mat4<T>::Self Mat4<T>::LookAt(const Vec3<T>& src, const Vec3<T>& dst, const Vec3<T>& up)
+typename Mat4<T>::Self Mat4<T>::LookAt(const Vec3<T>& src, const Vec3<T>& dst, const Vec3<T>& up) noexcept
 {
     constexpr T I = T(1), O = T(0);
     auto D = Normalize(dst - src);
@@ -369,13 +369,13 @@ typename Mat4<T>::Self Mat4<T>::LookAt(const Vec3<T>& src, const Vec3<T>& dst, c
 }
 
 template<typename T>
-Vec4<T> Mat4<T>::ApplyToPoint(const Vec4<T> &v) const
+Vec4<T> Mat4<T>::ApplyToPoint(const Vec4<T> &v) const noexcept
 {
     return *this * v;
 }
 
 template<typename T>
-Vec3<T> Mat4<T>::ApplyToPoint(const Vec3<T> &p) const
+Vec3<T> Mat4<T>::ApplyToPoint(const Vec3<T> &p) const noexcept
 {
     Vec4<T> ret = *this * Vec4<T>(p.x, p.y, p.z, T(1.0));
     T dw = T(1) / ret.w;
@@ -383,13 +383,13 @@ Vec3<T> Mat4<T>::ApplyToPoint(const Vec3<T> &p) const
 }
 
 template<typename T>
-Vec4<T> Mat4<T>::ApplyToVector(const Vec4<T> &v) const
+Vec4<T> Mat4<T>::ApplyToVector(const Vec4<T> &v) const noexcept
 {
     return *this * v;
 }
 
 template<typename T>
-Vec3<T> Mat4<T>::ApplyToVector(const Vec3<T> &v) const
+Vec3<T> Mat4<T>::ApplyToVector(const Vec3<T> &v) const noexcept
 {
     return Vec3<T>(m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
                    m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
@@ -397,7 +397,7 @@ Vec3<T> Mat4<T>::ApplyToVector(const Vec3<T> &v) const
 }
 
 template<typename T>
-Vec3<T> Mat4<T>::ApplyInverseToNormal(const Vec3<T> &n) const
+Vec3<T> Mat4<T>::ApplyInverseToNormal(const Vec3<T> &n) const noexcept
 {
     return Vec3<T>(m[0][0] * n.x + m[1][0] * n.y + m[2][0] * n.z,
                    m[0][1] * n.x + m[1][1] * n.y + m[2][1] * n.z, 
@@ -405,7 +405,7 @@ Vec3<T> Mat4<T>::ApplyInverseToNormal(const Vec3<T> &n) const
 }
 
 template<typename T>
-Mat4<T> Transpose(const Mat4<T> &m)
+Mat4<T> Transpose(const Mat4<T> &m) noexcept
 {
     return Mat4<T>(m.m[0][0], m.m[1][0], m.m[2][0], m.m[3][0],
                    m.m[0][1], m.m[1][1], m.m[2][1], m.m[3][1],
@@ -414,7 +414,7 @@ Mat4<T> Transpose(const Mat4<T> &m)
 }
 
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>>
-Mat4<T> Inverse(const Mat4<T> &_m)
+Mat4<T> Inverse(const Mat4<T> &_m) noexcept
 {
     int indxc[4], indxr[4], ipiv[4] = { 0 };
     T m[4][4];
@@ -489,13 +489,13 @@ Mat4<T> Inverse(const Mat4<T> &_m)
 }
 
 template<typename T>
-Mat4<T> Mat4<T>::Transpose() const
+Mat4<T> Mat4<T>::Transpose() const noexcept
 {
     return ::AGZ::Math::Transpose(*this);
 }
 
 template<typename T>
-Mat4<T> Mat4<T>::Inverse() const
+Mat4<T> Mat4<T>::Inverse() const noexcept
 {
     return ::AGZ::Math::Inverse(*this);
 }

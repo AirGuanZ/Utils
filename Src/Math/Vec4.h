@@ -27,59 +27,59 @@ public:
     using Component = T;
     using Self = Vec4<T>;
 
-    constexpr Vec4() : Vec4(T(0)) { }
+    constexpr Vec4() noexcept: Vec4(T(0)) { }
 
-    explicit Vec4(Uninitialized_t) { }
+    explicit Vec4(Uninitialized_t) noexcept { }
 
-    explicit constexpr Vec4(T value) : x(value), y(value), z(value), w(value) { }
+    explicit constexpr Vec4(T value) noexcept: x(value), y(value), z(value), w(value) { }
 
-    constexpr Vec4(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) { }
+    constexpr Vec4(T x, T y, T z, T w) noexcept: x(x), y(y), z(z), w(w) { }
 
-    explicit Vec4(const T *data)
+    explicit Vec4(const T *data) noexcept
     {
         static_assert(std::is_trivially_copyable_v<T>);
         std::memcpy(&x, data, sizeof(Data));
     }
 
-    Vec4(const Self &other) : x(other.x), y(other.y), z(other.z), w(other.w) { }
+    Vec4(const Self &other) noexcept: x(other.x), y(other.y), z(other.z), w(other.w) { }
 
-    Vec4(T param0, T param1, const Vec2<T> &param2)
+    Vec4(T param0, T param1, const Vec2<T> &param2) noexcept
         : x(param0), y(param1), z(param2.x), w(param2.y)
     {
 
     }
 
-    Vec4(T param0, const Vec2<T> &param1, T param2)
+    Vec4(T param0, const Vec2<T> &param1, T param2) noexcept
         : x(param0), y(param1.x), z(param1.y), w(param2)
     {
 
     }
 
-    Vec4(T param0, const Vec3<T> &param1)
+    Vec4(T param0, const Vec3<T> &param1) noexcept
         : x(param0), y(param1.x), z(param1.y), w(param1.z)
     {
 
     }
 
-    Vec4(const Vec2<T> &param0, T param1, T param2)
+    Vec4(const Vec2<T> &param0, T param1, T param2) noexcept
         : x(param0.x), y(param0.y), z(param1), w(param2)
     {
 
     }
 
-    Vec4(const Vec2<T> &param0, const Vec2<T> &param1)
+    Vec4(const Vec2<T> &param0, const Vec2<T> &param1) noexcept
         : x(param0.x), y(param0.y), z(param1.x), w(param1.y)
     {
 
     }
 
-    Vec4(const Vec3<T> &param0, T param1)
+    Vec4(const Vec3<T> &param0, T param1) noexcept
         : x(param0.x), y(param0.y), z(param0.z), w(param1)
     {
 
     }
 
-    Self &operator=(const Self &other)
+    Self &operator=(const Self &other) noexcept
     {
         x = other.x;
         y = other.y;
@@ -89,7 +89,7 @@ public:
     }
 
     template<typename F>
-    auto Map(F &&f) const
+    auto Map(F &&f) const noexcept
     {
         using U = remove_rcv_t<decltype(f(x))>;
         return Vec4<U>(f(x), f(y), f(z), f(w));
@@ -121,107 +121,107 @@ public:
 #undef z
 #undef w
 
-          T &operator[](size_t idx) { AGZ_ASSERT(idx < 4); return (&x)[idx]; }
-    const T &operator[](size_t idx) const { AGZ_ASSERT(idx < 4); return (&x)[idx]; }
+          T &operator[](size_t idx) noexcept { AGZ_ASSERT(idx < 4); return (&x)[idx]; }
+    const T &operator[](size_t idx) const noexcept { AGZ_ASSERT(idx < 4); return (&x)[idx]; }
 
-    Self operator+(const Self &rhs) const { return Self(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w); }
-    Self operator-(const Self &rhs) const { return Self(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w); }
-    Self operator*(const Self &rhs) const { return Self(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w); }
-    Self operator/(const Self &rhs) const { return Self(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w); }
+    Self operator+(const Self &rhs) const noexcept { return Self(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w); }
+    Self operator-(const Self &rhs) const noexcept { return Self(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w); }
+    Self operator*(const Self &rhs) const noexcept { return Self(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w); }
+    Self operator/(const Self &rhs) const noexcept { return Self(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w); }
 
-    Self &operator+=(const Self &rhs) { x += rhs.x; y += rhs.y; z += rhs.z; w += rhs.w; return *this; }
-    Self &operator-=(const Self &rhs) { x -= rhs.x; y -= rhs.y; z -= rhs.z; w -= rhs.w; return *this; }
-    Self &operator*=(const Self &rhs) { x *= rhs.x; y *= rhs.y; z *= rhs.z; w *= rhs.w; return *this; }
-    Self &operator/=(const Self &rhs) { x /= rhs.x; y /= rhs.y; z /= rhs.z; w /= rhs.w; return *this; }
+    Self &operator+=(const Self &rhs) noexcept { x += rhs.x; y += rhs.y; z += rhs.z; w += rhs.w; return *this; }
+    Self &operator-=(const Self &rhs) noexcept { x -= rhs.x; y -= rhs.y; z -= rhs.z; w -= rhs.w; return *this; }
+    Self &operator*=(const Self &rhs) noexcept { x *= rhs.x; y *= rhs.y; z *= rhs.z; w *= rhs.w; return *this; }
+    Self &operator/=(const Self &rhs) noexcept { x /= rhs.x; y /= rhs.y; z /= rhs.z; w /= rhs.w; return *this; }
 
-    bool operator==(const Self &rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
-    bool operator!=(const Self &rhs) const { return x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w; }
+    bool operator==(const Self &rhs) const noexcept { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
+    bool operator!=(const Self &rhs) const noexcept { return x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w; }
 
     template<typename U>
-    Self &operator+=(const U &rhs) { x += rhs; y += rhs; z += rhs; w += rhs; return *this; }
+    Self &operator+=(const U &rhs) noexcept { x += rhs; y += rhs; z += rhs; w += rhs; return *this; }
     template<typename U>
-    Self &operator-=(const U &rhs) { x -= rhs; y -= rhs; z -= rhs; w -= rhs; return *this; }
+    Self &operator-=(const U &rhs) noexcept { x -= rhs; y -= rhs; z -= rhs; w -= rhs; return *this; }
     template<typename U>
-    Self &operator*=(const U &rhs) { x *= rhs; y *= rhs; z *= rhs; w *= rhs; return *this; }
+    Self &operator*=(const U &rhs) noexcept { x *= rhs; y *= rhs; z *= rhs; w *= rhs; return *this; }
     template<typename U>
-    Self &operator/=(const U &rhs) { x /= rhs; y /= rhs; z /= rhs; w /= rhs; return *this; }
+    Self &operator/=(const U &rhs) noexcept { x /= rhs; y /= rhs; z /= rhs; w /= rhs; return *this; }
 
-    static const Self &UNIT_X()
+    static const Self &UNIT_X() noexcept
     {
         static const Self ret(T(1), T(0), T(0), T(0));
         return ret;
     }
 
-    static const Self &UNIT_Y()
+    static const Self &UNIT_Y() noexcept
     {
         static const Self ret(T(0), T(1), T(0), T(0));
         return ret;
     }
 
-    static const Self &UNIT_Z()
+    static const Self &UNIT_Z() noexcept
     {
         static const Self ret(T(0), T(0), T(1), T(0));
         return ret;
     }
 
-    static const Self &UNIT_W()
+    static const Self &UNIT_W() noexcept
     {
         static const Self ret(T(0), T(0), T(0), T(1));
         return ret;
     }
 
-    auto LengthSquare()      const;
-    auto Length()            const;
-    Self Normalize()         const;
-    Self Clamp(T min, T max) const;
-    Self Sqrt()              const;
+    auto LengthSquare()      const noexcept;
+    auto Length()            const noexcept;
+    Self Normalize()         const noexcept;
+    Self Clamp(T min, T max) const noexcept;
+    Self Sqrt()              const noexcept;
 
     bool Serialize(BinarySerializer &serializer) const;
     bool Deserialize(BinaryDeserializer &deserializer);
 };
 
 template<typename T>
-Vec4<T> operator-(const Vec4<T> &v) { return Vec4<T>(-v.x, -v.y, -v.z, -v.w); }
+Vec4<T> operator-(const Vec4<T> &v) noexcept { return Vec4<T>(-v.x, -v.y, -v.z, -v.w); }
 
 template<typename T1, typename T2>
-Vec4<T2> operator+(const T1 &lhs, const Vec4<T2> &rhs) { return Vec4<T2>(lhs + rhs.x, lhs + rhs.y, lhs + rhs.z, lhs + rhs.w); }
+Vec4<T2> operator+(const T1 &lhs, const Vec4<T2> &rhs) noexcept { return Vec4<T2>(lhs + rhs.x, lhs + rhs.y, lhs + rhs.z, lhs + rhs.w); }
 template<typename T1, typename T2>
-Vec4<T1> operator+(const Vec4<T1> &lhs, const T2 &rhs) { return Vec4<T1>(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs, lhs.w + rhs); }
+Vec4<T1> operator+(const Vec4<T1> &lhs, const T2 &rhs) noexcept { return Vec4<T1>(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs, lhs.w + rhs); }
 template<typename T1, typename T2>
-Vec4<T1> operator-(const Vec4<T1> &lhs, const T2 &rhs) { return Vec4<T1>(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs, lhs.w - rhs); }
+Vec4<T1> operator-(const Vec4<T1> &lhs, const T2 &rhs) noexcept { return Vec4<T1>(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs, lhs.w - rhs); }
 template<typename T1, typename T2, std::enable_if_t<std::is_arithmetic_v<T1>>>
-Vec4<T2> operator*(const T1 &lhs, const Vec4<T2> &rhs) { return Vec4<T2>(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z, lhs * rhs.w); }
+Vec4<T2> operator*(const T1 &lhs, const Vec4<T2> &rhs) noexcept { return Vec4<T2>(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z, lhs * rhs.w); }
 template<typename T1, typename T2>
-Vec4<T1> operator*(const Vec4<T1> &lhs, const T2 &rhs) { return Vec4<T1>(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs, lhs.w * rhs); }
+Vec4<T1> operator*(const Vec4<T1> &lhs, const T2 &rhs) noexcept { return Vec4<T1>(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs, lhs.w * rhs); }
 template<typename T1, typename T2>
-Vec4<T1> operator/(const Vec4<T1> &lhs, const T2 &rhs) { return Vec4<T1>(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs, lhs.w / rhs); }
+Vec4<T1> operator/(const Vec4<T1> &lhs, const T2 &rhs) noexcept { return Vec4<T1>(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs, lhs.w / rhs); }
 
 template<typename T1, typename T2>
-auto Dot(const Vec4<T1> &lhs, const Vec4<T2> &rhs)
+auto Dot(const Vec4<T1> &lhs, const Vec4<T2> &rhs) noexcept
 {
     return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
 }
 
 template<typename T>
-auto LengthSquare(const Vec4<T> &vec)
+auto LengthSquare(const Vec4<T> &vec) noexcept
 {
     return Dot(vec, vec);
 }
 
 template<typename T>
-auto Length(const Vec4<T> &vec)
+auto Length(const Vec4<T> &vec) noexcept
 {
     return Sqrt(LengthSquare(vec));
 }
 
 template<typename T>
-auto Normalize(const Vec4<T> &vec)
+auto Normalize(const Vec4<T> &vec) noexcept
 {
     return vec / Length(vec);
 }
 
 template<typename T>
-auto Clamp(const Vec4<T> &vec, T minv, T maxv)
+auto Clamp(const Vec4<T> &vec, T minv, T maxv) noexcept
 {
     return Vec4<decltype(Clamp(vec.x, minv, maxv))>(
                          Clamp(vec.x, minv, maxv),
@@ -231,13 +231,13 @@ auto Clamp(const Vec4<T> &vec, T minv, T maxv)
 }
 
 template<typename T>
-auto Sqrt(const Vec4<T> &v)
+auto Sqrt(const Vec4<T> &v) noexcept
 {
     return Vec4<decltype(Sqrt(v.x))>(Sqrt(v.x), Sqrt(v.y), Sqrt(v.y), Sqrt(v.w));
 }
 
 template<typename T>
-bool ApproxEq(const Vec4<T> &lhs, const Vec4<T> &rhs, T epsilon)
+bool ApproxEq(const Vec4<T> &lhs, const Vec4<T> &rhs, T epsilon) noexcept
 {
     return ApproxEq(lhs.x, rhs.x, epsilon) &&
            ApproxEq(lhs.y, rhs.y, epsilon) &&
@@ -246,44 +246,44 @@ bool ApproxEq(const Vec4<T> &lhs, const Vec4<T> &rhs, T epsilon)
 }
 
 template<typename T>
-Vec4<T> Homogenize(const Vec4<T> &vec)
+Vec4<T> Homogenize(const Vec4<T> &vec) noexcept
 {
     T inv_w = T(1) / vec.w;
     return Vec4<T>(vec.x * inv_w, vec.y * inv_w, vec.z * inv_w, T(1));
 }
 
 template<typename T>
-auto Brightness(const Vec4<T> &v)
+auto Brightness(const Vec4<T> &v) noexcept
 {
     return T(0.2126) * v.r + T(0.7152) * v.g + T(0.0722) * v.b;
 }
 
 template<typename T>
-auto Vec4<T>::LengthSquare() const
+auto Vec4<T>::LengthSquare() const noexcept
 {
     return ::AGZ::Math::LengthSquare(*this);
 }
 
 template<typename T>
-auto Vec4<T>::Length() const
+auto Vec4<T>::Length() const noexcept
 {
     return ::AGZ::Math::Length(*this);
 }
 
 template<typename T>
-Vec4<T> Vec4<T>::Normalize() const
+Vec4<T> Vec4<T>::Normalize() const noexcept
 {
     return ::AGZ::Math::Normalize(*this);
 }
 
 template<typename T>
-Vec4<T> Vec4<T>::Clamp(T min, T max) const
+Vec4<T> Vec4<T>::Clamp(T min, T max) const noexcept
 {
     return ::AGZ::Math::Clamp(*this, min, max);
 }
 
 template<typename T>
-Vec4<T> Vec4<T>::Sqrt() const
+Vec4<T> Vec4<T>::Sqrt() const noexcept
 {
     return ::AGZ::Math::Sqrt(*this);
 }

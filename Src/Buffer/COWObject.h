@@ -31,7 +31,7 @@ public:
     using Object = T;                   ///< 内部存储的对象类型
 
     /** 默认不存储任何对象 */
-    COWObject()
+    COWObject() noexcept
         : storage_(nullptr)
     {
         
@@ -60,7 +60,7 @@ public:
     }
 
     /** 共享copyFrom所持有的对象的所有权 */
-    COWObject(const Self &copyFrom)
+    COWObject(const Self &copyFrom) noexcept
         : storage_(copyFrom.storage_)
     {
         if(storage_)
@@ -111,32 +111,32 @@ public:
     }
 
     /** 内部对象共享所有权的持有者数量 */
-    RefCounter Refs() const
+    RefCounter Refs() const noexcept
     {
         return storage_ ? storage_->refs_ : 0;
     }
 
     /** 是否持有某个对象的所有权 */
-    bool IsAvailable() const
+    bool IsAvailable() const noexcept
     {
         return storage_ != nullptr;
     }
 
     /** 是否持有某个对象的所有权 */
-    operator bool() const
+    operator bool() const noexcept
     {
         return IsAvailable();
     }
 
     /** 取得内部对象的常量引用 */
-    const T &operator*() const
+    const T &operator*() const noexcept
     {
         AGZ_ASSERT(storage_);
         return storage_->obj;
     }
 
     /** 将调用转发给内部对象 */
-    const T *operator->() const
+    const T *operator->() const noexcept
     {
         AGZ_ASSERT(storage_);
         return &storage_->obj;

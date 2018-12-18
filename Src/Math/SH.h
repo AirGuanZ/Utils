@@ -21,7 +21,7 @@ namespace SHImpl
     template<typename T, int L, int M> struct SHAux { };
 
     template<typename T>
-    T Zero([[maybe_unused]] const Vec3<T>&)
+    T Zero([[maybe_unused]] const Vec3<T>&) noexcept
     {
         return T(0);
     }
@@ -29,7 +29,7 @@ namespace SHImpl
 #define DEF_SH(L, M, COEF, RET) \
     template<typename T> struct SHAux<T, L, M> \
     { \
-        static T Eval([[maybe_unused]] const Vec3<T> &dir) \
+        static T Eval([[maybe_unused]] const Vec3<T> &dir) noexcept \
         { \
             AGZ_ASSERT(ApproxEq<T>(dir.Length(), T(1), T(1e-4))); \
             [[maybe_unused]] constexpr T pi = ::AGZ::Math::PI<T>; \
@@ -78,7 +78,7 @@ namespace SHImpl
 
     template<typename T> struct PAux<T, 1>
     {
-        static Vec3<T> Eval(const Vec3<T> &dir)
+        static Vec3<T> Eval(const Vec3<T> &dir) noexcept
         {
             static const T C = Sqrt(3 / (4 * PI<T>));
             auto r = dir.Length();
@@ -89,7 +89,7 @@ namespace SHImpl
 
     template<typename T> struct PAux<T, 2>
     {
-        static Vec<5, T> Eval(const Vec3<T> &dir)
+        static Vec<5, T> Eval(const Vec3<T> &dir) noexcept
         {
             auto ndir = dir.Normalize();
             return Vec<5, T>(
@@ -104,7 +104,7 @@ namespace SHImpl
 
     template<typename T> struct PAux<T, 3>
     {
-        static Vec<7, T> Eval(const Vec3<T> &dir)
+        static Vec<7, T> Eval(const Vec3<T> &dir) noexcept
         {
             auto ndir = dir.Normalize();
             return Vec<7, T>(
@@ -121,7 +121,7 @@ namespace SHImpl
 
     template<typename T> struct PAux<T, 4>
     {
-        static Vec<9, T> Eval(const Vec3<T> &dir)
+        static Vec<9, T> Eval(const Vec3<T> &dir) noexcept
         {
             auto ndir = dir.Normalize();
             return Vec<9, T>(
@@ -149,7 +149,7 @@ namespace SHImpl
  * @param dir 单位方向向量
  */
 template<typename T, int L, int M>
-T SH(const Vec3<T> &dir)
+T SH(const Vec3<T> &dir) noexcept
 {
     static_assert(M <= L && L <= 4);
     return SHImpl::SHAux<T, L, M>::Eval(dir);
@@ -161,7 +161,7 @@ T SH(const Vec3<T> &dir)
  * 仅支持实现范围内的L和M值，越界 == UB
  */
 template<typename T>
-SHImpl::SH_FUNC_PTR<T> *GetSHTable()
+SHImpl::SH_FUNC_PTR<T> *GetSHTable() noexcept
 {
     // SH bands tower!
     static SHImpl::SH_FUNC_PTR<T> FUNC_PTR[] =
@@ -181,7 +181,7 @@ SHImpl::SH_FUNC_PTR<T> *GetSHTable()
  * 对超出实现范围的L和M值，返回零函数
  */
 template<typename T>
-auto GetSHByLM(int L, int M)
+auto GetSHByLM(int L, int M) noexcept
 {
     if(L > 4 || Abs(M) > L)
         return &SHImpl::Zero<T>;
@@ -196,7 +196,7 @@ auto GetSHByLM(int L, int M)
  * @param SHCoef 待修改的系数
  */
 template<typename T>
-void RotateSH_L0([[maybe_unused]] const Mat3<T> &M, [[maybe_unused]] T *SHCoef)
+void RotateSH_L0([[maybe_unused]] const Mat3<T> &M, [[maybe_unused]] T *SHCoef) noexcept
 {
     // l=0对应的SH是常量函数，其系数不受旋转的影响
 }
@@ -210,7 +210,7 @@ void RotateSH_L0([[maybe_unused]] const Mat3<T> &M, [[maybe_unused]] T *SHCoef)
  * @param SHCoef 待修改的系数，应包含3个元素
  */
 template<typename T>
-void RotateSH_L1(const Mat3<T> &M, T *SHCoef)
+void RotateSH_L1(const Mat3<T> &M, T *SHCoef) noexcept
 {
     static const T INV_C = Sqrt(4 * PI<T> / 3);
 
@@ -242,7 +242,7 @@ void RotateSH_L1(const Mat3<T> &M, T *SHCoef)
  * @param SHCoef 待修改的系数，应包含5个元素
  */
 template<typename T>
-void RotateSH_L2(const Mat3<T> &M, T *SHCoef)
+void RotateSH_L2(const Mat3<T> &M, T *SHCoef) noexcept
 {
     constexpr T K = T(0.7071067811865475);
     static const Vec3<T> N2(K, K, T(0));
@@ -293,7 +293,7 @@ void RotateSH_L2(const Mat3<T> &M, T *SHCoef)
  * @param SHCoef 待修改的系数，应包含7个元素
  */
 template<typename T>
-void RotateSH_L3(const Mat3<T> &M, T *SHCoef)
+void RotateSH_L3(const Mat3<T> &M, T *SHCoef) noexcept
 {
     static const Vec3<T> N[7] = {
            Vec3<T>(T(1),   T(0), T(0))   .Normalize(),
@@ -343,7 +343,7 @@ void RotateSH_L3(const Mat3<T> &M, T *SHCoef)
 * @param SHCoef 待修改的系数，应包含9个元素
 */
 template<typename T>
-void RotateSH_L4(const Mat3<T> &M, T *SHCoef)
+void RotateSH_L4(const Mat3<T> &M, T *SHCoef) noexcept
 {
     static const Vec3<T> N[9] = {
            Vec3<T>(T(1),    T(0),    T(0))   .Normalize(),

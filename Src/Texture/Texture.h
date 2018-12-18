@@ -26,7 +26,7 @@ class TextureCore
         ::operator delete(data_);
     }
 
-    uint32_t LinearIndex(const Math::Vec<DIM, uint32_t> &coord) const
+    uint32_t LinearIndex(const Math::Vec<DIM, uint32_t> &coord) const noexcept
     {
         AGZ_ASSERT(IsAvailable() && coord.EachElemLessThan(size_));
 
@@ -54,7 +54,7 @@ public:
 
     static constexpr DimType Dim = DIM;
 
-    TextureCore()
+    TextureCore() noexcept
         : size_(0), cnt_(0), data_(nullptr)
     {
         
@@ -127,17 +127,17 @@ public:
             UncheckedRelease();
     }
 
-    Self &GetCore()
+    Self &GetCore() noexcept
     {
         return *this;
     }
 
-    const Self &GetCore() const
+    const Self &GetCore() const noexcept
     {
         return *this;
     }
 
-    bool IsAvailable() const
+    bool IsAvailable() const noexcept
     {
         return data_ != nullptr;
     }
@@ -158,46 +158,46 @@ public:
             data_[i] = value;
     }
 
-    const Pixel &operator()(const Coord &coord) const
+    const Pixel &operator()(const Coord &coord) const noexcept
     {
         AGZ_ASSERT(IsAvailable());
         return data_[LinearIndex(coord)];
     }
 
-    Pixel &operator()(const Coord &coord)
+    Pixel &operator()(const Coord &coord) noexcept
     {
         AGZ_ASSERT(IsAvailable());
         return data_[LinearIndex(coord)];
     }
 
-    const Pixel &At(const Coord &coord) const
+    const Pixel &At(const Coord &coord) const noexcept
     {
         return (*this)(coord);
     }
 
-    Pixel &At(const Coord &coord)
+    Pixel &At(const Coord &coord) noexcept
     {
         return (*this)(coord);
     }
 
-    const Coord &GetSize() const
+    const Coord &GetSize() const noexcept
     {
         AGZ_ASSERT(IsAvailable());
         return size_;
     }
 
-    uint32_t GetLinearSize() const
+    uint32_t GetLinearSize() const noexcept
     {
         return cnt_;
     }
 
-    Pixel *RawData()
+    Pixel *RawData() noexcept
     {
         AGZ_ASSERT(IsAvailable());
         return data_;
     }
 
-    const Pixel *RawData() const
+    const Pixel *RawData() const noexcept
     {
         AGZ_ASSERT(IsAvailable());
         return data_;
@@ -295,31 +295,31 @@ public:
     }
 
     //! 包含的texel数量
-    uint32_t GetLength() const
+    uint32_t GetLength() const noexcept
     {
         return Core::GetSize()[0];
     }
 
     //! 取得具有给定下标的texel
-    const Pixel &operator()(uint32_t idx) const
+    const Pixel &operator()(uint32_t idx) const noexcept
     {
         return Core::At(Coord(idx));
     }
 
     //! 取得具有给定下标的texel
-    Pixel &operator()(uint32_t idx)
+    Pixel &operator()(uint32_t idx) noexcept
     {
         return Core::At(Coord(idx));
     }
 
     //! 取得具有给定下标的texel
-    const Pixel &At(uint32_t idx) const
+    const Pixel &At(uint32_t idx) const noexcept
     {
         return Core::At(Coord(idx));
     }
 
     //! 取得具有给定下标的texel
-    Pixel &At(uint32_t idx)
+    Pixel &At(uint32_t idx) noexcept
     {
         return Core::At(Coord(idx));
     }
@@ -378,37 +378,37 @@ public:
     }
 
     //! 取得横向texel数量
-    uint32_t GetWidth() const
+    uint32_t GetWidth() const noexcept
     {
         return Core::GetSize()[0];
     }
 
     //! 取得纵向texel数量
-    uint32_t GetHeight() const
+    uint32_t GetHeight() const noexcept
     {
         return Core::GetSize()[1];
     }
 
     //! 取得具有给定下标的texel
-    const Pixel &operator()(uint32_t x, uint32_t y) const
+    const Pixel &operator()(uint32_t x, uint32_t y) const noexcept
     {
         return Core::At(Coord(x, y));
     }
 
     //! 取得具有给定下标的texel
-    Pixel &operator()(uint32_t x, uint32_t y)
+    Pixel &operator()(uint32_t x, uint32_t y) noexcept
     {
         return Core::At(Coord(x, y));
     }
 
     //! 取得具有给定下标的texel
-    const Pixel &At(uint32_t x, uint32_t y) const
+    const Pixel &At(uint32_t x, uint32_t y) const noexcept
     {
         return Core::At(Coord(x, y));
     }
 
     //! 取得具有给定下标的texel
-    Pixel &At(uint32_t x, uint32_t y)
+    Pixel &At(uint32_t x, uint32_t y) noexcept
     {
         return Core::At(Coord(x, y));
     }
@@ -467,43 +467,43 @@ public:
     }
 
     //! 取得X方向的texel数量
-    uint32_t GetXSize() const
+    uint32_t GetXSize() const noexcept
     {
         return Core::GetSize()[0];
     }
 
     //! 取得Y方向的texel数量
-    uint32_t GetYSize() const
+    uint32_t GetYSize() const noexcept
     {
         return Core::GetSize()[1];
     }
 
     //! 取得Z方向的texel数量
-    uint32_t GetZSize() const
+    uint32_t GetZSize() const noexcept
     {
         return Core::GetSize()[2];
     }
 
     //! 取得具有给定下标的texel
-    const Pixel &operator()(uint32_t x, uint32_t y, uint32_t z) const
+    const Pixel &operator()(uint32_t x, uint32_t y, uint32_t z) const noexcept
     {
         return Core::At(Coord(x, y, z));
     }
 
     //! 取得具有给定下标的texel
-    Pixel &operator()(uint32_t x, uint32_t y, uint32_t z)
+    Pixel &operator()(uint32_t x, uint32_t y, uint32_t z) noexcept
     {
         return Core::At(Coord(x, y, z));
     }
 
     //! 取得具有给定下标的texel
-    const Pixel &At(uint32_t x, uint32_t y, uint32_t z) const
+    const Pixel &At(uint32_t x, uint32_t y, uint32_t z) const noexcept
     {
         return Core::At(Coord(x, y, z));
     }
 
     //! 取得具有给定下标的texel
-    Pixel &At(uint32_t x, uint32_t y, uint32_t z)
+    Pixel &At(uint32_t x, uint32_t y, uint32_t z) noexcept
     {
         return Core::At(Coord(x, y, z));
     }

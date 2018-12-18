@@ -123,7 +123,7 @@ public:
      * 
      * @param ptr 待释放内存块的首字节地址
      */
-    void Free(void *ptr)
+    void Free(void *ptr) noexcept
     {
         auto *n = reinterpret_cast<Node*>(ptr);
         n->next = freeNodes_;

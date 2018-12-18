@@ -14,19 +14,19 @@ template<DimType DIM, typename T>
 class Vec
 {
     template<DimType...Indices>
-    auto ProductAux(std::integer_sequence<DimType, Indices...>) const
+    auto ProductAux(std::integer_sequence<DimType, Indices...>) const noexcept
     {
         return (... * data[Indices]);
     }
 
     template<DimType...Indices>
-    auto SumAux(std::integer_sequence<DimType, Indices...>) const
+    auto SumAux(std::integer_sequence<DimType, Indices...>) const noexcept
     {
         return (... + data[Indices]);
     }
 
     template<DimType...Indices>
-    auto EachElemLessThanAux(const Vec<DIM, T> &rhs, std::integer_sequence<DimType, Indices...>) const
+    auto EachElemLessThanAux(const Vec<DIM, T> &rhs, std::integer_sequence<DimType, Indices...>) const noexcept
     {
         return (... && (data[Indices] < rhs[Indices]));
     }
@@ -48,10 +48,10 @@ public:
     Vec() : Vec(T(0)) { }
 
     /** 不对元素进行任何初始化 */
-    explicit constexpr Vec(Uninitialized_t) { }
+    explicit constexpr Vec(Uninitialized_t) noexcept { }
 
     /** 将所有元素初始化为同一个值 */
-    explicit Vec(const Element &value) noexcept
+    explicit Vec(Element value) noexcept
         : Vec(UNINITIALIZED)
     {
         static_assert(noexcept(Element(value)));
@@ -72,23 +72,23 @@ Vec<3, int> wrong(1, 2);            // Incorrect
      */
     template<typename...Args, int = 0,
              typename = TypeOpr::TrueToVoid_t<
-                (Dim > 1) &&
-                (TypeOpr::TypeListLength_v<Args...> == Dim) &&
-                !TypeOpr::Any_v<CanConvertToUninitializedFlag, Args...>>>
-    constexpr Vec(Args&&...args)
-        : data{ Element(std::forward<Args>(args))... }
+                ((Dim > 1) &&
+                 (TypeOpr::TypeListLength_v<Args...> == Dim) &&
+                 !TypeOpr::Any_v<CanConvertToUninitializedFlag, Args...>)>>
+    constexpr Vec(Args...args) noexcept
+        : data{ Element(args)... }
     {
 
     }
 
     /** 按下标取得特定元素值 */
-    Element       &operator[](size_t idx)       { AGZ_ASSERT(idx < Dim); return data[idx]; }
+    Element       &operator[](size_t idx) noexcept { AGZ_ASSERT(idx < Dim); return data[idx]; }
 
     /** 按下标取得特定元素值 */
-    const Element &operator[](size_t idx) const { AGZ_ASSERT(idx < Dim); return data[idx]; }
+    const Element &operator[](size_t idx) const noexcept { AGZ_ASSERT(idx < Dim); return data[idx]; }
 
     /** 每个元素分别相等 */
-    bool operator==(const Self &rhs) const
+    bool operator==(const Self &rhs) const noexcept
     {
         for(DimType i = 0; i < Dim; ++i)
         {
@@ -99,25 +99,25 @@ Vec<3, int> wrong(1, 2);            // Incorrect
     }
 
     /** 不是所有的元素都分别相等 */
-    bool operator!=(const Self &rhs) const
+    bool operator!=(const Self &rhs) const noexcept
     {
         return !(*this == rhs);
     }
 
     /** 求所有元素的乘积 */
-    auto Product() const
+    auto Product() const noexcept
     {
         return ProductAux(std::make_integer_sequence<DimType, Dim>());
     }
 
     /** 求所有元素的和 */
-    auto Sum() const
+    auto Sum() const noexcept
     {
         return SumAux(std::make_integer_sequence<DimType, Dim>());
     }
 
     /** 是否每个分量都小于另一向量的对应分量 */
-    auto EachElemLessThan(const Self &rhs) const
+    auto EachElemLessThan(const Self &rhs) const noexcept
     {
         return EachElemLessThanAux(rhs, std::make_integer_sequence<DimType, Dim>());
     }

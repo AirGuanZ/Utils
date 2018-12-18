@@ -36,19 +36,19 @@ using Color4b = Color4<uint8_t>;
         struct Color_##N##_t \
         { \
             constexpr Color_##N##_t() = default; \
-            constexpr operator Color3f() const \
+            constexpr operator Color3f() const noexcept \
                 { return Color3f(float(R),  float(G),  float(B)); } \
-            constexpr operator Color3d() const \
+            constexpr operator Color3d() const noexcept \
                 { return Color3d(double(R), double(G), double(B)); } \
-            constexpr operator Color3b() const \
+            constexpr operator Color3b() const noexcept \
                 { return Color3b(RB, GB, BB); } \
-            constexpr operator Color4f() const \
+            constexpr operator Color4f() const noexcept \
                 { return Color4f(float(R),  float(G), \
                                  float(B),  float(A)); } \
-            constexpr operator Color4d() const \
+            constexpr operator Color4d() const noexcept \
                 { return Color4d(double(R), double(G), \
                                  double(B), double(A)); } \
-            constexpr operator Color4b() const \
+            constexpr operator Color4b() const noexcept \
                 { return Color4b(RB, GB, BB, AB); } \
         }; \
     } \

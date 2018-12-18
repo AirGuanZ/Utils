@@ -28,7 +28,7 @@ class ObjArena : public Uncopiable
 
         virtual ~DestructorInterface() = default;
 
-        virtual size_t NodeSize() const = 0;
+        virtual size_t NodeSize() const noexcept = 0;
 
         virtual void Destruct() = 0;
     };
@@ -40,7 +40,7 @@ class ObjArena : public Uncopiable
 
         Destructor() noexcept = default;
 
-        size_t NodeSize() const override
+        size_t NodeSize() const noexcept override
         {
             return sizeof(T) + sizeof(NodeHead) + sizeof(Destructor<T>);
         }
@@ -116,7 +116,7 @@ public:
     /**
      * @brief 取得目前已使用的总字节数，包括簿记内存，但不包含预分配但未使用的内存
      */
-    size_t GetUsedBytes() const
+    size_t GetUsedBytes() const noexcept
     {
         return usedBytes_;
     }

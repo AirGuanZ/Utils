@@ -108,7 +108,7 @@ inline thread_local SharedRandomEngine_t<Engine> SHARED_RNG;
  * 这个问题坑掉了我整整一个下午，有必要在这记一笔。
  */
 template<typename Engine = DefaultInternalEngine>
-SharedRandomEngine_t<Engine> &GetDefaultSharedRNG()
+SharedRandomEngine_t<Engine> &GetDefaultSharedRNG() noexcept
 {
     static thread_local SharedRandomEngine_t<Engine> ret;
     return ret;

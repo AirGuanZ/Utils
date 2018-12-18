@@ -45,7 +45,7 @@ public:
     };
 
     /** 把一对[0, 1]间的随机数转换为在单位圆内的均匀采样 */
-    static Result Transform(const Vec2<T> &u)
+    static Result Transform(const Vec2<T> &u) noexcept
     {
         T r = Sqrt(u.u);
         T theta = 2 * PI<T> * u.v;
@@ -53,7 +53,7 @@ public:
     }
 
     /** 概率密度函数值 */
-    static T PDF()
+    static T PDF() noexcept
     {
         return InvPI<T>;
     }
@@ -75,7 +75,7 @@ public:
     };
 
     /** 把一对[0, 1]间的随机数转换为单位半球面上的均匀采样 */
-    static Result Transform(const Vec2<T> &u)
+    static Result Transform(const Vec2<T> &u) noexcept
     {
         T z = u.u;
         T phi = 2 * PI<T> * u.v;
@@ -86,7 +86,7 @@ public:
     }
 
     /** 概率密度函数值 */
-    static T PDF()
+    static T PDF() noexcept
     {
         return Inv2PI<T>;
     }
@@ -108,7 +108,7 @@ public:
     };
 
     /** 把一对[0, 1]间的随机数转换为单位球面上的均匀采样 */
-    static Result Transform(const Vec2<T> &u)
+    static Result Transform(const Vec2<T> &u) noexcept
     {
         T z = 1 - 2 * u.u;
         T phi = 2 * PI<T> * u.v;
@@ -119,7 +119,7 @@ public:
     }
 
     /** 概率密度函数值 */
-    static T PDF()
+    static T PDF() noexcept
     {
         return Inv4PI<T>;
     }
@@ -141,7 +141,7 @@ public:
     };
 
     /** 把一对[0, 1]间的随机数转换为单位半球面上的Cos-weighed采样 */
-    static Result Transform(Vec2<T> u)
+    static Result Transform(Vec2<T> u) noexcept
     {
         Vec2<T> sam;
         u = T(2) * u - Vec2<T>(1);
@@ -166,7 +166,7 @@ public:
     }
 
     /** 给定采样点，返回它在该采样策略中的概率密度函数值 */
-    static T PDF(const Vec3<T> &sample)
+    static T PDF(const Vec3<T> &sample) noexcept
     {
         return sample.z * InvPI<T>;
     }
@@ -181,7 +181,7 @@ class UniformOnTriangle
 public:
 
     /** 将一对[0, 1]间的随机数转换为三角坐标均匀采样 */
-    static Vec2<T> Transform(const Vec2<T> &u)
+    static Vec2<T> Transform(const Vec2<T> &u) noexcept
     {
         T t = Sqrt(u.u);
         return { 1 - t, t * u.v };
@@ -207,7 +207,7 @@ public:
      * 把一对[0, 1]间的随机数转换为以maxCosTheta为顶角的单位球面上的锥体内的方向采样，
      * 且在立体角意义上是均匀的
      */
-    Result Transform(T maxCosTheta, const Vec2<T> &u)
+    Result Transform(T maxCosTheta, const Vec2<T> &u) noexcept
     {
         T cosTheta = (1 - u.u) + u.u * maxCosTheta;
         T sinTheta = Sqrt(Max(T(0), T(1) - cosTheta * cosTheta));
@@ -219,7 +219,7 @@ public:
     }
 
     /** 概率密度函数值 */
-    static T PDF(T maxCosTheta)
+    static T PDF(T maxCosTheta) noexcept
     {
         return 1 / (2 * PI<T> * (1 - maxCosTheta));
     }
