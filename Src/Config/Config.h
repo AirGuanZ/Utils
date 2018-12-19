@@ -236,6 +236,9 @@ public:
     bool IsArray() const noexcept override { return true; }
 
     Str8 ToString() const override;
+
+    auto begin() const { return array_.begin(); }
+    auto end()   const { return array_.end(); }
 };
 
 /**

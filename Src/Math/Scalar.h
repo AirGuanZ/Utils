@@ -77,25 +77,17 @@ namespace Impl
     template<typename T> struct PI_impl<Rad<T>> { static constexpr Rad<T> PI() noexcept { return Rad<T>{ PI_impl<T>::PI() }; } };
     template<typename T> struct PI_impl<Deg<T>> { static constexpr Deg<T> PI() noexcept { return Deg<T>{ T(180.0) }; } };
 
-    template<typename T> T Sin_rawimpl(T);
-    template<>           inline float  Sin_rawimpl<float>(float rad) noexcept(noexcept(std::sin(rad))) { return std::sin(rad); }
-    template<>           inline double Sin_rawimpl<double>(double rad) noexcept(noexcept(std::sin(rad))) { return std::sin(rad); }
-
-    template<typename T> T Cos_rawimpl(T);
-    template<>           inline float  Cos_rawimpl<float>(float rad)   noexcept(noexcept(std::cos(rad))) { return std::cos(rad); }
-    template<>           inline double Cos_rawimpl<double>(double rad) noexcept(noexcept(std::cos(rad))) { return std::cos(rad); }
-
     template<typename T> struct Sin_impl;
-    template<>           struct Sin_impl<float>  { static auto Sin(float rad)  noexcept(noexcept(Sin_rawimpl<float>(rad))) { return Sin_rawimpl<float>(rad); } };
-    template<>           struct Sin_impl<double> { static auto Sin(double rad) noexcept(noexcept(Sin_rawimpl<double>(rad))) { return Sin_rawimpl<double>(rad); } };
-    template<typename T> struct Sin_impl<Rad<T>> { static auto Sin(Rad<T> rad) noexcept(noexcept(Sin_rawimpl<T>(rad.value))) { return Sin_rawimpl<T>(rad.value); } };
-    template<typename T> struct Sin_impl<Deg<T>> { static auto Sin(Deg<T> deg) noexcept(noexcept(Sin_rawimpl<T>(deg.value * (PI_impl<T>::PI() / T(180.0))))) { return Sin_rawimpl<T>(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
+    template<>           struct Sin_impl<float>  { static auto Sin(float rad)  noexcept(noexcept(std::sin(rad))) { return std::sin(rad); } };
+    template<>           struct Sin_impl<double> { static auto Sin(double rad) noexcept(noexcept(std::sin(rad))) { return std::sin(rad); } };
+    template<typename T> struct Sin_impl<Rad<T>> { static auto Sin(Rad<T> rad) noexcept(noexcept(std::sin(rad.value))) { return std::sin(rad.value); } };
+    template<typename T> struct Sin_impl<Deg<T>> { static auto Sin(Deg<T> deg) noexcept(noexcept(std::sin(deg.value * (PI_impl<T>::PI() / T(180.0))))) { return std::sin(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
 
     template<typename T> struct Cos_impl;
-    template<>           struct Cos_impl<float> { static auto Cos(float rad)   noexcept(noexcept(Cos_rawimpl<float>(rad))) { return Cos_rawimpl<float>(rad); } };
-    template<>           struct Cos_impl<double> { static auto Cos(double rad) noexcept(noexcept(Cos_rawimpl<double>(rad))) { return Cos_rawimpl<double>(rad); } };
-    template<typename T> struct Cos_impl<Rad<T>> { static auto Cos(Rad<T> rad) noexcept(noexcept(Cos_rawimpl<T>(rad.value))) { return Cos_rawimpl<T>(rad.value); } };
-    template<typename T> struct Cos_impl<Deg<T>> { static auto Cos(Deg<T> deg) noexcept(noexcept(Cos_rawimpl<T>(deg.value * (PI_impl<T>::PI() / T(180.0))))) { return Cos_rawimpl<T>(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
+    template<>           struct Cos_impl<float> { static auto Cos(float rad)   noexcept(noexcept(std::cos(rad))) { return std::cos(rad); } };
+    template<>           struct Cos_impl<double> { static auto Cos(double rad) noexcept(noexcept(std::cos(rad))) { return std::cos(rad); } };
+    template<typename T> struct Cos_impl<Rad<T>> { static auto Cos(Rad<T> rad) noexcept(noexcept(std::cos(rad.value))) { return std::cos(rad.value); } };
+    template<typename T> struct Cos_impl<Deg<T>> { static auto Cos(Deg<T> deg) noexcept(noexcept(std::cos(deg.value * (PI_impl<T>::PI() / T(180.0))))) { return std::cos(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
 }
 
 template<typename T> constexpr auto Deg2Rad(Deg<T> deg) noexcept { return Rad<T> { deg.value * (Impl::PI_impl<T>::PI() / T(180.0)) }; }
