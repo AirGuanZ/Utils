@@ -11,6 +11,7 @@
  * - 将[0, 1]^2上的均匀分布转换为三角形上的均匀分布
  * - 将[0, 1]^2上的均匀分布转换为锥形立体角上的均匀分布
  * - 从[0, 1]上的均匀分布中额外抽出一个整型随机数
+ * - 将[0, 1]上的均匀分布转换为给定范围内的整数上的均匀分布
  */
 
 #include <type_traits>
@@ -28,6 +29,7 @@ template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class Z
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnTriangle;
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnCone;
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class SampleExtractor;
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformInteger;
 
 /**
  * @brief 在单位圆内均匀采样
@@ -241,6 +243,21 @@ public:
         I integer = begin + (std::min<I>)(I(u * delta), delta - 1);
         T real = (std::min<T>)(begin + u * delta - integer, 1);
         return { integer, real };
+    }
+};
+
+/*
+ * @brief 将[0, 1]间的浮点随机数转换为指定范围内的均匀整数
+ */
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+class UniformInteger
+{
+public:
+
+    template<typename I, std::enable_if_t<std::is_integral_v<I>, int> = 0>
+    static I Transform(T u, I begin, I end) noexcept
+    {
+        return (std::min)(end - 1, begin + I(u * (end - begin)));
     }
 };
 
