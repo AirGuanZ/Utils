@@ -135,7 +135,7 @@ inline Str8 ConfigGroup::ToString() const
     b << "{";
     b << Str8("").Join(
         children_ |
-        Map([](auto &p){ return p.first + "=" + p.second->ToString(); }));
+        Map([](auto &p){ return p.first + "=" + p.second->ToString() + ";"; }));
     b << "}";
     return b.Get();
 }
