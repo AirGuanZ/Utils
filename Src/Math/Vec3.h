@@ -69,6 +69,11 @@ public:
         return Vec3<U>(f(x), f(y), f(z));
     }
 
+    bool HasInf() const noexcept
+    {
+        return FP<T>(x).IsInfinity() || FP<T>(y).IsInfinity() || FP<T>(z).IsInfinity();
+    }
+
 #include "SwizzleVec3.inl"
 
 #define x r
