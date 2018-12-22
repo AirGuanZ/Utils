@@ -209,7 +209,7 @@ public:
      * 把一对[0, 1]间的随机数转换为以maxCosTheta为顶角的单位球面上的锥体内的方向采样，
      * 且在立体角意义上是均匀的
      */
-    Result Transform(T maxCosTheta, const Vec2<T> &u) noexcept
+    static Result Transform(T maxCosTheta, const Vec2<T> &u) noexcept
     {
         T cosTheta = (1 - u.u) + u.u * maxCosTheta;
         T sinTheta = Sqrt(Max(T(0), T(1) - cosTheta * cosTheta));
