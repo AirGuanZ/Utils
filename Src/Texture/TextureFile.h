@@ -36,6 +36,14 @@ public:
      */
     static TextureCore<2, Math::Color4b> LoadRGBAFromFile(
         const Str8 &filename);
+    
+    /**
+     * @brief 从.hdr文件中加载一个二维RGB纹理对象
+     * 
+     * @exception FileException 加载失败时抛出
+     */
+    static TextureCore<2, Math::Color3f> LoadRGBFromHDR(
+        const Str8 &filename);
 
     /**
      * @brief 将一个二维RGB纹理对象写入到指定格式的文件
@@ -204,6 +212,41 @@ TextureCore<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
     }
 
     stbi_image_free(bytes);
+    FileSys::DefaultlyReleaseRawBinaryFileContent(content);
+
+    return ret;
+}
+
+TextureCore<2, Math::Color3f> TextureFile::LoadRGBFromHDR(
+    const Str8 &filename)
+{
+    auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
+    if(!content)
+        throw FileException("Failed to read texture file content");
+    
+    int w, h, channels;
+    float *data = stbi_loadf_from_memory(content, int(len), &w, &h, &channels, STBI_rgb);
+    if(!data)
+    {
+        FileSys::DefaultlyReleaseRawBinaryFileContent(content);
+        throw FileException("Failed to load texture from memory");
+    }
+
+    AGZ_ASSERT(w > 0 && h > 0);
+
+    TextureCore<2, Math::Color3f> ret({ w, h }, UNINITIALIZED);
+    float *scanlineData = data;
+
+    for(int scanline = 0; scanline < h; ++scanline)
+    {
+        for(int x = 0; x < w; ++x)
+        {
+            ret({x, scanline}) = Math::Color3f(scanlineData[0], scanlineData[1], scanlineData[2]);
+            scanlineData += 3;
+        }
+    }
+
+    stbi_image_free(data);
     FileSys::DefaultlyReleaseRawBinaryFileContent(content);
 
     return ret;
