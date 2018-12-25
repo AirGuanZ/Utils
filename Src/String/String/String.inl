@@ -910,18 +910,18 @@ StringView<CS>::Split(const Self &spliter) const
 {
     AGZ_ASSERT(spliter.Empty() == false);
     std::vector<Self> ret;
-    size_t segBeg = 0;
+    size_t segBeg = 0; size_t offBeg = beg_ - str_->begin();
     while(segBeg < len_)
     {
         size_t fi = Find(spliter, segBeg);
         if(fi == NPOS)
         {
-            ret.emplace_back(*str_, segBeg, len_);
+            ret.emplace_back(*str_, offBeg + segBeg, offBeg + len_);
             return ret;
         }
 
         if(fi != segBeg)
-            ret.emplace_back(*str_, segBeg, fi);
+            ret.emplace_back(*str_, offBeg + segBeg, offBeg + fi);
         segBeg = fi + spliter.Length();
     }
     return ret;
@@ -943,7 +943,7 @@ std::vector<StringView<CS>> StringView<CS>::Split(const C &spliters) const
     // IMPROVE
 
     std::vector<Self> ret;
-    size_t segBeg = 0;
+    size_t segBeg = 0; size_t offBeg = beg_ - str_->begin();
 
     while(segBeg < len_)
     {
@@ -967,12 +967,12 @@ std::vector<StringView<CS>> StringView<CS>::Split(const C &spliters) const
 
         if(fi == NPOS)
         {
-            ret.emplace_back(*str_, segBeg, len_);
+            ret.emplace_back(*str_, offBeg + segBeg, offBeg + len_);
             return ret;
         }
 
         if(fi != segBeg)
-            ret.emplace_back(*str_, segBeg, fi);
+            ret.emplace_back(*str_, offBeg + segBeg, offBeg + fi);
 
         segBeg = fi + slen;
     }

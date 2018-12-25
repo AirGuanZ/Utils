@@ -120,6 +120,14 @@ TEST_CASE("String")
                 | Map([](const Str8::View &v) { return v.AsString(); })
                 | Collect<vector<Str8>>())
              == vector<Str8>{ "a", "b", "c", "d" });
+
+        {
+            Str8 s = "ABC@DEF";
+            auto t = s.Slice(4);
+            REQUIRE(t == "DEF");
+            auto st = t.Split("/") | Collect<vector<StrView8>>();
+            REQUIRE(st.at(0) == "DEF");
+        }
     }
 
     SECTION("Join")
