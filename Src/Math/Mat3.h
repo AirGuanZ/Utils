@@ -178,7 +178,7 @@ typename Mat3<T>::Self Mat3<T>::Rotate(const Vec3<T> &_axis, U angle) noexcept
     Vec3<T> axis = Normalize(_axis);
     auto sinv = Sin(angle), cosv = Cos(angle);
 
-    constexpr T I = T(1), O = T(0);
+    constexpr T I = T(1);
 
     m[0][0] = axis.x * axis.x + (I - axis.x * axis.x) * cosv;
     m[0][1] = axis.x * axis.y * (I - cosv) - axis.z * sinv;
