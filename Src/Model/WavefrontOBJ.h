@@ -125,7 +125,7 @@ public:
 
 private:
 
-    static typename WavefrontObj<T>::Index ParseIndex(const StrView8 &str);
+    static typename WavefrontObj<T>::Index ParseIndex(int32_t baseVtx, int32_t baseTex, int32_t baseNor, const StrView8 &str);
 };
 
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
@@ -217,6 +217,8 @@ inline bool WavefrontObjFile<T, DN>::LoadFromMemory(const Str8 &content, Wavefro
         return cur;
     };
 
+    int32_t baseVtxIdx = 0, baseTexIdx = 0, baseNorIdx = 0;
+
     try
     {
         auto lines = content.Split("\n")
@@ -244,6 +246,12 @@ inline bool WavefrontObjFile<T, DN>::LoadFromMemory(const Str8 &content, Wavefro
             {
                 Str8 key(m(0, 1));
                 objs->objs.erase(key);
+                if(cur)
+                {
+                    baseVtxIdx += int32_t(cur->vertices.size());
+                    baseTexIdx += int32_t(cur->texCoords.size());
+                    baseNorIdx += int32_t(cur->normals.size());
+                }
                 cur = &objs->objs[key];
                 continue;
             }
@@ -290,7 +298,7 @@ inline bool WavefrontObjFile<T, DN>::LoadFromMemory(const Str8 &content, Wavefro
 
                 typename  WavefrontObj<T>::Face face;
                 for(size_t i = 0; i < indices.size(); ++i)
-                    face.indices[i] = ParseIndex(indices[i]);
+                    face.indices[i] = ParseIndex(baseVtxIdx, baseTexIdx, baseNorIdx, indices[i]);
 
                 if(indices.size() == 3)
                 {
@@ -320,31 +328,32 @@ inline bool WavefrontObjFile<T, DN>::LoadFromMemory(const Str8 &content, Wavefro
 }
 
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
-inline typename WavefrontObj<T>::Index WavefrontObjFile<T, DN>::ParseIndex(const StrView8 &str)
+inline typename WavefrontObj<T>::Index WavefrontObjFile<T, DN>::ParseIndex(
+    int32_t baseVtx, int32_t baseTex, int32_t baseNor, const StrView8 &str)
 {
     typename WavefrontObj<T>::Index ret = { -1, -1, -1 };
 
     static thread_local Regex8 reg0(R"___(\d+)___");
     if(auto m = reg0.Match(str); m)
     {
-        ret.vtx = str.Parse<int32_t>() - 1;
+        ret.vtx = str.Parse<int32_t>() - 1 - baseVtx;
         return ret;
     }
 
     static thread_local Regex8 reg1(R"___(&\d+&/&\d+&)___");
     if(auto m = reg1.Match(str); m)
     {
-        ret.vtx = m(0, 1).Parse<int32_t>() - 1;
-        ret.tex = m(2, 3).Parse<int32_t>() - 1;
+        ret.vtx = m(0, 1).Parse<int32_t>() - 1 - baseVtx;
+        ret.tex = m(2, 3).Parse<int32_t>() - 1 - baseTex;
         return ret;
     }
 
     static thread_local Regex8 reg2(R"___(&\d+&/&\d*&/&\d+&)___");
     if(auto m = reg2.Match(str); m)
     {
-        ret.vtx = m(0, 1).Parse<int32_t>() - 1;
-        ret.tex = m(2, 3).Empty() ? -1 : (m(2, 3).Parse<int32_t>() - 1);
-        ret.nor = m(4, 5).Parse<int32_t>() - 1;
+        ret.vtx = m(0, 1).Parse<int32_t>() - 1 - baseVtx;
+        ret.tex = m(2, 3).Empty() ? -1 : (m(2, 3).Parse<int32_t>() - 1 - baseTex);
+        ret.nor = m(4, 5).Parse<int32_t>() - 1 - baseNor;
         return ret;
     }
 
