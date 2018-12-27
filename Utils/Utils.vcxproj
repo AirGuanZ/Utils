@@ -44,6 +44,8 @@
     <ClInclude Include="..\Src\Math\Vec2.h" />
     <ClInclude Include="..\Src\Math\Vec3.h" />
     <ClInclude Include="..\Src\Math\Vec4.h" />
+    <ClInclude Include="..\Src\Mesh\Mesh.h" />
+    <ClInclude Include="..\Src\Mesh\WavefrontObj.h" />
     <ClInclude Include="..\Src\Misc\Common.h" />
     <ClInclude Include="..\Src\Misc\Config.h" />
     <ClInclude Include="..\Src\Misc\Either.h" />
@@ -53,8 +55,6 @@
     <ClInclude Include="..\Src\Misc\Singleton.h" />
     <ClInclude Include="..\Src\Misc\TypeOpr.h" />
     <ClInclude Include="..\Src\Misc\Uncopiable.h" />
-    <ClInclude Include="..\Src\Model\Model.h" />
-    <ClInclude Include="..\Src\Model\WavefrontOBJ.h" />
     <ClInclude Include="..\Src\Range\Aggregate.h" />
     <ClInclude Include="..\Src\Range\All.h" />
     <ClInclude Include="..\Src\Range\Any.h" />
@@ -103,8 +103,8 @@
     <ClInclude Include="..\Src\Utils\Config.h" />
     <ClInclude Include="..\Src\Utils\FileSys.h" />
     <ClInclude Include="..\Src\Utils\Math.h" />
+    <ClInclude Include="..\Src\Utils\Mesh.h" />
     <ClInclude Include="..\Src\Utils\Misc.h" />
-    <ClInclude Include="..\Src\Utils\Model.h" />
     <ClInclude Include="..\Src\Utils\Platform.h" />
     <ClInclude Include="..\Src\Utils\Range.h" />
     <ClInclude Include="..\Src\Utils\Serialize.h" />

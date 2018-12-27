@@ -10,7 +10,6 @@
     <ClCompile Include="FileSys.cpp" />
     <ClCompile Include="PikeVM.cpp" />
     <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="Model.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Serialize.cpp" />
   </ItemGroup>

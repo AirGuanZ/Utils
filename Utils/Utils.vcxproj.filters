@@ -40,9 +40,6 @@
     <Filter Include="Texture">
       <UniqueIdentifier>{c1ae0090-5471-4554-a3d3-52f330293e4d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Model">
-      <UniqueIdentifier>{9130d6f5-4bad-4832-8701-b37d5d29d8bc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Time">
       <UniqueIdentifier>{30c6b6e7-ea30-4779-a730-3228e127d24e}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,9 @@
     </Filter>
     <Filter Include="Serialize">
       <UniqueIdentifier>{6787a653-a0f1-4624-9d6e-e33759b98633}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mesh">
+      <UniqueIdentifier>{dcc0d234-36ae-442b-a3ab-d210fe3b26e4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -250,15 +250,6 @@
     <ClInclude Include="..\Src\Misc\Singleton.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Model\WavefrontOBJ.h">
-      <Filter>Model</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\Model.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Model\Model.h">
-      <Filter>Model</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Range\FilterMap.h">
       <Filter>Range</Filter>
     </ClInclude>
@@ -336,6 +327,15 @@
     </ClInclude>
     <ClInclude Include="..\Src\FileSys\FileCache.h">
       <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Mesh\Mesh.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Mesh\WavefrontObj.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Utils\Mesh.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
