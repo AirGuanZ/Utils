@@ -619,6 +619,11 @@ public:
     /** 见 String<CS>::From(char, unsigned int) */
     static Self From(unsigned long long v, unsigned int base = 10);
 
+    /** 将浮点数转换为字符串 */
+    static Self From(float v);
+    /** 将浮点数转换为字符串 */
+    static Self From(double v);
+
     /**
      * @brief 将字符串转换为整数值
      * 
@@ -818,6 +823,17 @@ public:
     static String<DCS> Convert(const String<SCS> &src) { return Convert<DCS, SCS>(src.AsView()); }
 };
 
+/**
+ * @brief 统一的将对象转为String的接口
+ * 
+ * - 若obj.ToString()类型和String<CS>相同，则返回obj.ToString()
+ * - 否则，若String<CS>::From(obj)合法，则返回其结果
+ * - 否则，若stringBuilder << obj合法，则用stringBuilder进行转换
+ * - 否则报错
+*/
+template<typename CS, typename T>
+String<CS> ToString(const T &obj);
+
 } // namespace AGZ::StrImpl
 
 namespace AGZ {
@@ -839,6 +855,15 @@ using AStr  = String<ASCII<>>; ///< 以ASCII编码的字符串
 using WStr  = String<WUTF>;    ///< 以宽字符编码（平台相关）的字符串
 using PStr  = String<PUTF>;    ///< 平台缺省使用的字符串
 
+using StrImpl::ToString;
+
+template<typename T> auto ToStr8 (const T &obj) { return ToString<UTF8<>,  T>(obj); }
+template<typename T> auto ToStr16(const T &obj) { return ToString<UTF16<>, T>(obj); }
+template<typename T> auto ToStr32(const T &obj) { return ToString<UTF32<>, T>(obj); }
+template<typename T> auto ToAStr (const T &obj) { return ToString<ASCII<>, T>(obj); }
+template<typename T> auto ToWStr (const T &obj) { return ToString<WUTF,    T>(obj); }
+template<typename T> auto ToPStr (const T &obj) { return ToString<PUTF,    T>(obj); }
+
 using StdPStr = decltype(std::declval<Str8>().ToPlatformString());
 
 using StrView8  = StringView<UTF8<>>;  ///< 以UTF-8编码的字符串视图
@@ -852,6 +877,13 @@ using CSConv = StrImpl::CharsetConvertor;
 
 template<typename CS>
 using StringBuilder = StrImpl::StringBuilder<CS>;
+
+using Str8Builder  = StringBuilder<UTF8<>>;
+using Str16Builder = StringBuilder<UTF16<>>;
+using Str32Builder = StringBuilder<UTF32<>>;
+using AStrBuilder  = StringBuilder<ASCII<>>;
+using WStrBuilder  = StringBuilder<WUTF>;
+using PStrBuilder  = StringBuilder<PUTF>;
 
 template<typename CS>
 using CodePointRange = StrImpl::CodePointRange<CS>;

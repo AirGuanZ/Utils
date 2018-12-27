@@ -1330,6 +1330,18 @@ AGZ_STR_FROM_INT_IMPL(unsigned long long)
 #undef AGZ_STR_FROM_INT_IMPL
 
 template<typename CS>
+String<CS> String<CS>::From(float v)
+{
+    return Self(std::to_string(v));
+}
+
+template<typename CS>
+String<CS> String<CS>::From(double v)
+{
+    return Self(std::to_string(v));
+}
+
+template<typename CS>
 StringView<CS> String<CS>::AsView() const
 {
     return View(*this);
@@ -1477,6 +1489,97 @@ String<DCS> CharsetConvertor::Convert(const typename String<SCS>::View &src)
 
         return String<DCS>(cus.data(), cus.size());
     }
+}
+
+/**
+ * @cond
+ */
+namespace ToStringImpl
+{
+    template<typename CS>
+    using Str = ::AGZ::StrImpl::String<CS>;
+
+    template<typename CS, typename U>
+    struct HasToString
+    {
+    private:
+
+        template<typename T, typename = std::void_t<>>
+        struct Impl : std::false_type { };
+
+        template<typename T>
+        struct Impl<T, std::void_t<decltype(std::declval<const T&>().ToString())>>
+        {
+            static const bool value = std::is_same_v<
+                Str<CS>, remove_rcv_t<decltype(std::declval<const T&>().ToString())>>;
+        };
+    
+    public:
+
+        static const bool value = Impl<U>::value;
+    };
+
+    template<typename CS, typename U, typename = std::void_t<>>
+    struct IsStringFromValid : std::false_type { };
+
+    template<typename CS, typename U>
+    struct IsStringFromValid<CS, U, std::void_t<decltype(Str<CS>::From(std::declval<U>()))>>
+        : std::true_type { };
+    
+    template<typename CS, typename U, typename = std::void_t<>>
+    struct CanUseStringBuilder : std::false_type { };
+
+    template<typename CS, typename U>
+    struct CanUseStringBuilder<CS, U, std::void_t<decltype(std::declval<StringBuilder<CS>&>() << std::declval<U>())>>
+        : std::true_type { };
+
+    template<typename CS, typename T, bool = false>
+    struct TryToUseStringBuilder
+    {
+        static Str<CS> Call(const T&) { static_assert(CanUseStringBuilder<CS, T>::value, "ToString unimplemented"); }
+    };
+
+    template<typename CS, typename T>
+    struct TryToUseStringBuilder<CS, T, true>
+    {
+        static Str<CS> Call(const T &obj) { StringBuilder<CS> sb; sb << obj; return sb.Get(); }
+    };
+
+    template<typename CS, typename T, bool = false>
+    struct TryToUseStringFrom
+    {
+        static Str<CS> Call(const T &obj)
+        { return TryToUseStringBuilder<CS, T, CanUseStringBuilder<CS, T>::value>::Call(obj); }
+    };
+
+    template<typename CS, typename T>
+    struct TryToUseStringFrom<CS, T, true>
+    {
+        static Str<CS> Call(const T &obj) { return Str<CS>::From(obj); }
+    };
+    
+    template<typename CS, typename T, bool = false>
+    struct TryToCallToString
+    {
+        static Str<CS> Call(const T &obj)
+        { return TryToUseStringFrom<CS, T, IsStringFromValid<CS, T>::value>::Call(obj); }
+    };
+
+    template<typename CS, typename T>
+    struct TryToCallToString<CS, T, true>
+    {
+        static Str<CS> Call(const T &obj) { return obj.ToString(); }
+    };
+}
+
+/**
+ * @endcond
+ */
+
+template<typename CS, typename T>
+String<CS> ToString(const T &obj)
+{
+    return ToStringImpl::TryToCallToString<CS, T, ToStringImpl::HasToString<CS, T>::value>::Call(obj);
 }
 
 } // namespace AGZ::StrImpl

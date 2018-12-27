@@ -9,6 +9,13 @@
 using namespace AGZ;
 using namespace std;
 
+struct TS { };
+
+Str8Builder &operator<<(Str8Builder &builder, const TS&)
+{
+    return builder << "HaHaHa";
+}
+
 TEST_CASE("String")
 {
     SECTION("Constructor")
@@ -154,5 +161,16 @@ TEST_CASE("String")
              == vector<Str8>{ u8"a", u8"b", u8"c" });
         REQUIRE((Str8(u8"今天a天气!").Chars() | Collect<vector<Str8>>())
              == vector<Str8>{ u8"今", u8"天", u8"a", u8"天", u8"气", u8"!" });
+    }
+
+    SECTION("ToString")
+    {
+        REQUIRE(ToStr8(5) == "5");
+        REQUIRE(ToStr32(3.158) == std::to_string(3.158));
+
+        struct A { Str8 ToString() const { return "Minecraft"; } };
+        REQUIRE(ToStr8(A{}) == "Minecraft");
+
+        REQUIRE(ToStr8(TS{}) == "HaHaHa");
     }
 }

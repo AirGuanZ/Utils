@@ -5,6 +5,7 @@
 #include "Utils/Config.h"
 #include "Utils/FileSys.h"
 #include "Utils/Math.h"
+#include "Utils/Mesh.h"
 #include "Utils/Misc.h"
 #include "Utils/Model.h"
 #include "Utils/Range.h"
