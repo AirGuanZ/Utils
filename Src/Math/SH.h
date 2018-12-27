@@ -6,7 +6,7 @@
 #include "Vec.h"
 #include "Vec3.h"
 
-namespace AGZ::Math {
+namespace AGZ::Math::SH {
 
 /**
  * @cond
@@ -15,7 +15,7 @@ namespace AGZ::Math {
 namespace SHImpl
 {
     template<typename T>
-    using SH_FUNC_PTR = T(*)(const Vec3<T>&);
+    using SH_FUNC_PTR = T(*)(const Vec3<T>&) noexcept;
 
     // 见 https://en.wikipedia.org/wiki/Table_of_spherical_harmonics
     template<typename T, int L, int M> struct SHAux { };
@@ -255,11 +255,11 @@ void RotateSH_L2(const Mat3<T> &M, T *SHCoef) noexcept
 
     // 计算A^{-1}x
 
-    Vec<5, T> invAx(K0 * (-SHCoef[1] + SHCoef[3]) + K1 * SHCoef[4],
-                    K0 * (SHCoef[0] + SHCoef[3] + SHCoef[4]) + K2 * SHCoef[2],
+    Vec<5, T> invAx(K0 * (SHCoef[1] - SHCoef[3]) + K1 * SHCoef[4],
+                    K0 * (SHCoef[0] - SHCoef[3] + SHCoef[4]) + K2 * SHCoef[2],
                     K1 * SHCoef[0],
-                    -K1 * SHCoef[3],
-                    -K1 * SHCoef[1]);
+                    K1 * SHCoef[3],
+                    K1 * SHCoef[1]);
 
     // 构造S
     // IMPROVE：N是确定的，故P(M * N)可以优化
@@ -272,16 +272,11 @@ void RotateSH_L2(const Mat3<T> &M, T *SHCoef) noexcept
 
     // 计算S(A^{-1}x)
 
-    SHCoef[0] = PMN0[0] * invAx[0] + PMN1[0] * invAx[1] + PMN2[0] * invAx[2]
-              + PMN3[0] * invAx[3] + PMN4[0] * invAx[4];
-    SHCoef[1] = PMN0[1] * invAx[0] + PMN1[1] * invAx[1] + PMN2[1] * invAx[2]
-              + PMN3[1] * invAx[3] + PMN4[1] * invAx[4];
-    SHCoef[2] = PMN0[2] * invAx[0] + PMN1[2] * invAx[1] + PMN2[2] * invAx[2]
-              + PMN3[2] * invAx[3] + PMN4[2] * invAx[4];
-    SHCoef[3] = PMN0[3] * invAx[0] + PMN1[3] * invAx[1] + PMN2[3] * invAx[2]
-              + PMN3[3] * invAx[3] + PMN4[3] * invAx[4];
-    SHCoef[4] = PMN0[4] * invAx[0] + PMN1[4] * invAx[1] + PMN2[4] * invAx[2]
-              + PMN3[4] * invAx[3] + PMN4[4] * invAx[4];
+    SHCoef[0] = PMN0[0] * invAx[0] + PMN1[0] * invAx[1] + PMN2[0] * invAx[2] + PMN3[0] * invAx[3] + PMN4[0] * invAx[4];
+    SHCoef[1] = PMN0[1] * invAx[0] + PMN1[1] * invAx[1] + PMN2[1] * invAx[2] + PMN3[1] * invAx[3] + PMN4[1] * invAx[4];
+    SHCoef[2] = PMN0[2] * invAx[0] + PMN1[2] * invAx[1] + PMN2[2] * invAx[2] + PMN3[2] * invAx[3] + PMN4[2] * invAx[4];
+    SHCoef[3] = PMN0[3] * invAx[0] + PMN1[3] * invAx[1] + PMN2[3] * invAx[2] + PMN3[3] * invAx[3] + PMN4[3] * invAx[4];
+    SHCoef[4] = PMN0[4] * invAx[0] + PMN1[4] * invAx[1] + PMN2[4] * invAx[2] + PMN3[4] * invAx[3] + PMN4[4] * invAx[4];
 }
 
 /**
@@ -388,4 +383,4 @@ void RotateSH_L4(const Mat3<T> &M, T *SHCoef) noexcept
     }
 }
 
-} // namespace AGZ::Math
+} // namespace AGZ::Math::SH
