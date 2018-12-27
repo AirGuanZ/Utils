@@ -10,7 +10,7 @@
 #include "../Utils/Math.h"
 #include "../Utils/String.h"
 
-namespace AGZ::Model {
+namespace AGZ::Mesh {
 
 /**
  * @brief 简单的几何模型，仅包含顶点位置、纹理坐标以及法线
@@ -110,4 +110,4 @@ inline GeometryMesh<T> GeometryMeshGroup<T, DN>::MergeAllSubmeshes() const
     return ret;
 }
 
-} // namespace AGZ::Model
+} // namespace AGZ::Mesh

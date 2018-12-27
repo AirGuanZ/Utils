@@ -7,7 +7,6 @@
 #include "Utils/Math.h"
 #include "Utils/Mesh.h"
 #include "Utils/Misc.h"
-#include "Utils/Model.h"
 #include "Utils/Range.h"
 #include "Utils/Serialize.h"
 #include "Utils/String.h"
