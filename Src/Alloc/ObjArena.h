@@ -42,14 +42,41 @@ class ObjArena : public Uncopiable
 
         size_t NodeSize() const noexcept override
         {
-            return sizeof(T) + sizeof(NodeHead) + sizeof(Destructor<T>);
+            //return sizeof(T) + sizeof(NodeHead) + sizeof(Destructor<T>);
+            return ObjArena<Alloc>::template Obj2NodeSize<T>();
         }
 
         void Destruct() override
         {
-            T *dst = reinterpret_cast<T*>((
-                reinterpret_cast<char*>(this) + sizeof(Destructor<T>)));
+            T *dst = reinterpret_cast<T*>(
+                reinterpret_cast<char*>(this) + sizeof(Destructor<T>));
             dst->~T();
+        }
+    };
+
+    template<typename T>
+    class ArrayDestructor : public DestructorInterface
+    {
+        size_t arrSize_;
+
+    public:
+
+        explicit ArrayDestructor(size_t arrSize) noexcept
+            : arrSize_(arrSize)
+        {
+            
+        }
+
+        size_t NodeSize() const noexcept override
+        {
+            return ObjArena<Alloc>::template Arr2NodeSize<T>(arrSize_);
+        }
+
+        void Destruct() override
+        {
+            T *beg = reinterpret_cast<T*>(reinterpret_cast<char*>(this) + sizeof(ArrayDestructor<T>));
+            for(size_t i = 0; i < arrSize_; ++i)
+                (beg + i)->~T();
         }
     };
 
@@ -66,7 +93,7 @@ class ObjArena : public Uncopiable
 
     ChunkHead *chunkEntry_;
     char *curChunkTop_;    // 当前chunk数据区的首个未占用字节地址
-    size_t curChunkRest_;   // 当前chunk还剩多少字节
+    size_t curChunkRest_;  // 当前chunk还剩多少字节
 
     NodeHead *nodeEntry_;
 
@@ -74,9 +101,15 @@ class ObjArena : public Uncopiable
     size_t usedBytes_;
 
     template<typename T>
-    static size_t ObjSize2NodeSize()
+    static size_t Obj2NodeSize() noexcept
     {
         return sizeof(T) + sizeof(NodeHead) + sizeof(Destructor<T>);
+    }
+
+    template<typename T>
+    static size_t Arr2NodeSize(size_t arrSize) noexcept
+    {
+        return sizeof(NodeHead) + sizeof(ArrayDestructor<T>) + arrSize * sizeof(T);
     }
 
     void AllocNewChunk()
@@ -138,7 +171,7 @@ public:
     {
         // IMPROVE：对trivially_destructible的T，不需要Destructor
 
-        size_t nodeSize = ObjSize2NodeSize<T>();
+        size_t nodeSize = Obj2NodeSize<T>();
 
         // 过大的对象直接用Alloc::Malloc分配
         if(nodeSize > chunkDataSize_)
@@ -188,6 +221,94 @@ public:
         usedBytes_ += nodeSize;
 
         return reinterpret_cast<T*>(obj);
+    }
+
+    /**
+     * @brief 在堆上快速创建指定类型的对象的数组
+     *
+     * 如果对象过大，会将内存分配直接转发给Alloc；
+     * 否则会尝试从预分配空间中取得内存。
+     * 若预分配空间不足，会向Alloc申请更多的预分配内存。
+     *
+     * 若对象构造过程中抛出异常，则已创建的对象会被析构，异常则会被原样抛出。
+     *
+     * @param arrSize 被创建数组的元素数量
+     * @param args 被创建对象的构造函数参数
+     * @return 指向被创建对象数组首元素的指针
+     *
+     * @exception std::bad_alloc 向Alloc请求更多内存空间失败时抛出
+     */
+    template<typename T, typename...Args>
+    T *CreateArray(size_t arrSize, const Args&...args)
+    {
+        if(!arrSize)
+            throw ArgumentException("ObjArena: alloc zero-sized array");
+        size_t nodeSize = Arr2NodeSize<T>(arrSize);
+
+        if(nodeSize > chunkDataSize_)
+        {
+            char *data       = static_cast<char*>(Alloc::Malloc(nodeSize));
+            char *destructor = data + sizeof(NodeHead);
+            char *obj        = destructor + sizeof(ArrayDestructor<T>);
+            T *pObj          = static_cast<T*>(obj);
+
+            size_t initEnd = 0;
+            try
+            {
+                for(; initEnd < arrSize; ++initEnd)
+                    new(pObj + initEnd) T(args...);
+            }
+            catch(...)
+            {
+                for(size_t i = 0; i < initEnd; ++i)
+                    (pObj + i)->~T();
+                Alloc::Free(data);
+                throw;
+            }
+
+            new(destructor) ArrayDestructor<T>(arrSize);
+
+            NodeHead *newNode = static_cast<NodeHead*>(data);
+            newNode->nextNode = nodeEntry_;
+            nodeEntry_        = newNode;
+            usedBytes_        += nodeSize;
+
+            return pObj;
+        }
+
+        if(curChunkRest_ < nodeSize)
+            AllocNewChunk();
+        AGZ_ASSERT(curChunkRest_ >= nodeSize);
+
+        char *data       = curChunkTop_;
+        char *destructor = data + sizeof(NodeHead);
+        char *obj        = destructor + sizeof(ArrayDestructor<T>);
+        T *pObj          = static_cast<T*>(obj);
+
+        size_t initEnd = 0;
+        try
+        {
+            for(; initEnd < arrSize; ++initEnd)
+                new(pObj + initEnd) T(args...);
+        }
+        catch(...)
+        {
+            for(size_t i = 0; i < initEnd; ++i)
+                (pObj + i)->~T();
+            throw;
+        }
+
+        new(destructor) ArrayDestructor<T>(arrSize);
+
+        NodeHead *newNode = static_cast<NodeHead*>(data);
+        newNode->nextNode = nodeEntry_;
+        nodeEntry_        = newNode;
+
+        curChunkTop_  += nodeSize;
+        curChunkRest_ -= nodeSize;
+        usedBytes_    += nodeSize;
+
+        return pObj;
     }
 
     /**
