@@ -250,7 +250,7 @@ public:
             char *data       = static_cast<char*>(Alloc::Malloc(nodeSize));
             char *destructor = data + sizeof(NodeHead);
             char *obj        = destructor + sizeof(ArrayDestructor<T>);
-            T *pObj          = static_cast<T*>(obj);
+            T *pObj          = reinterpret_cast<T*>(obj);
 
             size_t initEnd = 0;
             try
@@ -268,7 +268,7 @@ public:
 
             new(destructor) ArrayDestructor<T>(arrSize);
 
-            NodeHead *newNode = static_cast<NodeHead*>(data);
+            NodeHead *newNode = reinterpret_cast<NodeHead*>(data);
             newNode->nextNode = nodeEntry_;
             nodeEntry_        = newNode;
             usedBytes_        += nodeSize;
@@ -283,7 +283,7 @@ public:
         char *data       = curChunkTop_;
         char *destructor = data + sizeof(NodeHead);
         char *obj        = destructor + sizeof(ArrayDestructor<T>);
-        T *pObj          = static_cast<T*>(obj);
+        T *pObj          = reinterpret_cast<T*>(obj);
 
         size_t initEnd = 0;
         try
@@ -300,7 +300,7 @@ public:
 
         new(destructor) ArrayDestructor<T>(arrSize);
 
-        NodeHead *newNode = static_cast<NodeHead*>(data);
+        NodeHead *newNode = reinterpret_cast<NodeHead*>(data);
         newNode->nextNode = nodeEntry_;
         nodeEntry_        = newNode;
 
