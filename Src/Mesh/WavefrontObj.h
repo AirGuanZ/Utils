@@ -13,6 +13,12 @@
 
 namespace AGZ::Mesh {
 
+/**
+ * @brief Wavefront OBJ类型文件的加载和解析
+ *
+ * 模型被分为两个层次，一个文件可以包含多个object（物体），一个object中可以有多个polygon group（组），每个group中则可以有多个三角形或四边形。
+ * 顶点位置、发现、uv数据是以文件为单位进行管理的，polygon group中每个多边形存储的是该文件中顶点数据的下标。
+ */
 template<typename T>
 class WavefrontObj
 {
@@ -20,29 +26,51 @@ class WavefrontObj
 
 public:
 
+    /** 顶点数据下标类型 */
     using Index = int32_t;
+
+    /** 顶点数据下标的无效值 */
     static constexpr Index INDEX_NONE = (std::numeric_limits<Index>::max)();
 
+    /**
+     * @brief 物体
+     * 
+     * 一个物体可以包含多个polygon group（组），每个组有自己的名字，存储在object.name2Group中。
+     */
     struct Object
     {
+        /**
+         * @brief polygon group
+         * 
+         * 一个组包含一系列三角形或四边形，通过group.faces访问。
+         */
         struct Group
         {
+            /**
+             * @brief 一个三角形或四边形面
+             */
             struct Face
             {
+                /** 是三角形还是四边形，若是后者，则v[3]的值无效 */
                 bool isTriangle;
 
+                /** 多边形的顶点包含哪些数据下标 */
                 struct FaceVertex
                 {
                     Index pos;
                     Index tex;
                     Index nor;
                 };
+
+                /** 多边形的顶点下标值 */
                 FaceVertex v[4];
             };
 
+            /** 组中的所有多边形 */
             std::vector<Face> faces;
         };
 
+        /** 取得具有指定名字的组 */
         Option<const Group&> FindGroup(const Str8 &name) const
         {
             auto it = name2Group.find(name);
@@ -51,9 +79,11 @@ public:
             return None;
         }
 
+        /** 从名字到组的映射 */
         std::map<Str8, Group> name2Group;
     };
 
+    /** 取得具有指定名字的物体 */
     Option<const Object&> FindObject(const Str8 &name) const
     {
         auto it = name2Obj.find(name);
@@ -62,6 +92,7 @@ public:
         return None;
     }
 
+    /** 清空已加载的所有数据 */
     void Clear()
     {
         vtxPos.clear();
@@ -70,6 +101,7 @@ public:
         name2Obj.clear();
     }
 
+    /** 加载指定的obj文件 */
     bool LoadFromFile(const Str8 &filename)
     {
         Str8 content;
@@ -78,17 +110,24 @@ public:
         return LoadFromMemory(content);
     }
 
+    /** 从字符串中加载obj内容 */
     bool LoadFromMemory(const Str8 &content, bool ignoreUnknownLine = true) noexcept;
 
+    /** 将包含的某个组转换为 GeometryMesh<T> 类型 */
     GeometryMesh<T> ToGeometryMesh(
         const typename Object::Group &grp, bool reverseNor = false, bool reverseTex = false) const;
 
+    /** 将整个obj转换为一个 GeometryMeshGroup<T>，名字映射为“物体名-组名” */
     GeometryMeshGroup<T> ToGeometryMeshGroup(bool reverseNor = false, bool reverseTex = false) const;
 
+    /** 顶点位置数组 */
     std::vector<Math::Vec3<T>> vtxPos;
+    /** 顶点uv数组 */
     std::vector<Math::Vec3<T>> vtxTex;
+    /** 顶点法线数组 */
     std::vector<Math::Vec3<T>> vtxNor;
 
+    /** 从名字到物体的映射 */
     std::map<Str8, Object> name2Obj;
 
 private:

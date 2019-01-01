@@ -57,7 +57,7 @@ struct GeometryMeshGroup
 };
 
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
-inline GeometryMesh<T> &GeometryMesh<T, DN>::SmoothenNormals()
+GeometryMesh<T> &GeometryMesh<T, DN>::SmoothenNormals()
 {
     // IMPROVE
 
@@ -90,7 +90,7 @@ inline GeometryMesh<T> &GeometryMesh<T, DN>::SmoothenNormals()
 }
 
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
-inline GeometryMeshGroup<T> &GeometryMeshGroup<T, DN>::SmoothenNormals()
+GeometryMeshGroup<T> &GeometryMeshGroup<T, DN>::SmoothenNormals()
 {
     for(auto &p : submeshes)
         p.second.SmoothenNormals();
@@ -98,7 +98,7 @@ inline GeometryMeshGroup<T> &GeometryMeshGroup<T, DN>::SmoothenNormals()
 }
 
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
-inline GeometryMesh<T> GeometryMeshGroup<T, DN>::MergeAllSubmeshes() const
+GeometryMesh<T> GeometryMeshGroup<T, DN>::MergeAllSubmeshes() const
 {
     GeometryMesh<T> ret;
     for(auto &it : submeshes)
