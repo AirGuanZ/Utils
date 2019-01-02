@@ -182,6 +182,6 @@ inline size_t CombineHash(size_t fst, size_t snd)
 
 using std::size_t;
 
-template<typename T, int N> size_t ArraySize([[maybe_unused]] T (&arr)[N]) { return N; }
+template<typename T, int N> constexpr size_t ArraySize([[maybe_unused]] T (&arr)[N]) { return N; }
 
 } // namespace AGZ
