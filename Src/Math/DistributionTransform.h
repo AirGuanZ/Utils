@@ -12,6 +12,7 @@
  * - 将[0, 1]^2上的均匀分布转换为锥形立体角上的均匀分布
  * - 从[0, 1]上的均匀分布中额外抽出一个整型随机数
  * - 将[0, 1]上的均匀分布转换为给定范围内的整数上的均匀分布
+ * - 将[0, 1]间的均匀浮点数转换为服从给定了inverse CDF表格分布
  */
 
 #include <type_traits>
@@ -30,6 +31,7 @@ template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class U
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnCone;
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class SampleExtractor;
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformInteger;
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class TableSampler;
 
 /**
  * @brief 在单位圆内均匀采样
@@ -246,7 +248,7 @@ public:
     }
 };
 
-/*
+/**
  * @brief 将[0, 1]间的浮点随机数转换为指定范围内的均匀整数
  */
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
@@ -258,6 +260,25 @@ public:
     static I Transform(T u, I begin, I end) noexcept
     {
         return (std::min)(end - 1, begin + I(u * (end - begin)));
+    }
+};
+
+/**
+ * @brief 给定一张inverse CDF表格，将[0, 1]间的均匀浮点数转换为服从该CDF的浮点数
+ * 
+ * 记inverse CDF表格为A，大小为N，则A[0]对应CDF^{-1}(0)，A[N-1]对应CDF^{-1}(1)，中间的值用最近的表项作线性插值得到
+ */
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+class TableSampler
+{
+public:
+
+    static T Sample(T u, T *invCDF, size_t tabSize) noexcept
+    {
+        T global = u * tabSize;
+        size_t low = Min<size_t>(static_cast<size_t>(global), tabSize - 1);
+        T local = global - low;
+        return invCDF[low] * (1 - local) + invCDF[low + 1] * local;
     }
 };
 
