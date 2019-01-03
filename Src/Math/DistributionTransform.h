@@ -275,8 +275,9 @@ public:
 
     static T Sample(T u, const T *invCDF, size_t tabSize) noexcept
     {
-        T global = u * tabSize;
-        size_t low = Min<size_t>(static_cast<size_t>(global), tabSize - 1);
+        AGZ_ASSERT(tabSize >= 2);
+        T global = u * (tabSize - 1);
+        size_t low = Min<size_t>(static_cast<size_t>(global), tabSize - 2);
         T local = global - low;
         return invCDF[low] * (1 - local) + invCDF[low + 1] * local;
     }
