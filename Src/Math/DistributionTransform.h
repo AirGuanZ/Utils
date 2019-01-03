@@ -273,7 +273,7 @@ class TableSampler
 {
 public:
 
-    static T Sample(T u, T *invCDF, size_t tabSize) noexcept
+    static T Sample(T u, const T *invCDF, size_t tabSize) noexcept
     {
         T global = u * tabSize;
         size_t low = Min<size_t>(static_cast<size_t>(global), tabSize - 1);
