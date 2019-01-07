@@ -155,11 +155,13 @@ public:
     using InternalUInt = std::conditional_t<sizeof(F) == sizeof(uint32_t),
                                             uint32_t, uint64_t>;
 
-    union // 理论上这是UB，但实际上works well
+    /*union
     {
         ValueType float_;
         InternalUInt uint_;
-    };
+    };*/
+
+    ValueType float_;
 
 private:
 
@@ -175,15 +177,16 @@ private:
 
     static ValueType Bits2Value(InternalUInt uint) noexcept
     {
-        Self ret(UNINITIALIZED);
-        ret.uint_ = uint;
-        return ret.float_;
+        F ret;
+        std::memcpy(static_cast<void*>(&ret), static_cast<void*>(&uint), sizeof(uint));
+        return ret;
     }
 
     static InternalUInt Value2Bits(ValueType v) noexcept
     {
-        Self ret(v);
-        return ret.uint_;
+        InternalUInt uint;
+        std::memcpy(static_cast<void*>(&uint), static_cast<void*>(&v), sizeof(uint));
+        return uint;
     }
 
 public:
@@ -220,34 +223,34 @@ public:
     /**
      * 取得无符号整数表示
      */
-    InternalUInt Bits() const noexcept { return uint_; }
+    InternalUInt Bits() const noexcept { return Value2Bits(float_); }
 
     /**
      * 取得尾数
      */
-    InternalUInt ExptBits() const noexcept { return EXPT_BIT_MASK & uint_; }
+    InternalUInt ExptBits() const noexcept { return EXPT_BIT_MASK & Value2Bits(float_); }
     
     /**
      * 取得阶码
      */
-    InternalUInt FracBits() const noexcept { return FRAC_BIT_MASK & uint_; }
+    InternalUInt FracBits() const noexcept { return FRAC_BIT_MASK & Value2Bits(float_); }
     
     /**
      * 取得符号位
      */
-    InternalUInt SignBit()  const noexcept { return SIGN_BIT_MASK & uint_; }
+    InternalUInt SignBit()  const noexcept { return SIGN_BIT_MASK & Value2Bits(float_); }
 
     operator ValueType() const noexcept { return Value(); }
 
     /**
      * 是否是NAN
      */
-    bool IsNAN() const noexcept { return ExptBits() == EXPT_BIT_MASK && FracBits(); }
+    bool IsNAN() const noexcept { return std::isnan(float_); }
     
     /**
      * 是否是正无穷或负无穷
      */
-    bool IsInfinity() const noexcept { return ExptBits() == EXPT_BIT_MASK && !FracBits(); }
+    bool IsInfinity() const noexcept { return std::isinf(float_); }
     
     /**
      * 是否是负数/-0
@@ -266,7 +269,8 @@ public:
     {
         if(IsNegative() != rhs.IsNegative())
             return float_ == rhs.float_;
-        InternalUInt ULPsDiff = uint_ > rhs.uint_ ? uint_ - rhs.uint_ : rhs.uint_ - uint_;
+        InternalUInt uint = Value2Bits(float_), ruint = Value2Bits(rhs.float_);
+        InternalUInt ULPsDiff = uint > ruint ? uint - ruint : ruint - uint;
         return ULPsDiff <= maxULPs;
     }
 
