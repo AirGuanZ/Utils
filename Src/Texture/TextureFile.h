@@ -118,11 +118,20 @@ public:
     static void WriteRGBAToBMP(
         const Str8 &filename,
         const TextureCore<2, Math::Color4b> &tex);
+
+    /**
+     * @brief 将一个二维RGB纹理对象写入到HDR文件
+     * 
+     * @exception FileException 保存失败时抛出
+     */
+    static void WriteRGBToHDR(
+        const Str8 &filename,
+        const TextureCore<2, Math::Color3f> &tex);
 };
 
 } // namespace AGZ
 
-#if defined(AGZ_TEXTURE_FILE_IMPL)
+#ifdef AGZ_TEXTURE_FILE_IMPL
 
 #include <vector>
 
@@ -425,6 +434,26 @@ void TextureFile::WriteRGBAToBMP(
         throw FileException("Failed to write to BMP file");
 }
 
+void TextureFile::WriteRGBToHDR(
+    const Str8 &filename,
+    const TextureCore<2, Math::Color3f> &tex)
+{
+    AGZ_ASSERT(tex.IsAvailable());
+
+    std::vector<unsigned char> data;
+    BufferContext bc = { &data };
+    if(!stbi_write_hdr_to_func(
+        buffer_func, &bc,
+        tex.GetSize()[0], tex.GetSize()[1],
+        3, &tex.RawData()->x))
+    {
+        throw FileException("Failed to construct HDR file in memory");
+    }
+
+    if(!FileSys::WriteBinaryFileRaw(filename, data.data(), data.size()))
+        throw FileException("Failed to write to HDR file");
+}
+
 } // namespace AGZ
 
-#endif
+#endif // #ifdef AGZ_TEXTURE_FILE_IMPL
