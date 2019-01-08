@@ -13,6 +13,8 @@
  * - 从[0, 1]上的均匀分布中额外抽出一个整型随机数
  * - 将[0, 1]上的均匀分布转换为给定范围内的整数上的均匀分布
  * - 将[0, 1]间的均匀浮点数转换为服从给定了inverse CDF表格分布
+ * - 将[0, 1]间的均匀浮点数转换为服从给定的一维分段线性常值cdf的分布
+ * - 将[0, 1]^2上的均匀浮点数转换为服从给定的二维分段线性常值cdf的分布
  */
 
 #include <type_traits>
@@ -32,6 +34,8 @@ template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class U
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class SampleExtractor;
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformInteger;
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class TableSampler;
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class PiecewiseConstantDistribution1D;
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class PiecewiseConstantDistribution2D;
 
 /**
  * @brief 在单位圆内均匀采样
@@ -281,6 +285,57 @@ public:
         T local = global - low;
         return invCDF[low] * (1 - local) + invCDF[low + 1] * local;
     }
+};
+
+/**
+ * @brief 将[0, 1]上的均匀浮点数转换为服从给定的等间距分段常值cdf的分布
+ * 
+ * 设一条线段被等间距地分为N段，每段有一个长度，记作w[0], w[1], ..., w[N-1]
+ * 令tab[i] = w[0] + ... + n[i]，则tab[i]记录了第i段及其左边所有段的权值之和，tab[N-1]记录了全部权值之和
+ * 现在在线段上以均匀分布随机选择一点，返回该点落在哪一段上，落在该段上的分布律值，以及具体落在该段上的哪个位置
+ */
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+class PiecewiseConstantDistribution1D
+{
+public:
+
+    struct Result
+    {
+        size_t value;
+        T pdf;
+        T insidePosition; // 采样点在该段内处于什么位置，取值范围[0, 1)
+    };
+
+    static Result Transform(T u, const T *tab, size_t tabSize) noexcept
+    {
+        AGZ_ASSERT(tab >= 1);
+
+        u *= tab[tabSize - 1];
+
+        auto lowIt = std::lower_bound(tab, tab + tabSize, u);
+        size_t value = Min<size_t>(lowIt - tab, tabSize - 1);
+
+        T pieceLength = value > 0 ? (tab[value] - tab[value-1]) : tab[value];
+        T uOffset     = value > 0 ? (u          - tab[value-1]) : u;
+
+        T pdf = pieceLength / tab[tabSize - 1];
+        T insidePos = uOffset / pieceLength;
+
+        return { value, pdf, insidePos };
+    }
+
+    static T PDF(size_t value, const T *tab, size_t tabSize) noexcept
+    {
+        AGZ_ASSERT(tabSize >= 1 && value < tabSize);
+        T ret = value > 0 ? (tab[value] - tab[value-1]) : tab[value];
+        return ret /= tab[tabSize - 1];
+    }
+};
+
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+class PiecewiseConstantDistribution2D
+{
+
 };
 
 } // namespace AGZ::Math::DistributionTransform
