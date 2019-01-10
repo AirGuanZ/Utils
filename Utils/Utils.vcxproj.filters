@@ -1,358 +1,352 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Math">
-      <UniqueIdentifier>{e8bb4a33-5f13-46a8-9205-8a1ef2cf1159}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Buffer">
-      <UniqueIdentifier>{10d262d2-8012-4482-9276-80048e6714aa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Misc">
-      <UniqueIdentifier>{695ff70c-efc1-4c77-926e-ce7a2e1e46a1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="String">
-      <UniqueIdentifier>{20a9f90c-cbee-4c36-959c-827ce718850b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Range">
-      <UniqueIdentifier>{c15bab53-935c-406b-9cb1-0e6e06a56b40}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="String\Charset">
-      <UniqueIdentifier>{041ae47a-d3f7-46b6-8d5c-f2ea0f7ddccf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Alloc">
-      <UniqueIdentifier>{bbc86d95-b5c8-4adc-b421-2e908041f776}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="String\Regex">
-      <UniqueIdentifier>{90cdbbff-e04e-48e3-a5b6-07094d331477}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="FileSys">
-      <UniqueIdentifier>{8a4777f6-1f7e-4568-a06c-66e6e57eced9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="String\String">
-      <UniqueIdentifier>{8557d3fb-575a-44f3-9f08-42b95d3c5a53}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Utils">
-      <UniqueIdentifier>{0a1225e9-3f29-40ee-8c81-1667d139a90c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="String\Regex\PikeVM">
-      <UniqueIdentifier>{d3c50a4f-5d0f-4fe9-9a6e-3a5b0aa8ebab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Texture">
-      <UniqueIdentifier>{c1ae0090-5471-4554-a3d3-52f330293e4d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Time">
-      <UniqueIdentifier>{30c6b6e7-ea30-4779-a730-3228e127d24e}</UniqueIdentifier>
+      <UniqueIdentifier>{b59781c5-7de7-4a2b-91c6-a2c00c8676c3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Config">
-      <UniqueIdentifier>{1618bb83-3dd2-4098-92c2-9e803689af30}</UniqueIdentifier>
+      <UniqueIdentifier>{e461969a-925a-48fb-a0ea-d1020c894091}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Thread">
-      <UniqueIdentifier>{08b201c1-09a0-4ad8-ac14-5a74f5f561e1}</UniqueIdentifier>
+    <Filter Include="FileSys">
+      <UniqueIdentifier>{6d6b03fc-9d8e-4ee2-a8d2-4284efa5ddcc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Serialize">
-      <UniqueIdentifier>{6787a653-a0f1-4624-9d6e-e33759b98633}</UniqueIdentifier>
+    <Filter Include="Math">
+      <UniqueIdentifier>{250bb63b-8063-49b6-8103-dd793ed23a12}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mesh">
-      <UniqueIdentifier>{dcc0d234-36ae-442b-a3ab-d210fe3b26e4}</UniqueIdentifier>
+      <UniqueIdentifier>{957812f2-5d88-413b-b038-6f7aa35fc924}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Misc">
+      <UniqueIdentifier>{903ae99d-ce1a-4e31-8556-8b0b8d0753c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Range">
+      <UniqueIdentifier>{5c81792d-7915-4763-9061-0fc0716e6350}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Serialize">
+      <UniqueIdentifier>{eddc5c25-51e4-49fb-acea-44cfe8ad5551}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="String">
+      <UniqueIdentifier>{0a4d5f58-6f0e-4a0a-9b02-9810608298d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="String\Charset">
+      <UniqueIdentifier>{9f5729eb-98b2-4604-b16c-311e6ea2079d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="String\String">
+      <UniqueIdentifier>{12541554-3c45-4c1e-98e4-65f69f9a00b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="String\Regex">
+      <UniqueIdentifier>{0507cfe0-a938-4593-970e-9b7dcb59c5eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="String\Regex\PikeVM">
+      <UniqueIdentifier>{8f89885a-1724-4f37-b10d-0ec34a18feae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{ef13ffa7-790e-42c4-85a3-5a132b632f21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thread">
+      <UniqueIdentifier>{f4c1cc94-8e4e-4c47-bbe6-bd8fcfe5ef22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Time">
+      <UniqueIdentifier>{c2190f44-c20d-4213-a0a6-ea8d69d0d5c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{754fc06b-4805-4fee-a21f-a386c3e18e6e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Src\Math\Scalar.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Math\Vec2.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Math\Vec3.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Math\Vec4.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Math\Mat4.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Math\Angle.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Math\Random.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Math\Color.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils.h" />
-    <ClInclude Include="..\Src\Misc\Endian.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Misc\TypeOpr.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Misc\Common.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Take.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Seq.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Aggregate.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Between.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Filter.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Map.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Reverse.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Collect.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Drop.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Iterator.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\PartialFoldl.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Transform.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Reduce.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Count.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Each.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\All.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\Any.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Charset\ASCII.h">
-      <Filter>String\Charset</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Charset\UTF.h">
-      <Filter>String\Charset</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Charset\UTF8.h">
-      <Filter>String\Charset</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Charset\UTF16.h">
-      <Filter>String\Charset</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Charset\UTF32.h">
-      <Filter>String\Charset</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Alloc\Alloc.h">
+    <ClInclude Include="..\Src\AGZUtils\Alloc\Alloc.h">
       <Filter>Alloc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Alloc\Malloc.h">
+    <ClInclude Include="..\Src\AGZUtils\Alloc\FixedSizedArena.h">
       <Filter>Alloc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\String\Regex\Regex.h">
-      <Filter>String\Regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Buffer\COWObject.h">
-      <Filter>Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Charset\Charset.h">
-      <Filter>String\Charset</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\String\StrAlgo.h">
-      <Filter>String\String</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\String\String.h">
-      <Filter>String\String</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Misc\Config.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\Alloc.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\Buffer.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\Math.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\FileSys.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\Misc.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\Range.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\String.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\Platform.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Regex\PikeVM\Backend.h">
-      <Filter>String\Regex\PikeVM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Regex\PikeVM\Inst.h">
-      <Filter>String\Regex\PikeVM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Regex\PikeVM\Machine.h">
-      <Filter>String\Regex\PikeVM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Regex\PikeVM\Syntax.h">
-      <Filter>String\Regex\PikeVM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\String\Regex\PikeVM.h">
-      <Filter>String\Regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\Texture.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Texture\TextureFile.h">
-      <Filter>Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\FileSys\Path.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\FileSys\Raw.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Math\Quaternion.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Math\Vec.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Texture\Texture.h">
-      <Filter>Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Misc\Uncopiable.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Math\Mat3.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Misc\Singleton.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Range\FilterMap.h">
-      <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\Time.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Misc\Exception.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Misc\PrettyTypeName.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Texture\Sampler.h">
-      <Filter>Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Math\DistributionTransform.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Alloc\ObjArena.h">
+    <ClInclude Include="..\Src\AGZUtils\Alloc\Malloc.h">
       <Filter>Alloc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Alloc\FixedSizedArena.h">
+    <ClInclude Include="..\Src\AGZUtils\Alloc\ObjArena.h">
       <Filter>Alloc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Config\Config.h">
+    <ClInclude Include="..\Src\AGZUtils\Config\Config.h">
       <Filter>Config</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Utils\Config.h">
-      <Filter>Utils</Filter>
+    <ClInclude Include="..\Src\AGZUtils\FileSys\File.h">
+      <Filter>FileSys</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Math\D64x4.h">
+    <ClInclude Include="..\Src\AGZUtils\FileSys\FileCache.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\FileSys\Path.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\FileSys\Raw.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Angle.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Math\F32x4.h">
+    <ClInclude Include="..\Src\AGZUtils\Math\Color.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Misc\Either.h">
+    <ClInclude Include="..\Src\AGZUtils\Math\D64x4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\DistributionTransform.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\F32x4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Mat3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Mat4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Quaternion.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Random.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Rect.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Scalar.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\SH.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Vec.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Vec2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Vec3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Vec4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Mesh\Mesh.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Mesh\WavefrontObj.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Misc\Common.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Config\Config.inl">
-      <Filter>Config</Filter>
+    <ClInclude Include="..\Src\AGZUtils\Misc\Config.h">
+      <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Time\Clock.h">
-      <Filter>Time</Filter>
+    <ClInclude Include="..\Src\AGZUtils\Misc\COWObject.h">
+      <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Texture\CubeMap.h">
+    <ClInclude Include="..\Src\AGZUtils\Misc\Either.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Misc\Endian.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Misc\Exception.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Misc\PrettyTypeName.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Misc\Singleton.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Misc\TypeOpr.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Misc\Uncopiable.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Aggregate.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\All.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Any.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Between.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Collect.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Count.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Drop.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Each.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Filter.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\FilterMap.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Iterator.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Map.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\PartialFoldl.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Reduce.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Reverse.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Seq.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Take.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Range\Transform.h">
+      <Filter>Range</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Serialize\BinaryDeserializer.h">
+      <Filter>Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Serialize\BinarySerializer.h">
+      <Filter>Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Serialize\Predefined.h">
+      <Filter>Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Charset\ASCII.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Charset\Charset.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Charset\UTF.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Charset\UTF8.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Charset\UTF16.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Charset\UTF32.h">
+      <Filter>String\Charset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\String\StrAlgo.h">
+      <Filter>String\String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\String\String.h">
+      <Filter>String\String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM.h">
+      <Filter>String\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Regex\Regex.h">
+      <Filter>String\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Backend.h">
+      <Filter>String\Regex\PikeVM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Inst.h">
+      <Filter>String\Regex\PikeVM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Machine.h">
+      <Filter>String\Regex\PikeVM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Syntax.h">
+      <Filter>String\Regex\PikeVM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Texture\CubeMap.h">
       <Filter>Texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Texture\SphereMap.h">
+    <ClInclude Include="..\Src\AGZUtils\Texture\Sampler.h">
       <Filter>Texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Math\SH.h">
-      <Filter>Math</Filter>
+    <ClInclude Include="..\Src\AGZUtils\Texture\SphereMap.h">
+      <Filter>Texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Thread\StaticTaskDispatcher.h">
+    <ClInclude Include="..\Src\AGZUtils\Texture\Texture.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Texture\TextureFile.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Thread\StaticTaskDispatcher.h">
       <Filter>Thread</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Utils\Thread.h">
+    <ClInclude Include="..\Src\AGZUtils\Time\Clock.h">
+      <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Alloc.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Serialize\BinaryDeserializer.h">
-      <Filter>Serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Serialize\BinarySerializer.h">
-      <Filter>Serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\Serialize.h">
+    <ClInclude Include="..\Src\AGZUtils\Utils\Config.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Serialize\Predefined.h">
-      <Filter>Serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\FileSys\File.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\FileSys\FileCache.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Mesh\Mesh.h">
-      <Filter>Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Mesh\WavefrontObj.h">
-      <Filter>Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Utils\Mesh.h">
+    <ClInclude Include="..\Src\AGZUtils\Utils\FileSys.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Math.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Mesh.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Misc.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Range.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Serialize.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\String.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Texture.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Thread.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Time.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Src\Math\SwizzleVec4.inl">
-      <Filter>Math</Filter>
+    <None Include="..\Src\AGZUtils\Config\Config.inl">
+      <Filter>Config</Filter>
     </None>
-    <None Include="..\Src\Math\SwizzleVec3.inl">
-      <Filter>Math</Filter>
-    </None>
-    <None Include="..\Src\Math\SwizzleVec2.inl">
-      <Filter>Math</Filter>
-    </None>
-    <None Include="..\Src\String\String\String.inl">
-      <Filter>String\String</Filter>
-    </None>
-    <None Include="..\Src\FileSys\File.inl">
+    <None Include="..\Src\AGZUtils\FileSys\File.inl">
       <Filter>FileSys</Filter>
+    </None>
+    <None Include="..\Src\AGZUtils\Math\SwizzleVec2.inl">
+      <Filter>Math</Filter>
+    </None>
+    <None Include="..\Src\AGZUtils\Math\SwizzleVec3.inl">
+      <Filter>Math</Filter>
+    </None>
+    <None Include="..\Src\AGZUtils\Math\SwizzleVec4.inl">
+      <Filter>Math</Filter>
+    </None>
+    <None Include="..\Src\AGZUtils\String\String\String.inl">
+      <Filter>String\String</Filter>
     </None>
   </ItemGroup>
 </Project>

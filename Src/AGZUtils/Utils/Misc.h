@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Misc/COWObject.h"
 #include "../Misc/Either.h"
 #include "../Misc/Endian.h"
 #include "../Misc/PrettyTypeName.h"
