@@ -6,7 +6,6 @@
  */
 
 #include "../Misc/Common.h"
-#include "../Misc/Config.h"
 
 #if defined(AGZ_USE_AVX)
 

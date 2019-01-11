@@ -25,9 +25,12 @@
     <ClInclude Include="..\Src\AGZUtils\Alloc\ObjArena.h" />
     <ClInclude Include="..\Src\AGZUtils\Config\Config.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\File.h" />
-    <ClInclude Include="..\Src\AGZUtils\FileSys\FileCache.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\Path.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\Raw.h" />
+    <ClInclude Include="..\Src\AGZUtils\Input\Event.h" />
+    <ClInclude Include="..\Src\AGZUtils\Input\GLFWCapturer.h" />
+    <ClInclude Include="..\Src\AGZUtils\Input\Keyboard.h" />
+    <ClInclude Include="..\Src\AGZUtils\Input\PredefinedHandler.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\Angle.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\Color.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\D64x4.h" />
@@ -47,7 +50,6 @@
     <ClInclude Include="..\Src\AGZUtils\Mesh\Mesh.h" />
     <ClInclude Include="..\Src\AGZUtils\Mesh\WavefrontObj.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Common.h" />
-    <ClInclude Include="..\Src\AGZUtils\Misc\Config.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\COWObject.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Either.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Endian.h" />

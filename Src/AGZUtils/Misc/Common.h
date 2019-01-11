@@ -5,6 +5,14 @@
 #include <stdexcept>
 #include <string>
 
+// ¹¦ÄÜºê
+
+// AGZ_USE_SSE2
+// AGZ_USE_AVX
+// AGZ_THREAD_SAFE_STRING
+// AGZ_ENABLE_STRING_SSO
+// AGZ_USE_GLFW
+
 // ============================= forceinline =============================
 
 #if defined(_MSC_VER)

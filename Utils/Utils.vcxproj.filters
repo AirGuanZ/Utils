@@ -52,6 +52,9 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{754fc06b-4805-4fee-a21f-a386c3e18e6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{a431435f-cd34-482e-ac01-dd6d4f39d3ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\AGZUtils\Alloc\Alloc.h">
@@ -70,9 +73,6 @@
       <Filter>Config</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\FileSys\File.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\FileSys\FileCache.h">
       <Filter>FileSys</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\FileSys\Path.h">
@@ -136,9 +136,6 @@
       <Filter>Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Misc\Common.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\Misc\Config.h">
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Misc\COWObject.h">
@@ -328,6 +325,18 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Utils.h" />
+    <ClInclude Include="..\Src\AGZUtils\Input\Event.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Input\GLFWCapturer.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Input\PredefinedHandler.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Input\Keyboard.h">
+      <Filter>Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\AGZUtils\Config\Config.inl">

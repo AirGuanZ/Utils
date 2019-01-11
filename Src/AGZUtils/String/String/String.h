@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "../../Misc/Common.h"
-#include "../../Misc/Config.h"
 #include "../../Range/Iterator.h"
 #include "../../Utils/Serialize.h"
 #include "../Charset/ASCII.h"
