@@ -31,7 +31,6 @@
     <ClInclude Include="..\Src\AGZUtils\Input\GLFWCapturer.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\Keyboard.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\PredefinedHandler.h" />
-    <ClInclude Include="..\Src\AGZUtils\Math\Angle.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\Color.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\D64x4.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\DistributionTransform.h" />

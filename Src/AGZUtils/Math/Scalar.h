@@ -6,15 +6,128 @@
 
 #include "../Misc/Common.h"
 #include "../Misc/TypeOpr.h"
-#include "Angle.h"
 
 namespace AGZ::Math {
 
+/**
+ * @brief 角度的公共基类，可用该类型结合SFINAE来过滤角度类型
+ * @see IsAngleType_v
+ */
+struct AngleBase { };
+
+/**
+ * @brief 某个类型是否是Rad/Deg类型
+ */
+template<typename T>
+constexpr bool IsAngleType_v = std::is_base_of_v<AngleBase, T>;
+
+template<typename T>
+struct Deg;
+
+/**
+ * @brief 弧度值
+ * 
+ * 可进行基本的算术运算和三角函数运算
+ */
+template<typename T>
+struct Rad : AngleBase
+{
+    T value;
+
+    /** 默认初始化为零 */
+    constexpr Rad() noexcept: value(T(0)) { }
+    /** 初始化为指定的弧度值 */
+    explicit constexpr Rad(T v) noexcept: value(v) { }
+    /** 不初始化内部值 */
+    explicit constexpr Rad(Uninitialized_t) noexcept { }
+    /** 从角度转换而来 */
+    constexpr Rad(const Deg<T> &d) noexcept;
+};
+
+/**
+ * @brief 角度值
+ * 
+ * 可进行基本的算术运算和三角函数运算
+ */
+template<typename T>
+struct Deg : AngleBase
+{
+    T value;
+
+    /** 默认初始化为零 */
+    constexpr Deg() noexcept: value(T(0)) { }
+    /** 初始化为指定的角度值 */
+    explicit constexpr Deg(T v) noexcept: value(v) { }
+    /** 不初始化内部值 */
+    explicit constexpr Deg(Uninitialized_t) noexcept { }
+    /** 从弧度转换而来 */
+    constexpr Deg(Rad<T> r) noexcept : value(T(180) / T(3.141592653589793238462643383) * r.value) { }
+};
+
+template<typename T>
+constexpr Rad<T>::Rad(const Deg<T> &d) noexcept : value(T(3.141592653589793238462643383) / T(180) * d.value)
+{
+    
+}
+
+#define ANGLE_OPERATORS(Type) \
+    template<typename T> constexpr auto operator+(Type<T> lhs, Type<T> rhs) noexcept \
+        { return Type<T>(lhs.value + rhs.value); } \
+    template<typename T> constexpr auto operator-(Type<T> lhs, Type<T> rhs) noexcept \
+        { return Type<T>(lhs.value - rhs.value); } \
+    template<typename T> constexpr auto operator-(Type<T> angle) noexcept \
+        { return Type<T>(-angle.value); } \
+    template<typename T> constexpr auto operator*(T lhs, Type<T> rhs) noexcept \
+        { return Type<T>(lhs * rhs.value); } \
+    template<typename T> constexpr auto operator*(Type<T> lhs, T rhs) noexcept \
+        { return Type<T>(lhs.value * rhs); } \
+    template<typename T> constexpr auto operator/(Type<T> lhs, T rhs) noexcept \
+        { return Type<T>(lhs.value / rhs); }
+
+ANGLE_OPERATORS(Rad)
+ANGLE_OPERATORS(Deg)
+
+#undef ANGLE_OPERATORS
+
+using Degf = Deg<float>;
+using Degd = Deg<double>;
+
+using Radf = Rad<float>;
+using Radd = Rad<double>;
+
 namespace Impl
 {
-    template<typename T> struct Abs_impl { static T Abs(T v) noexcept { return std::abs(v); } };
+    template<typename T> struct Abs_impl         { static T Abs(T v)           noexcept { return std::abs(v); } };
     template<typename T> struct Abs_impl<Rad<T>> { static Rad<T> Abs(Rad<T> v) noexcept { return Rad<T>{ Abs_impl<T>::Abs(v.value) }; } };
     template<typename T> struct Abs_impl<Deg<T>> { static Deg<T> Abs(Deg<T> v) noexcept { return Deg<T>{ Abs_impl<T>::Abs(v.value) }; } };
+
+    template<typename T> struct PI_impl;
+    template<>           struct PI_impl<float>  { static constexpr float  PI() noexcept { return 3.141592653589793238462643383f; } };
+    template<>           struct PI_impl<double> { static constexpr double PI() noexcept { return 3.141592653589793238462643383; } };
+    template<typename T> struct PI_impl<Rad<T>> { static constexpr Rad<T> PI() noexcept { return Rad<T>{ PI_impl<T>::PI() }; } };
+    template<typename T> struct PI_impl<Deg<T>> { static constexpr Deg<T> PI() noexcept { return Deg<T>{ T(180.0) }; } };
+
+    template<typename T> struct Sin_impl;
+    template<>           struct Sin_impl<float>  { static auto Sin(float rad)  noexcept(noexcept(std::sin(rad)))       { return std::sin(rad); } };
+    template<>           struct Sin_impl<double> { static auto Sin(double rad) noexcept(noexcept(std::sin(rad)))       { return std::sin(rad); } };
+    template<typename T> struct Sin_impl<Rad<T>> { static auto Sin(Rad<T> rad) noexcept(noexcept(std::sin(rad.value))) { return std::sin(rad.value); } };
+    template<typename T> struct Sin_impl<Deg<T>> { static auto Sin(Deg<T> deg) noexcept(noexcept(std::sin(deg.value))) { return std::sin(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
+
+    template<typename T> struct Cos_impl;
+    template<>           struct Cos_impl<float>  { static auto Cos(float rad)  noexcept(noexcept(std::cos(rad)))       { return std::cos(rad); } };
+    template<>           struct Cos_impl<double> { static auto Cos(double rad) noexcept(noexcept(std::cos(rad)))       { return std::cos(rad); } };
+    template<typename T> struct Cos_impl<Rad<T>> { static auto Cos(Rad<T> rad) noexcept(noexcept(std::cos(rad.value))) { return std::cos(rad.value); } };
+    template<typename T> struct Cos_impl<Deg<T>> { static auto Cos(Deg<T> deg) noexcept(noexcept(std::cos(deg.value))) { return std::cos(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
+
+    template<typename T> struct OneMinusEpsilonImpl { };
+    template<> struct OneMinusEpsilonImpl<float>
+    {
+        static constexpr float Value = 0x1.fffffep-1;
+    };
+    template<> struct OneMinusEpsilonImpl<double>
+    {
+        static constexpr double Value = 0x1.fffffffffffffp-1;
+    };
 }
 
 template<typename T>
@@ -69,27 +182,6 @@ bool ApproxEq(T lhs, T rhs, U epsilon) noexcept
     return Abs(lhs - rhs) <= epsilon;
 }
 
-namespace Impl
-{
-    template<typename T> struct PI_impl;
-    template<>           struct PI_impl<float>  { static constexpr float  PI() noexcept { return 3.141592653589793238462643383f; } };
-    template<>           struct PI_impl<double> { static constexpr double PI() noexcept { return 3.141592653589793238462643383; } };
-    template<typename T> struct PI_impl<Rad<T>> { static constexpr Rad<T> PI() noexcept { return Rad<T>{ PI_impl<T>::PI() }; } };
-    template<typename T> struct PI_impl<Deg<T>> { static constexpr Deg<T> PI() noexcept { return Deg<T>{ T(180.0) }; } };
-
-    template<typename T> struct Sin_impl;
-    template<>           struct Sin_impl<float>  { static auto Sin(float rad)  noexcept(noexcept(std::sin(rad))) { return std::sin(rad); } };
-    template<>           struct Sin_impl<double> { static auto Sin(double rad) noexcept(noexcept(std::sin(rad))) { return std::sin(rad); } };
-    template<typename T> struct Sin_impl<Rad<T>> { static auto Sin(Rad<T> rad) noexcept(noexcept(std::sin(rad.value))) { return std::sin(rad.value); } };
-    template<typename T> struct Sin_impl<Deg<T>> { static auto Sin(Deg<T> deg) noexcept(noexcept(std::sin(deg.value * (PI_impl<T>::PI() / T(180.0))))) { return std::sin(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
-
-    template<typename T> struct Cos_impl;
-    template<>           struct Cos_impl<float> { static auto Cos(float rad)   noexcept(noexcept(std::cos(rad))) { return std::cos(rad); } };
-    template<>           struct Cos_impl<double> { static auto Cos(double rad) noexcept(noexcept(std::cos(rad))) { return std::cos(rad); } };
-    template<typename T> struct Cos_impl<Rad<T>> { static auto Cos(Rad<T> rad) noexcept(noexcept(std::cos(rad.value))) { return std::cos(rad.value); } };
-    template<typename T> struct Cos_impl<Deg<T>> { static auto Cos(Deg<T> deg) noexcept(noexcept(std::cos(deg.value * (PI_impl<T>::PI() / T(180.0))))) { return std::cos(deg.value * (PI_impl<T>::PI() / T(180.0))); } };
-}
-
 template<typename T> constexpr auto Deg2Rad(Deg<T> deg) noexcept { return Rad<T> { deg.value * (Impl::PI_impl<T>::PI() / T(180.0)) }; }
 template<typename T> constexpr auto Rad2Deg(Rad<T> rad) noexcept { return Deg<T> { rad.value * (T(180.0) / Impl::PI_impl<T>::PI()) }; }
 
@@ -99,18 +191,12 @@ template<typename T> constexpr auto AsDeg(Rad<T> rad) noexcept { return Rad2Deg<
 template<typename T> constexpr auto AsRad(Deg<T> deg) noexcept { return Deg2Rad<T>(deg); }
 template<typename T> constexpr auto AsRad(Rad<T> rad) noexcept { return rad; }
 
-template<typename T>
-constexpr auto PI = Impl::PI_impl<T>::PI();
-template<typename T>
-constexpr auto PIx2 = T(2) * PI<T>;
-template<typename T>
-constexpr auto PIx4 = T(4) * PI<T>;
-template<typename T>
-constexpr auto InvPI = T(1) / PI<T>;
-template<typename T>
-constexpr auto Inv2PI = T(1) / PIx2<T>;
-template<typename T>
-constexpr auto Inv4PI = T(1) / PIx4<T>;
+template<typename T> constexpr auto PI     = Impl::PI_impl<T>::PI();
+template<typename T> constexpr auto PIx2   = T(2) * PI<T>;
+template<typename T> constexpr auto PIx4   = T(4) * PI<T>;
+template<typename T> constexpr auto InvPI  = T(1) / PI<T>;
+template<typename T> constexpr auto Inv2PI = T(1) / PIx2<T>;
+template<typename T> constexpr auto Inv4PI = T(1) / PIx4<T>;
 
 template<typename T> auto Sin(T angle) noexcept(noexcept(Impl::Sin_impl<T>::Sin(angle))) { return Impl::Sin_impl<T>::Sin(angle); }
 template<typename T> auto Cos(T angle) noexcept(noexcept(Impl::Cos_impl<T>::Cos(angle))) { return Impl::Cos_impl<T>::Cos(angle); }
@@ -126,18 +212,17 @@ T Arctan(T v) { return std::atan(v); }
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 T Arctan2(T y, T x) { return std::atan2(y, x); }
 
-namespace Impl
-{
-    template<typename T> struct OneMinusEpsilonImpl { };
-    template<> struct OneMinusEpsilonImpl<float>
-    {
-        static constexpr float Value = 0x1.fffffep-1;
-    };
-    template<> struct OneMinusEpsilonImpl<double>
-    {
-        static constexpr double Value = 0x1.fffffffffffffp-1;
-    };
-}
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+constexpr T OneMinusEpsilon = Impl::OneMinusEpsilonImpl<T>::Value;
+
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+bool IsInf(T value) noexcept { return std::isinf(value); }
+
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+bool IsNAN(T value) noexcept { return std::isnan(value); }
+
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+constexpr T Inf = std::numeric_limits<T>::infinity();
 
 /**
  * @brief IEEE754 floating-poing number
@@ -154,12 +239,6 @@ public:
     using ValueType    = F;
     using InternalUInt = std::conditional_t<sizeof(F) == sizeof(uint32_t),
                                             uint32_t, uint64_t>;
-
-    /*union
-    {
-        ValueType float_;
-        InternalUInt uint_;
-    };*/
 
     ValueType float_;
 
@@ -193,27 +272,7 @@ public:
 
     constexpr FP() noexcept: float_(F(0)) { }
     constexpr FP(F v) noexcept: float_(v) { }
-    explicit FP(Uninitialized_t) noexcept { }
-
-    /**
-     * 正无穷
-     */
-    static Self Infinity() noexcept { return Bits2Value(EXPT_BIT_MASK); }
-    
-    /**
-     * 比1略小的值
-     */
-    static Self OneMinusEpsilon() noexcept { return Impl::OneMinusEpsilonImpl<F>::Value; }
-
-    /**
-     * 最大值
-     */
-    static Self Max() noexcept { return (std::numeric_limits<ValueType>::max)(); }
-    
-    /**
-     * 最小值
-     */
-    static Self Min() noexcept { return (std::numeric_limits<ValueType>::lowest()); }
+    explicit  FP(Uninitialized_t) noexcept { }
 
     /**
      * 取得浮点值
@@ -245,17 +304,12 @@ public:
     /**
      * 是否是NAN
      */
-    bool IsNAN() const noexcept { return std::isnan(float_); }
+    bool IsNAN() const noexcept { return IsNAN(float_); }
     
     /**
      * 是否是正无穷或负无穷
      */
-    bool IsInfinity() const noexcept { return std::isinf(float_); }
-    
-    /**
-     * 是否是负数/-0
-     */
-    bool IsNegative() const noexcept { return SignBit() != 0; }
+    bool IsInfinity() const noexcept { return IsInf(float_); }
 
     static constexpr size_t DefaultEqEpsilon() noexcept { return DEFAULT_MAX_ULP; }
 
@@ -267,37 +321,12 @@ public:
      */
     bool ApproxEq(Self rhs, size_t maxULPs = DEFAULT_MAX_ULP) const noexcept
     {
-        if(IsNegative() != rhs.IsNegative())
+        if((float_ < 0) != (rhs.float_ < 0))
             return float_ == rhs.float_;
         InternalUInt uint = Value2Bits(float_), ruint = Value2Bits(rhs.float_);
         InternalUInt ULPsDiff = uint > ruint ? uint - ruint : ruint - uint;
         return ULPsDiff <= maxULPs;
     }
-
-#define FP_BINARY_OPERATOR(binary_opr, assign_opr) \
-    auto operator binary_opr(Self rhs) const noexcept { return Self(float_ binary_opr rhs.float_); } \
-    Self &operator assign_opr(Self rhs) noexcept { float_ assign_opr rhs,float_; return *this; }
-
-    FP_BINARY_OPERATOR(+, +=)
-    FP_BINARY_OPERATOR(-, -=)
-    FP_BINARY_OPERATOR(*, *=)
-    FP_BINARY_OPERATOR(/, /=)
-
-#undef FP_BINARY_OPERATOR
-
-#define FP_COMPARE_OPERATOR(comp_opr) \
-    bool operator comp_opr(Self rhs) const noexcept { return float_ comp_opr rhs.float_; }
-
-    FP_COMPARE_OPERATOR(==)
-    FP_COMPARE_OPERATOR(!=)
-    FP_COMPARE_OPERATOR(<)
-    FP_COMPARE_OPERATOR(>)
-    FP_COMPARE_OPERATOR(<=)
-    FP_COMPARE_OPERATOR(>=)
-
-#undef FP_COMPARE_OPERATOR
-
-    Self operator-() const noexcept { return Self(-float_); }
 };
 
 using Float  = FP<float>;

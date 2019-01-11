@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Math/Angle.h"
 #include "../Math/Color.h"
 #include "../Math/D64x4.h"
 #include "../Math/DistributionTransform.h"

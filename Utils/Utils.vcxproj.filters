@@ -55,6 +55,15 @@
     <Filter Include="Input">
       <UniqueIdentifier>{a431435f-cd34-482e-ac01-dd6d4f39d3ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GraphicsAPI">
+      <UniqueIdentifier>{9b2e8215-3ec4-4f7f-8005-1d7f9b61932b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsAPI\OpenGL">
+      <UniqueIdentifier>{e96e2878-97bd-4fa6-b66f-09baa1b5dc29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsAPI\OpenGL\Shader">
+      <UniqueIdentifier>{e5b1dc4c-cfc9-459c-9b52-eaad45aa5575}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\AGZUtils\Alloc\Alloc.h">
@@ -80,9 +89,6 @@
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\FileSys\Raw.h">
       <Filter>FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\Math\Angle.h">
-      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Math\Color.h">
       <Filter>Math</Filter>
