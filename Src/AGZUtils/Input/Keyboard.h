@@ -2,12 +2,16 @@
 
 #include <cstdint>
 
-#include "Event.h"
 #include "../Misc/Common.h"
+#include "Event.h"
+#include "PredefinedHandler.h"
 
 namespace AGZ::Input
 {
     
+/**
+ * @brief 键值类型
+ */
 using Key = std::int32_t;
 
 constexpr Key KEY_UNKNOWN = -1;
@@ -131,80 +135,110 @@ constexpr Key KEY_RALT   = 346;
 
 constexpr Key KEY_MAX = 346;
 
-namespace Impl
+/**
+ * @brief 键盘按下事件
+ */
+struct KeyDown
 {
-    struct KeyDownEventParam
+    Key key;
+};
+
+/**
+ * @brief 键盘松开事件
+ */
+struct KeyUp
+{
+    Key key;
+};
+
+/**
+ * @brief 键盘事件category
+ */
+class Keyboard :
+    public EventCategoryBase<KeyDown, KeyUp>
+{
+    bool isKeyPressed_[KEY_MAX + 1];
+
+public:
+
+    Keyboard()
     {
-        Key key;
-    };
+        std::memset(isKeyPressed_, 0, sizeof(isKeyPressed_));
+    }
 
-    struct KeyUpEventParam
+    /**
+     * @brief 发送特定键被按下的事件消息
+     */
+    void Invoke(const KeyDown &param)
     {
-        Key key;
-    };
+        Key k = param.key;
+        AGZ_ASSERT(k == KEY_UNKNOWN || (0 <= k && k <= KEY_MAX));
+        if(k != KEY_UNKNOWN)
+            isKeyPressed_[k] = true;
+        InvokeAllHandlers(param);
+    }
 
-    class KeyboardEventCategory :
-        public EventCategoryBase<KeyDownEventParam, KeyUpEventParam>
+    /**
+     * @brief 发送特定键被松开的事件消息
+     */
+    void Invoke(const KeyUp &param)
     {
-        bool isKeyPressed_[KEY_MAX + 1];
+        Key k = param.key;
+        AGZ_ASSERT(k == KEY_UNKNOWN || (0 <= k && k <= KEY_MAX));
+        if(k != KEY_UNKNOWN)
+            isKeyPressed_[k] = false;
+        InvokeAllHandlers(param);
+    }
 
-    public:
+    /**
+     * @brief 查询某个键是否正被按压
+     */
+    bool IsKeyPressed(Key k) const noexcept
+    {
+        AGZ_ASSERT(0 <= k && k <= KEY_MAX);
+        return isKeyPressed_[k];
+    }
+};
 
-        KeyboardEventCategory()
-        {
-            std::memset(isKeyPressed_, 0, sizeof(isKeyPressed_));
-        }
+PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(KeyDown);
+PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(KeyUp);
 
-        void Invoke(const KeyDownEventParam &param)
-        {
-            Key k = param.key;
-            AGZ_ASSERT(k == KEY_UNKNOWN || (0 <= k && k <= KEY_MAX));
-            if(k != KEY_UNKNOWN)
-                isKeyPressed_[k] = true;
-            InvokeAllHandlers(param);
-        }
-
-        void Invoke(const KeyUpEventParam &param)
-        {
-            Key k = param.key;
-            AGZ_ASSERT(k == KEY_UNKNOWN || (0 <= k && k <= KEY_MAX));
-            if(k != KEY_UNKNOWN)
-                isKeyPressed_[k] = false;
-            InvokeAllHandlers(param);
-        }
-
-        bool IsKeyPressed(Key k) const noexcept
-        {
-            AGZ_ASSERT(0 <= k && k <= KEY_MAX);
-            return isKeyPressed_[k];
-        }
-    };
-}
-
-using KeyDown  = Impl::KeyDownEventParam;
-using KeyUp    = Impl::KeyUpEventParam;
-using Keyboard = Impl::KeyboardEventCategory;
-
+/**
+ * @brief 键盘管理器，负责打包键盘category和指定的事件捕获器
+ * @tparam CapturerType 捕获器类型
+ */
 template<typename CapturerType>
-class KeyboardManager : public EventManager<EventCategoryList<Keyboard>, EventCapturerList<CapturerType>>
+class KeyboardManager : public EventManagerBase<EventCategoryList<Keyboard>, EventCapturerList<CapturerType>>
 {
 public:
 
+    /**
+     * @brief 取得键盘实例
+     */
     Keyboard &GetKeyboard() noexcept
     {
         return this->template GetCategoryByType<Keyboard>();
     }
 
+    /**
+     * @brief 取得捕获器实例
+     */
     CapturerType &GetCapturer() noexcept
     {
         return this->template GetCapturerByType<CapturerType>();
     }
 
+    /**
+     * @brief 取得键盘实例
+     */
     const Keyboard &GetKeyboard() const noexcept
     {
         return this->template GetCategoryByType<Keyboard>();
     }
 
+    /**
+     * @brief 取得捕获器实例
+     */
     const CapturerType &GetCapturer() const noexcept
     {
         return this->template GetCapturerByType<CapturerType>();

@@ -14,13 +14,24 @@ namespace AGZ::Input
 
 class GLFWKeyboardCapturer;
 
+/**
+ * @cond
+ */
+
 namespace Impl
 {
     inline std::unordered_map<GLFWwindow*, GLFWKeyboardCapturer*> GLFWWindow2KeyboardCapturer;
 }
 
 inline void GLFWKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
-    
+
+/**
+ * @endcond
+ */
+
+/**
+ * @brief 适用于glfw3的键盘事件捕获器
+ */
 class GLFWKeyboardCapturer
 {
     GLFWwindow *window_ = nullptr;
@@ -50,6 +61,13 @@ public:
         Impl::GLFWWindow2KeyboardCapturer.erase(it);
     }
 
+    /**
+     * @brief 初始化捕获器，向glfw注册键盘事件回调
+     * 
+     * 在第一次使用前必须调用，且在该捕获器生命周期中仅能调用一次
+     * 
+     * @param window glfw窗口句柄
+     */
     void Initialize(GLFWwindow *window)
     {
         AGZ_ASSERT(window && !window_);
@@ -64,6 +82,9 @@ public:
         window_ = window;
     }
 
+    /**
+     * @brief 捕获由glfw给出的键盘事件
+     */
     void Capture(Keyboard &keyboard)
     {
         for(auto &er : eventRecords_)
@@ -77,6 +98,10 @@ public:
     }
 };
 
+/**
+ * @cond
+ */
+
 inline void GLFWKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     auto it = Impl::GLFWWindow2KeyboardCapturer.find(window);
@@ -86,6 +111,10 @@ inline void GLFWKeyCallback(GLFWwindow *window, int key, int scancode, int actio
     auto cpr = it->second;
     cpr->AddEventRecord(key, action);
 }
+
+/**
+ * @endcond
+ */
 
 } // namespace AGZ::Input
 
