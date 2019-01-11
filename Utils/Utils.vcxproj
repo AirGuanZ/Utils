@@ -27,6 +27,8 @@
     <ClInclude Include="..\Src\AGZUtils\FileSys\File.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\Path.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\Raw.h" />
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\OpenGL\Shader\Program.h" />
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\OpenGL\Shader\UniformVariable.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\Event.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\GLFWCapturer.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\Keyboard.h" />
@@ -54,6 +56,7 @@
     <ClInclude Include="..\Src\AGZUtils\Misc\Endian.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Exception.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\PrettyTypeName.h" />
+    <ClInclude Include="..\Src\AGZUtils\Misc\ScopeGuard.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Singleton.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\TypeOpr.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Uncopiable.h" />
@@ -103,6 +106,7 @@
     <ClInclude Include="..\Src\AGZUtils\Utils\Alloc.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\Config.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\FileSys.h" />
+    <ClInclude Include="..\Src\AGZUtils\Utils\Input.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\Math.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\Mesh.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\Misc.h" />

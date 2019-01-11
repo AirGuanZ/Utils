@@ -343,6 +343,18 @@
     <ClInclude Include="..\Src\AGZUtils\Input\Keyboard.h">
       <Filter>Input</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Input.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Misc\ScopeGuard.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\OpenGL\Shader\Program.h">
+      <Filter>GraphicsAPI\OpenGL\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\OpenGL\Shader\UniformVariable.h">
+      <Filter>GraphicsAPI\OpenGL\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\AGZUtils\Config\Config.inl">

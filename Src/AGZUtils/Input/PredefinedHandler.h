@@ -66,7 +66,7 @@ private:
 };
 
 #define PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(EventType) \
-    using EventType##Handler = FunctionalEventHandler<EventType>; \
-    template<typename C> using MemFn##EventType##Handler = MemberFunctionEventHandler<EventType, C>
+    using EventType##Handler = ::AGZ::Input::FunctionalEventHandler<EventType>; \
+    template<typename C> using MemFn##EventType##Handler = ::AGZ::Input::MemberFunctionEventHandler<EventType, C>
 
 } // namespace AGZ::Input

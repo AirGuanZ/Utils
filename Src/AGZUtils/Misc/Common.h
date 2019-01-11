@@ -12,6 +12,7 @@
 // AGZ_THREAD_SAFE_STRING
 // AGZ_ENABLE_STRING_SSO
 // AGZ_USE_GLFW
+// AGZ_USE_OPENGL
 
 // ============================= forceinline =============================
 

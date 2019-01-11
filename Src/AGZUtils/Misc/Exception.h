@@ -16,7 +16,7 @@ public:
 };
 
 #define AGZ_NEW_EXCEPTION(NAME) \
-    class NAME : public Exception \
+    class NAME : public ::AGZ::Exception \
     { \
     public: \
         explicit NAME(const std::string &err) : Exception(err) { } \
