@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 // include glfw before this header
 
@@ -30,7 +30,7 @@ inline void GLFWKeyCallback(GLFWwindow *window, int key, int scancode, int actio
  */
 
 /**
- * @brief ÊÊÓÃÓÚglfw3µÄ¼üÅÌÊÂ¼ş²¶»ñÆ÷
+ * @brief é€‚ç”¨äºglfw3çš„é”®ç›˜äº‹ä»¶æ•è·å™¨
  */
 class GLFWKeyboardCapturer
 {
@@ -62,11 +62,11 @@ public:
     }
 
     /**
-     * @brief ³õÊ¼»¯²¶»ñÆ÷£¬Ïòglfw×¢²á¼üÅÌÊÂ¼ş»Øµ÷
+     * @brief åˆå§‹åŒ–æ•è·å™¨ï¼Œå‘glfwæ³¨å†Œé”®ç›˜äº‹ä»¶å›è°ƒ
      * 
-     * ÔÚµÚÒ»´ÎÊ¹ÓÃÇ°±ØĞëµ÷ÓÃ£¬ÇÒÔÚ¸Ã²¶»ñÆ÷ÉúÃüÖÜÆÚÖĞ½öÄÜµ÷ÓÃÒ»´Î
+     * åœ¨ç¬¬ä¸€æ¬¡ä½¿ç”¨å‰å¿…é¡»è°ƒç”¨ï¼Œä¸”åœ¨è¯¥æ•è·å™¨ç”Ÿå‘½å‘¨æœŸä¸­ä»…èƒ½è°ƒç”¨ä¸€æ¬¡
      * 
-     * @param window glfw´°¿Ú¾ä±ú
+     * @param window glfwçª—å£å¥æŸ„
      */
     void Initialize(GLFWwindow *window)
     {
@@ -83,7 +83,7 @@ public:
     }
 
     /**
-     * @brief ²¶»ñÓÉglfw¸ø³öµÄ¼üÅÌÊÂ¼ş
+     * @brief æ•è·ç”±glfwç»™å‡ºçš„é”®ç›˜äº‹ä»¶
      */
     void Capture(Keyboard &keyboard)
     {

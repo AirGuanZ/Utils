@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <functional>
 #include <type_traits>
@@ -9,7 +9,7 @@ namespace AGZ::Input
 {
     
 /**
- * @brief ½«Ò»¸ö¿Éµ÷ÓÃ¶ÔÏó·â×°ÎªÖ¸¶¨ÀàĞÍµÄÊÂ¼ş´¦ÀíÆ÷
+ * @brief å°†ä¸€ä¸ªå¯è°ƒç”¨å¯¹è±¡å°è£…ä¸ºæŒ‡å®šç±»å‹çš„äº‹ä»¶å¤„ç†å™¨
  */
 template<typename EventParamType>
 class FunctionalEventHandler : public EventHandler<EventParamType>
@@ -39,7 +39,7 @@ private:
 };
 
 /**
- * @brief ½«Ò»¸öÀàÊµÀı¼°Æä³ÉÔ±º¯ÊıÖ¸Õë°ü×°³ÉÖ¸¶¨ÀàĞÍµÄÊÂ¼ş´¦ÀíÆ÷
+ * @brief å°†ä¸€ä¸ªç±»å®ä¾‹åŠå…¶æˆå‘˜å‡½æ•°æŒ‡é’ˆåŒ…è£…æˆæŒ‡å®šç±»å‹çš„äº‹ä»¶å¤„ç†å™¨
  */
 template<typename EventParamType, typename ClassType, std::enable_if_t<std::is_class_v<ClassType>, int> = 0>
 class MemberFunctionEventHandler : public EventHandler<EventParamType>

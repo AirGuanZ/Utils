@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <cstdint>
 
@@ -10,7 +10,7 @@ namespace AGZ::Input
 {
     
 /**
- * @brief ¼üÖµÀàĞÍ
+ * @brief é”®å€¼ç±»å‹
  */
 using Key = std::int32_t;
 
@@ -23,7 +23,7 @@ constexpr Key KEY_MINUS      = 45; // -
 constexpr Key KEY_PERIOD     = 46; // .
 constexpr Key KEY_SLASH      = 47; // /
 
-// Êı×Ö0-9ÓëASCII '0'-'9'ÏàÍ¬
+// æ•°å­—0-9ä¸ASCII '0'-'9'ç›¸åŒ
 
 constexpr Key KEY_D0 = 48;
 constexpr Key KEY_D1 = 49;
@@ -39,7 +39,7 @@ constexpr Key KEY_D9 = 57;
 constexpr Key KEY_SEMICOLON = 59; // ;
 constexpr Key KEY_EQUAL     = 61; // =
 
-// ×ÖÄ¸A-ZÓëASCII 'A'-'Z'ÏàÍ¬
+// å­—æ¯A-Zä¸ASCII 'A'-'Z'ç›¸åŒ
 
 constexpr Key KEY_A = 65;
 constexpr Key KEY_B = 66;
@@ -136,7 +136,7 @@ constexpr Key KEY_RALT   = 346;
 constexpr Key KEY_MAX = 346;
 
 /**
- * @brief ¼üÅÌ°´ÏÂÊÂ¼ş
+ * @brief é”®ç›˜æŒ‰ä¸‹äº‹ä»¶
  */
 struct KeyDown
 {
@@ -144,7 +144,7 @@ struct KeyDown
 };
 
 /**
- * @brief ¼üÅÌËÉ¿ªÊÂ¼ş
+ * @brief é”®ç›˜æ¾å¼€äº‹ä»¶
  */
 struct KeyUp
 {
@@ -152,7 +152,7 @@ struct KeyUp
 };
 
 /**
- * @brief ¼üÅÌÊÂ¼şcategory
+ * @brief é”®ç›˜äº‹ä»¶category
  */
 class Keyboard :
     public EventCategoryBase<KeyDown, KeyUp>
@@ -167,7 +167,7 @@ public:
     }
 
     /**
-     * @brief ·¢ËÍÌØ¶¨¼ü±»°´ÏÂµÄÊÂ¼şÏûÏ¢
+     * @brief å‘é€ç‰¹å®šé”®è¢«æŒ‰ä¸‹çš„äº‹ä»¶æ¶ˆæ¯
      */
     void Invoke(const KeyDown &param)
     {
@@ -179,7 +179,7 @@ public:
     }
 
     /**
-     * @brief ·¢ËÍÌØ¶¨¼ü±»ËÉ¿ªµÄÊÂ¼şÏûÏ¢
+     * @brief å‘é€ç‰¹å®šé”®è¢«æ¾å¼€çš„äº‹ä»¶æ¶ˆæ¯
      */
     void Invoke(const KeyUp &param)
     {
@@ -191,7 +191,7 @@ public:
     }
 
     /**
-     * @brief ²éÑ¯Ä³¸ö¼üÊÇ·ñÕı±»°´Ñ¹
+     * @brief æŸ¥è¯¢æŸä¸ªé”®æ˜¯å¦æ­£è¢«æŒ‰å‹
      */
     bool IsKeyPressed(Key k) const noexcept
     {
@@ -204,8 +204,8 @@ PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(KeyDown);
 PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(KeyUp);
 
 /**
- * @brief ¼üÅÌ¹ÜÀíÆ÷£¬¸ºÔğ´ò°ü¼üÅÌcategoryºÍÖ¸¶¨µÄÊÂ¼ş²¶»ñÆ÷
- * @tparam CapturerType ²¶»ñÆ÷ÀàĞÍ
+ * @brief é”®ç›˜ç®¡ç†å™¨ï¼Œè´Ÿè´£æ‰“åŒ…é”®ç›˜categoryå’ŒæŒ‡å®šçš„äº‹ä»¶æ•è·å™¨
+ * @tparam CapturerType æ•è·å™¨ç±»å‹
  */
 template<typename CapturerType>
 class KeyboardManager : public EventManagerBase<EventCategoryList<Keyboard>, EventCapturerList<CapturerType>>
@@ -213,7 +213,7 @@ class KeyboardManager : public EventManagerBase<EventCategoryList<Keyboard>, Eve
 public:
 
     /**
-     * @brief È¡µÃ¼üÅÌÊµÀı
+     * @brief å–å¾—é”®ç›˜å®ä¾‹
      */
     Keyboard &GetKeyboard() noexcept
     {
@@ -221,7 +221,7 @@ public:
     }
 
     /**
-     * @brief È¡µÃ²¶»ñÆ÷ÊµÀı
+     * @brief å–å¾—æ•è·å™¨å®ä¾‹
      */
     CapturerType &GetCapturer() noexcept
     {
@@ -229,7 +229,7 @@ public:
     }
 
     /**
-     * @brief È¡µÃ¼üÅÌÊµÀı
+     * @brief å–å¾—é”®ç›˜å®ä¾‹
      */
     const Keyboard &GetKeyboard() const noexcept
     {
@@ -237,7 +237,7 @@ public:
     }
 
     /**
-     * @brief È¡µÃ²¶»ñÆ÷ÊµÀı
+     * @brief å–å¾—æ•è·å™¨å®ä¾‹
      */
     const CapturerType &GetCapturer() const noexcept
     {
