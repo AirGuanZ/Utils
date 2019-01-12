@@ -105,9 +105,6 @@
     <ClInclude Include="..\Src\AGZUtils\Math\Mat3.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\Math\Mat4.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Math\Quaternion.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -354,6 +351,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\OpenGL\Shader\UniformVariable.h">
       <Filter>GraphicsAPI\OpenGL\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\RM_Mat4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\CM_Mat4.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -196,7 +196,7 @@ auto GetSHByLM(int L, int M) noexcept
  * @param SHCoef 待修改的系数
  */
 template<typename T>
-void RotateSH_L0([[maybe_unused]] const Mat3<T> &M, [[maybe_unused]] T *SHCoef) noexcept
+void RotateSH_L0([[maybe_unused]] const RM_Mat3<T> &M, [[maybe_unused]] T *SHCoef) noexcept
 {
     // l=0对应的SH是常量函数，其系数不受旋转的影响
 }
@@ -210,20 +210,20 @@ void RotateSH_L0([[maybe_unused]] const Mat3<T> &M, [[maybe_unused]] T *SHCoef) 
  * @param SHCoef 待修改的系数，应包含3个元素
  */
 template<typename T>
-void RotateSH_L1(const Mat3<T> &M, T *SHCoef) noexcept
+void RotateSH_L1(const RM_Mat3<T> &M, T *SHCoef) noexcept
 {
     static const T INV_C = Sqrt(4 * PI<T> / 3);
 
-    static const Mat3<T> INV_A(T(0),  T(0),  INV_C,
-                               INV_C, T(0),  T(0),
-                               T(0),  INV_C, T(0));
+    static const RM_Mat3<T> INV_A(T(0),  T(0),  INV_C,
+                                  INV_C, T(0),  T(0),
+                                  T(0),  INV_C, T(0));
     
     // 由于N_i被选取为各轴上的方向向量，故M * Ni就是M的第i列
 
     auto PMN0 = SHImpl::PAux<T, 1>::Eval(M.GetCol(0));
     auto PMN1 = SHImpl::PAux<T, 1>::Eval(M.GetCol(1));
     auto PMN2 = SHImpl::PAux<T, 1>::Eval(M.GetCol(2));
-    auto S = Mat3<T>::FromCols(PMN0, PMN1, PMN2);
+    auto S = RM_Mat3<T>::FromCols(PMN0, PMN1, PMN2);
 
     Vec3<T> x(SHCoef[0], SHCoef[1], SHCoef[2]);
     x = S * (INV_A * x);
@@ -242,7 +242,7 @@ void RotateSH_L1(const Mat3<T> &M, T *SHCoef) noexcept
  * @param SHCoef 待修改的系数，应包含5个元素
  */
 template<typename T>
-void RotateSH_L2(const Mat3<T> &M, T *SHCoef) noexcept
+void RotateSH_L2(const RM_Mat3<T> &M, T *SHCoef) noexcept
 {
     constexpr T K = T(0.7071067811865475);
     static const Vec3<T> N2(K, K, T(0));
@@ -288,7 +288,7 @@ void RotateSH_L2(const Mat3<T> &M, T *SHCoef) noexcept
  * @param SHCoef 待修改的系数，应包含7个元素
  */
 template<typename T>
-void RotateSH_L3(const Mat3<T> &M, T *SHCoef) noexcept
+void RotateSH_L3(const RM_Mat3<T> &M, T *SHCoef) noexcept
 {
     static const Vec3<T> N[7] = {
            Vec3<T>(T(1),   T(0), T(0))   .Normalize(),
@@ -338,7 +338,7 @@ void RotateSH_L3(const Mat3<T> &M, T *SHCoef) noexcept
 * @param SHCoef 待修改的系数，应包含9个元素
 */
 template<typename T>
-void RotateSH_L4(const Mat3<T> &M, T *SHCoef) noexcept
+void RotateSH_L4(const RM_Mat3<T> &M, T *SHCoef) noexcept
 {
     static const Vec3<T> N[9] = {
            Vec3<T>(T(1),    T(0),    T(0))   .Normalize(),
