@@ -897,7 +897,7 @@ namespace std
     template<typename CS>
     struct hash<AGZ::String<CS>>
     {
-        size_t operator()(const AGZ::String<CS>& s) const
+        size_t operator()(const AGZ::String<CS>& s) const noexcept
         {
             size_t ret = 0;
             for(size_t i = 0; i < s.Length(); i++)
@@ -909,7 +909,7 @@ namespace std
     template<typename CS>
     struct hash<AGZ::StringView<CS>>
     {
-        size_t operator()(const AGZ::StringView<CS>& s) const
+        size_t operator()(const AGZ::StringView<CS>& s) const noexcept
         {
             size_t ret = 0;
             for(size_t i = 0; i < s.Length(); i++)

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Scalar.h"
 #include "Vec2.h"
@@ -9,75 +9,166 @@ namespace AGZ::Math
 {
     
 /**
- * @brief ������4x4����
+ * @brief 列主序4x4矩阵
  */
 template<typename T>
 class CM_Mat4
 {
 public:
 
-    using Col  = Vec4<T>;
-    using Data = Col[4];
-    using Self = CM_Mat4<T>;
+    using Col  = Vec4<T>;    ///< 元素类型
+    using Data = Col[4];     ///< 所存储的数据
+    using Self = CM_Mat4<T>; ///< 自身类型
 
     Data m;
 
+    /**
+     * @brief 初始化为单位阵
+     */
     constexpr CM_Mat4() noexcept;
 
+    /**
+     * @brief 初始化为对角阵
+     */
     explicit constexpr CM_Mat4(T v) noexcept;
 
+    /**
+     * @brief 不作任何初始化
+     */
     explicit CM_Mat4(Uninitialized_t) noexcept { }
 
+    /**
+     * @brief 用现有数据初始化
+     */
     explicit CM_Mat4(const Data &_m) noexcept;
 
+    /**
+     * @brief 逐元素初始化
+     */
     constexpr CM_Mat4(T r0c0, T r0c1, T r0c2, T r0c3,
                       T r1c0, T r1c1, T r1c2, T r1c3,
                       T r2c0, T r2c1, T r2c2, T r2c3,
                       T r3c0, T r3c1, T r3c2, T r3c3) noexcept;
 
+    /**
+     * @brief 用行数据构造
+     */
     static constexpr Self FromRows(const Vec4<T> &r0, const Vec4<T> &r1, const Vec4<T> &r2, const Vec4<T> &r3) noexcept;
-    
+
+    /**
+     * @brief 用列数据构造
+     */
     static constexpr Self FromCols(const Vec4<T> &c0, const Vec4<T> &c1, const Vec4<T> &c2, const Vec4<T> &c3) noexcept;
 
+    /**
+     * @brief 将全部元素初始化为同一个值
+     */
     static constexpr Self All(T v) noexcept;
 
+    /**
+     * @brief 单位阵
+     */
     static constexpr Self IDENTITY() noexcept;
 
+    /**
+     * @brief 矩阵-矩阵乘法
+     */
     Self operator*(const Self &rhs) const noexcept;
 
+    /**
+     * @brief 矩阵-向量乘法
+     */
     Vec4<T> operator*(const Vec4<T> &p) const noexcept;
 
+    /**
+     * @brieg 用下标取得指定列
+     */
           Col &operator[](size_t idx)       noexcept { AGZ_ASSERT(idx < 4); return m[idx]; }
+
+    /**
+     * @brieg 用下标取得指定列
+     */
     const Col &operator[](size_t idx) const noexcept { AGZ_ASSERT(idx < 4); return m[idx]; }
 
+    /**
+     * @brief 用(行号，列号)取得指定元素
+     */
           T &operator()(size_t row, size_t col)       noexcept { AGZ_ASSERT(row < 4 && col < 4); return m[col][row]; }
+
+    /**
+     * @brief 用(行号，列号)取得指定元素
+     */
     const T &operator()(size_t row, size_t col) const noexcept { AGZ_ASSERT(row < 4 && col < 4); return m[col][row]; }
 
+    /**
+     * @brief 构造平移矩阵
+     * @param v 平移向量
+     */
     static Self Translate(const Vec3<T> &v) noexcept;
 
+    /**
+     * @brief 构造绕指定轴的旋转矩阵
+     * @param _axis 旋转轴
+     * @param angle 旋转角。为Deg/Rad时会自动进行单位转换，为float/double时单位为弧度
+     */
     template<typename U, std::enable_if_t<IsAngleType_v<U>, int> = 0>
     static Self Rotate(const Vec3<T> &_axis, U angle) noexcept;
 
+    /**
+     * @brief 构造绕X轴的旋转矩阵
+     */
     template<typename U, std::enable_if_t<IsAngleType_v<U>, int> = 0>
     static Self RotateX(U angle) noexcept;
 
+    /**
+     * @brief 构造绕Y轴的旋转矩阵
+     */
     template<typename U, std::enable_if_t<IsAngleType_v<U>, int> = 0>
     static Self RotateY(U angle) noexcept;
 
+    /**
+     * @brief 构造绕Z轴的旋转矩阵
+     */
     template<typename U, std::enable_if_t<IsAngleType_v<U>, int> = 0>
     static Self RotateZ(U angle) noexcept;
 
+    /**
+     * @brief 构造缩放矩阵
+     */
     static Self Scale(const Vec3<T> &s) noexcept;
 
+    /**
+     * @brief 构造透视投影矩阵
+     * @param fovY 竖直方向视野角
+     * @param ratio 视野宽度/视野高度
+     * @param _near 近截面和视点的距离
+     * @param _far 远截面和视点的距离
+     */
     template<typename U, std::enable_if_t<IsAngleType_v<U>, int> = 0>
     static Self Perspective(U fovY, T ratio, T _near, T _far) noexcept;
 
+    /**
+     * @brief 构造视点矩阵
+     * @param src 眼睛位置
+     * @param dst 目标点位置
+     * @param up 用来确定视野侧向倾斜角度的up向量
+     */
     static Self LookAt(const Vec3<T> &src, const Vec3<T> &dst, const Vec3<T> &up) noexcept;
 
+    /**
+     * @brief 将逆变换作用在法线上
+     */
     Vec3<T> ApplyInverseToNormal(const Vec3<T> &n) const noexcept;
 
+    /**
+     * @brief 转置矩阵
+     */
     Self Transpose() const noexcept;
 
+    /**
+     * @brief 逆矩阵
+     * @warning 若原矩阵不可逆，可能会造成除0错误
+     */
     std::enable_if_t<std::is_floating_point_v<T>, Self> Inverse() const noexcept;
 };
 

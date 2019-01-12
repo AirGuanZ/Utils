@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include <cstdint>
 #include <optional>
 #include <stdexcept>
 #include <string>
 
-// ���ܺ�
+// 功能宏
 
 // AGZ_USE_SSE2
 // AGZ_USE_AVX
@@ -192,5 +192,13 @@ inline size_t CombineHash(size_t fst, size_t snd)
 using std::size_t;
 
 template<typename T, int N> constexpr size_t ArraySize([[maybe_unused]] T (&arr)[N]) { return N; }
+
+template<typename C, typename M>
+ptrdiff_t ByteOffsetOf(M(C::*memPtr)) noexcept
+{
+    // 理论上这是UB，但我不知道有什么更好的方法能从成员指针得到成员在实例中的偏移量
+    return reinterpret_cast<char*>(&(reinterpret_cast<C*>(nullptr)->*memPtr))
+         - reinterpret_cast<char*>(  reinterpret_cast<C*>(nullptr));
+}
 
 } // namespace AGZ
