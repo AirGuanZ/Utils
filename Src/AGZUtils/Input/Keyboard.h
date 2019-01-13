@@ -2,7 +2,6 @@
 
 #include <cstdint>
 
-#include "../Misc/Common.h"
 #include "Event.h"
 #include "PredefinedHandler.h"
 
@@ -166,9 +165,6 @@ public:
         std::memset(isKeyPressed_, 0, sizeof(isKeyPressed_));
     }
 
-    /**
-     * @brief 发送特定键被按下的事件消息
-     */
     void Invoke(const KeyDown &param)
     {
         Key k = param.key;
@@ -178,9 +174,6 @@ public:
         InvokeAllHandlers(param);
     }
 
-    /**
-     * @brief 发送特定键被松开的事件消息
-     */
     void Invoke(const KeyUp &param)
     {
         Key k = param.key;
@@ -190,9 +183,6 @@ public:
         InvokeAllHandlers(param);
     }
 
-    /**
-     * @brief 查询某个键是否正被按压
-     */
     bool IsKeyPressed(Key k) const noexcept
     {
         AGZ_ASSERT(0 <= k && k <= KEY_MAX);

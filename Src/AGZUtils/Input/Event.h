@@ -137,7 +137,7 @@ namespace Impl
 template<typename...EventParamTypes>
 class EventCategoryBase : public Impl::EventHandlerSet<EventParamTypes>...
 {
-public:
+protected:
 
     /**
      * @brief 调用所有绑定到该category实例的事件处理器
@@ -147,6 +147,8 @@ public:
     {
         Impl::EventHandlerSet<EventParamType>::InvokeAllHandlersImpl(param);
     }
+
+public:
 
     /**
      * @brief 绑定一个事件处理器
@@ -210,6 +212,11 @@ class EventManagerBase
     }
 
 public:
+
+    EventManagerBase()
+    {
+        Capture();
+    }
 
     /**
      * 对每个category，调用其对应的capture捕获事件

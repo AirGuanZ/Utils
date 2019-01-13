@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "../../Utils/Texture.h"
 #include "Common.h"
 
 namespace AGZ::GL
@@ -23,7 +24,6 @@ namespace Impl
 class Texture2D : public GLObject
 {
 public:
-
 
     /**
      * @param initHandle 是否立即创建一个GL Texture2D Name
@@ -89,12 +89,29 @@ public:
     void InitializeFormatAndData(
         GLsizei levels, GLsizei width, GLsizei height, GLenum internalFormat, const DataTexelType *data) const noexcept
     {
-        AGZ_ASSERT(handle_);
+        AGZ_ASSERT(handle_ && width && height && data);
         glTextureStorage2D(handle_, levels, internalFormat, width, height);
         glTextureSubImage2D(
             handle_, 0, 0, 0, width, height,
             Impl::PT2DT<DataTexelType>::format, Impl::PT2DT<DataTexelType>::type, data);
         glGenerateTextureMipmap(handle_);
+    }
+
+    /**
+     * @brief 初始化该纹理对象的格式和内容
+     *
+     * 相当于InitializeFormat + ReinitializeData一次完成
+     *
+     * @param levels MipMap级数
+     * @param internalFormat 纹理内部像素格式，参见 glTextureStorage2D
+     * @param data 用于初始化的纹理数据
+     */
+    template<typename DataTexelType>
+    void InitializeFormatAndData(
+        GLsizei levels, GLenum internalFormat, const TextureCore<2, DataTexelType> &data) const noexcept
+    {
+        AGZ_ASSERT(handle_ && data.IsAvailable());
+        InitializeFormatAndData(levels, data.GetSize()[0], data.GetSize()[1], internalFormat, data.RawData());
     }
 
     /**

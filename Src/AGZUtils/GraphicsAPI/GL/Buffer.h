@@ -129,7 +129,8 @@ public:
     VertexBuffer<VarType> &operator=(VertexBuffer<VarType> &&moveFrom) noexcept
     {
         static_cast<Buffer&>(*this) = std::move(static_cast<Buffer&>(moveFrom));
-        std::swap(vertexCount_, moveFrom.vertexCount_);
+        vertexCount_ = moveFrom.vertexCount_;
+        moveFrom.vertexCount_ = 0;
         return *this;
     }
 
@@ -184,6 +185,105 @@ public:
     size_t GetVertexCount() const noexcept
     {
         return vertexCount_;
+    }
+};
+
+template<typename BlockType>
+class Std140UniformBlockBuffer : public Buffer
+{
+public:
+
+    /**
+     * @param initHandle 是否立即创建一个GL Buffer Name
+     */
+    explicit Std140UniformBlockBuffer(bool initHandle = false) noexcept
+        : Buffer(initHandle)
+    {
+
+    }
+
+    /**
+     * @brief 立刻创建一个Buffer Name并用给定的数据初始化其内容
+     * @param data 用于初始化的数据指针
+     * @param usage 如GL_STATIC_DRAW
+     */
+    Std140UniformBlockBuffer(const BlockType *data, GLenum usage) noexcept
+        : Std140UniformBlockBuffer(true)
+    {
+        ReinitializeData(data, usage);
+    }
+
+    Std140UniformBlockBuffer(Std140UniformBlockBuffer<BlockType> &&moveFrom) noexcept
+        : Buffer(std::move(static_cast<Buffer&>(moveFrom)))
+    {
+
+    }
+
+    Std140UniformBlockBuffer<BlockType> &operator=(Std140UniformBlockBuffer<BlockType> &&moveFrom) noexcept
+    {
+        static_cast<Buffer&>(*this) = std::move(static_cast<Buffer&>(moveFrom));
+        return *this;
+    }
+
+    ~Std140UniformBlockBuffer() = default;
+
+    /**
+     * @brief 创建一个GL Buffer Name
+     * @note 若已创建一个Name且未经删除，则调用该函数的结果是未定义的
+     */
+    void InitializeHandle() noexcept
+    {
+        Buffer::InitializeHandle();
+    }
+
+    /**
+     * @brief 若含有Buffer Object，将该Buffer标记为删除
+     */
+    void Destroy() noexcept
+    {
+        Buffer::Destroy();
+    }
+
+    /**
+     * @brief 初始化该Buffer内部的数据。若已有数据，则释放并重新申请存储空间并初始化。
+     * @param data 初始化数据指针
+     * @param usage 如GL_STATIC_DRAW
+     */
+    void ReinitializeData(const BlockType *data, GLenum usage) const noexcept
+    {
+        AGZ_ASSERT(handle_);
+        glNamedBufferData(handle_, sizeof(BlockType), data, usage);
+    }
+
+    /**
+     * @brief 设置Buffer的部分内容
+     * @param subdata 待写入buffer的数据
+     * @param byteOffset 要设置的内容据buffer开头的距离
+     * @param byteSize 要设置的内容的长度
+     */
+    void SetData(const void *subdata, size_t byteOffset, size_t byteSize) const noexcept
+    {
+        AGZ_ASSERT(handle_);
+        glNamedBufferSubData(handle_, static_cast<GLsizei>(byteOffset), static_cast<GLsizei>(byteSize), subdata);
+    }
+
+    /**
+     * @brief 设置整个Buffer的内容
+     * @param data 待写入buffer的数据
+     */
+    void SetData(const BlockType *data) const noexcept
+    {
+        AGZ_ASSERT(handle_);
+        glNamedBufferSubData(handle_, 0, sizeof(BlockType), data);
+    }
+
+    /**
+     * @brief 将该UBO绑定到指定的binding point
+     */
+    void Bind(GLuint bindingPoint) const noexcept
+    {
+        AGZ_ASSERT(handle_);
+        glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, handle_);
     }
 };
 

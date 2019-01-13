@@ -1,5 +1,9 @@
 ﻿#pragma once
 
+#if !(defined(__gl_h_) || defined(__GL_H__))
+#   error "Include gl.h/glew.h before AGZUtils/Utils/GL.h"
+#endif
+
 #include <AGZUtils/Utils/Math.h>
 
 namespace AGZ::GL
@@ -19,6 +23,9 @@ using Vec4b = Vec4<Byte>;
 using Vec2f = Vec2<GLfloat>;
 using Vec3f = Vec3<GLfloat>;
 using Vec4f = Vec4<GLfloat>;
+
+using Rad = Math::Rad<GLfloat>;
+using Deg = Math::Deg<GLfloat>;
 
 using Vec2i = Vec2<GLint>;
 using Vec3i = Vec3<GLint>;

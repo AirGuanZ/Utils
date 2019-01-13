@@ -382,6 +382,9 @@
     <ClInclude Include="..\Src\AGZUtils\Utils\GL.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Input\Mouse.h">
+      <Filter>Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\AGZUtils\Config\Config.inl">

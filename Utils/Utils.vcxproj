@@ -40,6 +40,7 @@
     <ClInclude Include="..\Src\AGZUtils\Input\Event.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\GLFWCapturer.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\Keyboard.h" />
+    <ClInclude Include="..\Src\AGZUtils\Input\Mouse.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\PredefinedHandler.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\CM_Mat4.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\Color.h" />

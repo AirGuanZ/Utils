@@ -57,6 +57,40 @@ public:
 };
 
 /**
+ * @brief 对layout(std140) uniform BlockName { ... }的block index的封装
+ */
+template<typename BlockType>
+class Std140UniformBlock
+{
+    GLuint program_;
+    GLuint idx_;
+
+    Std140UniformBlock(GLuint program, GLuint idx) noexcept
+        : program_(program), idx_(idx)
+    {
+
+    }
+
+public:
+
+    /**
+     * @brief 取得该Uniform Block在Program中的编号
+     */
+    GLuint GetIndex() const noexcept
+    {
+        return idx_;
+    }
+
+    /**
+     * @brief 将该Program中的该Block绑定到指定的UBO Binding Point
+     */
+    void Bind(GLuint bindingPoint) const noexcept
+    {
+        glUniformBlockBinding(program_, idx_, bindingPoint);
+    }
+};
+
+/**
  * @brief 一组UniformVariable-Value对，可统一进行绑定
  */
 class UniformVariableAssignment
@@ -75,14 +109,14 @@ class UniformVariableAssignment
     };
 
     template<typename VarType>
-    class Record : public RecordInterface
+    class UniformVariableRecord : public RecordInterface
     {
     public:
 
         UniformVariable<VarType> var;
         VarType value;
 
-        Record(UniformVariable<VarType> var, const VarType &value) noexcept
+        UniformVariableRecord(UniformVariable<VarType> var, const VarType &value) noexcept
             : var(var), value(value)
         {
             
@@ -105,6 +139,47 @@ class UniformVariableAssignment
         }
     };
 
+    template<typename BlockType>
+    struct Std140UniformBlockRecordValue
+    {
+        const Std140UniformBlockBuffer<BlockType> *buffer;
+        GLuint bindingPoint;
+    };
+
+    template<typename BlockType>
+    class Std140UniformBlockRecord : public RecordInterface
+    {
+    public:
+
+        Std140UniformBlock<BlockType> block;
+        const Std140UniformBlockBuffer<BlockType> *buffer;
+        GLuint bindingPoint;
+
+        Std140UniformBlockRecord(
+            Std140UniformBlock<BlockType> block, const Std140UniformBlockBuffer<BlockType> *buffer, GLuint bindingPoint) noexcept
+            : block(block), buffer(buffer), bindingPoint(bindingPoint)
+        {
+            
+        }
+
+        void Bind() const noexcept override
+        {
+            buffer->Bind(bindingPoint);
+        }
+
+        [[noreturn]] GLenum GetGLSLType() const noexcept override
+        {
+            std::terminate();
+        }
+
+        void SetValue(const void *value) noexcept override
+        {
+            auto tvalue = static_cast<Std140UniformBlockRecordValue<BlockType>*>(value);
+            buffer = tvalue->buffer;
+            bindingPoint = tvalue->bindingPoint;
+        }
+    };
+
     ObjArena<> arena_;
     std::unordered_map<GLint, RecordInterface*> assignments_;
 
@@ -124,8 +199,29 @@ public:
         }
         else
         {
-            auto *rc = arena_.Create<Record<VarType>>(var, value);
+            auto *rc = arena_.Create<UniformVariableRecord<VarType>>(var, value);
             assignments_[var.GetLocation()] = rc;
+        }
+    }
+
+    /**
+     * @brief 添加/设置一个StdUniformBlock-UniformBlockBuffer对
+     */
+    template<typename BlockType>
+    void SetValue(Std140UniformBlock<BlockType> block, const Std140UniformBlockBuffer<BlockType> *buffer, GLuint bindingPoint)
+    {
+        GLint key = static_cast<GLint>(block.GetIndex()) | 0xf00000;
+        AGZ_ASSERT(static_cast<GLuint>(key) != block.GetIndex());
+        auto it = assignments_.find(key);
+        if(it != assignments_.end())
+        {
+            Std140UniformBlockRecordValue<BlockType> value = { buffer, bindingPoint };
+            it->second->SetValue(&value);
+        }
+        else
+        {
+            auto rc = arena_.Create<Std140UniformBlockRecord<BlockType>>(block, buffer, bindingPoint);
+            assignments_[key] = rc;
         }
     }
 

@@ -13,6 +13,8 @@ AGZ_NEW_EXCEPTION(AttribVariableTypeException);
 AGZ_NEW_EXCEPTION(AttribVariableNameException);
 AGZ_NEW_EXCEPTION(UniformVariableTypeException);
 AGZ_NEW_EXCEPTION(UniformVariableNameException);
+AGZ_NEW_EXCEPTION(UniformBlockSizeException);
+AGZ_NEW_EXCEPTION(UniformBlockNameException);
 
 /**
  * @brief 完整的着色器程序
@@ -83,6 +85,23 @@ public:
             throw UniformVariableTypeException(name);
 
         return UniformVariable<VarType>(glGetUniformLocation(handle_, name));
+    }
+
+    template<typename BlockType>
+    Std140UniformBlock<BlockType> GetStd140UniformBlock(const char *name) const
+    {
+        AGZ_ASSERT(handle_);
+
+        GLuint blockIndex = glGetUniformBlockIndex(handle_, name);
+        if(blockIndex == GL_INVALID_INDEX)
+            throw UniformBlockNameException(name);
+
+        GLint size;
+        glGetActiveUniformsiv(handle_, 1, &blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+        if(sizeof(BlockType) != size)
+            throw UniformBlockSizeException(name);
+
+        return Std140UniformBlock<BlockType>(handle_, blockIndex);
     }
 
     /**

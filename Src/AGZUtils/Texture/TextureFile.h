@@ -26,7 +26,7 @@ public:
      * 
      * @exception FileException 加载失败时抛出
      */
-    static TextureCore<2, Math::Color3b> LoadRGBFromFile(
+    static Texture2D<Math::Color3b> LoadRGBFromFile(
         const Str8 &filename, bool flipVertically = false);
 
     /**
@@ -34,7 +34,7 @@ public:
      *
      * @exception FileException 加载失败时抛出
      */
-    static TextureCore<2, Math::Color4b> LoadRGBAFromFile(
+    static Texture2D<Math::Color4b> LoadRGBAFromFile(
         const Str8 &filename, bool flipVertically = false);
     
     /**
@@ -42,7 +42,7 @@ public:
      * 
      * @exception FileException 加载失败时抛出
      */
-    static TextureCore<2, Math::Color3f> LoadRGBFromHDR(
+    static Texture2D<Math::Color3f> LoadRGBFromHDR(
         const Str8 &filename, bool flipVertically = false);
 
     /**
@@ -151,7 +151,7 @@ public:
 
 namespace AGZ {
 
-TextureCore<2, Math::Color3b> TextureFile::LoadRGBFromFile(
+Texture2D<Math::Color3b> TextureFile::LoadRGBFromFile(
     const Str8 &filename, bool flipVertically)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
@@ -186,10 +186,10 @@ TextureCore<2, Math::Color3b> TextureFile::LoadRGBFromFile(
     stbi_image_free(bytes);
     FileSys::DefaultlyReleaseRawBinaryFileContent(content);
 
-    return ret;
+    return Texture2D<Math::Color3b>(std::move(ret));
 }
 
-TextureCore<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
+Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
     const Str8 &filename, bool flipVertically)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
@@ -225,10 +225,10 @@ TextureCore<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
     stbi_image_free(bytes);
     FileSys::DefaultlyReleaseRawBinaryFileContent(content);
 
-    return ret;
+    return Texture2D<Math::Color4b>(std::move(ret));
 }
 
-TextureCore<2, Math::Color3f> TextureFile::LoadRGBFromHDR(
+Texture2D<Math::Color3f> TextureFile::LoadRGBFromHDR(
     const Str8 &filename, bool flipVertically)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
@@ -261,7 +261,7 @@ TextureCore<2, Math::Color3f> TextureFile::LoadRGBFromHDR(
     stbi_image_free(data);
     FileSys::DefaultlyReleaseRawBinaryFileContent(content);
 
-    return ret;
+    return Texture2D<Math::Color3f>(std::move(ret));
 }
 
 void TextureFile::WriteTo(
