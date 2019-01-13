@@ -23,11 +23,11 @@ namespace Impl
     inline std::unordered_map<GLFWwindow*, GLFWKeyboardCapturer*> GLFWWindow2KeyboardCapturer;
 }
 
-inline void GLFWKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
-
 /**
  * @endcond
  */
+
+inline void GLFWKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 /**
  * @brief 适用于glfw3的键盘事件捕获器

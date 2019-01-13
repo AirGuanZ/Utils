@@ -27,7 +27,7 @@ public:
      * @exception FileException 加载失败时抛出
      */
     static TextureCore<2, Math::Color3b> LoadRGBFromFile(
-        const Str8 &filename);
+        const Str8 &filename, bool flipVertically = false);
 
     /**
      * @brief 从文件中加载一个二维RGBA纹理对象
@@ -35,7 +35,7 @@ public:
      * @exception FileException 加载失败时抛出
      */
     static TextureCore<2, Math::Color4b> LoadRGBAFromFile(
-        const Str8 &filename);
+        const Str8 &filename, bool flipVertically = false);
     
     /**
      * @brief 从.hdr文件中加载一个二维RGB纹理对象
@@ -43,7 +43,7 @@ public:
      * @exception FileException 加载失败时抛出
      */
     static TextureCore<2, Math::Color3f> LoadRGBFromHDR(
-        const Str8 &filename);
+        const Str8 &filename, bool flipVertically = false);
 
     /**
      * @brief 将一个二维RGB纹理对象写入到指定格式的文件
@@ -152,13 +152,14 @@ public:
 namespace AGZ {
 
 TextureCore<2, Math::Color3b> TextureFile::LoadRGBFromFile(
-    const Str8 &filename)
+    const Str8 &filename, bool flipVertically)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
         throw FileException("Failed to read texture file content");
 
     int w, h, channels;
+    stbi_set_flip_vertically_on_load(flipVertically);
     unsigned char *bytes = stbi_load_from_memory(
         content, static_cast<int>(len), &w, &h, &channels, STBI_rgb);
     if(!bytes)
@@ -189,13 +190,14 @@ TextureCore<2, Math::Color3b> TextureFile::LoadRGBFromFile(
 }
 
 TextureCore<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
-    const Str8 &filename)
+    const Str8 &filename, bool flipVertically)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
         throw FileException("Failed to read texture file content");
 
     int w, h, channels;
+    stbi_set_flip_vertically_on_load(flipVertically);
     unsigned char *bytes = stbi_load_from_memory(
         content, static_cast<int>(len), &w, &h, &channels, STBI_rgb_alpha);
     if(!bytes)
@@ -227,13 +229,14 @@ TextureCore<2, Math::Color4b> TextureFile::LoadRGBAFromFile(
 }
 
 TextureCore<2, Math::Color3f> TextureFile::LoadRGBFromHDR(
-    const Str8 &filename)
+    const Str8 &filename, bool flipVertically)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
         throw FileException("Failed to read texture file content");
     
     int w, h, channels;
+    stbi_set_flip_vertically_on_load(flipVertically);
     float *data = stbi_loadf_from_memory(content, int(len), &w, &h, &channels, STBI_rgb);
     if(!data)
     {

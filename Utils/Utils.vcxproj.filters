@@ -58,11 +58,8 @@
     <Filter Include="GraphicsAPI">
       <UniqueIdentifier>{9b2e8215-3ec4-4f7f-8005-1d7f9b61932b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GraphicsAPI\OpenGL">
-      <UniqueIdentifier>{e96e2878-97bd-4fa6-b66f-09baa1b5dc29}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GraphicsAPI\OpenGL\Shader">
-      <UniqueIdentifier>{e5b1dc4c-cfc9-459c-9b52-eaad45aa5575}</UniqueIdentifier>
+    <Filter Include="GraphicsAPI\GL">
+      <UniqueIdentifier>{5754fe47-b0b6-429f-938f-9a164359d0a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -346,17 +343,44 @@
     <ClInclude Include="..\Src\AGZUtils\Misc\ScopeGuard.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\OpenGL\Shader\Program.h">
-      <Filter>GraphicsAPI\OpenGL\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\OpenGL\Shader\UniformVariable.h">
-      <Filter>GraphicsAPI\OpenGL\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Math\RM_Mat4.h">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Math\CM_Mat4.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\AttribVariable.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Buffer.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Common.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Program.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\ProgramBuilder.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Sampler.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Shader.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Texture2D.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\UniformVariable.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\VertexArrayObject.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\GL.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

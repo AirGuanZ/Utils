@@ -84,7 +84,6 @@ public:
 
     }
 
-    /** 值复制 */
     F32x4(const Self &other)
         : d(other.d)
     {
@@ -103,7 +102,6 @@ public:
         return Vec4f(data);
     }
 
-    /** 值复制 */
     Self &operator=(const Self &other)
     {
         d = other.d;

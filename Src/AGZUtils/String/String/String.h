@@ -142,9 +142,7 @@ public:
     /** 销毁时，若内部持有子串的方式是引用计数，则令计数减1 */
     ~Storage();
 
-    /** 销毁自身并重新调用拷贝构造 */
     Storage<CU> &operator=(const Self &copyFrom);
-    /** 销毁自身并原地调用移动构造 */
     Storage<CU> &operator=(Self &&moveFrom) noexcept;
 
     //! 取得缓存大小
@@ -335,11 +333,8 @@ public:
 
     /** 不允许自行构造，只能从 String<CS> 获得 */
     StringView()                  = delete;
-    /** 拷贝构造 */
     StringView(const Self &)      = default;
-    /** 默认析构 */
     ~StringView()                 = default;
-    /** 拷贝赋值 */
     StringView<CS> &operator=(const Self &) = default;
 
     //! 转换为对应的String
@@ -569,9 +564,7 @@ public:
     //! 从std::wstring中初始化，缺省认为输入串使用WUTF编码
     String(const std::wstring &cppStr, NativeCharset cs = NativeCharset::WUTF);
 
-    /** 拷贝构造 */
     String(const Self &copyFrom);
-    /** 移动构造 */
     String(Self &&moveFrom) noexcept;
 
     //! 从使用其他编码方案的字符串中初始化，会自动进行编码转换
@@ -585,9 +578,7 @@ public:
     /** 默认析构 */
     ~String() = default;
 
-    /** 拷贝赋值 */
     String<CS> &operator=(const Self &copyFrom);
-    /** 移动赋值 */
     String<CS> &operator=(Self &&moveFrom) noexcept;
 
     /**

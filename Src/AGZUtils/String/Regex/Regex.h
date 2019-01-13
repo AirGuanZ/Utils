@@ -47,7 +47,6 @@ public:
 
     }
 
-    /** 复制MatchResult对象 */
     MatchResult(const MatchResult<CS> &copyFrom)
         : whole_(copyFrom.whole_),
           interval_(copyFrom.interval_),
@@ -56,7 +55,6 @@ public:
 
     }
 
-    /** 移动MatchResult对象 */
     MatchResult(MatchResult<CS> &&moveFrom) noexcept
         : whole_(std::move(moveFrom.whole_)),
           interval_(moveFrom.interval_),
@@ -67,7 +65,6 @@ public:
 
     ~MatchResult() = default;
 
-    /** 赋值MatchResult对象 */
     MatchResult<CS> &operator=(const Self &copyFrom)
     {
         whole_ = copyFrom.whole_;
@@ -76,7 +73,6 @@ public:
         return *this;
     }
 
-    /** 移动赋值MatchResult对象 */
     MatchResult<CS> &operator=(Self &&moveFrom) noexcept
     {
         whole_ = std::move(moveFrom.whole_);
@@ -197,36 +193,24 @@ public:
 
     }
 
-    /**
-     * 复制正则表达式
-     */
     Regex(const Self &copyFrom)
         : engine_(copyFrom.engine_)
     {
 
     }
 
-    /**
-     * 移动正则表达式
-     */
     Regex(Self &&moveFrom) noexcept
         : engine_(std::move(moveFrom.engine_))
     {
 
     }
 
-    /**
-     * 赋值正则表达式
-     */
     Regex<CS, Eng> &operator=(const Regex<CS, Eng> &copyFrom)
     {
         engine_ = copyFrom.engine_;
         return *this;
     }
 
-    /**
-     * 移动赋值正则表达式
-     */
     Regex<CS, Eng> &operator=(Regex<CS, Eng> &&moveFrom) noexcept
     {
         engine_ = std::move(moveFrom.engine_);
