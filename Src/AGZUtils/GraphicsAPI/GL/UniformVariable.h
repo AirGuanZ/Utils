@@ -27,6 +27,12 @@ class UniformVariable
 
 public:
 
+    UniformVariable() noexcept
+        : loc_(0)
+    {
+        
+    }
+
     /**
      * @brief 设置该location对应的uniform variable值
      */

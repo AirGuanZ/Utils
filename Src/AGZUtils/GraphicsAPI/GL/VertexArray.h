@@ -145,6 +145,25 @@ public:
     }
 
     /**
+     * @brief 绑定该VAO中的Element Array Buffer
+     */
+    template<typename ElemType>
+    void BindElementBuffer(ElementBuffer<ElemType> &buf) const noexcept
+    {
+        AGZ_ASSERT(handle_ && buf.GetHandle());
+        glVertexArrayElementBuffer(handle_, buf.GetHandle());
+    }
+
+    /**
+     * @brief 解除该VAO绑定的Element Array Buffer
+     */
+    void UnbindElementBuffer() const noexcept
+    {
+        AGZ_ASSERT(handle_);
+        glVertexArrayElementBuffer(handle_, 0);
+    }
+
+    /**
      * @brief 将该VAO绑定到渲染管线
      */
     void Bind() const noexcept

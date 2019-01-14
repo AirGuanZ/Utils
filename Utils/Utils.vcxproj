@@ -31,6 +31,7 @@
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Buffer.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Common.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\FrameBuffer.h" />
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Immediate.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Program.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\ProgramBuilder.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\RenderBuffer.h" />

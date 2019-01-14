@@ -29,6 +29,12 @@ class Program : public GLObject
 
 public:
 
+    Program() noexcept
+        : GLObject(0)
+    {
+        
+    }
+
     Program(Program &&moveFrom) noexcept
         : GLObject(moveFrom.handle_)
     {

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <type_traits>
+
 #include "Common.h"
 
 namespace AGZ::GL
@@ -132,8 +134,6 @@ public:
         return *this;
     }
 
-    ~VertexBuffer() = default;
-
     /**
      * @brief 创建一个GL Buffer Name
      * @note 若已创建一个Name且未经删除，则调用该函数的结果是未定义的
@@ -186,6 +186,9 @@ public:
     }
 };
 
+/**
+ * @brief 对适用于std140 layout的Uniform Block Object的直接封装
+ */
 template<typename BlockType>
 class Std140UniformBlockBuffer : public Buffer
 {
@@ -256,7 +259,7 @@ public:
     /**
      * @brief 设置Buffer的部分内容
      * @param subdata 待写入buffer的数据
-     * @param byteOffset 要设置的内容据buffer开头的距离
+     * @param byteOffset 要设置的内容距buffer开头的距离
      * @param byteSize 要设置的内容的长度
      */
     void SetData(const void *subdata, size_t byteOffset, size_t byteSize) const noexcept
@@ -282,6 +285,121 @@ public:
     {
         AGZ_ASSERT(handle_);
         glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, handle_);
+    }
+};
+
+/**
+ * @brief 对OpenGL Element Buffer的直接封装
+ */
+template<typename ElemType_>
+class ElementBuffer : public Buffer
+{
+    static_assert(std::is_same_v<ElemType_, GLubyte> || std::is_same_v<ElemType_, GLushort> || std::is_same_v<ElemType_, GLuint>,
+        "IndexType of ElementBuffer must be one of { GLubyte, GLushort, GLuint }");
+
+    size_t elemCount_;
+
+public:
+
+    using ElemType = ElemType_;
+
+    /**
+     * @param initHandle 是否立即创建一个GL Buffer Name
+     */
+    explicit ElementBuffer(bool initHandle = false) noexcept
+        : Buffer(initHandle), elemCount_(0)
+    {
+        
+    }
+
+    /**
+     * @brief 立刻创建一个Buffer Name并用给定的数据初始化其内容
+     * @param data 用于初始化的数据指针
+     * @param elemCount element数量
+     * @param usage 如GL_STATIC_DRAW
+     */
+    ElementBuffer(const ElemType *data, size_t elemCount, GLenum usage) noexcept
+        : ElementBuffer(true)
+    {
+        ReinitializeData(data, elemCount, usage);
+    }
+
+    ElementBuffer(ElementBuffer<ElemType> &&moveFrom) noexcept
+        : Buffer(std::move(static_cast<Buffer&>(moveFrom))), elemCount_(moveFrom.elemCount_)
+    {
+        moveFrom.elemCount_ = 0;
+    }
+
+    ElementBuffer<ElemType> &operator=(ElementBuffer<ElemType> &&moveFrom) noexcept
+    {
+        static_cast<Buffer&>(*this) = std::move(static_cast<Buffer&>(moveFrom));
+        elemCount_ = moveFrom.elemCount_;
+        moveFrom.elemCount_ = 0;
+        return *this;
+    }
+
+    /**
+     * @brief 创建一个GL Buffer Name
+     * @note 若已创建一个Name且未经删除，则调用该函数的结果是未定义的
+     */
+    void InitializeHandle() noexcept
+    {
+        Buffer::InitializeHandle();
+    }
+
+    /**
+     * @brief 若含有Buffer Object，将该Buffer标记为删除
+     */
+    void Destroy() noexcept
+    {
+        Buffer::Destroy();
+        elemCount_ = 0;
+    }
+
+    /**
+     * @brief 初始化该Buffer内部的数据。若已有数据，则释放并重新申请存储空间并初始化。
+     * @param data 初始化数据指针
+     * @param elemCount element数量
+     * @param usage 如GL_STATIC_DRAW
+     */
+    void ReinitializeData(const ElemType *data, size_t elemCount, GLenum usage) noexcept
+    {
+        AGZ_ASSERT(elemCount);
+        Buffer::ReinitializeData(data, sizeof(ElemType) * elemCount, usage);
+        elemCount_ = elemCount;
+    }
+
+    /**
+     * @brief 设置Buffer的部分内容
+     * @param data 待写入buffer的数据
+     * @param elemOffset 要设置的内容距buffer开头有多少个element
+     * @param elemCount 要设置的element的数量
+     */
+    void SetData(const ElemType *data, size_t elemOffset, size_t elemCount) const noexcept
+    {
+        AGZ_ASSERT(elemCount && elemOffset + elemCount <= elemCount_);
+        Buffer::SetData(data, elemOffset * sizeof(ElemType), elemCount * sizeof(ElemType));
+    }
+
+    /**
+     * @brief 取得element数量
+     */
+    size_t GetElemCount() const noexcept
+    {
+        return elemCount_;
+    }
+
+    /**
+     * @brief 取得element对应的GL类型
+     */
+    constexpr GLenum GetElemType() const noexcept
+    {
+        if constexpr(std::is_same_v<ElemType, GLubyte>)
+            return GL_UNSIGNED_BYTE;
+        else if constexpr(std::is_same_v<ElemType, GLushort>)
+            return GL_UNSIGNED_SHORT;
+        else
+            return GL_UNSIGNED_INT;
     }
 };
 

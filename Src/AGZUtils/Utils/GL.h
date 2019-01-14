@@ -5,6 +5,7 @@
 #include "../GraphicsAPI/GL/AttribVariable.h"
 #include "../GraphicsAPI/GL/Buffer.h"
 #include "../GraphicsAPI/GL/FrameBuffer.h"
+#include "../GraphicsAPI/GL/Immediate.h"
 #include "../GraphicsAPI/GL/Program.h"
 #include "../GraphicsAPI/GL/ProgramBuilder.h"
 #include "../GraphicsAPI/GL/RenderBuffer.h"
