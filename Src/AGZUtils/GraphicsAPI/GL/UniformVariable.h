@@ -63,6 +63,8 @@ class Std140UniformBlock
     GLuint program_;
     GLuint idx_;
 
+    friend class Program;
+
     Std140UniformBlock(GLuint program, GLuint idx) noexcept
         : program_(program), idx_(idx)
     {
@@ -172,7 +174,7 @@ class UniformVariableAssignment
 
         void SetValue(const void *value) noexcept override
         {
-            auto tvalue = static_cast<Std140UniformBlockRecordValue<BlockType>*>(value);
+            auto tvalue = static_cast<const Std140UniformBlockRecordValue<BlockType>*>(value);
             buffer = tvalue->buffer;
             bindingPoint = tvalue->bindingPoint;
         }

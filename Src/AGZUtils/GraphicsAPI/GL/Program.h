@@ -95,7 +95,7 @@ public:
             throw UniformBlockNameException(name);
 
         GLint size;
-        glGetActiveUniformsiv(handle_, 1, &blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+        glGetActiveUniformBlockiv(handle_, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
         if(sizeof(BlockType) != size)
             throw UniformBlockSizeException(name);
 
