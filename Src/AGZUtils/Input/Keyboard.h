@@ -183,10 +183,21 @@ public:
         InvokeAllHandlers(param);
     }
 
+    /**
+     * @brief 查询某个键盘按键是否处于按压状态
+     */
     bool IsKeyPressed(Key k) const noexcept
     {
         AGZ_ASSERT(0 <= k && k <= KEY_MAX);
         return isKeyPressed_[k];
+    }
+
+    /**
+     * @warning 供Capturer使用
+     */
+    void _setKeyPressed(Key k, bool pressed) noexcept
+    {
+        isKeyPressed_[k] = pressed;
     }
 };
 

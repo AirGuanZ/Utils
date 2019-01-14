@@ -108,20 +108,46 @@ public:
         InvokeAllHandlers(param);
     }
 
+    /**
+     * @brief 查询某个鼠标按钮是否处于按压状态
+     */
     bool IsMouseButtonPressed(MouseButton button) const noexcept
     {
         AGZ_ASSERT(0 <= button && button < 3);
         return isButtonPressed_[button];
     }
 
+    /**
+     * @brief 取得光标水平位置（相对于窗体客户区左上角）
+     */
     double GetCursorPositionX() const noexcept
     {
         return absX_;
     }
 
+    /**
+     * @brief 取得光标垂直位置（相对于窗体客户区左上角）
+     */
     double GetCursorPositionY() const noexcept
     {
         return absY_;
+    }
+
+    /**
+     * @warning 供Capturer使用
+     */
+    void _setCursorPosition(double x, double y) noexcept
+    {
+        absX_ = x;
+        absY_ = y;
+    }
+
+    /**
+     * @warning 供Capturer使用
+     */
+    void _setButtonPressed(MouseButton button, bool pressed) noexcept
+    {
+        isButtonPressed_[button] = pressed;
     }
 };
 

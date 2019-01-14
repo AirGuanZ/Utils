@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <AGZUtils/Utils/Misc.h>
-
 #include "Common.h"
 
 namespace AGZ::GL

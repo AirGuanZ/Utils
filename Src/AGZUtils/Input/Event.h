@@ -213,11 +213,6 @@ class EventManagerBase
 
 public:
 
-    EventManagerBase()
-    {
-        Capture();
-    }
-
     /**
      * 对每个category，调用其对应的capture捕获事件
      */

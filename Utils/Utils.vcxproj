@@ -30,13 +30,15 @@
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\AttribVariable.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Buffer.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Common.h" />
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\FrameBuffer.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Program.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\ProgramBuilder.h" />
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\RenderBuffer.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Sampler.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Shader.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Texture2D.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\UniformVariable.h" />
-    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\VertexArrayObject.h" />
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\VertexArray.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\Event.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\GLFWCapturer.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\Keyboard.h" />

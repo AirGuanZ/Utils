@@ -2,11 +2,16 @@
 
 // include glfw before this header
 
+#ifndef _glfw3_h_
+#   error "Include glfw before this header"
+#endif
+
 #ifdef AGZ_USE_GLFW
 
 #include <unordered_map>
 #include <vector>
 
+#include "../Misc/TypeOpr.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 
@@ -32,10 +37,10 @@ namespace Impl
 
 inline void GLFWKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-inline void GLFWCursorMoveCallback(GLFWwindow *window, double xpos, double ypos);
-inline void GLFWMouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
+inline void GLFWCursorMoveCallback      (GLFWwindow *window, double xpos, double ypos);
+inline void GLFWMouseButtonCallback     (GLFWwindow *window, int button, int action, int mods);
 inline void GLFWCursorEnterLeaveCallback(GLFWwindow *window, int entered);
-inline void GLFWWheelScrollCallback(GLFWwindow *window, double xoffset, double yoffset);
+inline void GLFWWheelScrollCallback     (GLFWwindow *window, double xoffset, double yoffset);
 
 /**
  * @brief 适用于glfw3的键盘事件捕获器
@@ -52,6 +57,7 @@ class GLFWKeyboardCapturer
         int action;
     };
 
+    bool isFirstCapture_;
     std::vector<EventRecord> eventRecords_;
 
     void AddEventRecord(int key, int action)
@@ -60,6 +66,12 @@ class GLFWKeyboardCapturer
     }
 
 public:
+
+    GLFWKeyboardCapturer()
+        : isFirstCapture_(true)
+    {
+        
+    }
 
     ~GLFWKeyboardCapturer()
     {
@@ -95,6 +107,17 @@ public:
      */
     void Capture(Keyboard &keyboard)
     {
+        if(isFirstCapture_)
+        {
+            for(int k = 0; k <= KEY_MAX; ++k)
+            {
+                if(glfwGetKey(window_, k) == GLFW_PRESS)
+                    keyboard._setKeyPressed(k, true);
+            }
+
+            isFirstCapture_ = false;
+        }
+
         for(auto &er : eventRecords_)
         {
             if(er.action == GLFW_PRESS)
@@ -113,10 +136,10 @@ class GLFWMouseCapturer
 {
     GLFWwindow *window_ = nullptr;
 
-    friend void GLFWCursorMoveCallback(GLFWwindow *window, double xpos, double ypos);
-    friend void GLFWMouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
+    friend void GLFWCursorMoveCallback      (GLFWwindow *window, double xpos, double ypos);
+    friend void GLFWMouseButtonCallback     (GLFWwindow *window, int button, int action, int mods);
     friend void GLFWCursorEnterLeaveCallback(GLFWwindow *window, int entered);
-    friend void GLFWWheelScrollCallback(GLFWwindow *window, double xoffset, double yoffset);
+    friend void GLFWWheelScrollCallback     (GLFWwindow *window, double xoffset, double yoffset);
 
     struct MoveEventRecord
     {
@@ -140,26 +163,19 @@ class GLFWMouseCapturer
         double offset;
     };
 
-    enum class Type
-    {
-        Move, Button, EnterLeave, Scroll
-    };
+    using EventRecord = TypeOpr::Variant<
+        MoveEventRecord, ButtonEventRecord, EnterLeaveRecord, ScrollEventRecord>;
 
-    struct EventRecord
-    {
-        Type type;
-        union
-        {
-            MoveEventRecord move;
-            ButtonEventRecord button;
-            EnterLeaveRecord enterLeave;
-            ScrollEventRecord scroll;
-        };
-    };
-
+    bool isFirstCapture_;
     std::vector<EventRecord> eventRecords_;
 
 public:
+
+    GLFWMouseCapturer()
+        : isFirstCapture_(true)
+    {
+        
+    }
 
     ~GLFWMouseCapturer()
     {
@@ -198,47 +214,63 @@ public:
      */
     void Capture(Mouse &mouse)
     {
+        if(isFirstCapture_)
+        {
+            double x, y;
+            glfwGetCursorPos(window_, &x, &y);
+            mouse._setCursorPosition(x, y);
+
+            if(glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+                mouse._setButtonPressed(MOUSE_LEFT, true);
+            if(glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
+                mouse._setButtonPressed(MOUSE_MIDDLE, true);
+            if(glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+                mouse._setButtonPressed(MOUSE_RIGHT, true);
+
+            isFirstCapture_ = false;
+        }
+
         for(auto &er : eventRecords_)
         {
-            if(er.type == Type::Move)
+            TypeOpr::MatchVar(er,
+            [&](const MoveEventRecord &e)
             {
                 CursorMove param =
                 {
-                    er.move.xpos, er.move.ypos,
-                    er.move.xpos - mouse.GetCursorPositionX(),
-                    er.move.ypos - mouse.GetCursorPositionY()
+                    e.xpos, e.ypos,
+                    e.xpos - mouse.GetCursorPositionX(),
+                    e.ypos - mouse.GetCursorPositionY()
                 };
                 mouse.Invoke(param);
-            }
-            else if(er.type == Type::Button)
+            },
+            [&](const ButtonEventRecord &e)
             {
                 MouseButton button;
-                if(er.button.button == GLFW_MOUSE_BUTTON_LEFT)
+                if(e.button == GLFW_MOUSE_BUTTON_LEFT)
                     button = MOUSE_LEFT;
-                else if(er.button.button == GLFW_MOUSE_BUTTON_MIDDLE)
+                else if(e.button == GLFW_MOUSE_BUTTON_MIDDLE)
                     button = MOUSE_MIDDLE;
-                else if(er.button.button == GLFW_MOUSE_BUTTON_RIGHT)
+                else if(e.button == GLFW_MOUSE_BUTTON_RIGHT)
                     button = MOUSE_RIGHT;
                 else
-                    continue;
+                    return;
 
-                if(er.button.action == GLFW_PRESS)
+                if(e.action == GLFW_PRESS)
                     mouse.Invoke(MouseButtonDown{ button });
-                else if(er.button.action == GLFW_RELEASE)
+                else if(e.action == GLFW_RELEASE)
                     mouse.Invoke(MouseButtonUp{ button });
-            }
-            else if(er.type == Type::EnterLeave)
+            },
+            [&](const EnterLeaveRecord &e)
             {
-                if(er.enterLeave.entered)
+                if(e.entered)
                     mouse.Invoke(CursorEnter{});
                 else
                     mouse.Invoke(CursorLeave{});
-            }
-            else
+            },
+            [&](const ScrollEventRecord &e)
             {
-                AGZ_ASSERT(type == Type::Type::Scroll);
-                mouse.Invoke(WheelScroll{ er.scroll.offset });
-            }
+                mouse.Invoke(WheelScroll{ e.offset });
+            });
         }
         eventRecords_.clear();
     }
@@ -253,7 +285,6 @@ inline void GLFWKeyCallback(GLFWwindow *window, int key, [[maybe_unused]] int sc
     auto it = Impl::GLFWWindow2KeyboardCapturer.find(window);
     if(it == Impl::GLFWWindow2KeyboardCapturer.end())
         return;
-
     auto cpr = it->second;
     cpr->AddEventRecord(key, action);
 }
@@ -263,11 +294,7 @@ inline void GLFWCursorMoveCallback(GLFWwindow *window, double xpos, double ypos)
     auto it = Impl::GLFWWindow2MouseCapturer.find(window);
     if(it == Impl::GLFWWindow2MouseCapturer.end())
         return;
-
-    GLFWMouseCapturer::EventRecord rc;
-    rc.type = GLFWMouseCapturer::Type::Move;
-    rc.move = { xpos, ypos };
-    it->second->eventRecords_.push_back(rc);
+    it->second->eventRecords_.emplace_back(GLFWMouseCapturer::MoveEventRecord{ xpos, ypos });
 }
 
 inline void GLFWMouseButtonCallback(GLFWwindow *window, int button, int action, [[maybe_unused]] int mods)
@@ -275,11 +302,7 @@ inline void GLFWMouseButtonCallback(GLFWwindow *window, int button, int action, 
     auto it = Impl::GLFWWindow2MouseCapturer.find(window);
     if(it == Impl::GLFWWindow2MouseCapturer.end())
         return;
-
-    GLFWMouseCapturer::EventRecord rc;
-    rc.type = GLFWMouseCapturer::Type::Button;
-    rc.button = { button, action };
-    it->second->eventRecords_.push_back(rc);
+    it->second->eventRecords_.emplace_back(GLFWMouseCapturer::ButtonEventRecord{ button, action });
 }
 
 inline void GLFWCursorEnterLeaveCallback(GLFWwindow *window, int entered)
@@ -287,11 +310,7 @@ inline void GLFWCursorEnterLeaveCallback(GLFWwindow *window, int entered)
     auto it = Impl::GLFWWindow2MouseCapturer.find(window);
     if(it == Impl::GLFWWindow2MouseCapturer.end())
         return;
-
-    GLFWMouseCapturer::EventRecord rc;
-    rc.type = GLFWMouseCapturer::Type::EnterLeave;
-    rc.enterLeave = { entered != 0 };
-    it->second->eventRecords_.push_back(rc);
+    it->second->eventRecords_.emplace_back(GLFWMouseCapturer::EnterLeaveRecord{ entered != 0 });
 }
 
 inline void GLFWWheelScrollCallback(GLFWwindow *window, [[maybe_unused]] double xoffset, double yoffset)
@@ -299,11 +318,7 @@ inline void GLFWWheelScrollCallback(GLFWwindow *window, [[maybe_unused]] double 
     auto it = Impl::GLFWWindow2MouseCapturer.find(window);
     if(it == Impl::GLFWWindow2MouseCapturer.end())
         return;
-
-    GLFWMouseCapturer::EventRecord rc;
-    rc.type = GLFWMouseCapturer::Type::Scroll;
-    rc.scroll = { yoffset };
-    it->second->eventRecords_.push_back(rc);
+    it->second->eventRecords_.emplace_back(GLFWMouseCapturer::ScrollEventRecord{ yoffset });
 }
 
 /**

@@ -376,14 +376,20 @@
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\UniformVariable.h">
       <Filter>GraphicsAPI\GL</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\VertexArrayObject.h">
-      <Filter>GraphicsAPI\GL</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Utils\GL.h">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Input\Mouse.h">
       <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\RenderBuffer.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\FrameBuffer.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\VertexArray.h">
+      <Filter>GraphicsAPI\GL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

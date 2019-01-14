@@ -1,8 +1,6 @@
 ﻿#pragma once
 
-#include <AGZUtils/Misc/Uncopiable.h>
-#include <AGZUtils/FileSys/File.h>
-
+#include "../../Utils/FileSys.h"
 #include "AttribVariable.h"
 #include "UniformVariable.h"
 

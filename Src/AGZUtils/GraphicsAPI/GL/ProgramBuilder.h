@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include <AGZUtils/Misc/ScopeGuard.h>
+#include "../../Misc/ScopeGuard.h"
 
 #include "Program.h"
 #include "Shader.h"
@@ -10,6 +10,7 @@
 namespace AGZ::GL
 {
 
+AGZ_NEW_EXCEPTION(ProgramBuilderTooMuchShaderException);
 AGZ_NEW_EXCEPTION(ProgramBuilderProgramCreationException);
 AGZ_NEW_EXCEPTION(ProgramBuilderLinkFailureException);
 
@@ -24,20 +25,21 @@ class ProgramBuilder
     int shaderCount_;
 
     template<GLenum ShaderType>
-    bool AddShaderImpl(const TShader<ShaderType> &shader) noexcept
+    void AddShaderImpl(const TShader<ShaderType> &shader)
     {
         if(shaderCount_ >= MAX_SHADER_COUNT)
-            return false;
+            throw ProgramBuilderTooMuchShaderException(
+                "More than " + std::to_string(MAX_SHADER_COUNT) + " shaders");
         shaderHandles_[shaderCount_++] = shader.GetHandle();
-        return true;
     }
 
     template<GLenum ShaderType1, GLenum ShaderType2, GLenum...OtherShaderTypes>
-    bool AddShaderImpl(
+    void AddShaderImpl(
         const TShader<ShaderType1> &shader0, const TShader<ShaderType2> &shader1,
-        const TShader<OtherShaderTypes> &...otherShaders) noexcept
+        const TShader<OtherShaderTypes> &...otherShaders)
     {
-        return AddShaderImpl(shader0) && AddShaderImpl(shader1, otherShaders...);
+        AddShaderImpl(shader0);
+        AddShaderImpl(shader1, otherShaders...);
     }
 
 public:
@@ -53,27 +55,44 @@ public:
 
     /**
      * @brief 以给定的一些Shader初始化该Builder，不占据ShaderObject的所有权
+     * @exception ProgramBuilderTooMuchShaderException Shader数量超过上限时抛出
      */
     template<GLenum ShaderType, GLenum...OtherShaderTypes>
-    explicit ProgramBuilder(const TShader<ShaderType> &shader1, const TShader<OtherShaderTypes>&...otherShaders) noexcept
+    explicit ProgramBuilder(
+        const TShader<ShaderType> &shader1, const TShader<OtherShaderTypes>&...otherShaders)
         : ProgramBuilder()
     {
         AddShader(shader1, otherShaders...);
     }
 
     /**
-     * @brief 添加更多的ShaderObject，不占据所有权
+     * @brief 直接创建一个Program并链接给定的Shader
+     * @exception ProgramBuilderTooMuchShaderException Shader数量超过上限时抛出
      */
     template<GLenum...ShaderTypes>
-    bool AddShader(const TShader<ShaderTypes>&...shaders) noexcept
+    static Program BuildOnce(const TShader<ShaderTypes>&...shaders)
+    {
+        ProgramBuilder builder(shaders...);
+        return builder.Build();
+    }
+
+    /**
+     * @brief 添加更多的ShaderObject，不占据所有权
+     * @exception ProgramBuilderTooMuchShaderException Shader数量超过上限时抛出
+     */
+    template<GLenum...ShaderTypes>
+    void AddShader(const TShader<ShaderTypes>&...shaders)
     {
         int oldShaderCount = shaderCount_;
-        if(!AddShaderImpl(shaders...))
+        try
+        {
+            AddShaderImpl(shaders...);
+        }
+        catch(...)
         {
             shaderCount_ = oldShaderCount;
-            return false;
+            throw;
         }
-        return true;
     }
 
     /**

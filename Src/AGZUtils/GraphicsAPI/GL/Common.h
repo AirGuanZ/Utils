@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #if !(defined(__gl_h_) || defined(__GL_H__))
-#   error "Include gl.h/glew.h before AGZUtils/Utils/GL.h"
+#   error "Include gl.h/glew.h before this header"
 #endif
 
-#include <AGZUtils/Utils/Math.h>
+#include "../../Misc/Common.h"
 
 namespace AGZ::GL
 {
@@ -33,6 +33,7 @@ using Vec4i = Vec4<GLint>;
 
 /**
  * @brief 对GLuint类型的GL Object Name的直接封装
+ * @note 所有的GLObject均独占所有权，不可复制
  */
 class GLObject : public Uncopiable
 {

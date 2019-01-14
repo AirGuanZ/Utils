@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <AGZUtils/Misc/Common.h>
+#include <utility>
 
 #include "AttribVariable.h"
 #include "Buffer.h"
@@ -11,34 +11,34 @@ namespace AGZ::GL
 /**
  * @brief 对OpenGL中VAO的直接封装
  */
-class VertexArrayObject : public GLObject
+class VertexArray : public GLObject
 {
 public:
 
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name
      */
-    explicit VertexArrayObject(bool initHandle = false) noexcept
+    explicit VertexArray(bool initHandle = false) noexcept
         : GLObject(0)
     {
         if(initHandle)
             InitializeHandle();
     }
 
-    VertexArrayObject(VertexArrayObject &&moveFrom) noexcept
+    VertexArray(VertexArray &&moveFrom) noexcept
         : GLObject(moveFrom.handle_)
     {
         moveFrom.handle_ = 0;
     }
 
-    VertexArrayObject &operator=(VertexArrayObject &&moveFrom) noexcept
+    VertexArray &operator=(VertexArray &&moveFrom) noexcept
     {
         Destroy();
         std::swap(handle_, moveFrom.handle_);
         return *this;
     }
 
-    ~VertexArrayObject()
+    ~VertexArray()
     {
         Destroy();
     }

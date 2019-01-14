@@ -681,6 +681,8 @@ public:
     std::string ToStdString(NativeCharset cs   = NativeCharset::UTF8) const { return AsView().ToStdString(cs); }
     std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const { return AsView().ToStdWString(cs); }
 
+    operator std::string() const { return ToStdString(); }
+
 #if defined(AGZ_OS_WIN32)
     std::wstring ToPlatformString() const { return ToStdWString(); }
 #else

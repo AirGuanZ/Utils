@@ -2,14 +2,14 @@
 
 #include <vector>
 
-#include <AGZUtils/Misc/ScopeGuard.h>
-#include <AGZUtils/Misc/Uncopiable.h>
-#include <AGZUtils/FileSys/Raw.h>
-
+#include "../../Misc/ScopeGuard.h"
+#include "../../Utils/FileSys.h"
 #include "Common.h"
 
 namespace AGZ::GL
 {
+
+AGZ_NEW_EXCEPTION(ShaderLoadingException);
 
 /**
  * @brief 可编程管线某一阶段的Shader Object
@@ -24,14 +24,12 @@ namespace AGZ::GL
 template<GLenum ShaderType>
 class TShader : public GLObject
 {
-    Str8 errMsg_;
-
 public:
 
     TShader() = default;
 
     TShader(TShader<ShaderType> &&moveFrom) noexcept
-        : GLObject(moveFrom.handle_), errMsg_(std::move(moveFrom.errMsg_))
+        : GLObject(moveFrom.handle_)
     {
         moveFrom.handle_ = 0;
     }
@@ -40,8 +38,29 @@ public:
     {
         Destroy();
         std::swap(handle_, moveFrom.handle_);
-        errMsg_ = std::move(moveFrom.errMsg_);
         return *this;
+    }
+
+    /**
+     * @brief 创建一个shader对象并从源代码中编译
+     * @exception ShaderLoadingException 着色器创建/编译失败时抛出
+     */
+    static TShader<ShaderType> FromMemory(const Str8 &src)
+    {
+        TShader<ShaderType> ret;
+        ret.LoadFromMemory(src);
+        return ret;
+    }
+
+    /**
+     * @brief 创建一个shader对象并从文件中编译
+     * @exception ShaderLoadingException 着色器创建/编译失败时抛出
+     */
+    static TShader<ShaderType> FromFile(const Str8 &filename)
+    {
+        TShader<ShaderType> ret;
+        ret.LoadFromFile(filename);
+        return ret;
     }
 
     /** 销毁时将ShaderObject标记为删除 */
@@ -64,8 +83,9 @@ public:
     /**
      * @brief 从源代码中创建Shader
      * @note 原Shader会被标记为删除
+     * @exception ShaderLoadingException 着色器加载失败时抛出
      */
-    bool LoadFromMemory(const Str8 &src)
+    void LoadFromMemory(const Str8 &src)
     {
         Destroy();
         
@@ -73,10 +93,7 @@ public:
         ScopeGuard newHandleGuard([=]() { glDeleteShader(newHandle); });
 
         if(!newHandle)
-        {
-            errMsg_ = "Failed to create shader object";
-            return false;
-        }
+            throw ShaderLoadingException("Failed to create shader object");
 
         const char *charSrc = src.Data();
         auto lenSrc = static_cast<GLint>(src.Length());
@@ -92,41 +109,27 @@ public:
 
             std::vector<char> logBuf(logLen + 1);
             glGetShaderInfoLog(newHandle, logLen + 1, nullptr, logBuf.data());
-            errMsg_ = logBuf.data();
 
-            return false;
+            throw ShaderLoadingException(logBuf.data());
         }
 
         handle_ = newHandle;
         newHandleGuard.Dismiss();
-
-        return true;
     }
 
     /**
      * @brief 从文件中加载Shader
      * @note 原Shader会被标记为删除
+     * @exception ShaderLoadingException 着色器加载失败时抛出
      */
-    bool LoadFromFile(const Str8 &filename)
+    void LoadFromFile(const Str8 &filename)
     {
         Destroy();
 
         Str8 src;
         if(!FileSys::ReadTextFileRaw(filename, &src))
-        {
-            errMsg_ = "Failed to load file content from " + filename;
-            return false;
-        }
-
-        return LoadFromMemory(src);
-    }
-
-    /**
-     * @brief 取得上一条错误信息
-     */
-    const Str8 &GetErrMsg() const noexcept
-    {
-        return errMsg_;
+            throw ShaderLoadingException("Failed to load file content from " + filename);
+        LoadFromMemory(src);
     }
 };
 
