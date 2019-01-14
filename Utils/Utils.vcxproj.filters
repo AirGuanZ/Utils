@@ -394,6 +394,9 @@
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Immediate.h">
       <Filter>GraphicsAPI\GL</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\RenderContext.h">
+      <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\AGZUtils\Config\Config.inl">

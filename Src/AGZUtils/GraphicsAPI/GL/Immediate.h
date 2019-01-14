@@ -3,6 +3,7 @@
 #include "Buffer.h"
 #include "Program.h"
 #include "ProgramBuilder.h"
+#include "RenderContext.h"
 #include "VertexArray.h"
 
 namespace AGZ::GL
@@ -45,7 +46,7 @@ class Immediate : public Uncopiable
             { { 1.0f, 0.0f } },
         };
         primVtxBuf_.InitializeHandle();
-        primVtxBuf_.ReinitializeData(vtxData, ArraySize(vtxData), GL_STATIC_DRAW);
+        primVtxBuf_.ReinitializeData(vtxData, uint32_t(ArraySize(vtxData)), GL_STATIC_DRAW);
 
         /*
             0-5: Quad
@@ -57,7 +58,7 @@ class Immediate : public Uncopiable
             0, 2,
         };
         primElemBuf_.InitializeHandle();
-        primElemBuf_.ReinitializeData(elemData, ArraySize(elemData), GL_STATIC_DRAW);
+        primElemBuf_.ReinitializeData(elemData, uint32_t(ArraySize(elemData)), GL_STATIC_DRAW);
     }
 
     void InitializePrimitiveProgram()
@@ -139,7 +140,7 @@ public:
         uniform_B.BindValue(p1);
         uniform_FRAG_COLOR.BindValue(color);
 
-        glDrawElements(GL_LINES, 2, primElemBuf_.GetElemType(), (decltype(primElemBuf_)::ElemType*)(nullptr) + 6);
+        RenderContext::DrawElements(GL_LINES, 6, 2, primElemBuf_.GetElemType());
 
         primVAO_.Unbind();
         primProg_.Unbind();
@@ -169,7 +170,7 @@ public:
         uniform_B.BindValue(LB);
         uniform_FRAG_COLOR.BindValue(color);
 
-        glDrawElements(GL_TRIANGLES, 6, primElemBuf_.GetElemType(), nullptr);
+        RenderContext::DrawElements(GL_TRIANGLES, 0, 6, primElemBuf_.GetElemType());
 
         primVAO_.Unbind();
         primProg_.Unbind();

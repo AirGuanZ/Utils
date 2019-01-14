@@ -95,7 +95,7 @@ protected:
 template<typename VarType>
 class VertexBuffer : public Buffer
 {
-    size_t vertexCount_;
+    uint32_t vertexCount_;
 
 public:
 
@@ -114,7 +114,7 @@ public:
      * @param vertexCount 有多少个顶点数据
      * @param usage 如GL_STATIC_DRAW
      */
-    VertexBuffer(const VarType *data, size_t vertexCount, GLenum usage) noexcept
+    VertexBuffer(const VarType *data, uint32_t vertexCount, GLenum usage) noexcept
         : VertexBuffer(true)
     {
         ReinitializeData(data, vertexCount, usage);
@@ -158,7 +158,7 @@ public:
      * @param vertexCount 初始化数据所包含的顶点数
      * @param usage 如GL_STATIC_DRAW
      */
-    void ReinitializeData(const VarType *data, size_t vertexCount, GLenum usage) noexcept
+    void ReinitializeData(const VarType *data, uint32_t vertexCount, GLenum usage) noexcept
     {
         AGZ_ASSERT(vertexCount);
         Buffer::ReinitializeData(data, sizeof(VarType) * vertexCount, usage);
@@ -171,7 +171,7 @@ public:
      * @param vertexOffset 要设置的内容据buffer开头有多少个顶点
      * @param vertexCount 要设置的内容包含多少个顶点
      */
-    void SetData(const VarType *data, size_t vertexOffset, size_t vertexCount) const noexcept
+    void SetData(const VarType *data, uint32_t vertexOffset, uint32_t vertexCount) const noexcept
     {
         AGZ_ASSERT(vertexCount && vertexOffset + vertexCount <= vertexCount_);
         Buffer::SetData(data, vertexOffset * sizeof(VarType), vertexCount * sizeof(VarType));
@@ -180,7 +180,7 @@ public:
     /**
      * @brief 取得内部所存储的顶点数量
      */
-    size_t GetVertexCount() const noexcept
+    uint32_t GetVertexCount() const noexcept
     {
         return vertexCount_;
     }
@@ -297,7 +297,7 @@ class ElementBuffer : public Buffer
     static_assert(std::is_same_v<ElemType_, GLubyte> || std::is_same_v<ElemType_, GLushort> || std::is_same_v<ElemType_, GLuint>,
         "IndexType of ElementBuffer must be one of { GLubyte, GLushort, GLuint }");
 
-    size_t elemCount_;
+    uint32_t elemCount_;
 
 public:
 
@@ -318,7 +318,7 @@ public:
      * @param elemCount element数量
      * @param usage 如GL_STATIC_DRAW
      */
-    ElementBuffer(const ElemType *data, size_t elemCount, GLenum usage) noexcept
+    ElementBuffer(const ElemType *data, uint32_t elemCount, GLenum usage) noexcept
         : ElementBuffer(true)
     {
         ReinitializeData(data, elemCount, usage);
@@ -362,7 +362,7 @@ public:
      * @param elemCount element数量
      * @param usage 如GL_STATIC_DRAW
      */
-    void ReinitializeData(const ElemType *data, size_t elemCount, GLenum usage) noexcept
+    void ReinitializeData(const ElemType *data, uint32_t elemCount, GLenum usage) noexcept
     {
         AGZ_ASSERT(elemCount);
         Buffer::ReinitializeData(data, sizeof(ElemType) * elemCount, usage);
@@ -375,7 +375,7 @@ public:
      * @param elemOffset 要设置的内容距buffer开头有多少个element
      * @param elemCount 要设置的element的数量
      */
-    void SetData(const ElemType *data, size_t elemOffset, size_t elemCount) const noexcept
+    void SetData(const ElemType *data, uint32_t elemOffset, uint32_t elemCount) const noexcept
     {
         AGZ_ASSERT(elemCount && elemOffset + elemCount <= elemCount_);
         Buffer::SetData(data, elemOffset * sizeof(ElemType), elemCount * sizeof(ElemType));
@@ -384,7 +384,7 @@ public:
     /**
      * @brief 取得element数量
      */
-    size_t GetElemCount() const noexcept
+    uint32_t GetElemCount() const noexcept
     {
         return elemCount_;
     }

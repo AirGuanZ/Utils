@@ -9,6 +9,7 @@
 #include "../GraphicsAPI/GL/Program.h"
 #include "../GraphicsAPI/GL/ProgramBuilder.h"
 #include "../GraphicsAPI/GL/RenderBuffer.h"
+#include "../GraphicsAPI/GL/RenderContext.h"
 #include "../GraphicsAPI/GL/Sampler.h"
 #include "../GraphicsAPI/GL/Shader.h"
 #include "../GraphicsAPI/GL/Texture2D.h"

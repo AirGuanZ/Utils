@@ -35,6 +35,7 @@
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Program.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\ProgramBuilder.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\RenderBuffer.h" />
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\RenderContext.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Sampler.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Shader.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Texture2D.h" />
