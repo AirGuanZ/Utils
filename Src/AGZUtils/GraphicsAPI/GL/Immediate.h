@@ -79,10 +79,9 @@ class Immediate : public Uncopiable
             R"____(
         #version 450 core
         uniform vec4 FRAG_COLOR;
-        out vec4 fragColor;
         void main(void)
         {
-            fragColor = FRAG_COLOR;
+            gl_FragColor = FRAG_COLOR;
         }
         )____";
 
