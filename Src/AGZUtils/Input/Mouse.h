@@ -59,9 +59,10 @@ struct WheelScroll { double offset; };
  * @brief 鼠标事件category
  */
 class Mouse :
-    public EventCategoryBase<MouseButtonDown, MouseButtonUp,
-                             CursorEnter, CursorLeave, CursorMove,
-                             WheelScroll>
+    public EventCategoryBase<
+                MouseButtonDown, MouseButtonUp,
+                CursorEnter, CursorLeave, CursorMove,
+                WheelScroll>
 {
     bool isButtonPressed_[3];
     double absX_, absY_;
@@ -163,7 +164,8 @@ PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(WheelScroll);
  * @tparam CapturerType 捕获器类型
  */
 template<typename CapturerType>
-class MouseManager : public EventManagerBase<EventCategoryList<Mouse>, EventCapturerList<CapturerType>>
+class MouseManager : public EventManagerBase<EventCategoryList<Mouse>,
+                                             EventCapturerList<CapturerType>>
 {
 public:
 

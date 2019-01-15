@@ -14,12 +14,14 @@
 #include "../Misc/TypeOpr.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Window.h"
 
 namespace AGZ::Input
 {
 
 class GLFWKeyboardCapturer;
 class GLFWMouseCapturer;
+class GLFWWindowCapturer;
 
 /**
  * @cond
@@ -29,6 +31,7 @@ namespace Impl
 {
     inline std::unordered_map<GLFWwindow*, GLFWKeyboardCapturer*> GLFWWindow2KeyboardCapturer;
     inline std::unordered_map<GLFWwindow*, GLFWMouseCapturer*> GLFWWindow2MouseCapturer;
+    inline std::unordered_map<GLFWwindow*, GLFWWindowCapturer*> GLFWWindow2WindowCapturer;
 }
 
 /**
@@ -41,6 +44,10 @@ inline void GLFWCursorMoveCallback      (GLFWwindow *window, double xpos, double
 inline void GLFWMouseButtonCallback     (GLFWwindow *window, int button, int action, int mods);
 inline void GLFWCursorEnterLeaveCallback(GLFWwindow *window, int entered);
 inline void GLFWWheelScrollCallback     (GLFWwindow *window, double xoffset, double yoffset);
+
+inline void GLFWWindowCloseCallback          (GLFWwindow *window);
+inline void GLFWWindowSizeCallback           (GLFWwindow *window, int width, int height);
+inline void GLFWWindowFramebufferSizeCallback(GLFWwindow *window, int width, int height);
 
 /**
  * @brief 适用于glfw3的键盘事件捕获器
@@ -277,6 +284,84 @@ public:
 };
 
 /**
+ * @brief 适用于glfw3的窗口事件捕获器
+ */
+class GLFWWindowCapturer
+{
+    struct ClosedEventRecord { };
+    struct SizeEventRecord { int w, h; };
+    struct FramebufferSizeEventRecord { int w, h; };
+
+    using EventRecord = TypeOpr::Variant<
+        ClosedEventRecord, SizeEventRecord, FramebufferSizeEventRecord>;
+
+    friend void GLFWWindowCloseCallback          (GLFWwindow *window);
+    friend void GLFWWindowSizeCallback           (GLFWwindow *window, int width, int height);
+    friend void GLFWWindowFramebufferSizeCallback(GLFWwindow *window, int width, int height);
+
+    GLFWwindow *window_;
+
+    std::vector<EventRecord> eventRecords_;
+
+public:
+
+    ~GLFWWindowCapturer()
+    {
+        auto it = Impl::GLFWWindow2WindowCapturer.find(window_);
+        AGZ_ASSERT(it != Impl::GLFWWindow2WindowCapturer.end());
+        AGZ_ASSERT(it->second == this);
+        Impl::GLFWWindow2WindowCapturer.erase(it);
+    }
+
+    /**
+     * @brief 初始化捕获器，向glfw注册窗口事件回调
+     *
+     * 在第一次使用前必须调用，且在该捕获器生命周期中仅能调用一次
+     *
+     * @param window glfw窗口句柄
+     */
+    void Initialize(GLFWwindow *window)
+    {
+        AGZ_ASSERT(window && !window_);
+        auto it = Impl::GLFWWindow2WindowCapturer.find(window);
+        if(it != Impl::GLFWWindow2WindowCapturer.end())
+            it->second = this;
+        else
+        {
+            glfwSetWindowCloseCallback(window, GLFWWindowCloseCallback);
+            glfwSetWindowSizeCallback(window, GLFWWindowSizeCallback);
+            glfwSetFramebufferSizeCallback(window, GLFWWindowFramebufferSizeCallback);
+            Impl::GLFWWindow2WindowCapturer[window] = this;
+        }
+        window_ = window;
+    }
+
+    /**
+     * @brief 捕获由glfw给出的窗口事件
+     */
+    void Capture(Window &window)
+    {
+        for(auto &er : eventRecords_)
+        {
+            TypeOpr::MatchVar(er,
+            [&](const SizeEventRecord &e)
+            {
+                window.Invoke(WindowSize{ e.w, e.h });
+            },
+            [&](const ClosedEventRecord &)
+            {
+                window.Invoke(WindowClose{});
+            },
+            [&](const FramebufferSizeEventRecord &e)
+            {
+                window.Invoke(FramebufferSize{ e.w, e.h });
+            });
+        }
+        eventRecords_.clear();
+    }
+};
+
+/**
  * @cond
  */
 
@@ -319,6 +404,30 @@ inline void GLFWWheelScrollCallback(GLFWwindow *window, [[maybe_unused]] double 
     if(it == Impl::GLFWWindow2MouseCapturer.end())
         return;
     it->second->eventRecords_.emplace_back(GLFWMouseCapturer::ScrollEventRecord{ yoffset });
+}
+
+inline void GLFWWindowSizeCallback(GLFWwindow *window, int width, int height)
+{
+    auto it = Impl::GLFWWindow2WindowCapturer.find(window);
+    if(it == Impl::GLFWWindow2WindowCapturer.end())
+        return;
+    it->second->eventRecords_.emplace_back(GLFWWindowCapturer::SizeEventRecord{ width, height });
+}
+
+inline void GLFWWindowCloseCallback(GLFWwindow *window)
+{
+    auto it = Impl::GLFWWindow2WindowCapturer.find(window);
+    if(it == Impl::GLFWWindow2WindowCapturer.end())
+        return;
+    it->second->eventRecords_.emplace_back(GLFWWindowCapturer::ClosedEventRecord{});
+}
+
+inline void GLFWWindowFramebufferSizeCallback(GLFWwindow *window, int width, int height)
+{
+    auto it = Impl::GLFWWindow2WindowCapturer.find(window);
+    if(it == Impl::GLFWWindow2WindowCapturer.end())
+        return;
+    it->second->eventRecords_.emplace_back(GLFWWindowCapturer::FramebufferSizeEventRecord{ width, height });
 }
 
 /**
