@@ -54,6 +54,10 @@ PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(WindowSize);
 PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(WindowClose);
 PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(FramebufferSize);
 
+/**
+ * @brief 窗口管理器，负责打包窗口category和指定的事件捕获器
+ * @tparam CapturerType 捕获器类型
+ */
 template<typename CapturerType>
 class WindowManager : public EventManagerBase<EventCategoryList<Window>,
                                               EventCapturerList<CapturerType>>

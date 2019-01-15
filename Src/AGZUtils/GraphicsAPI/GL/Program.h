@@ -81,12 +81,12 @@ public:
         GLuint index;
         glGetUniformIndices(handle_, 1, &name, &index);
         if(index == GL_INVALID_INDEX)
-            throw UniformVariableNameException(name);
+            throw UniformVariableNameException(std::string("Invalid uniform variable name: ") + name);
         
         GLint size;  GLenum type;
         glGetActiveUniform(handle_, index, 0, nullptr, &size, &type, nullptr);
         if(type != Impl::Var2GL<VarType>::Type)
-            throw UniformVariableTypeException(name);
+            throw UniformVariableTypeException(std::string("Invalid uniform variable type of ") + name);
 
         return UniformVariable<VarType>(glGetUniformLocation(handle_, name));
     }
@@ -98,12 +98,12 @@ public:
 
         GLuint blockIndex = glGetUniformBlockIndex(handle_, name);
         if(blockIndex == GL_INVALID_INDEX)
-            throw UniformBlockNameException(name);
+            throw UniformBlockNameException(std::string("Invalid uniform block name: ") + name);
 
         GLint size;
         glGetActiveUniformBlockiv(handle_, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
         if(sizeof(BlockType) != size)
-            throw UniformBlockSizeException(name);
+            throw UniformBlockSizeException(std::string("Invalid uniform block size of ") + name);
 
         return Std140UniformBlock<BlockType>(handle_, blockIndex);
     }
@@ -124,12 +124,12 @@ public:
 
         GLint loc = glGetAttribLocation(handle_, name);
         if(loc < 0)
-            throw AttribVariableNameException(name);
+            throw AttribVariableNameException(std::string("Invalid attrib variable name: ") + name);
 
         GLint size;  GLenum type;
         glGetActiveAttrib(handle_, loc, 0, nullptr, &size, &type, nullptr);
         if(type != Impl::Var2GL<VarType>::Type)
-            throw AttribVariableTypeException(name);
+            throw AttribVariableTypeException(std::string("Invalid attrib variable type of ") + name);
 
         return AttribVariable<VarType>(loc);
     }
