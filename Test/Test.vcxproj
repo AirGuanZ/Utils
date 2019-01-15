@@ -89,22 +89,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <IncludePath>$(SolutionDir)Src\AGZUtils;$(GLFW_3_2_1_INCLUDE);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Src;$(GLFW_3_2_1_INCLUDE);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <IncludePath>$(SolutionDir)Src\AGZUtils;$(GLFW_3_2_1_INCLUDE);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Src;$(GLFW_3_2_1_INCLUDE);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <IncludePath>$(SolutionDir)Src\AGZUtils;$(GLFW_3_2_1_INCLUDE);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Src;$(GLFW_3_2_1_INCLUDE);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <IncludePath>$(SolutionDir)Src\AGZUtils;$(GLFW_3_2_1_INCLUDE);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Src;$(GLFW_3_2_1_INCLUDE);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
