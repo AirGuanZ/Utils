@@ -12,7 +12,7 @@ namespace AGZ::GL
  */
 class Buffer : public GLObject
 {
-protected:
+public:
 
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name

@@ -1,8 +1,8 @@
 #include <string>
 
-#include <Utils/Misc.h>
-#include <Utils/Serialize.h>
-#include <Utils/String.h>
+#include <AGZUtils/Utils/Misc.h>
+#include <AGZUtils/Utils/Serialize.h>
+#include <AGZUtils/Utils/String.h>
 
 #include "Catch.hpp"
 

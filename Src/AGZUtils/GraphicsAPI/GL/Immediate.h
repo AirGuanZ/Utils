@@ -30,6 +30,13 @@ class Immediate : public Uncopiable
 
     Vec2f pixelSize_;
 
+    static constexpr uint32_t FILL_QUAD_BEGIN = 0;
+    static constexpr uint32_t FILL_QUAD_END   = 6;
+    static constexpr uint32_t LINE_QUAD_BEGIN = 6;
+    static constexpr uint32_t LINE_QUAD_END   = 10;
+    static constexpr uint32_t LINE_BEGIN      = 10;
+    static constexpr uint32_t LINE_END        = 12;
+
     void InitializePrimitiveBuffer()
     {
         /*
@@ -54,8 +61,9 @@ class Immediate : public Uncopiable
         */
         GLubyte elemData[] =
         {
-            0, 1, 2, 0, 2, 3,
-            0, 2,
+            0, 1, 2, 0, 2, 3, // GL_TRIANGLES
+            0, 1, 2, 3,       // GL_LINE_LOOP
+            0, 2,             // GL_LINES
         };
         primElemBuf_.InitializeHandle();
         primElemBuf_.ReinitializeData(elemData, uint32_t(ArraySize(elemData)), GL_STATIC_DRAW);
@@ -139,7 +147,8 @@ public:
         uniform_B.BindValue(p1);
         uniform_FRAG_COLOR.BindValue(color);
 
-        RenderContext::DrawElements(GL_LINES, 6, 2, primElemBuf_.GetElemType());
+        RenderContext::DrawElements(
+            GL_LINES, LINE_BEGIN, LINE_END - LINE_BEGIN, primElemBuf_.GetElemType());
 
         primVAO_.Unbind();
         primProg_.Unbind();
@@ -160,30 +169,43 @@ public:
      * @brief 在屏幕上绘制指定颜色的矩形
      * 以屏幕中心为原点，坐标范围[-1, 1]^2
      */
-    void DrawQuad(const Vec2f &LB, const Vec2f &RT, const Vec4f &color) const
+    void DrawQuad(const Vec2f &LB, const Vec2f &RT, const Vec4f &color, bool fill = true) const
     {
+        GLenum oldFill = RenderContext::GetFillMode();
+        RenderContext::SetFillMode(GL_FILL);
+
         primProg_.Bind();
         primVAO_.Bind();
-
         uniform_A.BindValue(RT - LB);
         uniform_B.BindValue(LB);
         uniform_FRAG_COLOR.BindValue(color);
 
-        RenderContext::DrawElements(GL_TRIANGLES, 0, 6, primElemBuf_.GetElemType());
+        if(fill)
+        {
+            RenderContext::DrawElements(
+                GL_TRIANGLES, FILL_QUAD_BEGIN, FILL_QUAD_END - FILL_QUAD_BEGIN, primElemBuf_.GetElemType());
+        }
+        else
+        {
+            RenderContext::DrawElements(
+                GL_LINE_LOOP, LINE_QUAD_BEGIN, LINE_QUAD_END - LINE_QUAD_BEGIN, primElemBuf_.GetElemType());
+        }
 
         primVAO_.Unbind();
         primProg_.Unbind();
+
+        RenderContext::SetFillMode(oldFill);
     }
 
     /**
      * @brief 在屏幕上绘制指定颜色的矩形
      * 以屏幕左上角为原点，坐标单位为像素
      */
-    void DrawQuadP(const Vec2f &LT, const Vec2f &RB, const Vec4f &color) const
+    void DrawQuadP(const Vec2f &LT, const Vec2f &RB, const Vec4f &color, bool fill = true) const
     {
         Vec2f tLT(2 * LT.x - 1, 1 - 2 * LT.y);
         Vec2f tRB(2 * RB.x - 1, 1 - 2 * RB.y);
-        DrawQuad(tLT, tRB, color);
+        DrawQuad(tLT, tRB, color, fill);
     }
 };
 

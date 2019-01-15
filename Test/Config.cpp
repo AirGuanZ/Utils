@@ -1,4 +1,4 @@
-﻿#include <Utils/Config.h>
+﻿#include <AGZUtils/Utils/Config.h>
 
 #include "Catch.hpp"
 

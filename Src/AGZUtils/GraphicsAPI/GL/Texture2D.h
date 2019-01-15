@@ -10,12 +10,12 @@ namespace Impl
 {
     template<typename DataPixel> struct PT2DT;
 
-    template<> struct PT2DT<GLfloat> { static constexpr GLenum format = GL_RED;  static constexpr GLenum type = GL_FLOAT;         };
-    template<> struct PT2DT<Vec3f>   { static constexpr GLenum format = GL_RGB;  static constexpr GLenum type = GL_FLOAT;         };
-    template<> struct PT2DT<Vec4f>   { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_FLOAT;         };
-    template<> struct PT2DT<GLubyte> { static constexpr GLenum format = GL_RED;  static constexpr GLenum type = GL_UNSIGNED_BYTE; };
-    template<> struct PT2DT<Vec3b>   { static constexpr GLenum format = GL_RGB;  static constexpr GLenum type = GL_UNSIGNED_BYTE; };
-    template<> struct PT2DT<Vec4b>   { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_UNSIGNED_BYTE; };
+    template<> struct PT2DT<GLfloat> { static constexpr GLenum format = GL_RED;  static constexpr GLenum type = GL_FLOAT;         static constexpr GLint rowAlignment = 4; };
+    template<> struct PT2DT<Vec3f>   { static constexpr GLenum format = GL_RGB;  static constexpr GLenum type = GL_FLOAT;         static constexpr GLint rowAlignment = 4; };
+    template<> struct PT2DT<Vec4f>   { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_FLOAT;         static constexpr GLint rowAlignment = 4; };
+    template<> struct PT2DT<GLubyte> { static constexpr GLenum format = GL_RED;  static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint rowAlignment = 1; };
+    template<> struct PT2DT<Vec3b>   { static constexpr GLenum format = GL_RGB;  static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint rowAlignment = 1; };
+    template<> struct PT2DT<Vec4b>   { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint rowAlignment = 4; };
 }
 
 /**
@@ -89,12 +89,14 @@ public:
     void InitializeFormatAndData(
         GLsizei levels, GLsizei width, GLsizei height, GLenum internalFormat, const DataTexelType *data) const noexcept
     {
-        AGZ_ASSERT(handle_ && width && height && data);
+        /*AGZ_ASSERT(handle_ && width && height && data);
         glTextureStorage2D(handle_, levels, internalFormat, width, height);
         glTextureSubImage2D(
             handle_, 0, 0, 0, width, height,
             Impl::PT2DT<DataTexelType>::format, Impl::PT2DT<DataTexelType>::type, data);
-        glGenerateTextureMipmap(handle_);
+        glGenerateTextureMipmap(handle_);*/
+        InitializeFormat(levels, width, height, internalFormat);
+        ReinitializeData(width, height, data);
     }
 
     /**
@@ -140,9 +142,13 @@ public:
     void ReinitializeData(GLsizei width, GLsizei height, const DataTexelType *data) const noexcept
     {
         AGZ_ASSERT(handle_);
+        GLint oldAlignment;
+        glGetIntegerv(GL_UNPACK_ALIGNMENT, &oldAlignment);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, Impl::PT2DT<DataTexelType>::rowAlignment);
         glTextureSubImage2D(
             handle_, 0, 0, 0, width, height,
             Impl::PT2DT<DataTexelType>::format, Impl::PT2DT<DataTexelType>::type, data);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, oldAlignment);
         glGenerateTextureMipmap(handle_);
     }
 

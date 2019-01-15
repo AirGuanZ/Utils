@@ -1,7 +1,7 @@
 CPPC = clang++
 CPPC_INCLUDE_FLAGS = -I ./Src/
 CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -stdlib=libc++ \
-			 -std=gnu++17 -Werror -Wall -Wextra -O2
+			 -std=gnu++17 -Werror -Wall -Wextra -O2 -DAGZ_USE_SSE2
 
 CPP_FILES = $(shell find ./Src/ -name "*.cpp")
 CPP_FILES = $(shell find ./Test/ -name "*.cpp")

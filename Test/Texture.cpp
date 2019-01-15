@@ -1,5 +1,5 @@
-#include <Utils/Math.h>
-#include <Utils/Texture.h>
+#include <AGZUtils/Utils/Math.h>
+#include <AGZUtils/Utils/Texture.h>
 
 #include "Catch.hpp"
 

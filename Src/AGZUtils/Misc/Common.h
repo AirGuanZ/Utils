@@ -197,8 +197,8 @@ template<typename C, typename M>
 ptrdiff_t ByteOffsetOf(M(C::*memPtr)) noexcept
 {
     // 理论上这是UB，但我不知道有什么更好的方法能从成员指针得到成员在实例中的偏移量
-    return reinterpret_cast<char*>(&(reinterpret_cast<C*>(nullptr)->*memPtr))
-         - reinterpret_cast<char*>(  reinterpret_cast<C*>(nullptr));
+    return reinterpret_cast<char*>(&(reinterpret_cast<C*>(0)->*memPtr))
+         - reinterpret_cast<char*>(  reinterpret_cast<C*>(0));
 }
 
 } // namespace AGZ
