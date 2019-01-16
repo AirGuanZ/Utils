@@ -61,6 +61,12 @@
     <Filter Include="GraphicsAPI\GL">
       <UniqueIdentifier>{5754fe47-b0b6-429f-938f-9a164359d0a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GraphicsAPI\GUI">
+      <UniqueIdentifier>{071ffd83-e5d1-48d6-a4e5-1e50da5e4a8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Container">
+      <UniqueIdentifier>{523b37cb-c249-4387-a88b-9ef40b5e4828}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\AGZUtils\Alloc\Alloc.h">
@@ -396,6 +402,15 @@
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\RenderContext.h">
       <Filter>GraphicsAPI\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GUI\CommandList.h">
+      <Filter>GraphicsAPI\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Container\AccumulateBuffer.h">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Container.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

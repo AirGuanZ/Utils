@@ -24,6 +24,7 @@
     <ClInclude Include="..\Src\AGZUtils\Alloc\Malloc.h" />
     <ClInclude Include="..\Src\AGZUtils\Alloc\ObjArena.h" />
     <ClInclude Include="..\Src\AGZUtils\Config\Config.h" />
+    <ClInclude Include="..\Src\AGZUtils\Container\AccumulateBuffer.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\File.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\Path.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\Raw.h" />
@@ -41,6 +42,7 @@
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\Texture2D.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\UniformVariable.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GL\VertexArray.h" />
+    <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\GUI\CommandList.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\Event.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\GLFWCapturer.h" />
     <ClInclude Include="..\Src\AGZUtils\Input\Keyboard.h" />
@@ -119,6 +121,7 @@
     <ClInclude Include="..\Src\AGZUtils\Utils.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\Alloc.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\Config.h" />
+    <ClInclude Include="..\Src\AGZUtils\Utils\Container.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\FileSys.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\GL.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\Input.h" />
