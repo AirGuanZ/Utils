@@ -84,6 +84,10 @@
 #define AGZ_FILE_IMPL
 #endif
 
+#if not defined(AGZ_GLFWCAPTURER_IMPL)
+#define AGZ_GLFWCAPTURER_IMPL
+#endif
+
 #endif
 
 namespace AGZ {

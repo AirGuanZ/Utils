@@ -29,9 +29,15 @@ class GLFWWindowCapturer;
 
 namespace Impl
 {
-    inline std::unordered_map<GLFWwindow*, GLFWKeyboardCapturer*> GLFWWindow2KeyboardCapturer;
-    inline std::unordered_map<GLFWwindow*, GLFWMouseCapturer*> GLFWWindow2MouseCapturer;
-    inline std::unordered_map<GLFWwindow*, GLFWWindowCapturer*> GLFWWindow2WindowCapturer;
+#ifdef AGZ_GLFWCAPTURER_IMPL
+    std::unordered_map<GLFWwindow*, GLFWKeyboardCapturer*> GLFWWindow2KeyboardCapturer;
+    std::unordered_map<GLFWwindow*, GLFWMouseCapturer*> GLFWWindow2MouseCapturer;
+    std::unordered_map<GLFWwindow*, GLFWWindowCapturer*> GLFWWindow2WindowCapturer;
+#else
+    extern std::unordered_map<GLFWwindow*, GLFWKeyboardCapturer*> GLFWWindow2KeyboardCapturer;
+    extern std::unordered_map<GLFWwindow*, GLFWMouseCapturer*> GLFWWindow2MouseCapturer;
+    extern std::unordered_map<GLFWwindow*, GLFWWindowCapturer*> GLFWWindow2WindowCapturer;
+#endif
 }
 
 /**

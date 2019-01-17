@@ -121,6 +121,22 @@ class Immediate : public Uncopiable
         }
         )____";
 
+        const char *TEXTURE_PRIMITIVE_PROGRAM_VS =
+            R"____(
+        #version 450 core
+        uniform vec2 A;
+        uniform vec2 B;
+        uniform vec2 TA;
+        uniform vec2 TB;
+        in vec2 iPos;
+        out vec2 mTexCoord;
+        void main(void)
+        {
+            gl_Position = vec4(A * iPos + B, 0, 1);
+            mTexCoord   = TA * iPos + TB;
+        }
+        )____";
+
         const char *NATIVE_TRIANGLE_PROGRAM_VS =
             R"____(
         #version 450 core
@@ -141,6 +157,17 @@ class Immediate : public Uncopiable
         void main(void)
         {
             gl_FragColor = FRAG_COLOR;
+        }
+        )____";
+
+        const char *TEXTURE_FS =
+            R"____(
+        #version 450 core
+        uniform sampler2D tex;
+        in vec2 mTexCoord;
+        void main(void)
+        {
+            gl_FragColor = texture(tex, mTexCoord);
         }
         )____";
 
@@ -293,7 +320,6 @@ public:
         triangle_.uniform_C_A.BindValue(C - A);
         triangle_.uniform_FRAG_COLOR.BindValue(color);
 
-        
         RenderContext::SetFillMode(fill ? GL_FILL : GL_LINE);
         RenderContext::DrawElements(
             GL_TRIANGLES, ELEM_TRIANGLE_BEGIN, ELEM_TRIANGLE_END - ELEM_TRIANGLE_BEGIN, primElemBuf_.GetElemType());

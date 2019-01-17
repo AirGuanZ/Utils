@@ -243,7 +243,7 @@ public:
     /**
      * @brief 绑定所有Variable-Value对
      */
-    void Bind() noexcept
+    void Bind() const noexcept
     {
         for(auto &it : assignments_)
             it.second->Bind();
