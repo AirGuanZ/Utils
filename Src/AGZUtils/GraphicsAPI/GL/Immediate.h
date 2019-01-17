@@ -6,7 +6,7 @@
 #include "RenderContext.h"
 #include "VertexArray.h"
 
-namespace AGZ::GL
+namespace AGZ::GraphicsAPI::GL
 {
     
 /**
@@ -362,4 +362,4 @@ public:
     }
 };
 
-} // namespace AGZ::GL
+} // namespace AGZ::GraphicsAPI::GL

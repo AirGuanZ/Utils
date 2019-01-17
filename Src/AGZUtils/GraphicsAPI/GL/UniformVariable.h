@@ -5,7 +5,7 @@
 #include "../../Utils/Alloc.h"
 #include "Common.h"
 
-namespace AGZ::GL
+namespace AGZ::GraphicsAPI::GL
 {
 
 /**
@@ -250,4 +250,4 @@ public:
     }
 };
 
-} // namespace AGZ::GL
+} // namespace AGZ::GraphicsAPI::GL

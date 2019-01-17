@@ -6,7 +6,7 @@
 #include "../../Utils/FileSys.h"
 #include "Common.h"
 
-namespace AGZ::GL
+namespace AGZ::GraphicsAPI::GL
 {
 
 AGZ_NEW_EXCEPTION(ShaderLoadingException);
@@ -136,4 +136,4 @@ public:
 using VertexShader   = TShader<GL_VERTEX_SHADER>;
 using FragmentShader = TShader<GL_FRAGMENT_SHADER>;
 
-} // namespace AGZ::GL
+} // namespace AGZ::GraphicsAPI::GL

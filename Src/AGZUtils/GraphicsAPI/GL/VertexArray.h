@@ -5,7 +5,7 @@
 #include "AttribVariable.h"
 #include "Buffer.h"
 
-namespace AGZ::GL
+namespace AGZ::GraphicsAPI::GL
 {
     
 /**
@@ -187,4 +187,4 @@ public:
     }
 };
 
-} // namespace AGZ::GL
+} // namespace AGZ::GraphicsAPI::GL

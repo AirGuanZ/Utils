@@ -3,7 +3,7 @@
 #include "RenderBuffer.h"
 #include "Texture2D.h"
 
-namespace AGZ::GL
+namespace AGZ::GraphicsAPI::GL
 {
     
 class FrameBuffer : public GLObject
@@ -104,4 +104,4 @@ public:
     }
 };
 
-} // namespace AGZ::GL
+} // namespace AGZ::GraphicsAPI::GL

@@ -2,15 +2,13 @@
 
 #include <iterator>
 
-#include "../Alloc/ObjArena.h"
-
 namespace AGZ
 {
     
 /**
- * @brief 
+ * @brief 数据累积缓存，相当于只能push_back和clear的vector，效率上有所优化
  */
-template<typename TValue, size_t TSectionSize>
+template<typename TValue, size_t TSectionSize = 32>
 class AccumulateBuffer
 {
     struct SectionHead
@@ -24,6 +22,8 @@ class AccumulateBuffer
     SectionHead *cur_;   // 当前活跃的section
     TValue *nextVal_;    // 下一个val要放哪。只在curRest_ > 0时有意义
     size_t curRest_;     // 当前活跃的section还剩多少空间
+
+    size_t size_;
 
     // 申请一块新的buffer section
     void AllocNewSection()
@@ -64,7 +64,7 @@ public:
     static constexpr size_t SectionSize = TSectionSize;
 
     AccumulateBuffer() noexcept
-        : entry_(nullptr), cur_(nullptr), nextVal_(nullptr), curRest_(0)
+        : entry_(nullptr), cur_(nullptr), nextVal_(nullptr), curRest_(0), size_(0)
     {
         
     }
@@ -78,12 +78,14 @@ public:
 
     AccumulateBuffer(Self &&moveFrom) noexcept
         : entry_(moveFrom.entry_), cur_(moveFrom.cur_),
-          nextVal_(moveFrom.nextVal_), curRest_(moveFrom.curRest_)
+          nextVal_(moveFrom.nextVal_), curRest_(moveFrom.curRest_),
+          size_(moveFrom.size_)
     {
         moveFrom.entry_   = nullptr;
         moveFrom.cur_     = nullptr;
         moveFrom.nextVal_ = nullptr;
         moveFrom.curRest_ = 0;
+        moveFrom.size_    = 0;
     }
 
     Self &operator=(const Self &copyFrom)
@@ -102,11 +104,13 @@ public:
         cur_     = moveFrom.cur_;
         nextVal_ = moveFrom.nextVal_;
         curRest_ = moveFrom.curRest_;
+        size_    = moveFrom.size_;
 
-        moveFrom.entry_ = nullptr;
-        moveFrom.cur_ = nullptr;
+        moveFrom.entry_   = nullptr;
+        moveFrom.cur_     = nullptr;
         moveFrom.nextVal_ = nullptr;
         moveFrom.curRest_ = 0;
+        moveFrom.size_    = 0;
 
         return *this;
     }
@@ -116,6 +120,9 @@ public:
         Clear();
     }
 
+    /**
+     * @brief 在缓存末尾追加一个新元素
+     */
     void Push(const TValue &value)
     {
         if(!curRest_)
@@ -125,8 +132,12 @@ public:
         
         ++nextVal_;
         --curRest_;
+        ++size_;
     }
 
+    /**
+     * @brief 在缓存末尾追加一个新元素
+     */
     void Push(TValue &&value)
     {
         if(!curRest_)
@@ -136,8 +147,12 @@ public:
 
         ++nextVal_;
         --curRest_;
+        ++size_;
     }
 
+    /**
+     * @brief 在缓存末尾原地构造一个新元素
+     */
     template<typename...Args>
     void Emplace(Args&&...args)
     {
@@ -148,8 +163,17 @@ public:
 
         ++nextVal_;
         --curRest_;
+        ++size_;
     }
 
+    size_t GetSize() const noexcept
+    {
+        return size_;
+    }
+
+    /**
+     * @brief 清空所有数据
+     */
     void Clear() noexcept
     {
         if(!entry_)
@@ -167,6 +191,7 @@ public:
         cur_     = nullptr;
         curRest_ = 0;
         nextVal_ = nullptr;
+        size_    = 0;
     }
 
     class Iterator

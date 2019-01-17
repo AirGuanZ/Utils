@@ -2,7 +2,7 @@
 
 #include "Common.h"
 
-namespace AGZ::GL
+namespace AGZ::GraphicsAPI::GL
 {
     
 /**
@@ -65,6 +65,7 @@ public:
 
     /**
      * @brief 设置该RenderBuffer内部的格式和大小
+     * 见 glNamedRenderbufferStorage
      * @note 在使用该对象前至少调用一次
      * @note 可重复调用，重复时会清除以前设置的格式、大小和内容
      */
@@ -75,4 +76,4 @@ public:
     }
 };
 
-} // namespace AGZ::GL
+} // namespace AGZ::GraphicsAPI::GL

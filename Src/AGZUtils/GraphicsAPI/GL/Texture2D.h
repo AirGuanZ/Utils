@@ -3,7 +3,7 @@
 #include "../../Utils/Texture.h"
 #include "Common.h"
 
-namespace AGZ::GL
+namespace AGZ::GraphicsAPI::GL
 {
 
 namespace Impl
@@ -180,4 +180,4 @@ public:
     }
 };
 
-} // namespace AGZ::GL
+} // namespace AGZ::GraphicsAPI::GL

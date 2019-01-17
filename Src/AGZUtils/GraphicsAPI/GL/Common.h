@@ -5,31 +5,10 @@
 #endif
 
 #include "../../Misc/Common.h"
+#include "../Common.h"
 
-namespace AGZ::GL
+namespace AGZ::GraphicsAPI::GL
 {
-
-using Math::Vec2;
-using Math::Vec3;
-using Math::Vec4;
-
-using Mat4f = Math::CM_Mat4<GLfloat>;
-
-using Byte = std::uint8_t;
-using Vec2b = Vec2<Byte>;
-using Vec3b = Vec3<Byte>;
-using Vec4b = Vec4<Byte>;
-
-using Vec2f = Vec2<GLfloat>;
-using Vec3f = Vec3<GLfloat>;
-using Vec4f = Vec4<GLfloat>;
-
-using Rad = Math::Rad<GLfloat>;
-using Deg = Math::Deg<GLfloat>;
-
-using Vec2i = Vec2<GLint>;
-using Vec3i = Vec3<GLint>;
-using Vec4i = Vec4<GLint>;
 
 /**
  * @brief 对GLuint类型的GL Object Name的直接封装
@@ -100,4 +79,4 @@ namespace Impl
  * @endcond
  */
 
-} // namespace AGZ::GL
+} // namespace AGZ::GraphicsAPI::GL

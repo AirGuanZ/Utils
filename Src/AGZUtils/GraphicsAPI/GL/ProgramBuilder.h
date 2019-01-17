@@ -7,7 +7,7 @@
 #include "Program.h"
 #include "Shader.h"
 
-namespace AGZ::GL
+namespace AGZ::GraphicsAPI::GL
 {
 
 AGZ_NEW_EXCEPTION(ProgramBuilderTooMuchShaderException);
@@ -161,4 +161,4 @@ public:
     }
 };
 
-} // namespace AGZ::GL
+} // namespace AGZ::GraphicsAPI::GL

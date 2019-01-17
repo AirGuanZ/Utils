@@ -4,7 +4,7 @@
 #include "AttribVariable.h"
 #include "UniformVariable.h"
 
-namespace AGZ::GL
+namespace AGZ::GraphicsAPI::GL
 {
 
 AGZ_NEW_EXCEPTION(AttribVariableTypeException);
@@ -158,4 +158,4 @@ public:
     }
 };
 
-} // namespace AGZ::GL
+} // namespace AGZ::GraphicsAPI::GL
