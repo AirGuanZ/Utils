@@ -151,10 +151,18 @@ struct KeyUp
 };
 
 /**
+ * @brief 字符输入事件
+ */
+struct CharEnter
+{
+    uint32_t ch;
+};
+
+/**
  * @brief 键盘事件category
  */
 class Keyboard :
-    public EventCategoryBase<KeyDown, KeyUp>
+    public EventCategoryBase<KeyDown, KeyUp, CharEnter>
 {
     bool isKeyPressed_[KEY_MAX + 1];
 
@@ -183,6 +191,11 @@ public:
         InvokeAllHandlers(param);
     }
 
+    void Invoke(const CharEnter &param)
+    {
+        InvokeAllHandlers(param);
+    }
+
     /**
      * @brief 查询某个键盘按键是否处于按压状态
      */
@@ -203,6 +216,7 @@ public:
 
 PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(KeyDown);
 PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(KeyUp);
+PREDEFINED_HANDLER_FOR_SPECIFIC_EVENT(CharEnter);
 
 /**
  * @brief 键盘管理器，负责打包键盘category和指定的事件捕获器

@@ -44,7 +44,8 @@ namespace Impl
  * @endcond
  */
 
-inline void GLFWKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+inline void GLFWKeyCallback (GLFWwindow *window, int key, int scancode, int action, int mods);
+inline void GLFWCharCallback(GLFWwindow *window, unsigned int codepoint);
 
 inline void GLFWCursorMoveCallback      (GLFWwindow *window, double xpos, double ypos);
 inline void GLFWMouseButtonCallback     (GLFWwindow *window, int button, int action, int mods);
@@ -62,12 +63,14 @@ class GLFWKeyboardCapturer
 {
     GLFWwindow *window_ = nullptr;
 
-    friend void GLFWKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+    friend void GLFWKeyCallback (GLFWwindow *window, int key, int scancode, int action, int mods);
+    friend void GLFWCharCallback(GLFWwindow *window, unsigned int codepoint);
 
     struct EventRecord
     {
         int key;
         int action;
+        uint32_t ch = 0; // 为0时表示key down/up事件，否则为ch事件
     };
 
     bool isFirstCapture_;
@@ -110,6 +113,7 @@ public:
         else
         {
             glfwSetKeyCallback(window, GLFWKeyCallback);
+            glfwSetCharCallback(window, GLFWCharCallback);
             Impl::GLFWWindow2KeyboardCapturer[window] = this;
         }
         window_ = window;
@@ -133,7 +137,9 @@ public:
 
         for(auto &er : eventRecords_)
         {
-            if(er.action == GLFW_PRESS)
+            if(er.ch)
+                keyboard.Invoke(CharEnter{ er.ch });
+            else if(er.action == GLFW_PRESS)
                 keyboard.Invoke(KeyDown{ Key(er.key) });
             else if(er.action == GLFW_RELEASE)
                 keyboard.Invoke(KeyUp{ Key(er.key) });
@@ -376,8 +382,15 @@ inline void GLFWKeyCallback(GLFWwindow *window, int key, [[maybe_unused]] int sc
     auto it = Impl::GLFWWindow2KeyboardCapturer.find(window);
     if(it == Impl::GLFWWindow2KeyboardCapturer.end())
         return;
-    auto cpr = it->second;
-    cpr->AddEventRecord(key, action);
+    it->second->eventRecords_.push_back(GLFWKeyboardCapturer::EventRecord{ key, action, 0 });
+}
+
+inline void GLFWCharCallback(GLFWwindow *window, unsigned int codepoint)
+{
+    auto it = Impl::GLFWWindow2KeyboardCapturer.find(window);
+    if(it == Impl::GLFWWindow2KeyboardCapturer.end())
+        return;
+    it->second->eventRecords_.push_back(GLFWKeyboardCapturer::EventRecord{ 0, 0, uint32_t(codepoint) });
 }
 
 inline void GLFWCursorMoveCallback(GLFWwindow *window, double xpos, double ypos)
