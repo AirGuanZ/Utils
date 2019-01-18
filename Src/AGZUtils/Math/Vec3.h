@@ -5,6 +5,7 @@
 
 #include "../Misc/Common.h"
 #include "../Utils/Serialize.h"
+#include "../Utils/String.h"
 #include "Scalar.h"
 #include "Vec2.h"
 
@@ -144,6 +145,8 @@ public:
     Self Normalize()         const noexcept;
     Self Clamp(T min, T max) const noexcept;
     Self Sqrt()              const noexcept;
+
+    Str8 ToString() const { return "(" + ToStr8(x) + ", " + ToStr8(y) + ", " + ToStr8(z) + ")"; }
 
     bool Serialize(BinarySerializer &serializer) const;
     bool Deserialize(BinaryDeserializer &deserializer);
