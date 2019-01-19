@@ -13,6 +13,44 @@
 namespace AGZ::Mesh {
 
 /**
+ * @brief AABB包围盒，用于表达物体的轴对称体积
+ */
+template<typename T>
+struct BoundingBox
+{
+    Math::Vec3<T> low  = Math::Vec3<T>(+Math::Inf<T>);
+    Math::Vec3<T> high = Math::Vec3<T>(-Math::Inf<T>);
+
+    /**
+     * @brief 将给定点纳入包围范围中
+     */
+    BoundingBox<T> &Expand(const Math::Vec3<T> &p) noexcept
+    {
+        low.x = Math::Min(low.x, p.x);
+        low.y = Math::Min(low.y, p.y);
+        low.z = Math::Min(low.z, p.z);
+        high.x = Math::Max(high.x, p.x);
+        high.y = Math::Max(high.y, p.y);
+        high.z = Math::Max(high.z, p.z);
+        return *this;
+    }
+
+    /**
+     * @brief 将给定包围盒纳入包围范围中
+     */
+    BoundingBox<T> &Union(const BoundingBox<T> &b) noexcept
+    {
+        low.x = Math::Min(low.x, b.low.x);
+        low.y = Math::Min(low.y, b.low.y);
+        low.z = Math::Min(low.z, b.low.z);
+        high.x = Math::Max(high.x, b.high.x);
+        high.y = Math::Max(high.y, b.high.y);
+        high.z = Math::Max(high.z, b.high.z);
+        return *this;
+    }
+};
+
+/**
  * @brief 简单的几何模型，仅包含顶点位置、纹理坐标以及法线
  */
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
@@ -33,6 +71,11 @@ struct GeometryMesh
      * @warning 算法非常糙，慎用
      */
     GeometryMesh<T> &SmoothenNormals();
+
+    /**
+     * @brief 取得整个mesh的AABB包围盒
+     */
+    BoundingBox<T> GetBoundingBox() const noexcept;
 };
 
 /**
@@ -54,6 +97,11 @@ struct GeometryMeshGroup
      * @brief 把submeshes合并成一个mesh并返回
      */
     GeometryMesh<T> MergeAllSubmeshes() const;
+
+    /**
+     * @brief 取得整个mesh group的AABB包围盒
+     */
+    BoundingBox<T> GetBoundingBox() const noexcept;
 };
 
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
@@ -89,6 +137,15 @@ GeometryMesh<T> &GeometryMesh<T, DN>::SmoothenNormals()
     return *this;
 }
 
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> N>
+BoundingBox<T> GeometryMesh<T, N>::GetBoundingBox() const noexcept
+{
+    BoundingBox<T> ret;
+    for(auto &v : vertices)
+        ret.Expand(v.pos);
+    return ret;
+}
+
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> DN>
 GeometryMeshGroup<T> &GeometryMeshGroup<T, DN>::SmoothenNormals()
 {
@@ -107,6 +164,15 @@ GeometryMesh<T> GeometryMeshGroup<T, DN>::MergeAllSubmeshes() const
         std::copy(std::begin(sm.vertices), std::end(sm.vertices),
                   std::back_inserter(ret.vertices));
     }
+    return ret;
+}
+
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> N>
+BoundingBox<T> GeometryMeshGroup<T, N>::GetBoundingBox() const noexcept
+{
+    BoundingBox<T> ret;
+    for(auto &it : submeshes)
+        ret.Union(it.second.GetBoundingBox());
     return ret;
 }
 

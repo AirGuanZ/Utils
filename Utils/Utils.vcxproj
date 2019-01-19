@@ -104,6 +104,7 @@
     <ClInclude Include="..\Src\AGZUtils\String\Charset\UTF16.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Charset\UTF32.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Charset\UTF8.h" />
+    <ClInclude Include="..\Src\AGZUtils\String\Format\Format.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Backend.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Inst.h" />

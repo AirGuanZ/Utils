@@ -206,3 +206,5 @@ ptrdiff_t ByteOffsetOf(M(C::*memPtr)) noexcept
 }
 
 } // namespace AGZ
+
+namespace agz = AGZ;

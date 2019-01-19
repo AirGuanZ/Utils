@@ -64,6 +64,9 @@
     <Filter Include="Container">
       <UniqueIdentifier>{523b37cb-c249-4387-a88b-9ef40b5e4828}</UniqueIdentifier>
     </Filter>
+    <Filter Include="String\Format">
+      <UniqueIdentifier>{52350196-2a40-4635-9366-659607d79be8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\AGZUtils\Alloc\Alloc.h">
@@ -411,6 +414,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Container\AccumulatorAndFetcher.h">
       <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Format\Format.h">
+      <Filter>String\Format</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
