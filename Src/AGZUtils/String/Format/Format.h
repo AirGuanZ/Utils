@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <tuple>
-
 #include "../String/String.h"
 #include "../String/StrAlgo.h"
 
@@ -50,8 +48,7 @@ String<CS> TFormat(const Str8 &fmt, const Args&...args)
         char32_t c = *it;
         if(c == '{')
         {
-            ++it;
-            if(it == end)
+            if(++it == end)
                 throw FormatStringException("Invalid format string: '}' expected");
             auto fc = *it;
             if(fc == '{')
