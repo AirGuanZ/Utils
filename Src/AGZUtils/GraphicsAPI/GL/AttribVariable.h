@@ -24,6 +24,12 @@ class AttribVariable
 
 public:
 
+    AttribVariable() noexcept
+        : AttribVariable(0)
+    {
+        
+    }
+
     /**
      * @brief 取得loc值
      */
