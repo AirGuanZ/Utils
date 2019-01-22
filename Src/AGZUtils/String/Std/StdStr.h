@@ -490,7 +490,7 @@ std::basic_string<TChar> &AppendUnicodeCodePointInPlace(std::basic_string<TChar>
     size_t cuCount = UTF::Encode(cp, buf);
 
     for(size_t i = 0; i < cuCount; ++i)
-        str.append(buf[i]);
+        str.push_back(buf[i]);
 
     return str;
 }
@@ -510,7 +510,7 @@ std::basic_string<TCharOut> ConvertBetweenUTF(const std::basic_string_view<TChar
     using UTFOut = Impl::CU2UTF_t<TCharOut>;
 
     std::basic_string<TCharOut> ret;
-    TCharIn *pIn = str.data(), *end = str.data() + str.size();
+    const TCharIn *pIn = str.data(), *end = str.data() + str.size();
 
     while(pIn < end)
     {
