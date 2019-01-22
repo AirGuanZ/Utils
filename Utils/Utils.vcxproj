@@ -111,6 +111,7 @@
     <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Machine.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Syntax.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Regex\Regex.h" />
+    <ClInclude Include="..\Src\AGZUtils\String\Std\UTF.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Std\StdStr.h" />
     <ClInclude Include="..\Src\AGZUtils\String\String\StrAlgo.h" />
     <ClInclude Include="..\Src\AGZUtils\String\String\String.h" />

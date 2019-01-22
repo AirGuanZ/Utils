@@ -424,6 +424,9 @@
     <ClInclude Include="..\Src\AGZUtils\String\Std\StdStr.h">
       <Filter>String\Std</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Std\UTF.h">
+      <Filter>String\Std</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\AGZUtils\Config\Config.inl">
