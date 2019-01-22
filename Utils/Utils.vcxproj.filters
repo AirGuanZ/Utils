@@ -67,6 +67,9 @@
     <Filter Include="String\Format">
       <UniqueIdentifier>{52350196-2a40-4635-9366-659607d79be8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="String\Std">
+      <UniqueIdentifier>{1d98a7c0-fe77-4d74-a912-74deb487b02f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\AGZUtils\Alloc\Alloc.h">
@@ -417,6 +420,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\String\Format\Format.h">
       <Filter>String\Format</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\String\Std\StdStr.h">
+      <Filter>String\Std</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
