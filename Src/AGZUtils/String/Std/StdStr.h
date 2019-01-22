@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <charconv>
 #include <cstdint>
@@ -6,12 +6,13 @@
 #include <string_view>
 
 #include "../../Misc/Common.h"
+#include "UTF.h"
 
 namespace AGZ::Str
 {
 
 /**
- * @brief ÅĞ¶ÏÒ»¸ö×Ö·ûÊÇ·ñÊÇ¿Õ°××Ö·û
+ * @brief åˆ¤æ–­ä¸€ä¸ªå­—ç¬¦æ˜¯å¦æ˜¯ç©ºç™½å­—ç¬¦
  */
 template<typename TChar>
 bool IsWhitespace(TChar ch) noexcept
@@ -20,7 +21,7 @@ bool IsWhitespace(TChar ch) noexcept
 }
 
 /**
- * @brief ÅĞ¶ÏÒ»¸ö×Ö·ûÊÇ·ñÊÇĞ¡Ğ´Ó¢ÎÄ×ÖÄ¸
+ * @brief åˆ¤æ–­ä¸€ä¸ªå­—ç¬¦æ˜¯å¦æ˜¯å°å†™è‹±æ–‡å­—æ¯
  */
 template<typename TChar>
 bool IsLower(TChar ch) noexcept
@@ -29,7 +30,7 @@ bool IsLower(TChar ch) noexcept
 }
 
 /**
- * @brief ÅĞ¶ÏÒ»¸ö×Ö·ûÊÇ·ñÊÇ´óĞ´Ó¢ÎÄ×ÖÄ¸
+ * @brief åˆ¤æ–­ä¸€ä¸ªå­—ç¬¦æ˜¯å¦æ˜¯å¤§å†™è‹±æ–‡å­—æ¯
  */
 template<typename TChar>
 bool IsUpper(TChar ch) noexcept
@@ -38,7 +39,7 @@ bool IsUpper(TChar ch) noexcept
 }
 
 /**
- * @brief ÅĞ¶ÏÒ»¸ö×Ö·ûÊÇ·ñÊÇÓ¢ÎÄ×ÖÄ¸
+ * @brief åˆ¤æ–­ä¸€ä¸ªå­—ç¬¦æ˜¯å¦æ˜¯è‹±æ–‡å­—æ¯
  */
 template<typename TChar>
 bool IsAlpha(TChar ch) noexcept
@@ -47,7 +48,7 @@ bool IsAlpha(TChar ch) noexcept
 }
 
 /**
- * @brief ÅĞ¶ÏÒ»¸ö×Ö·ûÊÇ·ñÊÇÊ®½øÖÆÊı×Ö
+ * @brief åˆ¤æ–­ä¸€ä¸ªå­—ç¬¦æ˜¯å¦æ˜¯åè¿›åˆ¶æ•°å­—
  */
 template<typename TChar>
 bool IsDemDigit(TChar ch) noexcept
@@ -56,7 +57,7 @@ bool IsDemDigit(TChar ch) noexcept
 }
 
 /**
- * @brief ½«Ğ¡Ğ´×ÖÄ¸×ª»»Îª´óĞ´×ÖÄ¸£»ÈôÊäÈë²»ÊÇĞ¡Ğ´×ÖÄ¸£¬ÔòÔ­Ñù·µ»Ø
+ * @brief å°†å°å†™å­—æ¯è½¬æ¢ä¸ºå¤§å†™å­—æ¯ï¼›è‹¥è¾“å…¥ä¸æ˜¯å°å†™å­—æ¯ï¼Œåˆ™åŸæ ·è¿”å›
  */
 template<typename TChar>
 TChar ToUpper(TChar ch) noexcept
@@ -65,7 +66,7 @@ TChar ToUpper(TChar ch) noexcept
 }
 
 /**
- * @brief ½«´óĞ´×ÖÄ¸×ª»»ÎªĞ¡Ğ´×ÖÄ¸£»ÈôÊäÈë²»ÊÇ´óĞ´×ÖÄ¸£¬ÔòÔ­Ñù·µ»Ø
+ * @brief å°†å¤§å†™å­—æ¯è½¬æ¢ä¸ºå°å†™å­—æ¯ï¼›è‹¥è¾“å…¥ä¸æ˜¯å¤§å†™å­—æ¯ï¼Œåˆ™åŸæ ·è¿”å›
  */
 template<typename TChar>
 TChar ToLower(TChar ch) noexcept
@@ -74,7 +75,7 @@ TChar ToLower(TChar ch) noexcept
 }
 
 /**
- * @brief ½«×Ö·û´®ÖĞµÄĞ¡Ğ´Ó¢ÎÄ×ÖÄ¸Ô­µØ×ª»»Îª´óĞ´ĞÎÊ½
+ * @brief å°†å­—ç¬¦ä¸²ä¸­çš„å°å†™è‹±æ–‡å­—æ¯åŸåœ°è½¬æ¢ä¸ºå¤§å†™å½¢å¼
  */
 template<typename TChar>
 std::basic_string<TChar> &ToUpperInPlace(std::basic_string<TChar> &str) noexcept
@@ -85,7 +86,7 @@ std::basic_string<TChar> &ToUpperInPlace(std::basic_string<TChar> &str) noexcept
 }
 
 /**
- * @brief ¸ø¶¨Ò»¸ö×Ö·û´®£¬·µ»Ø½«ÆäÖĞµÄËùÓĞĞ¡Ğ´Ó¢ÎÄ×ÖÄ¸×ª»»Îª´óĞ´ĞÎÊ½ºóµÄ½á¹û
+ * @brief ç»™å®šä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œè¿”å›å°†å…¶ä¸­çš„æ‰€æœ‰å°å†™è‹±æ–‡å­—æ¯è½¬æ¢ä¸ºå¤§å†™å½¢å¼åçš„ç»“æœ
  */
 template<typename TChar>
 std::basic_string<TChar> ToUpper(const std::basic_string_view<TChar> &str)
@@ -95,7 +96,7 @@ std::basic_string<TChar> ToUpper(const std::basic_string_view<TChar> &str)
 }
 
 /**
- * @brief ½«×Ö·û´®ÖĞµÄ´óĞ´Ó¢ÎÄ×ÖÄ¸Ô­µØ×ª»»ÎªĞ¡Ğ´ĞÎÊ½
+ * @brief å°†å­—ç¬¦ä¸²ä¸­çš„å¤§å†™è‹±æ–‡å­—æ¯åŸåœ°è½¬æ¢ä¸ºå°å†™å½¢å¼
  */
 template<typename TChar>
 std::basic_string<TChar> &ToLowerInPlace(std::basic_string<TChar> &str) noexcept
@@ -106,7 +107,7 @@ std::basic_string<TChar> &ToLowerInPlace(std::basic_string<TChar> &str) noexcept
 }
 
 /**
- * @brief ¸ø¶¨Ò»¸ö×Ö·û´®£¬·µ»Ø½«ÆäÖĞµÄËùÓĞ´óĞ´Ó¢ÎÄ×ÖÄ¸×ª»»ÎªĞ¡Ğ´ĞÎÊ½ºóµÄ½á¹û
+ * @brief ç»™å®šä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œè¿”å›å°†å…¶ä¸­çš„æ‰€æœ‰å¤§å†™è‹±æ–‡å­—æ¯è½¬æ¢ä¸ºå°å†™å½¢å¼åçš„ç»“æœ
  */
 template<typename TChar>
 std::basic_string<TChar> ToLower(const std::basic_string_view<TChar> &str)
@@ -116,13 +117,14 @@ std::basic_string<TChar> ToLower(const std::basic_string_view<TChar> &str)
 }
 
 /**
- * @brief Ô­µØÉ¾³ı×Ö·û´®¿ªÍ·ËùÓĞÂú×ãÖ¸¶¨Î½´ÊµÄ×Ö·û
+ * @brief åŸåœ°åˆ é™¤å­—ç¬¦ä¸²å¼€å¤´æ‰€æœ‰æ»¡è¶³æŒ‡å®šè°“è¯çš„å­—ç¬¦
  */
 template<typename TChar, typename TPred>
 std::basic_string<TChar> &TrimLeftInPlace(std::basic_string<TChar> &str, TPred &&pred)
 {
     if(str.empty())
         return str;
+
     auto it = str.begin();
     while(it != str.end())
     {
@@ -130,12 +132,13 @@ std::basic_string<TChar> &TrimLeftInPlace(std::basic_string<TChar> &str, TPred &
             break;
         ++it;
     }
+
     str.erase(str.begin(), it);
     return str;
 }
 
 /**
- * @brief ¸ø¶¨Ò»¸ö×Ö·û´®£¬·µ»ØÉ¾³ıËü¿ªÍ·ËùÓĞÂú×ã¸øÖ¸¶¨Î½´ÊµÄ×Ö·ûºóµÄ½á¹û
+ * @brief ç»™å®šä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œè¿”å›åˆ é™¤å®ƒå¼€å¤´æ‰€æœ‰æ»¡è¶³ç»™æŒ‡å®šè°“è¯çš„å­—ç¬¦åçš„ç»“æœ
  */
 template<typename TChar, typename TPred>
 std::basic_string<TChar> TrimLeft(const std::basic_string_view<TChar> &str, TPred &&pred)
@@ -145,7 +148,7 @@ std::basic_string<TChar> TrimLeft(const std::basic_string_view<TChar> &str, TPre
 }
 
 /**
- * @brief Ô­µØÉ¾³ı×Ö·û´®¿ªÍ·ËùÓĞµÄ¿Õ°××Ö·û
+ * @brief åŸåœ°åˆ é™¤å­—ç¬¦ä¸²å¼€å¤´æ‰€æœ‰çš„ç©ºç™½å­—ç¬¦
  */
 template<typename TChar>
 std::basic_string<TChar> &TrimLeftInPlace(std::basic_string<TChar> &str)
@@ -154,7 +157,7 @@ std::basic_string<TChar> &TrimLeftInPlace(std::basic_string<TChar> &str)
 }
 
 /**
- * @brief ¸ø¶¨Ò»¸ö×Ö·û´®£¬·µ»ØÉ¾³ıËü¿ªÍ·ËùÓĞ¿Õ°××Ö·ûºóµÄ½á¹û
+ * @brief ç»™å®šä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œè¿”å›åˆ é™¤å®ƒå¼€å¤´æ‰€æœ‰ç©ºç™½å­—ç¬¦åçš„ç»“æœ
  */
 template<typename TChar>
 std::basic_string<TChar> TrimLeft(const std::basic_string_view<TChar> &str)
@@ -164,13 +167,14 @@ std::basic_string<TChar> TrimLeft(const std::basic_string_view<TChar> &str)
 }
 
 /**
- * @brief Ô­µØÉ¾³ı×Ö·û´®Ä©Î²ËùÓĞÂú×ã¸ø¶¨Î½´ÊµÄ×Ö·û
+ * @brief åŸåœ°åˆ é™¤å­—ç¬¦ä¸²æœ«å°¾æ‰€æœ‰æ»¡è¶³ç»™å®šè°“è¯çš„å­—ç¬¦
  */
 template<typename TChar, typename TPred>
 std::basic_string<TChar> &TrimRightInPlace(std::basic_string<TChar> &str, TPred &&pred)
 {
     if(str.empty())
         return str;
+
     auto it = str.end();
     do
     {
@@ -178,12 +182,13 @@ std::basic_string<TChar> &TrimRightInPlace(std::basic_string<TChar> &str, TPred 
             break;
         --it;
     } while(it != str.begin());
+
     str.erase(it, str.end());
     return str;
 }
 
 /**
- * @brief ¸ø¶¨Ò»¸ö×Ö·û´®£¬·µ»ØÉ¾³ıËüÄ©Î²ËùÓĞÂú×ãÖ¸¶¨Î½´ÊµÄ×Ö·ûºóµÄ½á¹û
+ * @brief ç»™å®šä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œè¿”å›åˆ é™¤å®ƒæœ«å°¾æ‰€æœ‰æ»¡è¶³æŒ‡å®šè°“è¯çš„å­—ç¬¦åçš„ç»“æœ
  */
 template<typename TChar, typename TPred>
 std::basic_string<TChar> TrimRight(const std::basic_string_view<TChar> &str, TPred &&pred)
@@ -193,7 +198,7 @@ std::basic_string<TChar> TrimRight(const std::basic_string_view<TChar> &str, TPr
 }
 
 /**
- * @brief Ô­µØÉ¾³ı×Ö·û´®Ä©Î²ËùÓĞ¿Õ°××Ö·û
+ * @brief åŸåœ°åˆ é™¤å­—ç¬¦ä¸²æœ«å°¾æ‰€æœ‰ç©ºç™½å­—ç¬¦
  */
 template<typename TChar>
 std::basic_string<TChar> &TrimRightInPlace(std::basic_string<TChar> &str)
@@ -202,7 +207,7 @@ std::basic_string<TChar> &TrimRightInPlace(std::basic_string<TChar> &str)
 }
 
 /**
- * @brief ¸ø¶¨Ò»¸ö×Ö·û´®£¬·µ»ØÉ¾³ıËüÄ©Î²ËùÓĞ¿Õ°××Ö·ûºóµÄ½á¹û
+ * @brief ç»™å®šä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œè¿”å›åˆ é™¤å®ƒæœ«å°¾æ‰€æœ‰ç©ºç™½å­—ç¬¦åçš„ç»“æœ
  */
 template<typename TChar>
 std::basic_string<TChar> TrimRight(const std::basic_string_view<TChar> &str)
@@ -212,7 +217,7 @@ std::basic_string<TChar> TrimRight(const std::basic_string_view<TChar> &str)
 }
 
 /**
- * @brief Ô­µØÉ¾³ı×Ö·û´®Ê×Î²ËùÓĞÂú×ã¸ø¶¨Î½´ÊµÄ×Ö·û
+ * @brief åŸåœ°åˆ é™¤å­—ç¬¦ä¸²é¦–å°¾æ‰€æœ‰æ»¡è¶³ç»™å®šè°“è¯çš„å­—ç¬¦
  */
 template<typename TChar, typename TPred>
 std::basic_string<TChar> &TrimInPlace(std::basic_string<TChar> &str, TPred &&pred)
@@ -221,7 +226,7 @@ std::basic_string<TChar> &TrimInPlace(std::basic_string<TChar> &str, TPred &&pre
 }
 
 /**
- * @brief ¸ø¶¨Ò»¸ö×Ö·û´®£¬·µ»ØÉ¾³ıËüÊ×Î²ËùÓĞÂú×ãÖ¸¶¨Î½´ÊµÄ×Ö·ûºóµÄ½á¹û
+ * @brief ç»™å®šä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œè¿”å›åˆ é™¤å®ƒé¦–å°¾æ‰€æœ‰æ»¡è¶³æŒ‡å®šè°“è¯çš„å­—ç¬¦åçš„ç»“æœ
  */
 template<typename TChar, typename TPred>
 std::basic_string<TChar> Trim(const std::basic_string_view<TChar> &str, TPred &&pred)
@@ -231,7 +236,7 @@ std::basic_string<TChar> Trim(const std::basic_string_view<TChar> &str, TPred &&
 }
 
 /**
- * @brief Ô­µØÉ¾³ı×Ö·û´®Ê×Î²ËùÓĞ¿Õ°××Ö·û
+ * @brief åŸåœ°åˆ é™¤å­—ç¬¦ä¸²é¦–å°¾æ‰€æœ‰ç©ºç™½å­—ç¬¦
  */
 template<typename TChar>
 std::basic_string<TChar> &TrimInPlace(std::basic_string<TChar> &str)
@@ -240,7 +245,7 @@ std::basic_string<TChar> &TrimInPlace(std::basic_string<TChar> &str)
 }
 
 /**
- * @brief ¸ø¶¨Ò»¸ö×Ö·û´®£¬·µ»ØÉ¾³ıËüÊ×Î²ËùÓĞ¿Õ°××Ö·ûºóµÄ½á¹û
+ * @brief ç»™å®šä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œè¿”å›åˆ é™¤å®ƒé¦–å°¾æ‰€æœ‰ç©ºç™½å­—ç¬¦åçš„ç»“æœ
  */
 template<typename TChar>
 std::basic_string<TChar> Trim(const std::basic_string_view<TChar> &str)
@@ -250,52 +255,56 @@ std::basic_string<TChar> Trim(const std::basic_string_view<TChar> &str)
 }
 
 /**
- * @brief ÓÃÒ»¸ö×Ö·ûÁ¬½ÓÒ»×é×Ö·û´®
- * @param joiner ÓÃÀ´Á¬½ÓµÄ×Ö·û
- * @param begin ±»Á¬½ÓµÄ×Ö·û´®ÈİÆ÷µÄÆğÊ¼µü´úÆ÷
- * @param end ±»Á¬½ÓµÄ×Ö·û´®ÈİÆ÷µÄÖÕÖ¹µü´úÆ÷
+ * @brief ç”¨ä¸€ä¸ªå­—ç¬¦è¿æ¥ä¸€ç»„å­—ç¬¦ä¸²
+ * @param joiner ç”¨æ¥è¿æ¥çš„å­—ç¬¦
+ * @param begin è¢«è¿æ¥çš„å­—ç¬¦ä¸²å®¹å™¨çš„èµ·å§‹è¿­ä»£å™¨
+ * @param end è¢«è¿æ¥çš„å­—ç¬¦ä¸²å®¹å™¨çš„ç»ˆæ­¢è¿­ä»£å™¨
  */
 template<typename TChar, typename TIterator>
 std::basic_string<TChar> Join(TChar &joiner, TIterator begin, TIterator end)
 {
     if (begin == end)
         return std::basic_string<TChar>();
+
     std::basic_string<TChar> ret = *begin++;
     while (begin != end)
     {
         ret.push_back(joiner);
         ret.append(*begin++);
     }
+
     return ret;
 }
 
 /**
- * @brief ÓÃÒ»¸ö×Ö·û´®Á¬½ÓÒ»×é×Ö·û´®
- * @param joiner ÓÃÀ´Á¬½ÓµÄ×Ö·û´®
- * @param begin ±»Á¬½ÓµÄ×Ö·û´®ÈİÆ÷µÄÆğÊ¼µü´úÆ÷
- * @param end ±»Á¬½ÓµÄ×Ö·û´®ÈİÆ÷µÄÖÕÖ¹µü´úÆ÷
+ * @brief ç”¨ä¸€ä¸ªå­—ç¬¦ä¸²è¿æ¥ä¸€ç»„å­—ç¬¦ä¸²
+ * @param joiner ç”¨æ¥è¿æ¥çš„å­—ç¬¦ä¸²
+ * @param begin è¢«è¿æ¥çš„å­—ç¬¦ä¸²å®¹å™¨çš„èµ·å§‹è¿­ä»£å™¨
+ * @param end è¢«è¿æ¥çš„å­—ç¬¦ä¸²å®¹å™¨çš„ç»ˆæ­¢è¿­ä»£å™¨
  */
 template<typename TChar, typename TIterator>
 std::basic_string<TChar> Join(const std::basic_string_view<TChar> &joiner, TIterator begin, TIterator end)
 {
     if(begin == end)
         return std::basic_string<TChar>();
+
     std::basic_string<TChar> ret = *begin++;
     while(begin != end)
     {
         ret.append(joiner);
         ret.append(*begin++);
     }
+
     return ret;
 }
 
 /**
- * @brief ÓÃ¸ø¶¨µÄ×Ö·ûÎ½´Ê·Ö¸î×Ö·û´®
- * @param src ´ı·Ö¸îµÄ×Ö·û´®£¬ÉªÉª·¢¶¶ÖĞ
- * @param pred ×Ö·ûÎ½´Ê£¬·²Âú×ã¸ÃÎ½´ÊµÄ×Ö·û¾ù±»ÊÓÎª·Ö¸î×Ö·û
- * @param outIterator Êä³öµü´úÆ÷£¬½ÓÊÕ std::basic_string_view<TChar> ÀàĞÍµÄ½á¹û
- * @param removeEmptyResult ÊÇ·ñÒÆ³ı·Ö¸î½á¹ûÖĞµÄ¿Õ×Ö·û´®£¬È±Ê¡Îª true
- * @return ·Ö¸îºóµÃµ½ÁË¶àÉÙ¸ö×Ó´®
+ * @brief ç”¨ç»™å®šçš„å­—ç¬¦è°“è¯åˆ†å‰²å­—ç¬¦ä¸²
+ * @param src å¾…åˆ†å‰²çš„å­—ç¬¦ä¸²ï¼Œç‘Ÿç‘Ÿå‘æŠ–ä¸­
+ * @param pred å­—ç¬¦è°“è¯ï¼Œå‡¡æ»¡è¶³è¯¥è°“è¯çš„å­—ç¬¦å‡è¢«è§†ä¸ºåˆ†å‰²å­—ç¬¦
+ * @param outIterator è¾“å‡ºè¿­ä»£å™¨ï¼Œæ¥æ”¶ std::basic_string_view<TChar> ç±»å‹çš„ç»“æœ
+ * @param removeEmptyResult æ˜¯å¦ç§»é™¤åˆ†å‰²ç»“æœä¸­çš„ç©ºå­—ç¬¦ä¸²ï¼Œç¼ºçœä¸º true
+ * @return åˆ†å‰²åå¾—åˆ°äº†å¤šå°‘ä¸ªå­ä¸²
  */
 template<typename TChar, typename TPred, typename TOutIterator>
 size_t Split(
@@ -319,12 +328,12 @@ size_t Split(
 }
 
 /**
- * @brief ÓÃ¸ø¶¨µÄ×Ö·û´®·Ö¸î×Ö·û´®
- * @param src ´ı·Ö¸îµÄ×Ö·û´®£¬ÉªÉª·¢¶¶ÖĞ
- * @param splitter ÓÃÓÚ×÷Îª·Ö¸î´®µÄ×Ö·û´®
- * @param outIterator Êä³öµü´úÆ÷£¬½ÓÊÕ std::basic_string_view<TChar> ÀàĞÍµÄ½á¹û
- * @param removeEmptyResult ÊÇ·ñÒÆ³ı·Ö¸î½á¹ûÖĞµÄ¿Õ×Ö·û´®£¬È±Ê¡Îª true
- * @return ·Ö¸îºóµÃµ½ÁË¶àÉÙ¸ö×Ó´®
+ * @brief ç”¨ç»™å®šçš„å­—ç¬¦ä¸²åˆ†å‰²å­—ç¬¦ä¸²
+ * @param src å¾…åˆ†å‰²çš„å­—ç¬¦ä¸²ï¼Œç‘Ÿç‘Ÿå‘æŠ–ä¸­
+ * @param splitter ç”¨äºä½œä¸ºåˆ†å‰²ä¸²çš„å­—ç¬¦ä¸²
+ * @param outIterator è¾“å‡ºè¿­ä»£å™¨ï¼Œæ¥æ”¶ std::basic_string_view<TChar> ç±»å‹çš„ç»“æœ
+ * @param removeEmptyResult æ˜¯å¦ç§»é™¤åˆ†å‰²ç»“æœä¸­çš„ç©ºå­—ç¬¦ä¸²ï¼Œç¼ºçœä¸º true
+ * @return åˆ†å‰²åå¾—åˆ°äº†å¤šå°‘ä¸ªå­ä¸²
  */
 template<typename TChar, typename TOutIterator>
 size_t Split(
@@ -335,28 +344,31 @@ size_t Split(
     while(beg < src.size())
     {
         size_t end = src.find(splitter, beg);
+
         if(end == std::basic_string_view<TChar>::npos)
         {
             ++ret;
             *outIterator++ = src.substr(beg, src.size() - beg);
             break;
         }
+
         if(end != beg || !removeEmptyResult)
         {
             ++ret;
             *outIterator++ = src.substr(beg, end - beg);
         }
+
         beg = end + splitter.size();
     }
     return ret;
 }
 
 /**
- * @brief ÓÃ¿Õ°××Ö·û×÷Îª·Ö¸ô·û·Ö¸î×Ö·û´®
- * @param src ´ı·Ö¸îµÄ×Ö·û´®£¬ÉªÉª·¢¶¶ÖĞ
- * @param outIterator Êä³öµü´úÆ÷£¬½ÓÊÕ std::basic_string_view<TChar> ÀàĞÍµÄ½á¹û
- * @param removeEmptyResult ÊÇ·ñÒÆ³ı·Ö¸î½á¹ûÖĞµÄ¿Õ×Ö·û´®£¬È±Ê¡Îª true
- * @return ·Ö¸îºóµÃµ½ÁË¶àÉÙ¸ö×Ó´®
+ * @brief ç”¨ç©ºç™½å­—ç¬¦ä½œä¸ºåˆ†éš”ç¬¦åˆ†å‰²å­—ç¬¦ä¸²
+ * @param src å¾…åˆ†å‰²çš„å­—ç¬¦ä¸²ï¼Œç‘Ÿç‘Ÿå‘æŠ–ä¸­
+ * @param outIterator è¾“å‡ºè¿­ä»£å™¨ï¼Œæ¥æ”¶ std::basic_string_view<TChar> ç±»å‹çš„ç»“æœ
+ * @param removeEmptyResult æ˜¯å¦ç§»é™¤åˆ†å‰²ç»“æœä¸­çš„ç©ºå­—ç¬¦ä¸²ï¼Œç¼ºçœä¸º true
+ * @return åˆ†å‰²åå¾—åˆ°äº†å¤šå°‘ä¸ªå­ä¸²
  */
 template<typename TChar, typename TOutIterator>
 size_t Split(const std::basic_string_view<TChar> &src, TOutIterator outIterator, bool removeEmptyResult = true)
@@ -365,11 +377,11 @@ size_t Split(const std::basic_string_view<TChar> &src, TOutIterator outIterator,
 }
 
 /**
- * @brief Ô­µØ½«×Ö·û´®ÖĞµÄÖ¸¶¨×Ó´®Ìæ»»ÎªÁíÍâµÄ×Ó´®
- * @param str ±»´¦ÀíµÄÄ¸´®
- * @param oldSubstr ±»Ìæ»»µôµÄ×Ó´®
- * @param newSubstr ÓÃÀ´Ìæ»»µÄĞÂ×Ó´®
- * @return ¹²Ìæ»»µôÁË¶àÉÙ¸ö×Ó´®
+ * @brief åŸåœ°å°†å­—ç¬¦ä¸²ä¸­çš„æŒ‡å®šå­ä¸²æ›¿æ¢ä¸ºå¦å¤–çš„å­ä¸²
+ * @param str è¢«å¤„ç†çš„æ¯ä¸²
+ * @param oldSubstr è¢«æ›¿æ¢æ‰çš„å­ä¸²
+ * @param newSubstr ç”¨æ¥æ›¿æ¢çš„æ–°å­ä¸²
+ * @return å…±æ›¿æ¢æ‰äº†å¤šå°‘ä¸ªå­ä¸²
  */
 template<typename TChar>
 size_t ReplaceInPlace(
@@ -389,11 +401,11 @@ size_t ReplaceInPlace(
 }
 
 /**
- * @brief ¸ø¶¨Ò»¸ö×Ö·û´®£¬·µ»Ø½«ÆäÖĞµÄÖ¸¶¨×Ó´®Ìæ»»ÎªÁíÍâµÄ×Ó´®ºóµÄ½á¹û
- * @param str ±»´¦ÀíµÄÄ¸´®
- * @param oldSubstr ±»Ìæ»»µôµÄ×Ó´®
- * @param newSubstr ÓÃÀ´Ìæ»»µÄĞÂ×Ó´®
- * @return ¹²Ìæ»»µôÁË¶àÉÙ¸ö×Ó´®
+ * @brief ç»™å®šä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œè¿”å›å°†å…¶ä¸­çš„æŒ‡å®šå­ä¸²æ›¿æ¢ä¸ºå¦å¤–çš„å­ä¸²åçš„ç»“æœ
+ * @param str è¢«å¤„ç†çš„æ¯ä¸²
+ * @param oldSubstr è¢«æ›¿æ¢æ‰çš„å­ä¸²
+ * @param newSubstr ç”¨æ¥æ›¿æ¢çš„æ–°å­ä¸²
+ * @return å…±æ›¿æ¢æ‰äº†å¤šå°‘ä¸ªå­ä¸²
  */
 template<typename TChar>
 std::basic_string<TChar> Replace(
@@ -432,10 +444,10 @@ namespace Impl
 } // namespace Impl
 
 /**
- * @brief ½«¸ø¶¨µÄ¶ÔÏó×ª»»Îª×Ö·û´®
- * @param obj ´ı×ª»»µÄ¶ÔÏó
- * @param args ×ª»»²ÎÊı
- * @return ×ª»»µÃµ½µÄ×Ö·û´®½á¹û
+ * @brief å°†ç»™å®šçš„å¯¹è±¡è½¬æ¢ä¸ºå­—ç¬¦ä¸²
+ * @param obj å¾…è½¬æ¢çš„å¯¹è±¡
+ * @param args è½¬æ¢å‚æ•°
+ * @return è½¬æ¢å¾—åˆ°çš„å­—ç¬¦ä¸²ç»“æœ
  */
 template<typename TChar, typename T, typename...Args>
 std::basic_string<TChar> To(T &&obj, Args&&...args)
@@ -444,15 +456,225 @@ std::basic_string<TChar> To(T &&obj, Args&&...args)
 }
 
 /**
- * @brief ´Ó×Ö·û´®ÖĞparse³öÖ¸¶¨ÀàĞÍµÄ¶ÔÏó
- * @param src ´ıparseµÄ×Ö·û´®
- * @param args parsing¹ı³ÌµÄ²ÎÊı
- * @return parsingµÃµ½µÄ½á¹û
+ * @brief ä»å­—ç¬¦ä¸²ä¸­parseå‡ºæŒ‡å®šç±»å‹çš„å¯¹è±¡
+ * @param src å¾…parseçš„å­—ç¬¦ä¸²
+ * @param args parsingè¿‡ç¨‹çš„å‚æ•°
+ * @return parsingå¾—åˆ°çš„ç»“æœ
  */
 template<typename T, typename TChar, typename...Args>
 T From(const std::basic_string_view<TChar> &src, Args&&...args)
 {
     return Impl::FromImpl<TChar, remove_rcv_t<T>, remove_rcv_t<Args>...>::Call(src, std::forward<Args>(args)...);
 }
+
+namespace Impl
+{
+    template<typename TCodeUnit, typename TCodePoint = char32_t>
+    using CU2UTF_t = std::conditional_t<
+        sizeof(TCodeUnit) == 1,
+        TUTF8<TCodeUnit, char32_t, true>,
+        TUTF16<TCodeUnit, char32_t, true>>;
+} // namespace Impl
+
+/**
+ * @brief åœ¨ä¸€ä¸ªUTFå­—ç¬¦ä¸²åè¿½åŠ ä¸€ä¸ªUnicode CodePoint
+ * @param str è¿½åŠ çš„å­—ç¬¦ä¸²
+ * @param cp è¢«è¿½åŠ çš„CodePoint
+ */
+template<typename TChar, typename TCodePoint>
+std::basic_string<TChar> &AppendUnicodeCodePointInPlace(std::basic_string<TChar> &str, TCodePoint cp)
+{
+    using UTF = Impl::CU2UTF_t<TChar, TCodePoint>;
+
+    TChar buf[UTF::MAX_CU_COUNT_IN_ONE_CP];
+    size_t cuCount = UTF::Encode(cp, buf);
+
+    for(size_t i = 0; i < cuCount; ++i)
+        str.append(buf[i]);
+
+    return str;
+}
+
+/**
+ * @brief åœ¨UTFå­—ç¬¦ä¸²é—´è¿›è¡Œç¼–ç è½¬æ¢
+ * @tparam TCharIn æºå­—ç¬¦ä¸²æ‰€ä½¿ç”¨çš„CodeUnitç±»å‹
+ * @tparam TCharOut ç›®æ ‡å­—ç¬¦ä¸²æ‰€ä½¿ç”¨çš„CodeUnitç±»å‹
+ * @param str æºå­—ç¬¦ä¸²
+ * @return è½¬æ¢å¾—åˆ°çš„ç›®æ ‡å­—ç¬¦ä¸²
+ * @exception UTFException æºå­—ç¬¦ä¸²ä¸­åŒ…å«ä¸åˆæ³•UTFåºåˆ—æ—¶æŠ›å‡º
+ */
+template<typename TCharIn, typename TCharOut>
+std::basic_string<TCharOut> ConvertBetweenUTF(const std::basic_string_view<TCharIn> &str)
+{
+    using UTFIn  = Impl::CU2UTF_t<TCharIn>;
+    using UTFOut = Impl::CU2UTF_t<TCharOut>;
+
+    std::basic_string<TCharOut> ret;
+    TCharIn *pIn = str.data(), *end = str.data() + str.size();
+
+    while(pIn < end)
+    {
+        auto [cp, newPIn] = UTFIn::Decode(pIn);
+        AppendUnicodeCodePointInPlace(ret, cp);
+        pIn = newPIn;
+    }
+    return ret;
+}
+
+#ifdef AGZ_OS_WIN32
+using PlatformChar       = wchar_t;
+using PlatformString     = std::wstring;
+using PlatformStringView = std::wstring_view;
+inline std::wstring Str2PStr(const std::string_view &str) { return ConvertBetweenUTF<char, wchar_t>(str); }
+inline std::string PStr2Str(const std::wstring_view &str) { return ConvertBetweenUTF<wchar_t, char>(str); }
+#else
+using PlatformChar       = char;
+using PlatformString     = std::string;
+using PlatformStringView = std::string_view;
+inline std::string_view Str2PStr(const std::string_view &str) { return str; }
+inline std::string_view PStr2Str(const std::string_view &str) { return str; }
+#endif
+
+/**
+ * @brief ä»¥CodePointçš„è§†è§’éå†ä¸€æ®µUTF CodeUnitåºåˆ—
+ * @tparam TCodeUnit UTF CodeUnitç±»å‹
+ * @tparam TCodePoint UTF CodePointç±»å‹ï¼Œç¼ºçœä¸ºchar32_t
+ */
+template<typename TCodeUnit, typename TCodePoint = char32_t>
+class UTFCodePointRange
+{
+    const TCodeUnit *beg_;
+    const TCodeUnit *end_;
+
+    using UTF       = Impl::CU2UTF_t<TCodeUnit, TCodePoint>;
+    using CodeUnit  = TCodeUnit;
+    using CodePoint = TCodePoint;
+
+public:
+
+    /**
+     * @brief ç”¨äºéå†CodePointçš„è¿­ä»£å™¨ç±»å‹
+     */
+    class Iterator
+    {
+        const CodeUnit *pCodeUnit_;
+
+        explicit Iterator(const CodeUnit *pCodeUnit) noexcept
+            : pCodeUnit_(pCodeUnit)
+        {
+            AGZ_ASSERT(pCodeUnit);
+        }
+
+    public:
+
+        using iterator_category = std::forward_iterator_tag;
+        using value_type        = char32_t;
+        using difference_type   = std::make_signed_t<size_t>;
+
+        Iterator() noexcept
+            : pCodeUnit_(nullptr)
+        {
+            
+        }
+
+        CodePoint operator*() const
+        {
+            auto [ret, np] = UTF::Decode(pCodeUnit_);
+            return ret;
+        }
+
+        Iterator &operator++()
+        {
+            auto [cp, np] = UTF::Decode(pCodeUnit_);
+            pCodeUnit_ = np;
+            return *this;
+        }
+
+        Iterator operator++(int)
+        {
+            auto ret = *this;
+            ++*this;
+            return ret;
+        }
+
+        bool operator==(const Iterator &rhs) const noexcept
+        {
+            return pCodeUnit_ == rhs.pCodeUnit_;
+        }
+
+        bool operator!=(const Iterator &rhs) const noexcept
+        {
+            return pCodeUnit_ != rhs.pCodeUnit_;
+        }
+    };
+
+    /**
+     * @brief é»˜è®¤åˆå§‹åŒ–ä¸ºç©ºä¸²
+     */
+    UTFCodePointRange() noexcept
+        : beg_(nullptr), end_(nullptr)
+    {
+        
+    }
+
+    /**
+     * @brief ä»¥ç»™å®šçš„èŒƒå›´åˆå§‹åŒ–
+     * @param beg é¦–ä¸ªCodeUnitåœ°å€
+     * @param end èŒƒå›´åæ–¹ç¬¬ä¸€ä¸ªCodeUnitåœ°å€
+     * CodeUnitåœ°å€èŒƒå›´ä¸º[beg, end)
+     */
+    UTFCodePointRange(const CodeUnit *beg, const CodeUnit *end) noexcept
+        : beg_(beg), end_(end)
+    {
+        AGZ_ASSERT(beg && beg <= end);
+    }
+
+    /**
+     * @brief ä»¥ç»™å®šçš„ä»¥0ç»“å°¾çš„èŒƒå›´è¿›è¡Œåˆå§‹åŒ–
+     * @param beg é¦–ä¸ªCodeUnitåœ°å€
+     * è®¾ä»begå¼€å§‹ï¼Œé¦–ä¸ªå€¼ä¸º0çš„CodeUnitåœ°å€ä¸ºendï¼Œåˆ™CodeUnitåœ°å€èŒƒå›´ä¸º[beg, end)
+     */
+    explicit UTFCodePointRange(const CodeUnit *beg) noexcept
+        : beg_(beg), end_(beg)
+    {
+        AGZ_ASSERT(beg);
+        while(*end_)
+            ++end_;
+    }
+
+    /**
+     * @brief ä»¥æ ‡å‡†åº“å­—ç¬¦ä¸²è¿›è¡Œåˆå§‹åŒ–
+     */
+    explicit UTFCodePointRange(const std::basic_string<CodeUnit> &str) noexcept
+        : beg_(str.data()), end_(str.data() + str.size())
+    {
+        
+    }
+
+    /**
+     * @brief ä»¥æ ‡å‡†åº“å­—ç¬¦ä¸²è¿›è¡Œåˆå§‹åŒ–
+     */
+    explicit UTFCodePointRange(const std::basic_string_view<CodeUnit> &str) noexcept
+        : beg_(str.data()), end_(str.data() + str.size())
+    {
+        
+    }
+
+    /**
+     * @brief å–å¾—ç”¨äºéå†CodePointçš„èµ·å§‹è¿­ä»£å™¨
+     */
+    Iterator begin() const noexcept
+    {
+        return Iterator(beg_);
+    }
+
+    /**
+     * @brief å–å¾—ç”¨äºéå†CodePointçš„ç»ˆæ­¢è¿­ä»£å™¨
+     */
+    Iterator end() const noexcept
+    {
+        return Iterator(end_);
+    }
+};
 
 } // namespace AGZ::Str
