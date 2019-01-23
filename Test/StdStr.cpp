@@ -34,6 +34,9 @@ TEST_CASE("StdStr")
 
     SECTION("Trim")
     {
+        REQUIRE(TrimLeft(u8"  你好啊") == u8"你好啊");
+        REQUIRE(TrimLeft(u8"") == u8"");
+        REQUIRE(TrimRight(u8"你好啊  ") == u8"你好啊");
         REQUIRE(Trim(u8"  今天天气不错\t\t ") == u8"今天天气不错");
         REQUIRE(Trim(u8"12 8 今天天气不错\t456\t ", [](char c) { return IsWhitespace(c) || IsDemDigit(c); }) == u8"今天天气不错");
     }
@@ -55,15 +58,24 @@ TEST_CASE("StdStr")
 
     SECTION("Split")
     {
-        std::vector<std::string_view> strs;
-        size_t size = Split("mine craft is  a good game", std::back_inserter(strs));
-        REQUIRE(size == 6);
-        REQUIRE(strs == std::vector<std::string_view>{ "mine", "craft", "is", "a", "good", "game" });
+        {
+            std::vector<std::string_view> strs;
+            size_t size = Split("mine craft is  a good game", std::back_inserter(strs));
+            REQUIRE(size == 6);
+            REQUIRE(strs == std::vector<std::string_view>{ "mine", "craft", "is", "a", "good", "game" });
 
-        strs.clear();
-        size = Split("mine craft is  a good game", std::back_inserter(strs), false);
-        REQUIRE(size == 7);
-        REQUIRE(strs == std::vector<std::string_view>{ "mine", "craft", "is", "", "a", "good", "game" });
+            strs.clear();
+            size = Split("mine craft is  a good game", std::back_inserter(strs), false);
+            REQUIRE(size == 7);
+            REQUIRE(strs == std::vector<std::string_view>{ "mine", "craft", "is", "", "a", "good", "game" });
+        }
+
+        {
+            std::vector<std::string_view> strs;
+            size_t size = Split("ab4cd5ef6gh", [](char c) { return IsDemDigit(c); }, std::back_inserter(strs));
+            REQUIRE(size == 4);
+            REQUIRE(strs == std::vector<std::string_view>{ "ab", "cd", "ef", "gh" });
+        }
     }
 
     SECTION("From & To")

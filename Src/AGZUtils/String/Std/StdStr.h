@@ -4,6 +4,7 @@
 #include <array>
 #include <charconv>
 #include <cstdint>
+#include <limits>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -78,6 +79,10 @@ TChar ToLower(TChar ch) noexcept
     return IsUpper(ch) ? (ch - 'A' + 'a') : ch;
 }
 
+/**
+ * @cond
+ */
+
 namespace Impl
 {
     template<typename T>               struct CanConvertToStringViewImpl                                : std::false_type {};
@@ -94,6 +99,10 @@ namespace Impl
 #define CONV(VAL)        std::basic_string_view<Impl::ConvertToStringViewCharType_t<remove_rcv_t<decltype(_##VAL)>>> VAL(_##VAL)
 #define TCHAR(TYPE)      Impl::ConvertToStringViewCharType_t<remove_rcv_t<TYPE>>
 #define TCHAR_EQ(T1, T2) std::enable_if_t<std::is_same_v<TCHAR(T1), TCHAR(T2)>, int> =0
+
+/**
+ * @endcond
+ */
 
 /**
  * @brief 将字符串中的小写英文字母原地转换为大写形式
@@ -456,6 +465,10 @@ std::basic_string<TCHAR(T1)> Replace(const T1 &_str, const T2 &_oldSubstr, const
     return ret;
 }
 
+/**
+ * @cond
+ */
+
 AGZ_NEW_EXCEPTION(FromException);
 
 namespace Impl
@@ -492,6 +505,10 @@ namespace Impl
 } // namespace Impl
 
 /**
+ * @endcond
+ */
+
+/**
  * @brief 将给定的对象转换为字符串
  * @param obj 待转换的对象
  * @param args 转换参数
@@ -516,6 +533,10 @@ T From(const T2 &_src, Args&&...args)
     return Impl::FromImpl<TCHAR(T2), remove_rcv_t<T>, remove_rcv_t<Args>...>::Call(src, std::forward<Args>(args)...);
 }
 
+/**
+ * @cond
+ */
+
 namespace Impl
 {
     template<typename TCodeUnit, typename TCodePoint = char32_t>
@@ -524,6 +545,10 @@ namespace Impl
         TUTF8<TCodeUnit, char32_t, true>,
         TUTF16<TCodeUnit, char32_t, true>>;
 } // namespace Impl
+
+/**
+ * @endcond
+ */
 
 /**
  * @brief 在一个UTF字符串后追加一个Unicode CodePoint
@@ -725,7 +750,15 @@ public:
     }
 };
 
+/**
+ * @cond
+ */
+
 AGZ_NEW_EXCEPTION(FormatterException);
+
+/**
+ * @endcond
+ */
 
 /**
  * @brief 字符串格式化工具
@@ -861,6 +894,131 @@ public:
         return ret;
     }
 };
+
+/**
+ * @cond
+ */
+
+AGZ_NEW_EXCEPTION(ParseFirstException);
+
+namespace Impl
+{
+    inline uint8_t Char2Digit(uint8_t ch) noexcept
+    {
+        static constexpr uint8_t LUT[] = {
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   255, 255, 255, 255, 255, 255,
+            255, 10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24,
+            25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  255, 255, 255, 255, 255,
+            255, 10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24,
+            25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+        };
+        return LUT[ch];
+    }
+
+    template<typename TOut, typename TChar> struct TParseFirstImpl;
+
+    template<typename TOut, typename TChar, std::enable_if_t<std::is_integral_v<TOut>, int> = 0>
+    struct TParseFirstImpl<TOut, TChar>
+    {
+        static TOut Call(const TChar **pStr, const TChar *end, int base)
+        {
+            AGZ_ASSERT(pStr && *pStr && end && *pStr <= end);
+            AGZ_ASSERT(2 <= base && base <= 36);
+
+            const TChar *cur = *pStr;
+            
+            bool isNegative = false;
+
+            if constexpr(std::is_signed_v<TOut>)
+            {
+                if(cur != end && *cur == '-')
+                {
+                    isNegative = true;
+                    ++cur;
+                }
+            }
+
+            using UnsignedTOut = std::make_unsigned_t<TOut>;
+
+            constexpr UnsignedTOut UMAX = std::numeric_limits<UnsignedTOut>::max();
+            constexpr UnsignedTOut IMAX = UMAX >> 1;
+            constexpr UnsignedTOut ABS_IMIN = IMAX + 1;
+
+            UnsignedTOut val = 0;
+            for(; cur != end; ++cur)
+            {
+                uint8_t digit = Char2Digit(static_cast<uint8_t>(*cur));
+                if(digit >= base)
+                    break;
+                val = static_cast<UnsignedTOut>(base * val + digit);
+            }
+
+            if(cur - *pStr == static_cast<ptrdiff_t>(isNegative))
+                throw ParseFirstException(std::string("TParseFirst: failed to parse ") + typeid(TOut).name());
+
+            *pStr = cur;
+            return isNegative ? -static_cast<TOut>(val) : static_cast<TOut>(val);
+        }
+    };
+}
+
+/**
+ * @endcond
+ */
+
+/**
+ * @brief 从一段字符序列的开头parse出一个指定类型的对象
+ * @param pCur 字符序列首元素指针的指针，若parse成功，会被设置为新开头的地址
+ * @param end 字符序列的尾元素地址
+ * @param args 其他parsing参数，根据 TOut 的不同而有所区别。
+ *             当 TOut 为整数时，需提供一个 int 值作为parsing的基数。
+ */
+template<typename TOut, typename TChar, typename...Args>
+TOut TParseFirst(const TChar **pCur, const TChar *end, Args&&...args)
+{
+    return Impl::TParseFirstImpl<TOut, TChar>::Call(pCur, end, std::forward<Args>(args)...);
+}
+
+/**
+ * @brief 从一个字符串的开头parse出一个指定类型的对象
+ * @param str 被parsing的字符串地址，parse成功时消耗掉的字符会从其中删除
+ * @param args 其他parsing参数，根据 TOut 的不同而有所区别。
+ *             当 TOut 为整数时，需提供一个 int 值作为parsing的基数。
+ */
+template<typename TOut, typename TChar, typename...Args>
+TOut TParseFirst(std::basic_string_view<TChar> *str, Args&&...args)
+{
+    const TChar *cur = str->data(), *end = str->data() + str->size();
+    auto ret = TParseFirst<TOut>(&cur, end, std::forward<Args>(args)...);
+    str = str->substr(cur - str->data());
+    return ret;
+}
+
+/**
+ * @brief 从一个字符串的开头parse出一个指定类型的对象
+ * @param str 被parsing的字符串地址，parse成功时消耗掉的字符会从其中删除
+ * @param args 其他parsing参数，根据 TOut 的不同而有所区别。
+ *             当 TOut 为整数时，需提供一个 int 值作为parsing的基数。
+ */
+template<typename TOut, typename TChar, typename...Args>
+TOut TParseFirst(std::basic_string<TChar> *str, Args&&...args)
+{
+    const TChar *cur = str->data(), *end = str->data() + str->size();
+    auto ret = TParseFirst<TOut>(&cur, end, std::forward<Args>(args)...);
+    str = str->substr(cur - str->data());
+    return ret;
+}
 
 #undef CONV
 #undef CONV_T
