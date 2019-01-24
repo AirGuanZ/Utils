@@ -1074,6 +1074,17 @@ TOut TParseFirst(std::basic_string<TChar> *str, Args&&...args)
     return ret;
 }
 
+/**
+ * @brief 格式化字符串解析工具
+ * 
+ * 使用时，在 TScanner 的构造函数中给出格式串，调用其实例的 Scan 方法解析参数中的字符串。如：
+ * 
+@code
+int a, b;
+assert(TScanner<char>("abc{}def{}").Scan("abc123def456", a, b));
+assert(a == 123 && def == 456);
+@endcode
+ */
 template<typename TChar>
 class TScanner
 {
@@ -1113,6 +1124,19 @@ class TScanner
 
 public:
 
+    /**
+     * @brief 以格式串进行初始化
+     * @param _fmt 格式串
+     * 
+     * 格式串语法：
+     *  - {} 表示解析输出引用，引用下标从0开始，逐个递增
+     *  - {{ 字符'{'的转义
+     *  - 其他字符 直接匹配
+     * 
+     * 格式串的解析较慢，若需要多次用同一个格式串进行字符串进行解析，可以缓存该 TScanner 对象以减小解析开销
+     * 
+     * @exception ScannerException 格式串含有语法错误时抛出
+     */
     template<typename T, CONV_T(T), std::enable_if_t<std::is_same_v<TCHAR(T), TChar>, int> = 0>
     explicit TScanner(const T &_fmt)
         : outputCount_(0)
@@ -1154,6 +1178,12 @@ public:
         }
     }
 
+    /**
+     * @brief 用格式串匹配给定的字符串内容
+     * @param _str 被匹配的字符串
+     * @param args 用于接受解析输出的参数，目前只支持整数类型(integral type)
+     * @exception ScannerException 参数数量过少时抛出
+     */
     template<typename T, typename...Args, CONV_T(T)>
     bool Scan(const T &_str, Args&...args)
     {
@@ -1165,7 +1195,7 @@ public:
         try
         {
             std::array<ProcessOutputFunc_t, sizeof...(args)> processFuncArr;
-            std::array<void*, sizeof...(args)> voidOutputs;
+            std::array<void*, sizeof...(args)>               voidOutputs;
             AssignProcessOutputFunc(processFuncArr.data(),voidOutputs.data(), args...);
 
             size_t outputIndex = 0;

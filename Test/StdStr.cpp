@@ -35,7 +35,7 @@ TEST_CASE("StdStr")
     SECTION("Trim")
     {
         REQUIRE(TrimLeft(u8"  你好啊") == u8"你好啊");
-        REQUIRE(TrimLeft(u8"") == u8"");
+        REQUIRE(TrimLeft(u8"").empty());
         REQUIRE(TrimRight(u8"你好啊  ") == u8"你好啊");
         REQUIRE(Trim(u8"  今天天气不错\t\t ") == u8"今天天气不错");
         REQUIRE(Trim(u8"12 8 今天天气不错\t456\t ", [](char c) { return IsWhitespace(c) || IsDemDigit(c); }) == u8"今天天气不错");
@@ -102,12 +102,10 @@ TEST_CASE("StdStr")
 
     SECTION("Scanner")
     {
-        {
-            int a, b;
-            REQUIRE(TScanner<char>("abc{}def{}").Scan("abc123def456", a, b));
-            REQUIRE((a == 123 && b == 456));
-            REQUIRE(TScanner<char>(u8"今天天气不错").Scan(u8"今天天气不错"));
-            REQUIRE(!TScanner<char>(u8"今天天气不错").Scan(u8"今天天气很好"));
-        }
+        int a, b;
+        REQUIRE(TScanner<char>("abc{}def{}{{").Scan("abc123def456{", a, b));
+        REQUIRE((a == 123 && b == 456));
+        REQUIRE(TScanner<char>(u8"今天天气不错").Scan(u8"今天天气不错"));
+        REQUIRE(!TScanner<char>(u8"今天天气不错").Scan(u8"今天天气很好"));
     }
 }
