@@ -293,6 +293,58 @@ std::basic_string<TCHAR(T)> Trim(const T &_str)
 }
 
 /**
+ * @brief 判断一个字符串是否具有给定的前缀
+ * @param _str 母字符串
+ * @param _prefix 被比较的前缀串
+ */
+template<typename T1, typename T2, CONV_T(T1), CONV_T(T2)>
+bool StartsWith(const T1 &_str, const T2 &_prefix)
+{
+    CONV(str);
+    CONV(prefix);
+    return str.substr(0, prefix.size()) == prefix;
+}
+
+/**
+ * @brief 判断一个字符串是否具有给定的前缀字符
+ * @param _str 母字符串
+ * @param prefix 被比较的前缀字符
+ */
+template<typename T, CONV_T(T)>
+bool StartsWith(const T &_str, TCHAR(T) prefix)
+{
+    CONV(str);
+    return !str.empty() && str.front() == prefix;
+}
+
+/**
+ * @brief 判断一个字符串是否具有指定的后缀
+ * @param _str 母字符串
+ * @param _suffix 被比较的后缀串
+ */
+template<typename T1, typename T2, CONV_T(T1), CONV_T(T2)>
+bool EndsWith(const T1 &_str, const T2 &_suffix)
+{
+    CONV(str);
+    CONV(suffix);
+    if(str.size() < suffix.size())
+        return false;
+    return str.substr(str.size() - suffix.size()) == suffix;
+}
+
+/**
+ * @brief 判断一个字符串是否具有指定的后缀
+ * @param _str 母字符串
+ * @param suffix 被比较的后缀字符
+ */
+template<typename T, CONV_T(T)>
+bool EndsWith(const T &_str, TCHAR(T) suffix)
+{
+    CONV(str);
+    return !str.empty() && str.back() == suffix;
+}
+
+/**
  * @brief 用一个字符连接一组字符串
  * @param joiner 用来连接的字符
  * @param begin 被连接的字符串容器的起始迭代器
@@ -773,14 +825,14 @@ assert(str == "2 + 2 = 4");
 template<typename TChar>
 class TFormatter
 {
-    struct Char    { TChar ch; };
-    struct Seg     { std::basic_string<TChar> seg; };
-    struct ArgIdx  { size_t idx; };
+    struct Char      { TChar ch; };
+    struct Seg       { std::basic_string<TChar> seg; };
+    struct ArgIndex  { size_t index; };
 
-    using Unit = TypeOpr::Variant<Char, Seg, ArgIdx>;
+    using Unit = TypeOpr::Variant<Char, Seg, ArgIndex>;
 
     std::vector<Unit> units_;
-    size_t maxArgIdx_;
+    size_t minArgIndex_;
 
     static void ArgArr2Str(std::basic_string<TChar> *) { }
 
@@ -809,54 +861,54 @@ public:
      */
     template<typename T, CONV_T(T), std::enable_if_t<std::is_same_v<TCHAR(T), TChar>, int> = 0>
     explicit TFormatter(const T &_fmt)
-        : maxArgIdx_(0)
+        : minArgIndex_(0)
     {
         CONV(fmt);
 
-        size_t cur = 0, nextArgIdx = 0;
+        size_t cur = 0, nextArgIndex = 0;
         while(cur < fmt.size())
         {
-            size_t braceIdx = fmt.find('{', cur);
-            if(braceIdx == std::basic_string_view<TChar>::npos)
+            size_t braceIndex = fmt.find('{', cur);
+            if(braceIndex == std::basic_string_view<TChar>::npos)
             {
                 units_.emplace_back(Seg{ std::basic_string<TChar>(fmt.substr(cur)) });
                 break;
             }
 
-            if(braceIdx > cur)
-                units_.emplace_back(Seg{ std::basic_string<TChar>(fmt.substr(cur, braceIdx - cur)) });
+            if(braceIndex > cur)
+                units_.emplace_back(Seg{ std::basic_string<TChar>(fmt.substr(cur, braceIndex - cur)) });
 
-            if(braceIdx >= fmt.size() - 1)
+            if(braceIndex >= fmt.size() - 1)
                 throw FormatterException("Invalid format string: '}' expected");
 
-            if(fmt[braceIdx + 1] == '{')
+            if(fmt[braceIndex + 1] == '{')
             {
                 units_.emplace_back(Char{ '{' });
-                cur = braceIdx + 2;
+                cur = braceIndex + 2;
                 continue;
             }
 
-            if(fmt[braceIdx + 1] == '}')
+            if(fmt[braceIndex + 1] == '}')
             {
-                units_.emplace_back(ArgIdx{ nextArgIdx });
-                maxArgIdx_ = std::max(maxArgIdx_, nextArgIdx);
-                ++nextArgIdx;
-                cur = braceIdx + 2;
+                units_.emplace_back(ArgIndex{ nextArgIndex });
+                minArgIndex_ = (std::max)(minArgIndex_, nextArgIndex);
+                ++nextArgIndex;
+                cur = braceIndex + 2;
                 continue;
             }
 
-            size_t argIdx;
-            auto [newPCur, err] = std::from_chars(fmt.data() + braceIdx + 1, fmt.data() + fmt.size(), argIdx);
+            size_t argIndex;
+            auto [newPCur, err] = std::from_chars(fmt.data() + braceIndex + 1, fmt.data() + fmt.size(), argIndex);
             if(err != std::errc())
                 throw FormatterException("Invalid format string: unknown argument index");
-            units_.emplace_back(ArgIdx{ argIdx });
-            maxArgIdx_ = std::max(maxArgIdx_, argIdx);
-            nextArgIdx = argIdx + 1;
+            units_.emplace_back(ArgIndex{ argIndex });
+            minArgIndex_ = (std::max)(minArgIndex_, argIndex);
+            nextArgIndex = argIndex + 1;
 
-            size_t endBracIdx = newPCur - fmt.data();
-            if(endBracIdx >= fmt.size() || fmt[endBracIdx] != '}')
+            size_t endBracIndex = newPCur - fmt.data();
+            if(endBracIndex >= fmt.size() || fmt[endBracIndex] != '}')
                 throw FormatterException("Invalid format string: '}' expected");
-            cur = endBracIdx + 1;
+            cur = endBracIndex + 1;
         }
     }
 
@@ -867,8 +919,8 @@ public:
     template<typename...Args>
     std::basic_string<TChar> Arg(Args&&...args) const
     {
-        if(maxArgIdx_ >= sizeof...(args))
-            throw FormatterException("Invalid format arguments: sizeof...(args) must be more than " + To<TChar>(maxArgIdx_));
+        if(minArgIndex_ >= sizeof...(args))
+            throw FormatterException("Invalid format arguments: sizeof...(args) must be more than " + To<TChar>(minArgIndex_));
 
         std::basic_string<TChar> ret;
         std::array<std::basic_string<TChar>, sizeof...(args)> strs;
@@ -885,9 +937,9 @@ public:
             {
                 ret.append(param.seg);
             },
-                [&](const ArgIdx &param)
+                [&](const ArgIndex &param)
             {
-                ret.append(strs[param.idx]);
+                ret.append(strs[param.index]);
             });
         }
 
@@ -900,6 +952,7 @@ public:
  */
 
 AGZ_NEW_EXCEPTION(ParseFirstException);
+AGZ_NEW_EXCEPTION(ScannerException);
 
 namespace Impl
 {
@@ -926,10 +979,8 @@ namespace Impl
         return LUT[ch];
     }
 
-    template<typename TOut, typename TChar> struct TParseFirstImpl;
-
     template<typename TOut, typename TChar, std::enable_if_t<std::is_integral_v<TOut>, int> = 0>
-    struct TParseFirstImpl<TOut, TChar>
+    struct TParseFirstImpl
     {
         static TOut Call(const TChar **pStr, const TChar *end, int base)
         {
@@ -951,7 +1002,7 @@ namespace Impl
 
             using UnsignedTOut = std::make_unsigned_t<TOut>;
 
-            constexpr UnsignedTOut UMAX = std::numeric_limits<UnsignedTOut>::max();
+            constexpr UnsignedTOut UMAX = (std::numeric_limits<UnsignedTOut>::max)();
             constexpr UnsignedTOut IMAX = UMAX >> 1;
             constexpr UnsignedTOut ABS_IMIN = IMAX + 1;
 
@@ -983,6 +1034,7 @@ namespace Impl
  * @param end 字符序列的尾元素地址
  * @param args 其他parsing参数，根据 TOut 的不同而有所区别。
  *             当 TOut 为整数时，需提供一个 int 值作为parsing的基数。
+ * @exception ParseFirstException parse失败时抛出
  */
 template<typename TOut, typename TChar, typename...Args>
 TOut TParseFirst(const TChar **pCur, const TChar *end, Args&&...args)
@@ -995,13 +1047,14 @@ TOut TParseFirst(const TChar **pCur, const TChar *end, Args&&...args)
  * @param str 被parsing的字符串地址，parse成功时消耗掉的字符会从其中删除
  * @param args 其他parsing参数，根据 TOut 的不同而有所区别。
  *             当 TOut 为整数时，需提供一个 int 值作为parsing的基数。
+ * @exception ParseFirstException parse失败时抛出
  */
 template<typename TOut, typename TChar, typename...Args>
 TOut TParseFirst(std::basic_string_view<TChar> *str, Args&&...args)
 {
     const TChar *cur = str->data(), *end = str->data() + str->size();
     auto ret = TParseFirst<TOut>(&cur, end, std::forward<Args>(args)...);
-    str = str->substr(cur - str->data());
+    *str = str->substr(cur - str->data());
     return ret;
 }
 
@@ -1010,15 +1063,155 @@ TOut TParseFirst(std::basic_string_view<TChar> *str, Args&&...args)
  * @param str 被parsing的字符串地址，parse成功时消耗掉的字符会从其中删除
  * @param args 其他parsing参数，根据 TOut 的不同而有所区别。
  *             当 TOut 为整数时，需提供一个 int 值作为parsing的基数。
+ * @exception ParseFirstException parse失败时抛出
  */
 template<typename TOut, typename TChar, typename...Args>
 TOut TParseFirst(std::basic_string<TChar> *str, Args&&...args)
 {
     const TChar *cur = str->data(), *end = str->data() + str->size();
     auto ret = TParseFirst<TOut>(&cur, end, std::forward<Args>(args)...);
-    str = str->substr(cur - str->data());
+    *str = str->substr(cur - str->data());
     return ret;
 }
+
+template<typename TChar>
+class TScanner
+{
+    struct Output { };
+    struct Seg    { std::basic_string<TChar> seg; };
+    struct Char   { TChar ch; };
+
+    using Unit = TypeOpr::Variant<Output, Seg, Char>;
+
+    size_t outputCount_;
+    std::vector<Unit> units_;
+
+    using ProcessOutputFunc_t = void(*)(std::basic_string_view<TChar>&, void*);
+
+    template<typename TInt>
+    static void ProcessIntegerOutput(std::basic_string_view<TChar> &str, void *output)
+    {
+        static_assert(std::is_integral_v<TInt>);
+        TInt *pOutput = static_cast<TInt*>(output);
+        *pOutput = TParseFirst<TInt>(&str, 10);
+    }
+
+    static void AssignProcessOutputFunc(ProcessOutputFunc_t*, void**) { }
+    
+    template<typename FirstOutput, typename...OtherOutputs>
+    static void AssignProcessOutputFunc(ProcessOutputFunc_t *pFuncPtr, void **voidOutputs, FirstOutput &firstOutput, OtherOutputs&...otherOutputs)
+    {
+        using FO = remove_rcv_t<FirstOutput>;
+        static_assert(std::is_integral_v<FO>, "Each output argument must be of integral type");
+        ;
+        if constexpr(std::is_integral_v<FO>)
+            *pFuncPtr = ProcessIntegerOutput<FO>;
+        *voidOutputs = &firstOutput;
+
+        AssignProcessOutputFunc(pFuncPtr + 1, voidOutputs + 1, otherOutputs...);
+    }
+
+public:
+
+    template<typename T, CONV_T(T), std::enable_if_t<std::is_same_v<TCHAR(T), TChar>, int> = 0>
+    explicit TScanner(const T &_fmt)
+        : outputCount_(0)
+    {
+        CONV(fmt);
+
+        size_t cur = 0;
+        while(cur < fmt.size())
+        {
+            size_t braceIndex = fmt.find('{', cur);
+            if(braceIndex == std::basic_string_view<TChar>::npos)
+            {
+                units_.emplace_back(Seg{ std::basic_string<TChar>(fmt.substr(cur)) });
+                break;
+            }
+
+            if(braceIndex > cur)
+                units_.emplace_back(Seg{ std::basic_string<TChar>(fmt.substr(cur, braceIndex - cur)) });
+
+            if(braceIndex >= fmt.size() - 1)
+                throw ScannerException("Invalid scanning format: '}' expected");
+
+            if(fmt[braceIndex + 1] == '{')
+            {
+                units_.emplace_back(Char{ '{' });
+                cur = braceIndex + 2;
+                continue;
+            }
+
+            if(fmt[braceIndex + 1] == '}')
+            {
+                units_.emplace_back(Output{});
+                ++outputCount_;
+                cur = braceIndex + 2;
+                continue;
+            }
+
+            throw ScannerException("Invalid scanner format");
+        }
+    }
+
+    template<typename T, typename...Args, CONV_T(T)>
+    bool Scan(const T &_str, Args&...args)
+    {
+        CONV(str);
+
+        if(sizeof...(args) < outputCount_)
+            throw ScannerException("Invalid scanner arguments: sizeof...(args) must be more than " + To<TChar>(outputCount_));
+
+        try
+        {
+            std::array<ProcessOutputFunc_t, sizeof...(args)> processFuncArr;
+            std::array<void*, sizeof...(args)> voidOutputs;
+            AssignProcessOutputFunc(processFuncArr.data(),voidOutputs.data(), args...);
+
+            size_t outputIndex = 0;
+            for(auto &unit : units_)
+            {
+                auto m = TypeOpr::MatchVar(unit,
+                    [&](const Output &)
+                {
+                    void *pOutput = voidOutputs[outputIndex];
+                    ProcessOutputFunc_t processFunction = processFuncArr[outputIndex];
+                    processFunction(str, pOutput);
+                    ++outputIndex;
+                    return true;
+                },
+                    [&](const Seg &param)
+                {
+                    if(StartsWith(str, param.seg))
+                    {
+                        str = str.substr(param.seg.size());
+                        return true;
+                    }
+                    return false;
+
+                },
+                    [&](const Char &param)
+                {
+                    if(StartsWith(str, param.ch))
+                    {
+                        str = str.substr(1);
+                        return true;
+                    }
+                    return false;
+                });
+
+                if(!m)
+                    return false;
+            }
+
+            return true;
+        }
+        catch(...)
+        {
+            return false;
+        }
+    }
+};
 
 #undef CONV
 #undef CONV_T

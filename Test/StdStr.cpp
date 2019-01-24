@@ -99,4 +99,15 @@ TEST_CASE("StdStr")
         REQUIRE(TFormatter<char>("abc{0} + {0} = {2}, {1}").Arg(1, 3, 2) == "abc1 + 1 = 2, 3");
         REQUIRE(TFormatter<char>(u8"今天{1}天气{}不错").Arg(0, 1, 2) == u8"今天1天气2不错");
     }
+
+    SECTION("Scanner")
+    {
+        {
+            int a, b;
+            REQUIRE(TScanner<char>("abc{}def{}").Scan("abc123def456", a, b));
+            REQUIRE((a == 123 && b == 456));
+            REQUIRE(TScanner<char>(u8"今天天气不错").Scan(u8"今天天气不错"));
+            REQUIRE(!TScanner<char>(u8"今天天气不错").Scan(u8"今天天气很好"));
+        }
+    }
 }
