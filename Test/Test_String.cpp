@@ -1,4 +1,4 @@
-﻿#include <AGZUtils/String/Std/StdStr.h>
+﻿#include <AGZUtils/String.h>
 
 #include "Catch.hpp"
 

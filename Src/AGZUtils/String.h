@@ -9,12 +9,238 @@
 #include <string_view>
 #include <vector>
 
-#include "../../Misc/Common.h"
-#include "../../Misc/TypeOpr.h"
-#include "UTF.h"
+#include "Misc/Common.h"
+#include "Misc/Exception.h"
+#include "Misc/TypeOpr.h"
 
 namespace AGZ::Str
 {
+
+/**
+ * @cond
+ */
+AGZ_NEW_EXCEPTION(UTFException);
+
+/**
+ * @endcond
+ */
+
+/**
+ * @brief UTF-8 的code point、code unit转换
+ * @tparam TCodeUnit 用于表示一个CodeUnit的类型，大小应为1
+ * @tparam TCodePoint 用于表示一个CodePoint的类型，大小应为4
+ * @tparam TUseException 是否在出现编码错误时使用异常，缺省为 true
+ */
+template<typename TCodeUnit, typename TCodePoint, bool TUseException = true>
+class TUTF8
+{
+    static_assert(sizeof(TCodeUnit) == 1, "sizeof TCodeUnit of UTF-8 must be 1");
+    static_assert(sizeof(TCodePoint) == 4, "sizeof TCodePoint of UTF-8 must be 4");
+
+public:
+
+    using CodePoint = TCodePoint;
+    using CodeUnit  = TCodeUnit;
+
+    /**
+     * @brief 将一个CodePoint转换为CodeUnit时最多需要多少个CodeUnit的空间
+     */
+    static constexpr size_t MAX_CU_COUNT_IN_ONE_CP = 4;
+
+    /**
+     * @brief 从一系列CodeUnit的开头提取一个CodePoint
+     * @param cu CodeUnit串的指针
+     * @return 二元组(CP, pCU)，其中CP是提取出的CodePoint，pCU是剩余的CodeUnit串的首元素指针
+     *         若没有启用异常，则当出现不合法CodeUnit串时返回(0, nullptr)
+     * @exception TUseException 若启用了异常，则在遇到不合法CodeUnit串时抛出
+     */
+    static std::pair<CodePoint, const CodeUnit*> Decode(const CodeUnit *cu) noexcept(!TUseException)
+    {
+        AGZ_ASSERT(cu);
+
+        CodeUnit fst = *cu++;
+
+        // 1 bytes
+        if(!(fst & 0b10000000))
+            return { static_cast<CodePoint>(fst), cu };
+
+#define NEXT(C, DST) \
+    do {\
+        CodeUnit ch = (C); \
+        if((ch & 0b11000000) != 0b10000000) \
+        { \
+            if constexpr(TUseException) \
+                throw UTFException("Decoding invalid utf-8 sequence"); \
+            else \
+                return { 0, nullptr }; \
+        } \
+        (DST) = ch & 0b00111111; \
+    } while(0)
+
+        // 2 bytes
+        if((fst & 0b11100000) == 0b11000000)
+        {
+            CodePoint low;
+            NEXT(*cu++, low);
+            return { ((fst & 0b00011111) << 6) | low, cu };
+        }
+
+        // 3 bytes
+        if((fst & 0b11110000) == 0b11100000)
+        {
+            CodePoint high, low;
+            NEXT(*cu++, high);
+            NEXT(*cu++, low);
+            return { ((fst & 0b00001111) << 12) | (high << 6) | low, cu };
+        }
+
+        // 4 bytes
+        if((fst & 0b11111000) == 0b11110000)
+        {
+            CodePoint high, medi, low;
+            NEXT(*cu++, high);
+            NEXT(*cu++, medi);
+            NEXT(*cu++, low);
+            return { ((fst & 0b00000111) << 18) | (high << 12) | (medi << 6) | low, cu };
+        }
+
+#undef NEXT
+
+        if constexpr(TUseException)
+            throw UTFException("Decoding invalid utf-8 sequence");
+        else
+            return { 0, nullptr };
+    }
+
+    /**
+     * @brief 将一个CodePoint转换为几个CodeUnit
+     * @param cp CodePoint值
+     * @param cu 用于存放输出的CodeUnit的缓冲区，至少应能容纳 MAX_CU_COUNT_IN_ONE_CP 个CodeUnit
+     * @return 该CodePoint占据了几个CodeUnit的空间
+     *          若没有启用异常，则在CodePoint值不合法时返回0
+     * @exception UTFException 若启用了异常，则在遇到不合法的CodePoint值时抛出
+     */
+    static size_t Encode(CodePoint cp, CodeUnit *cu) noexcept(!TUseException)
+    {
+        AGZ_ASSERT(cu);
+
+        if(cp <= 0x7f)
+        {
+            cu[0] = static_cast<CodeUnit>(cp);
+            return 1;
+        }
+
+        if(cp <= 0x7ff)
+        {
+            cu[0] = static_cast<CodeUnit>(0b11000000 | (cp >> 6));
+            cu[1] = static_cast<CodeUnit>(0b10000000 | (cp & 0b00111111));
+            return 2;
+        }
+
+        if(cp < 0xffff)
+        {
+            cu[0] = static_cast<CodeUnit>(0b11100000 | (cp >> 12));
+            cu[1] = static_cast<CodeUnit>(0b10000000 | ((cp >> 6) & 0b00111111));
+            cu[2] = static_cast<CodeUnit>(0b10000000 | (cp & 0b00111111));
+            return 3;
+        }
+
+        if(cp <= 0x10ffff)
+        {
+            cu[0] = static_cast<CodeUnit>(0b11110000 | (cp >> 18));
+            cu[1] = static_cast<CodeUnit>(0b10000000 | ((cp >> 12) & 0b00111111));
+            cu[2] = static_cast<CodeUnit>(0b10000000 | ((cp >> 6) & 0b00111111));
+            cu[3] = static_cast<CodeUnit>(0b10000000 | (cp & 0b00111111));
+            return 4;
+        }
+
+        if constexpr(TUseException)
+            throw UTFException("Encoding invalid unicode codepoint to utf-8");
+        else
+            return 0;
+    }
+};
+
+/**
+ * @brief UTF-16 的code point、code unit转换
+ * @tparam TCodeUnit 用于表示一个CodeUnit的类型，大小应为2
+ * @tparam TCodePoint 用于表示一个CodePoint的类型，大小应为4
+ * @tparam TUseException 是否在出现编码错误时使用异常，缺省为 true
+ */
+template<typename TCodeUnit, typename TCodePoint, bool TUseException = true>
+class TUTF16
+{
+    static_assert(sizeof(TCodeUnit) == 2, "sizeof TCodeUnit of UTF-16 must be 2");
+    static_assert(sizeof(TCodePoint) == 4, "sizeof TCodePoint of UTF-16 must be 4");
+
+public:
+
+    using CodePoint = TCodePoint;
+    using CodeUnit  = TCodeUnit;
+
+    /**
+     * @brief 将一个CodePoint转换为CodeUnit时最多需要多少个CodeUnit的空间
+     */
+    static constexpr size_t MAX_CU_COUNT_IN_ONE_CP = 2;
+
+    /**
+     * @brief 从一系列CodeUnit的开头提取一个CodePoint
+     * @param cu CodeUnit串的指针
+     * @return 二元组(CP, pCU)，其中CP是提取出的CodePoint，pCU是剩余的CodeUnit串的首元素指针
+     *         若没有启用异常，则当出现不合法CodeUnit串时返回(0, nullptr)
+     * @exception TUseException 若启用了异常，则在遇到不合法CodeUnit串时抛出
+     */
+    static std::pair<CodePoint, const CodeUnit*> Decode(const CodeUnit *cu) noexcept(!TUseException)
+    {
+        AGZ_ASSERT(cu);
+
+        CodePoint high = static_cast<CodePoint>(*cu++);
+        if(high <= 0xd7ff || (0xe000 <= high && high <= 0xffff))
+            return { high, cu };
+
+        if(0xd800 <= high && high <= 0xdbff)
+        {
+            CodePoint low = static_cast<CodePoint>(*cu++);
+            if(low <= 0xdfff)
+                return { 0x10000 + (((high & 0x3ff) << 10) | (low & 0x3ff)), cu };
+        }
+
+        if constexpr(TUseException)
+            throw UTFException("Decoding invalid utf-16 sequence");
+        else
+            return { 0, nullptr };
+    }
+
+    /**
+     * @brief 将一个CodePoint转换为几个CodeUnit
+     * @param cp CodePoint值
+     * @param cu 用于存放输出的CodeUnit的缓冲区，至少应能容纳 MAX_CU_COUNT_IN_ONE_CP 个CodeUnit
+     * @return 该CodePoint占据了几个CodeUnit的空间
+     *          若没有启用异常，则在CodePoint值不合法时返回0
+     * @exception UTFException 若启用了异常，则在遇到不合法的CodePoint值时抛出
+     */
+    static size_t Encode(CodePoint cp, CodeUnit *cu) noexcept(!TUseException)
+    {
+        if(cp <= 0xd7ff || (0xe000 <= cp && cp <= 0xffff))
+        {
+            *cu = static_cast<CodeUnit>(cp);
+            return 1;
+        }
+
+        if(0x10000 <= cp && cp <= 0x10ffff)
+        {
+            cp -= 0x10000;
+            *cu++ = static_cast<CodeUnit>(0xd800 | (cp >> 10));
+            *cu = static_cast<CodeUnit>(0xdc00 | (cp & 0x3ff));
+            return 2;
+        }
+
+        if constexpr(TUseException)
+            throw UTFException("Encoding invalid unicode codepoint to utf-16");
+        else
+            return 0;
+    }
+};
 
 /**
  * @brief 判断一个字符是否是空白字符
@@ -625,14 +851,16 @@ std::basic_string<TChar> &AppendUnicodeCodePointInPlace(std::basic_string<TChar>
  * @brief 在UTF字符串间进行编码转换
  * @tparam TCharIn 源字符串所使用的CodeUnit类型
  * @tparam TCharOut 目标字符串所使用的CodeUnit类型
- * @param str 源字符串
+ * @param _str 源字符串
  * @return 转换得到的目标字符串
  * @exception UTFException 源字符串中包含不合法UTF序列时抛出
  */
-template<typename TCharIn, typename TCharOut>
-std::basic_string<TCharOut> ConvertBetweenUTF(const std::basic_string_view<TCharIn> &str)
+template<typename TCharIn, typename TCharOut, typename T, CONV_T(T), std::enable_if_t<std::is_same_v<TCHAR(T), TCharIn>, int> = 0>
+std::basic_string<TCharOut> ConvertBetweenUTF(const T &_str)
 {
     using UTFIn  = Impl::CU2UTF_t<TCharIn>;
+
+    CONV(str);
 
     std::basic_string<TCharOut> ret;
     const TCharIn *pIn = str.data(), *end = str.data() + str.size();
@@ -647,17 +875,37 @@ std::basic_string<TCharOut> ConvertBetweenUTF(const std::basic_string_view<TChar
 }
 
 #ifdef AGZ_OS_WIN32
+
 using PlatformChar       = wchar_t;
 using PlatformString     = std::wstring;
 using PlatformStringView = std::wstring_view;
-inline std::wstring Str2PStr(const std::string_view &str) { return ConvertBetweenUTF<char, wchar_t>(str); }
-inline std::string PStr2Str(const std::wstring_view &str) { return ConvertBetweenUTF<wchar_t, char>(str); }
+
+/**
+ * @brief 将utf-8编码的字符串S转换为utf-16编码的宽字符串
+ */
+#define WIDEN(S)     (ConvertBetweenUTF<char, wchar_t>(S))
+
+ /**
+  * @brief 将utf-16编码的宽字符串S转换为utf-8编码的字符串
+  */
+#define INV_WIDEN(S) (ConvertBetweenUTF<wchar_t, char>(S))
+
 #else
+
 using PlatformChar       = char;
 using PlatformString     = std::string;
 using PlatformStringView = std::string_view;
-inline std::string_view Str2PStr(const std::string_view &str) { return str; }
-inline std::string_view PStr2Str(const std::string_view &str) { return str; }
+
+/**
+ * @brief 该宏仅在Win32平台上有意义，在该平台上维持S不变
+ */
+#define WIDEN(S)     (S)
+
+ /**
+  * @brief 该宏仅在Win32平台上有意义，在该平台上维持S不变
+  */
+#define INV_WIDEN(S) (S)
+
 #endif
 
 /**

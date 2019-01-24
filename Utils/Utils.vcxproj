@@ -98,6 +98,7 @@
     <ClInclude Include="..\Src\AGZUtils\Serialize\BinaryDeserializer.h" />
     <ClInclude Include="..\Src\AGZUtils\Serialize\BinarySerializer.h" />
     <ClInclude Include="..\Src\AGZUtils\Serialize\Predefined.h" />
+    <ClInclude Include="..\Src\AGZUtils\String.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Charset\ASCII.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Charset\Charset.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Charset\UTF.h" />
@@ -111,8 +112,6 @@
     <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Machine.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Syntax.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Regex\Regex.h" />
-    <ClInclude Include="..\Src\AGZUtils\String\Std\UTF.h" />
-    <ClInclude Include="..\Src\AGZUtils\String\Std\StdStr.h" />
     <ClInclude Include="..\Src\AGZUtils\String\String\StrAlgo.h" />
     <ClInclude Include="..\Src\AGZUtils\String\String\String.h" />
     <ClInclude Include="..\Src\AGZUtils\Texture\CubeMap.h" />

@@ -28,7 +28,7 @@
     <ClCompile Include="Range.cpp" />
     <ClCompile Include="PikeVM.cpp" />
     <ClCompile Include="Serialize.cpp" />
-    <ClCompile Include="StdStr.cpp" />
+    <ClCompile Include="Test_String.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>

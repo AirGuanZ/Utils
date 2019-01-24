@@ -12,7 +12,7 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Serialize.cpp" />
-    <ClCompile Include="StdStr.cpp" />
+    <ClCompile Include="Test_String.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Catch.hpp" />
