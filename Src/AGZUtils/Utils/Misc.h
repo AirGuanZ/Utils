@@ -7,4 +7,3 @@
 #include "../Misc/ScopeGuard.h"
 #include "../Misc/Singleton.h"
 #include "../Misc/TypeOpr.h"
-#include "../Misc/Uncopiable.h"

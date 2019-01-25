@@ -7,7 +7,6 @@
 
 #include "../Misc/Common.h"
 #include "../Misc/Exception.h"
-#include "../Misc/Uncopiable.h"
 #include "Alloc.h"
 
 namespace AGZ {

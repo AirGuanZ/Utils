@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <type_traits>
+#include <variant>
 
 #include "Common.h"
 #include "TypeOpr.h"
@@ -13,7 +14,7 @@ namespace AGZ {
 template<typename L, typename R, std::enable_if_t<!std::is_same_v<L, R>, int> = 0>
 class Either
 {
-    TypeOpr::Variant<L, R> var_;
+    std::variant<L, R> var_;
 
 public:
 

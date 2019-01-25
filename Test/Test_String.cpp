@@ -1,8 +1,8 @@
-﻿#include <AGZUtils/String.h>
+﻿#include <AGZUtils/String/StdStr.h>
 
 #include "Catch.hpp"
 
-using namespace AGZ::Str;
+using namespace AGZ;
 
 TEST_CASE("StdStr")
 {

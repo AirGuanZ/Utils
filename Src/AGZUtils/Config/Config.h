@@ -5,7 +5,6 @@
 
 #include "../Alloc/ObjArena.h"
 #include "../Misc/Exception.h"
-#include "../Misc/Uncopiable.h"
 #include "../Utils/String.h"
 
 namespace AGZ {

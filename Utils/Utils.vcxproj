@@ -76,7 +76,6 @@
     <ClInclude Include="..\Src\AGZUtils\Misc\ScopeGuard.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Singleton.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\TypeOpr.h" />
-    <ClInclude Include="..\Src\AGZUtils\Misc\Uncopiable.h" />
     <ClInclude Include="..\Src\AGZUtils\Range\Aggregate.h" />
     <ClInclude Include="..\Src\AGZUtils\Range\All.h" />
     <ClInclude Include="..\Src\AGZUtils\Range\Any.h" />
@@ -95,10 +94,8 @@
     <ClInclude Include="..\Src\AGZUtils\Range\Seq.h" />
     <ClInclude Include="..\Src\AGZUtils\Range\Take.h" />
     <ClInclude Include="..\Src\AGZUtils\Range\Transform.h" />
-    <ClInclude Include="..\Src\AGZUtils\Serialize\BinaryDeserializer.h" />
-    <ClInclude Include="..\Src\AGZUtils\Serialize\BinarySerializer.h" />
-    <ClInclude Include="..\Src\AGZUtils\Serialize\Predefined.h" />
-    <ClInclude Include="..\Src\AGZUtils\String.h" />
+    <ClInclude Include="..\Src\AGZUtils\Serialize\Serialize.h" />
+    <ClInclude Include="..\Src\AGZUtils\StdStr.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Charset\ASCII.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Charset\Charset.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Charset\UTF.h" />
@@ -112,6 +109,7 @@
     <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Machine.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Regex\PikeVM\Syntax.h" />
     <ClInclude Include="..\Src\AGZUtils\String\Regex\Regex.h" />
+    <ClInclude Include="..\Src\AGZUtils\String\StdStr.h" />
     <ClInclude Include="..\Src\AGZUtils\String\String\StrAlgo.h" />
     <ClInclude Include="..\Src\AGZUtils\String\String\String.h" />
     <ClInclude Include="..\Src\AGZUtils\Texture\CubeMap.h" />

@@ -165,9 +165,6 @@
     <ClInclude Include="..\Src\AGZUtils\Misc\TypeOpr.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\Misc\Uncopiable.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Range\Aggregate.h">
       <Filter>Range</Filter>
     </ClInclude>
@@ -221,15 +218,6 @@
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Range\Transform.h">
       <Filter>Range</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\Serialize\BinaryDeserializer.h">
-      <Filter>Serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\Serialize\BinarySerializer.h">
-      <Filter>Serialize</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\Serialize\Predefined.h">
-      <Filter>Serialize</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\String\Charset\ASCII.h">
       <Filter>String\Charset</Filter>
@@ -418,7 +406,13 @@
     <ClInclude Include="..\Src\AGZUtils\String\Format\Format.h">
       <Filter>String\Format</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\String.h" />
+    <ClInclude Include="..\Src\AGZUtils\Serialize\Serialize.h">
+      <Filter>Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\StdStr.h" />
+    <ClInclude Include="..\Src\AGZUtils\String\StdStr.h">
+      <Filter>String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\AGZUtils\Config\Config.inl">

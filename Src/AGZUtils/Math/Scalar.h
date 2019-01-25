@@ -170,8 +170,7 @@ T Min(T lhs, T rhs) noexcept { return (std::min)(lhs, rhs); }
 template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 T Max(T lhs, T rhs) noexcept { return (std::max)(lhs, rhs); }
 
-template<typename T, typename U = decltype(T::DefaultEqEpsilon()),
-    std::enable_if_t<TypeOpr::True_v<decltype(&T::ApproxEq)>, int> = 0>
+template<typename T, typename U = decltype(T::DefaultEqEpsilon()), typename = decltype(&T::ApproxEq)>
 bool ApproxEq(const T &lhs, const T &rhs, U epsilon = T::DefaultEqEpsilon()) noexcept(noexcept(lhs.ApproxEq(rhs, epsilon)))
 {
     return lhs.ApproxEq(rhs, epsilon);

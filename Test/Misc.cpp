@@ -50,9 +50,9 @@ TEST_CASE("Misc")
         static_assert(Any_v<std::is_integral, float, double, int>);
         static_assert(!Any_v<std::is_class, int, short, unsigned char>);
 
-        Variant<int, float, std::string> tu = 5;
+        std::variant<int, float, std::string> tu = 5;
 
-        auto v = MatchVar(tu,
+        auto v = MatchVariant(tu,
             [](float f) { return f; },
             [](int x) { return x + 2.0f; },
             [](auto) { return 0.0f; });

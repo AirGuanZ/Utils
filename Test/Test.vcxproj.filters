@@ -11,8 +11,8 @@
     <ClCompile Include="PikeVM.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Config.cpp" />
-    <ClCompile Include="Serialize.cpp" />
     <ClCompile Include="Test_String.cpp" />
+    <ClCompile Include="Test_Serialize.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Catch.hpp" />

@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "Uncopiable.h"
+#include "Common.h"
 
 namespace AGZ
 {

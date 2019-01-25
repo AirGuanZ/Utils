@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "../Misc/Common.h"
-#include "../Misc/Uncopiable.h"
 
 namespace AGZ
 {

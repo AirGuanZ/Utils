@@ -114,6 +114,21 @@ constexpr std::nullopt_t None = std::nullopt;
     std::terminate();
 }
 
+/**
+ * @brief 用一组可调用对象构造一个variant visitor，并用以匹配一个std::variant对象
+ * @param E
+ */
+template<typename E, typename...Vs>
+auto MatchVariant(E &&e, Vs...vs)
+{
+    struct overloaded : public Vs...
+    {
+        explicit overloaded(Vs...vss) : Vs(vss)... { }
+        using Vs::operator()...;
+    };
+    return std::visit(overloaded(vs...), std::forward<E>(e));
+}
+
 // ============================= common deleter =============================
 
 struct OperatorDeleter
@@ -204,6 +219,32 @@ ptrdiff_t ByteOffsetOf(M(C::*memPtr)) noexcept
     return reinterpret_cast<char*>(&(reinterpret_cast<C*>(0)->*memPtr))
          - reinterpret_cast<char*>(  reinterpret_cast<C*>(0));
 }
+
+/**
+ * @brief 不可复制类模板
+ */
+class Uncopiable
+{
+public:
+
+    Uncopiable() = default;
+    Uncopiable(const Uncopiable&) = delete;
+    Uncopiable &operator=(const Uncopiable&) = delete;
+    Uncopiable(Uncopiable&&) noexcept = default;
+    Uncopiable &operator=(Uncopiable&&) noexcept = default;
+};
+
+/**
+ * @brief 不可移动类模板
+ */
+class Unmovable
+{
+public:
+
+    Unmovable() = default;
+    Unmovable(Unmovable&&) noexcept = delete;
+    Unmovable &operator=(Unmovable&&) noexcept = delete;
+};
 
 } // namespace AGZ
 

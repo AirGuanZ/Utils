@@ -9,16 +9,17 @@
 #include <string_view>
 #include <vector>
 
-#include "Misc/Common.h"
-#include "Misc/Exception.h"
-#include "Misc/TypeOpr.h"
+#include "../Misc/Common.h"
+#include "../Misc/Exception.h"
+#include "../Misc/TypeOpr.h"
 
-namespace AGZ::Str
+namespace AGZ
 {
 
 /**
  * @cond
  */
+
 AGZ_NEW_EXCEPTION(UTFException);
 
 /**
@@ -1077,7 +1078,7 @@ class TFormatter
     struct Seg       { std::basic_string<TChar> seg; };
     struct ArgIndex  { size_t index; };
 
-    using Unit = TypeOpr::Variant<Char, Seg, ArgIndex>;
+    using Unit = std::variant<Char, Seg, ArgIndex>;
 
     std::vector<Unit> units_;
     size_t minArgIndex_;
@@ -1176,7 +1177,7 @@ public:
 
         for(auto &unit : units_)
         {
-            TypeOpr::MatchVar(unit,
+            MatchVariant(unit,
                 [&](const Char &param)
             {
                 ret.push_back(param.ch);
@@ -1340,7 +1341,7 @@ class TScanner
     struct Seg    { std::basic_string<TChar> seg; };
     struct Char   { TChar ch; };
 
-    using Unit = TypeOpr::Variant<Output, Seg, Char>;
+    using Unit = std::variant<Output, Seg, Char>;
 
     size_t outputCount_;
     std::vector<Unit> units_;
@@ -1449,7 +1450,7 @@ public:
             size_t outputIndex = 0;
             for(auto &unit : units_)
             {
-                auto m = TypeOpr::MatchVar(unit,
+                auto m = MatchVariant(unit,
                     [&](const Output &)
                 {
                     void *pOutput = voidOutputs[outputIndex];
@@ -1496,4 +1497,4 @@ public:
 #undef TCHAR
 #undef TCHAR_EQ
 
-} // namespace AGZ::Str
+} // namespace AGZ

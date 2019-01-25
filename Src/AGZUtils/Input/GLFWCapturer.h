@@ -9,6 +9,7 @@
 #ifdef AGZ_USE_GLFW
 
 #include <unordered_map>
+#include <variant>
 #include <vector>
 
 #include "../Misc/TypeOpr.h"
@@ -182,7 +183,7 @@ class GLFWMouseCapturer
         double offset;
     };
 
-    using EventRecord = TypeOpr::Variant<
+    using EventRecord = std::variant<
         MoveEventRecord, ButtonEventRecord, EnterLeaveRecord, ScrollEventRecord>;
 
     bool isFirstCapture_;
@@ -251,7 +252,7 @@ public:
 
         for(auto &er : eventRecords_)
         {
-            TypeOpr::MatchVar(er,
+            MatchVariant(er,
             [&](const MoveEventRecord &e)
             {
                 CursorMove param =
@@ -304,7 +305,7 @@ class GLFWWindowCapturer
     struct SizeEventRecord { int w, h; };
     struct FramebufferSizeEventRecord { int w, h; };
 
-    using EventRecord = TypeOpr::Variant<
+    using EventRecord = std::variant<
         ClosedEventRecord, SizeEventRecord, FramebufferSizeEventRecord>;
 
     friend void GLFWWindowCloseCallback          (GLFWwindow *window);
@@ -355,7 +356,7 @@ public:
     {
         for(auto &er : eventRecords_)
         {
-            TypeOpr::MatchVar(er,
+            MatchVariant(er,
             [&](const SizeEventRecord &e)
             {
                 window.Invoke(WindowSize{ e.w, e.h });

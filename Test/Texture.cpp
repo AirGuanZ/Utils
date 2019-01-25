@@ -30,7 +30,7 @@ TEST_CASE("Texture2D")
     BinaryMemorySerializer serializer;
     serializer.Serialize(tex1);
 
-    BinaryMemoryDeserializer deserializer(serializer.GetData(), serializer.GetByteSize());
+    BinaryMemoryDeserializer deserializer(serializer.GetData(), serializer.GetSize());
     Texture2D<Color3f> tex2;
     deserializer.Deserialize(tex2);
 
