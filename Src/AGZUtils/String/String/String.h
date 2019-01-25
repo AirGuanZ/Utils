@@ -472,6 +472,8 @@ public:
     std::string ToStdString(NativeCharset cs = NativeCharset::UTF8)  const;
     //! 转换为宽字符串，默认编码和平台有关
     std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const;
+    //! 转换为basic_string_view
+    operator std::basic_string_view<CodeUnit>() { return std::basic_string_view<CodeUnit>(Data(), Length()); }
 
 #if defined(AGZ_OS_WIN32)
     //! 转换为平台默认使用的字符串
@@ -680,6 +682,8 @@ public:
 
     std::string ToStdString(NativeCharset cs   = NativeCharset::UTF8) const { return AsView().ToStdString(cs); }
     std::wstring ToStdWString(NativeCharset cs = NativeCharset::WUTF) const { return AsView().ToStdWString(cs); }
+
+    operator std::basic_string_view<CodeUnit>() { return std::basic_string_view<CodeUnit>(Data(), Length()); }
 
     operator std::string() const { return ToStdString(); }
 

@@ -12,6 +12,7 @@
 #include "../Misc/Common.h"
 #include "../Misc/Exception.h"
 #include "../Misc/TypeOpr.h"
+#include "String/String.h"
 
 namespace AGZ
 {
@@ -317,14 +318,29 @@ namespace Impl
     template<typename TChar>           struct CanConvertToStringViewImpl<std::basic_string_view<TChar>> : std::true_type { using Char = TChar; };
     template<typename TChar>           struct CanConvertToStringViewImpl<TChar*>                        : std::true_type { using Char = TChar; };
     template<typename TChar, size_t N> struct CanConvertToStringViewImpl<TChar[N]>                      : std::true_type { using Char = TChar; };
+    template<typename CS>              struct CanConvertToStringViewImpl<String<CS>>                    : std::true_type { using Char = typename CS::CodeUnit; };
+    template<typename CS>              struct CanConvertToStringViewImpl<StringView<CS>>                : std::true_type { using Char = typename CS::CodeUnit; };
 
     template<typename T> constexpr bool CanConvertToStringView_v = CanConvertToStringViewImpl<T>::value;
     template<typename T> using ConvertToStringViewCharType_t     = typename CanConvertToStringViewImpl<T>::Char;
 }
 
+// 以下几个宏仅在本文件中有效，用于做string-like parameter到std::basic_string_view的自动转换，在文件末尾被undef
+// string-like type:
+//      std::basic_string
+//      std::basic_string_view
+//      TChar*
+//      TChar[N]
+//      AGZ::String<CS>
+//      AGZ::StringView<CS>
+
+// 测试TYPE是否能显示转换为作为某个std::basic_string_view<TChar>，放在模板参数末尾。
 #define CONV_T(TYPE)     std::enable_if_t<Impl::CanConvertToStringView_v<TYPE>,int> =0
+// 若CONV_T(decltype(_VAL))测试通过，则定义一个具有合适类型的std::basic_string_view变量，其名字为VAL，构造函数参数为_VAL
 #define CONV(VAL)        std::basic_string_view<Impl::ConvertToStringViewCharType_t<remove_rcv_t<decltype(_##VAL)>>> VAL(_##VAL)
+// 设TYPE通过了CONV_T测试，则TCHAR(TYPE)给出“某个std::basic_string_view<TChar>”中的类型TChar
 #define TCHAR(TYPE)      Impl::ConvertToStringViewCharType_t<remove_rcv_t<TYPE>>
+// 设T1和T2均通过了CONV_T测试，则TCHAR_EQ测试它们对应的TChar是否相同，放在模板参数末尾。
 #define TCHAR_EQ(T1, T2) std::enable_if_t<std::is_same_v<TCHAR(T1), TCHAR(T2)>, int> =0
 
 /**
