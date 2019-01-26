@@ -10,9 +10,9 @@
 namespace AGZ::GraphicsAPI::GL
 {
 
-AGZ_NEW_EXCEPTION(ProgramBuilderTooMuchShaderException);
-AGZ_NEW_EXCEPTION(ProgramBuilderProgramCreationException);
-AGZ_NEW_EXCEPTION(ProgramBuilderLinkFailureException);
+AGZ_NEW_EXCEPTION(ProgramBuilderTooMuchShaderException, Exception);
+AGZ_NEW_EXCEPTION(ProgramBuilderProgramCreationException, Exception);
+AGZ_NEW_EXCEPTION(ProgramBuilderLinkFailureException, Exception);
 
 /**
  * @brief 用于将一系列Shader统合在一起链接成一个Program

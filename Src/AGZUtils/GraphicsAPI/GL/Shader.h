@@ -9,7 +9,7 @@
 namespace AGZ::GraphicsAPI::GL
 {
 
-AGZ_NEW_EXCEPTION(ShaderLoadingException);
+AGZ_NEW_EXCEPTION(ShaderLoadingException, Exception);
 
 /**
  * @brief 可编程管线某一阶段的Shader Object

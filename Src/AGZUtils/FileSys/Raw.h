@@ -134,7 +134,8 @@ inline bool WriteBinaryFileRaw(
 
 inline bool ReadTextFileRaw(const Str8 &filename, Str8 *str)
 {
-    std::ifstream fin(filename.ToPlatformString(), std::ios_base::in);
+	auto platformString = filename.ToPlatformString();
+    std::ifstream fin(platformString, std::ios_base::in);
     if(!fin)
         return false;
     std::stringstream sst;
