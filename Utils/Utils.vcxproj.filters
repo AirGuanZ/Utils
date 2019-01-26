@@ -409,7 +409,6 @@
     <ClInclude Include="..\Src\AGZUtils\Serialize\Serialize.h">
       <Filter>Serialize</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\StdStr.h" />
     <ClInclude Include="..\Src\AGZUtils\String\StdStr.h">
       <Filter>String</Filter>
     </ClInclude>
