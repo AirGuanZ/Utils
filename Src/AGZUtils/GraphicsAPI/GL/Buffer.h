@@ -17,7 +17,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name
      */
-    explicit Buffer(bool initHandle = false) noexcept
+    explicit Buffer(bool initHandle = true) noexcept
     {
         if(initHandle)
             InitializeHandle();
@@ -69,9 +69,9 @@ public:
      * @param byteSize 初始化数据的字节数
      * @param usage 如GL_STATIC_DRAW
      */
-    void ReinitializeData(const void *data, size_t byteSize, GLenum usage) const noexcept
+    void ReinitializeData(const void *data, size_t byteSize, GLenum usage) noexcept
     {
-        AGZ_ASSERT(handle_);
+		AGZ_ASSERT(handle_);
         glNamedBufferData(handle_, static_cast<GLsizei>(byteSize), data, usage);
     }
 
@@ -81,9 +81,9 @@ public:
      * @param byteOffset 要设置的内容据buffer开头的距离
      * @param byteSize 要设置的内容的长度
      */
-    void SetData(const void *subdata, size_t byteOffset, size_t byteSize) const noexcept
+    void SetData(const void *subdata, size_t byteOffset, size_t byteSize) noexcept
     {
-        AGZ_ASSERT(handle_);
+		AGZ_ASSERT(handle_);
         glNamedBufferSubData(handle_, static_cast<GLsizei>(byteOffset), static_cast<GLsizei>(byteSize), subdata);
     }
 };
@@ -102,7 +102,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name
      */
-    explicit VertexBuffer(bool initHandle = false) noexcept
+    explicit VertexBuffer(bool initHandle = true) noexcept
         : Buffer(initHandle), vertexCount_(0)
     {
         
@@ -197,7 +197,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name
      */
-    explicit Std140UniformBlockBuffer(bool initHandle = false) noexcept
+    explicit Std140UniformBlockBuffer(bool initHandle = true) noexcept
         : Buffer(initHandle)
     {
 
@@ -250,10 +250,9 @@ public:
      * @param data 初始化数据指针
      * @param usage 如GL_STATIC_DRAW
      */
-    void ReinitializeData(const BlockType *data, GLenum usage) const noexcept
+    void ReinitializeData(const BlockType *data, GLenum usage) noexcept
     {
-        AGZ_ASSERT(handle_);
-        glNamedBufferData(handle_, sizeof(BlockType), data, usage);
+		Buffer::ReinitializeData(data, sizeof(BlockType), usage);
     }
 
     /**
@@ -262,20 +261,18 @@ public:
      * @param byteOffset 要设置的内容距buffer开头的距离
      * @param byteSize 要设置的内容的长度
      */
-    void SetData(const void *subdata, size_t byteOffset, size_t byteSize) const noexcept
+    void SetData(const void *subdata, size_t byteOffset, size_t byteSize) noexcept
     {
-        AGZ_ASSERT(handle_);
-        glNamedBufferSubData(handle_, static_cast<GLsizei>(byteOffset), static_cast<GLsizei>(byteSize), subdata);
+		Buffer::SetData(subdata, static_cast<GLsizei>(byteOffset), static_cast<GLsizei>(byteSize));
     }
 
     /**
      * @brief 设置整个Buffer的内容
      * @param data 待写入buffer的数据
      */
-    void SetData(const BlockType *data) const noexcept
+    void SetData(const BlockType *data) noexcept
     {
-        AGZ_ASSERT(handle_);
-        glNamedBufferSubData(handle_, 0, sizeof(BlockType), data);
+		Buffer::SetData(data, 0, sizeof(BlockType));
     }
 
     /**
@@ -306,7 +303,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name
      */
-    explicit ElementBuffer(bool initHandle = false) noexcept
+    explicit ElementBuffer(bool initHandle = true) noexcept
         : Buffer(initHandle), elemCount_(0)
     {
         
@@ -364,7 +361,6 @@ public:
      */
     void ReinitializeData(const ElemType *data, uint32_t elemCount, GLenum usage) noexcept
     {
-        AGZ_ASSERT(elemCount);
         Buffer::ReinitializeData(data, sizeof(ElemType) * elemCount, usage);
         elemCount_ = elemCount;
     }

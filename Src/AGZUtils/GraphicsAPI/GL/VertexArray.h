@@ -18,7 +18,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name
      */
-    explicit VertexArray(bool initHandle = false) noexcept
+    explicit VertexArray(bool initHandle = true) noexcept
         : GLObject(0)
     {
         if(initHandle)

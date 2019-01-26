@@ -7,12 +7,12 @@
 namespace AGZ::GraphicsAPI::GL
 {
 
-AGZ_NEW_EXCEPTION(AttribVariableTypeException, Exception);
-AGZ_NEW_EXCEPTION(AttribVariableNameException, Exception);
+AGZ_NEW_EXCEPTION(AttribVariableTypeException,  Exception);
+AGZ_NEW_EXCEPTION(AttribVariableNameException,  Exception);
 AGZ_NEW_EXCEPTION(UniformVariableTypeException, Exception);
 AGZ_NEW_EXCEPTION(UniformVariableNameException, Exception);
-AGZ_NEW_EXCEPTION(UniformBlockSizeException, Exception);
-AGZ_NEW_EXCEPTION(UniformBlockNameException, Exception);
+AGZ_NEW_EXCEPTION(UniformBlockSizeException,    Exception);
+AGZ_NEW_EXCEPTION(UniformBlockNameException,    Exception);
 
 /**
  * @brief 完整的着色器程序

@@ -13,7 +13,7 @@ public:
     /**
  * @param initHandle 是否立即创建一个GL FrameBuffer Name
  */
-    explicit FrameBuffer(bool initHandle = false) noexcept
+    explicit FrameBuffer(bool initHandle = true) noexcept
         : GLObject(0)
     {
         if(initHandle)
@@ -64,9 +64,8 @@ public:
      * @brief 连接一块Texture2D
      * 见 glNamedFramebufferTexture
      */
-    void Attach(GLenum attachment, const Texture2D &tex) const noexcept
+    void Attach(GLenum attachment, const Texture2D &tex) noexcept
     {
-        AGZ_ASSERT(handle_ && tex.GetHandle());
         glNamedFramebufferTexture(handle_, attachment, tex.GetHandle(), 0);
     }
 
@@ -74,7 +73,7 @@ public:
      * @brief 连接一块RenderBuffer
      * 见 glNamedFramebufferRenderbuffer
      */
-    void Attach(GLenum attachment, const RenderBuffer &buffer) const noexcept
+    void Attach(GLenum attachment, const RenderBuffer &buffer) noexcept
     {
         AGZ_ASSERT(handle_ && buffer.GetHandle());
         glNamedFramebufferRenderbuffer(handle_, attachment, GL_RENDERBUFFER, buffer.GetHandle());

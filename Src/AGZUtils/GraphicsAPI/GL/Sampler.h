@@ -15,7 +15,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name
      */
-    explicit Sampler(bool initHandle = false) noexcept
+    explicit Sampler(bool initHandle = true) noexcept
     {
         if(initHandle)
             InitializeHandle();

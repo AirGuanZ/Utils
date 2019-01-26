@@ -16,7 +16,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL RenderBuffer Name
      */
-    explicit RenderBuffer(bool initHandle = false) noexcept
+    explicit RenderBuffer(bool initHandle = true) noexcept
         : GLObject(0)
     {
         if(initHandle)
@@ -71,7 +71,7 @@ public:
      */
     void SetFormat(GLsizei width, GLsizei height, GLenum internalFormat) const noexcept
     {
-        AGZ_ASSERT(handle_);
+		AGZ_ASSERT(handle_);
         glNamedRenderbufferStorage(handle_, internalFormat, width, height);
     }
 };
