@@ -13,8 +13,8 @@ class ConfigGroup;
 class ConfigArray;
 class ConfigValue;
 
-AGZ_NEW_EXCEPTION(ConfigNodeKeyNotFound);
-AGZ_NEW_EXCEPTION(ConfigNodeInvalidCasting);
+AGZ_NEW_EXCEPTION(ConfigNodeKeyNotFound,    Exception);
+AGZ_NEW_EXCEPTION(ConfigNodeInvalidCasting, Exception);
 
 /**
  * @brief 配置参数树中的节点

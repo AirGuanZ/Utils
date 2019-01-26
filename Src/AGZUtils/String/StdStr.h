@@ -21,7 +21,7 @@ namespace AGZ
  * @cond
  */
 
-AGZ_NEW_EXCEPTION(UTFException);
+AGZ_NEW_EXCEPTION(UTFException, Exception);
 
 /**
  * @endcond
@@ -764,7 +764,7 @@ std::basic_string<TCHAR(T1)> Replace(const T1 &_str, const T2 &_oldSubstr, const
  * @cond
  */
 
-AGZ_NEW_EXCEPTION(FromException);
+AGZ_NEW_EXCEPTION(FromException, Exception);
 
 namespace Impl
 {
@@ -1071,7 +1071,7 @@ public:
  * @cond
  */
 
-AGZ_NEW_EXCEPTION(FormatterException);
+AGZ_NEW_EXCEPTION(FormatterException, Exception);
 
 /**
  * @endcond
@@ -1216,8 +1216,8 @@ public:
  * @cond
  */
 
-AGZ_NEW_EXCEPTION(ParseFirstException);
-AGZ_NEW_EXCEPTION(ScannerException);
+AGZ_NEW_EXCEPTION(ParseFirstException, Exception);
+AGZ_NEW_EXCEPTION(ScannerException,    Exception);
 
 namespace Impl
 {

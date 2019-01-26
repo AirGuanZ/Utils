@@ -6,7 +6,7 @@
 namespace AGZ
 {
 
-AGZ_NEW_EXCEPTION(FormatStringException);
+AGZ_NEW_EXCEPTION(FormatStringException, Exception);
  
 namespace FMTImpl
 {

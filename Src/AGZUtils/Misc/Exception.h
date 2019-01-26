@@ -15,17 +15,17 @@ public:
     explicit Exception(const std::string &err) : runtime_error(err) { }
 };
 
-#define AGZ_NEW_EXCEPTION(NAME) \
-    class NAME : public ::AGZ::Exception \
+#define AGZ_NEW_EXCEPTION(NAME, BASE_NAME) \
+    class NAME : public BASE_NAME \
     { \
     public: \
-        explicit NAME(const std::string &err) : Exception(err) { } \
+		using BASE_NAME::BASE_NAME; \
     }
 
-AGZ_NEW_EXCEPTION(CharsetException);
-AGZ_NEW_EXCEPTION(ArgumentException);
-AGZ_NEW_EXCEPTION(OSException);
-AGZ_NEW_EXCEPTION(FileException);
-AGZ_NEW_EXCEPTION(UnreachableException);
+AGZ_NEW_EXCEPTION(CharsetException,     Exception);
+AGZ_NEW_EXCEPTION(ArgumentException,    Exception);
+AGZ_NEW_EXCEPTION(OSException,          Exception);
+AGZ_NEW_EXCEPTION(FileException,        Exception);
+AGZ_NEW_EXCEPTION(UnreachableException, Exception);
 
 } // namespace AGZ

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <tuple>
-#include <variant>
 
 namespace AGZ::TypeOpr {
 
