@@ -27,13 +27,13 @@ FileTime File::GetCurrentFileTime()
     return ret;
 }
 
-Option<FileTime> File::GetLastWriteTime(const Str8 &filename)
+std::optional<FileTime> File::GetLastWriteTime(const Str8 &filename)
 {
     WIN32_FIND_DATA findData;
 
     auto hFind = FindFirstFileW(filename.ToStdWString().c_str(), &findData);
     if(hFind == INVALID_HANDLE_VALUE)
-        return None;
+        return std::nullopt;
     FindClose(hFind);
 
     SYSTEMTIME sysUTC, sysLocal;
@@ -112,11 +112,11 @@ FileTime File::GetCurrentFileTime()
     return ret;
 }
 
-Option<FileTime> File::GetLastWriteTime(const Str8 &filename)
+std::optional<FileTime> File::GetLastWriteTime(const Str8 &filename)
 {
     struct stat buf;
     if(stat(filename.ToStdString().c_str(), &buf))
-        return None;
+        return std::nullopt;
 
     // localTime由内核自动分配，不要尝试手动释放它
     tm localTime;

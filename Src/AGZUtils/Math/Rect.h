@@ -42,15 +42,15 @@ public:
         };
     }
 
-    Option<Rect<T>> Union(const Rect<T> &other) const noexcept
+    std::optional<Rect<T>> Union(const Rect<T> &other) const noexcept
     {
         Rect<T> ret = {
             { Max(low.x,  other.low.x),  Max(low.y,  other.low.y),  Max(low.z,  other.low.z)  },
             { Min(high.x, other.high.x), Min(high.y, other.high.y), Min(high.z, other.high.z) }
         };
         if(ret.low.x > ret.high.x || ret.low.y > ret.high.y || ret.low.z > ret.high.z)
-            return None;
-        return Some(ret);
+            return std::nullopt;
+        return ret;
     }
 };
 

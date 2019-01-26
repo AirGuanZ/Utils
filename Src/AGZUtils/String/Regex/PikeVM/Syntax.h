@@ -683,7 +683,7 @@ private:
         return ret;
     }
 
-    [[noreturn]] static AGZ_FORCEINLINE void Error()
+    [[noreturn]] static void Error()
     {
         throw ArgumentException("Ill-formed regular expression");
     }

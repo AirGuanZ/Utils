@@ -78,37 +78,37 @@ inline const Str8 *ConfigGroup::FindValue(const Str8 &k) const
 }
 
 template<typename T, typename A>
-Option<T> ConfigGroup::FindAndParse(const Str8 &k, A &&parseParam) const
+std::optional<T> ConfigGroup::FindAndParse(const Str8 &k, A &&parseParam) const
 {
     if(auto v = FindValue(k))
     {
         try
         {
-            return Some(v->Parse<T>(std::forward<A>(parseParam)));
+            return v->Parse<T>(std::forward<A>(parseParam));
         }
         catch(...)
         {
-            return None;
+            return std::nullopt;
         }
     }
-    return None;
+    return std::nullopt;
 }
 
 template<typename T>
-Option<T> ConfigGroup::FindAndParse(const Str8 &k) const
+std::optional<T> ConfigGroup::FindAndParse(const Str8 &k) const
 {
     if(auto v = FindValue(k))
     {
         try
         {
-            return Some(v->Parse<T>());
+            return v->Parse<T>();
         }
         catch(...)
         {
-            return None;
+            return std::nullopt;
         }
     }
-    return None;
+    return std::nullopt;
 }
 
 inline const ConfigNode &ConfigGroup::operator[](const Str8 &k) const

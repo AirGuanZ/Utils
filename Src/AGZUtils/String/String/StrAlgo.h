@@ -194,34 +194,34 @@ inline const unsigned char DIGIT_CHAR_VALUE_TABLE[256] =
     255, 255, 255, 255, 255, 255, 255, 255
 };
 
-AGZ_FORCEINLINE unsigned char DTV(char32_t ucp)
+inline unsigned char DTV(char32_t ucp)
 {
     return static_cast<uint32_t>(ucp < 256) ?
            DIGIT_CHAR_VALUE_TABLE[ucp] : 255;
 }
 
-AGZ_FORCEINLINE bool IsUnicodeDigit(char32_t ucp)
+inline bool IsUnicodeDigit(char32_t ucp)
 {
     return '0' <= ucp && ucp <= '9';
 }
 
-AGZ_FORCEINLINE bool IsUnicodeHexDigit(char32_t ucp)
+inline bool IsUnicodeHexDigit(char32_t ucp)
 {
     return DTV(ucp) < 16;
 }
 
-AGZ_FORCEINLINE bool IsUnicodeAlpha(char32_t ucp)
+inline bool IsUnicodeAlpha(char32_t ucp)
 {
     auto v = DTV(ucp);
     return 10 <= v && v < 36;
 }
 
-AGZ_FORCEINLINE bool IsUnicodeAlnum(char32_t ucp)
+inline bool IsUnicodeAlnum(char32_t ucp)
 {
     return DTV(ucp) < 36;
 }
 
-AGZ_FORCEINLINE bool IsUnicodeWhitespace(char32_t ucp)
+inline bool IsUnicodeWhitespace(char32_t ucp)
 {
     return DTV(ucp) == 128;
 }

@@ -35,7 +35,7 @@ public:
 class LinearSampler
 {
     template<typename PT, typename E>
-    static AGZ_FORCEINLINE auto Interpolate(
+    static auto Interpolate(
         const PT &u0v0, const PT &u1v0, const PT &u0v1, const PT &u1v1,
         E u, E v)
     {

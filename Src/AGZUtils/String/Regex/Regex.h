@@ -220,13 +220,13 @@ public:
     ~Regex() = default;
 
     //! 用该表达式匹配整个目标字符串
-    AGZ_FORCEINLINE Result Match(const String<CS> &dst) const
+    Result Match(const String<CS> &dst) const
     {
         return this->Match(dst.AsView());
     }
 
     //! 在目标串中搜寻能和该表达式匹配的子串
-    AGZ_FORCEINLINE Result Search(const String<CS> &dst) const
+    Result Search(const String<CS> &dst) const
     {
         return this->Search(dst.AsView());
     }

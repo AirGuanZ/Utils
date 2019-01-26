@@ -71,12 +71,12 @@ public:
         };
 
         /** 取得具有指定名字的组 */
-        Option<const Group&> FindGroup(const Str8 &name) const
+		std::optional<const Group&> FindGroup(const Str8 &name) const
         {
             auto it = name2Group.find(name);
             if(it != name2Group.end())
-                return Some(it->second);
-            return None;
+                return it->second;
+            return std::nullopt;
         }
 
         /** 从名字到组的映射 */
@@ -84,12 +84,12 @@ public:
     };
 
     /** 取得具有指定名字的物体 */
-    Option<const Object&> FindObject(const Str8 &name) const
+	std::optional<const Object&> FindObject(const Str8 &name) const
     {
         auto it = name2Obj.find(name);
         if(it != name2Obj.end())
-            return Some(it->second);
-        return None;
+            return it->second;
+        return std::nullopt;
     }
 
     /** 清空已加载的所有数据 */
@@ -163,11 +163,11 @@ bool WavefrontObj<T>::LoadFromMemory(const Str8 &content, bool ignoreUnknownLine
         // 按\n拆分并剔除空行、注释行
 
         auto lines = content.Split("\n")
-            | FilterMap([](const Str8 &line) -> Option<Str8>
+            | FilterMap([](const Str8 &line) -> std::optional<Str8>
             {
                 Str8 ret = line.Trim();
                 if(ret.Empty() || ret.StartsWith("#"))
-                    return None;
+                    return std::nullopt;
                 return ret;
             })
             | Collect<std::vector<Str8>>();

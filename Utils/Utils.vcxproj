@@ -70,9 +70,7 @@
     <ClInclude Include="..\Src\AGZUtils\Misc\Common.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\COWObject.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Either.h" />
-    <ClInclude Include="..\Src\AGZUtils\Misc\Endian.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Exception.h" />
-    <ClInclude Include="..\Src\AGZUtils\Misc\PrettyTypeName.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\ScopeGuard.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Singleton.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\TypeOpr.h" />
@@ -148,7 +146,7 @@
     <ProjectGuid>{8E5BB8AB-2C07-4815-807F-EA23991B3F93}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Utils</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

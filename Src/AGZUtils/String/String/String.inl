@@ -670,15 +670,15 @@ bool StringView<CS>::EndsWith(const Self &suffix) const
 namespace
 {
     template<typename T>
-    AGZ_FORCEINLINE bool IsASCII(T v)
+    bool IsASCII(T v)
     { return static_cast<uint8_t>(v) < 128; }
 
     template<typename T, std::enable_if_t<(sizeof(T) > 1), int> = 0>
-    AGZ_FORCEINLINE bool In256(T v)
+    bool In256(T v)
     { return static_cast<std::make_unsigned_t<T>>(v) < 256; }
 
     template<typename T, std::enable_if_t<(sizeof(T) > 1), int> = 0>
-    AGZ_FORCEINLINE uint8_t ByteIden(T v)
+    uint8_t ByteIden(T v)
     {
         return In256(v) ?
                StrAlgo::DIGIT_CHAR_VALUE_TABLE[static_cast<uint8_t>(v)]
@@ -686,7 +686,7 @@ namespace
     }
 
     template<typename T, std::enable_if_t<(sizeof(T) == 1), int> = 0>
-    AGZ_FORCEINLINE uint8_t ByteIden(T v)
+    uint8_t ByteIden(T v)
     {
         return StrAlgo::DIGIT_CHAR_VALUE_TABLE[static_cast<uint8_t>(v)];
     }

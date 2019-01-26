@@ -47,10 +47,10 @@ public:
 namespace Impl
 {
     template<typename T, int Axis, bool Neg>
-    Option<Math::Vec3<T>> AlignedQuadInct(const Math::Vec3<T> &dir)
+	std::optional<Math::Vec3<T>> AlignedQuadInct(const Math::Vec3<T> &dir)
     {
         if(!dir[Axis])
-            return None;
+            return std::nullopt;
 
         T t;
         if constexpr(!Neg)
@@ -62,7 +62,7 @@ namespace Impl
         if(t < 0 ||
            Math::Abs(p[(Axis + 1) % 3]) > T(1) ||
            Math::Abs(p[(Axis + 2) % 3]) > T(1))
-            return None;
+            return std::nullopt;
 
         return p;
     }
@@ -74,7 +74,7 @@ typename CubeMapper<T, N>::MapResult CubeMapper<T, N>::Map(const Math::Vec3<T> &
     using Math::Clamp;
 
     int bestAxis; bool neg;
-    Option<Math::Vec3<T>> op;
+	std::optional<Math::Vec3<T>> op;
 
     constexpr int X = 0, Y = 1, Z = 2;
 

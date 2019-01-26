@@ -147,7 +147,7 @@ public:
      * 查找失败或parse失败时返回None
      */
     template<typename T, typename A>
-    Option<T> FindAndParse(const Str8 &k, A &&parseParam) const;
+    std::optional<T> FindAndParse(const Str8 &k, A &&parseParam) const;
 
     /**
      * 查找指定路径中的值，并parse为数值类型
@@ -157,7 +157,7 @@ public:
      * 查找失败或parse失败时返回None
      */
     template<typename T>
-    Option<T> FindAndParse(const Str8 &k) const;
+	std::optional<T> FindAndParse(const Str8 &k) const;
 
     /**
      * @copydoc ConfigGroup::Find(const Str8&) const

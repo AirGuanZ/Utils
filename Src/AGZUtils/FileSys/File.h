@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <cstring>
+
 #include "../Misc/Common.h"
 #include "../Utils/String.h"
 
@@ -31,7 +33,7 @@ public:
     static FileTime GetCurrentFileTime();
 
     //! 取得用本地时间表示的最后修改时间
-    static Option<FileTime> GetLastWriteTime(const Str8 &filename);
+    static std::optional<FileTime> GetLastWriteTime(const Str8 &filename);
 
     //! 取得当前工作目录（绝对路径）
     static Str8 GetWorkingDirectory();

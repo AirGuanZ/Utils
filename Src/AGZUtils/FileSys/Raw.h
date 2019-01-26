@@ -12,7 +12,7 @@ template<typename AllocFunc = void*(*)(size_t)>
 std::pair<size_t, unsigned char*> ReadBinaryFileRaw(
     const Str8 &filename, AllocFunc &&func = &(std::malloc));
 
-AGZ_FORCEINLINE void DefaultlyReleaseRawBinaryFileContent(unsigned char *ptr);
+inline void DefaultlyReleaseRawBinaryFileContent(unsigned char *ptr);
 
 inline bool WriteBinaryFileRaw(
     const Str8 &filename, const unsigned char *data, size_t len);
@@ -115,7 +115,7 @@ std::pair<size_t, unsigned char*> ReadBinaryFileRaw(
     return { static_cast<size_t>(len), buf };
 }
 
-AGZ_FORCEINLINE void DefaultlyReleaseRawBinaryFileContent(unsigned char *ptr)
+inline void DefaultlyReleaseRawBinaryFileContent(unsigned char *ptr)
 {
     std::free(ptr);
 }

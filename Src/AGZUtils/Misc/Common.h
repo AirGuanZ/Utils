@@ -1,9 +1,11 @@
 ﻿#pragma once
 
 #include <cstdint>
+#include <exception>
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <variant>
 
 // 功能宏
 
@@ -14,41 +16,12 @@
 // AGZ_USE_GLFW
 // AGZ_USE_OPENGL
 
-// ============================= forceinline =============================
-
-#if defined(_MSC_VER)
-
-#define AGZ_INLINE inline
-#define AGZ_FORCEINLINE __forceinline
-
-#elif defined __GNUC__
-    #define AGZ_INLINE inline
-    #define AGZ_FORCEINLINE inline __attribute__((always_inline))
-#else
-    #define AGZ_INLINE inline
-    #define AGZ_FORCEINLINE inline
-#endif
-
-// ============================= namespace guard =============================
-
-#define AGZ_NS_BEG(N) namespace N {
-#define AGZ_NS_END(N) }
-
-// ============================= assertion =============================
-
+#if defined(_DEBUG) || defined(DEBUG)
 #include <cassert>
 #define AGZ_ASSERT(X) assert(X)
-
-// ============================= when __BYTE_ORDER__ unavailable =============================
-
-#ifndef __BYTE_ORDER__
-    #if defined(_MSC_VER)
-        // Platform supporting MSVC must use little endian
-        #define AGZ_LITTLE_ENDIAN
-    #else
-        // #define AGZ_BIG_ENDIAN
-        #define AGZ_LITTLE_ENDIAN
-    #endif
+#define AGZ_IN_DEBUG
+#else
+#define AGZ_ASSERT(X)
 #endif
 
 // ============================= operating system =============================
@@ -92,19 +65,9 @@
 
 namespace AGZ {
 
-// ============================= option =============================
-
-template<typename T>
-using Option = std::optional<T>;
-
-template<typename T>
-auto Some(T &&v) { return std::make_optional<T>(std::forward<T>(v)); }
-
-constexpr std::nullopt_t None = std::nullopt;
-
 // ============================= unreachable hint =============================
 
-[[noreturn]] AGZ_FORCEINLINE void Unreachable()
+[[noreturn]] inline void Unreachable()
 {
 #if defined(_MSC_VER)
     __assume(0);
@@ -116,7 +79,10 @@ constexpr std::nullopt_t None = std::nullopt;
 
 /**
  * @brief 用一组可调用对象构造一个variant visitor，并用以匹配一个std::variant对象
- * @param E
+ * @param e 被匹配的variant对象
+ * @param vs 用于处理各variant分支的functor class实例。
+ *			  它们的operator()返回值类型必须全部相同，且参数能覆盖所有的variant情形。
+ *			  可以用[](auto){ ... }来处理默认分支，类似许多语言的模式匹配中的“_”。
  */
 template<typename E, typename...Vs>
 auto MatchVariant(E &&e, Vs...vs)
@@ -145,16 +111,16 @@ struct DummyDeleter
 // ============================= exception-safe array constructor =============================
 
 template<typename C, typename Deleter, typename...Args>
-void ConstructN(C *ptr, size_t n, const Args&...args) noexcept(noexcept(C(args...)))
+void ConstructN(C *ptr, std::size_t n, const Args&...args) noexcept(noexcept(C(args...)))
 {
     if constexpr(noexcept(C(args...)))
     {
-        for(size_t i = 0; i < n; ++i)
+        for(std::size_t i = 0; i < n; ++i)
             new(ptr + i) C(args...);
     }
     else
     {
-        size_t i = 0;
+        std::size_t i = 0;
         try
         {
             for(; i < n; ++i)
@@ -162,7 +128,7 @@ void ConstructN(C *ptr, size_t n, const Args&...args) noexcept(noexcept(C(args..
         }
         catch(...)
         {
-            for(size_t j = 0; j < i; ++j)
+            for(std::size_t j = 0; j < i; ++j)
                 (ptr + j)->~C();
             Deleter::Delete(ptr);
             throw;
@@ -203,7 +169,7 @@ using remove_rcv_t = std::remove_cv_t<std::remove_reference_t<T>>;
 template<typename T>
 constexpr T StaticMax(T lhs, T rhs) { return lhs < rhs ? rhs : lhs; }
 
-inline size_t CombineHash(size_t fst, size_t snd)
+inline std::size_t CombineHash(std::size_t fst, std::size_t snd)
 {
     return fst ^ (snd + 0x9e3779b9 + (fst << 6) + (fst >> 2));
 }

@@ -150,13 +150,7 @@
     <ClInclude Include="..\Src\AGZUtils\Misc\Either.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\Misc\Endian.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Misc\Exception.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\Misc\PrettyTypeName.h">
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Misc\Singleton.h">

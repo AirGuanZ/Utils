@@ -19,7 +19,7 @@ namespace AGZ {
     /*
      * @brief 按指定对齐方式分配一块内存，align应为2的整数次幂
      */
-    AGZ_FORCEINLINE void *aligned_alloc(size_t align, size_t size)
+	inline void *aligned_alloc(size_t align, size_t size)
     {
         return ::_aligned_malloc(size, align);
     }
@@ -27,7 +27,7 @@ namespace AGZ {
     /**
      * @brief 释放用aligned_alloc分配的存储
      */
-    AGZ_FORCEINLINE void aligned_free(void *ptr)
+	inline void aligned_free(void *ptr)
     {
         return ::_aligned_free(ptr);
     }
@@ -35,7 +35,7 @@ namespace AGZ {
     /*
      * @brief 按指定对齐方式分配一块内存，align应为2的整数次幂
      */
-    AGZ_FORCEINLINE void *aligned_alloc(size_t align, size_t size)
+	inline void *aligned_alloc(size_t align, size_t size)
     {
         return std::aligned_alloc(align, size);
     }
@@ -43,7 +43,7 @@ namespace AGZ {
     /**
      * @brief 释放用aligned_alloc分配的存储
      */
-    AGZ_FORCEINLINE void aligned_free(void *ptr)
+	inline void aligned_free(void *ptr)
     {
         std::free(ptr);
     }
@@ -53,7 +53,7 @@ namespace AGZ {
  * @brief 若给定的内存分配函数返回null，则抛出std::bad_alloc，否则按指定类型返回分配结果
  */
 template<typename D, typename F, typename...Args>
-AGZ_FORCEINLINE D *alloc_throw(F &&alloc_func, Args&&...args)
+D *alloc_throw(F &&alloc_func, Args&&...args)
 {
     auto ret = alloc_func(std::forward<Args>(args)...);
     if(!ret)
