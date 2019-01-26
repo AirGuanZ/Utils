@@ -205,11 +205,6 @@ inline Str8 ConfigValue::ToString() const
 
 namespace Impl
 {
-    template<typename T>
-    using Option = std::optional<T>;
-
-    constexpr std::nullopt_t None = std::nullopt;
-
     enum class TokenType
     {
         Name, String,
@@ -224,7 +219,7 @@ namespace Impl
         Str8 str;
     };
 
-    inline Option<Token> NextToken(StrView8 &src)
+    inline std::optional<Token> NextToken(StrView8 &src)
     {
         // Skip whitespaces and comments
 
@@ -235,7 +230,7 @@ namespace Impl
             {
                 auto t = src.Find("###", 3);
                 if(t == StrView8::NPOS)
-                    return None;
+                    return std::nullopt;
                 else
                     src = src.Slice(t + 3);
             }
@@ -252,7 +247,7 @@ namespace Impl
         }
 
         if(src.Empty())
-            return None;
+            return std::nullopt;
 
         switch(*src.CodePoints().begin())
         {
@@ -294,7 +289,7 @@ namespace Impl
             static thread_local Regex8 regex(R"__("&((@{!"}|\\")*@{!\\})?&")__");
             auto m = regex.SearchPrefix(src);
             if(!m)
-                return None;
+                return std::nullopt;
             src = src.Slice(m[1] + 1);
             return Token{ TokenType::String, m(0, 1) };
         }
@@ -304,7 +299,7 @@ namespace Impl
             return StrAlgo::IsUnicodeWhitespace(c) || c == ',' || c == '=' || c == ';' || c == ')' || c == '(' || c == '#';
         });
         if(!tidx)
-            return None;
+            return std::nullopt;
         if(tidx == StrView8::NPOS)
             tidx = src.Length();
         Str8 s = src.Prefix(tidx);

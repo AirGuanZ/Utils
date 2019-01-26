@@ -27,7 +27,6 @@
     <ClInclude Include="..\Src\AGZUtils\Container\AccumulateBuffer.h" />
     <ClInclude Include="..\Src\AGZUtils\Container\AccumulatorAndFetcher.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\File.h" />
-    <ClInclude Include="..\Src\AGZUtils\FileSys\FileSystem.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\Path.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\Raw.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\Common.h" />

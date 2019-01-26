@@ -144,7 +144,7 @@ public:
      * @param k 查找路径
      * @param parseParam parse用的参数
      * 
-     * 查找失败或parse失败时返回None
+     * 查找失败或parse失败时返回std::nullopt
      */
     template<typename T, typename A>
     std::optional<T> FindAndParse(const Str8 &k, A &&parseParam) const;
@@ -154,7 +154,7 @@ public:
      * 
      * @param k 查找路径
      * 
-     * 查找失败或parse失败时返回None
+     * 查找失败或parse失败时返回std::nullopt
      */
     template<typename T>
 	std::optional<T> FindAndParse(const Str8 &k) const;

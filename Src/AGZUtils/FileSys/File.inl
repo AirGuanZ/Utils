@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "../Misc/Common.h"
+#include "../String/StdStr.h"
 
 #ifdef AGZ_FILE_IMPL
 
@@ -27,11 +28,11 @@ FileTime File::GetCurrentFileTime()
     return ret;
 }
 
-std::optional<FileTime> File::GetLastWriteTime(const Str8 &filename)
+std::optional<FileTime> File::GetLastWriteTime(std::string_view filename)
 {
     WIN32_FIND_DATA findData;
 
-    auto hFind = FindFirstFileW(filename.ToStdWString().c_str(), &findData);
+    auto hFind = FindFirstFileW(WIDEN(filename).c_str(), &findData);
     if(hFind == INVALID_HANDLE_VALUE)
         return std::nullopt;
     FindClose(hFind);
@@ -68,9 +69,9 @@ Str8 File::GetWorkingDirectory()
     throw OSException("Failed to get the working directory");
 }
 
-bool File::CreateDirectoryRecursively(const Str8 &directory)
+bool File::CreateDirectoryRecursively(std::string_view directory)
 {
-    return std::filesystem::create_directories(directory.ToStdString());
+    return std::filesystem::create_directories(directory);
 }
 
 bool File::IsRegularFile(const Str8 &filename)
@@ -112,10 +113,10 @@ FileTime File::GetCurrentFileTime()
     return ret;
 }
 
-std::optional<FileTime> File::GetLastWriteTime(const Str8 &filename)
+std::optional<FileTime> File::GetLastWriteTime(std::string_view filename)
 {
     struct stat buf;
-    if(stat(filename.ToStdString().c_str(), &buf))
+    if(stat(std::string(filename).c_str(), &buf))
         return std::nullopt;
 
     // localTime由内核自动分配，不要尝试手动释放它
@@ -143,14 +144,9 @@ Str8 File::GetWorkingDirectory()
     return w.EndsWith("/") ? std::move(w) : w + "/";
 }
 
-bool File::CreateDirectoryRecursively(const Str8 &directory)
+bool File::CreateDirectoryRecursively(std::string_view directory)
 {
-    Path8 p(directory, false);
-    AGZ_ASSERT(p.IsDirectory());
-    size_t sc = p.GetSectionCount();
-    for(size_t i = 1; i <= sc; ++i)
-        mkdir(p.GetPrefix(i).ToStr().ToPlatformString().c_str(), S_IRWXU);
-    return true;
+    return std::filesystem::create_directories(directory);
 }
 
 bool File::IsRegularFile(const Str8 &filename)

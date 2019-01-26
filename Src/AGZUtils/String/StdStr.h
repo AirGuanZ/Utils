@@ -316,8 +316,8 @@ namespace Impl
     template<typename T>               struct CanConvertToStringViewImpl                                : std::false_type {};
     template<typename TChar>           struct CanConvertToStringViewImpl<std::basic_string<TChar>>      : std::true_type { using Char = TChar; };
     template<typename TChar>           struct CanConvertToStringViewImpl<std::basic_string_view<TChar>> : std::true_type { using Char = TChar; };
-    template<typename TChar>           struct CanConvertToStringViewImpl<TChar*>                        : std::true_type { using Char = TChar; };
-    template<typename TChar, size_t N> struct CanConvertToStringViewImpl<TChar[N]>                      : std::true_type { using Char = TChar; };
+    template<typename TChar>           struct CanConvertToStringViewImpl<TChar*>                        : std::true_type { using Char = remove_rcv_t<TChar>; };
+    template<typename TChar, size_t N> struct CanConvertToStringViewImpl<TChar[N]>                      : std::true_type { using Char = remove_rcv_t<TChar>; };
     template<typename CS>              struct CanConvertToStringViewImpl<String<CS>>                    : std::true_type { using Char = typename CS::CodeUnit; };
     template<typename CS>              struct CanConvertToStringViewImpl<StringView<CS>>                : std::true_type { using Char = typename CS::CodeUnit; };
 
@@ -876,7 +876,6 @@ template<typename TCharIn, typename TCharOut, typename T, CONV_T(T), std::enable
 std::basic_string<TCharOut> ConvertBetweenUTF(const T &_str)
 {
     using UTFIn  = Impl::CU2UTF_t<TCharIn>;
-
     CONV(str);
 
     std::basic_string<TCharOut> ret;
@@ -916,12 +915,12 @@ using PlatformStringView = std::string_view;
 /**
  * @brief 该宏仅在Win32平台上有意义，在该平台上维持S不变
  */
-#define WIDEN(S)     (S)
+#define WIDEN(S)     (std::string(S))
 
  /**
   * @brief 该宏仅在Win32平台上有意义，在该平台上维持S不变
   */
-#define INV_WIDEN(S) (S)
+#define INV_WIDEN(S) (std::string(S))
 
 #endif
 

@@ -33,13 +33,13 @@ public:
     static FileTime GetCurrentFileTime();
 
     //! 取得用本地时间表示的最后修改时间
-    static std::optional<FileTime> GetLastWriteTime(const Str8 &filename);
+    static std::optional<FileTime> GetLastWriteTime(std::string_view filename);
 
     //! 取得当前工作目录（绝对路径）
     static Str8 GetWorkingDirectory();
 
     //! 创建指定目录
-    static bool CreateDirectoryRecursively(const Str8 &directory);
+    static bool CreateDirectoryRecursively(std::string_view directory);
 
     //! 查询一个路径是否是regular file
     static bool IsRegularFile(const Str8 &filename);
