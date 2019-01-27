@@ -28,7 +28,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL Texture2D Name
      */
-    explicit Texture2D(bool initHandle = true) noexcept
+    explicit Texture2D(bool initHandle = false) noexcept
     {
         if(initHandle)
             InitializeHandle();

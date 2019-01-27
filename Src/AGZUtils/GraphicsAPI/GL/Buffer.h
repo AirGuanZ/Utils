@@ -17,7 +17,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name
      */
-    explicit Buffer(bool initHandle = true) noexcept
+    explicit Buffer(bool initHandle = false) noexcept
     {
         if(initHandle)
             InitializeHandle();
@@ -102,7 +102,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name
      */
-    explicit VertexBuffer(bool initHandle = true) noexcept
+    explicit VertexBuffer(bool initHandle = false) noexcept
         : Buffer(initHandle), vertexCount_(0)
     {
         
@@ -197,7 +197,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name
      */
-    explicit Std140UniformBlockBuffer(bool initHandle = true) noexcept
+    explicit Std140UniformBlockBuffer(bool initHandle = false) noexcept
         : Buffer(initHandle)
     {
 
@@ -303,7 +303,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL Buffer Name
      */
-    explicit ElementBuffer(bool initHandle = true) noexcept
+    explicit ElementBuffer(bool initHandle = false) noexcept
         : Buffer(initHandle), elemCount_(0)
     {
         

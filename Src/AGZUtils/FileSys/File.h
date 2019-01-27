@@ -1,9 +1,10 @@
 ﻿#pragma once
 
 #include <cstring>
+#include <string>
+#include <string_view>
 
 #include "../Misc/Common.h"
-#include "../Utils/String.h"
 
 namespace AGZ::FileSys {
 
@@ -36,16 +37,16 @@ public:
     static std::optional<FileTime> GetLastWriteTime(std::string_view filename);
 
     //! 取得当前工作目录（绝对路径）
-    static Str8 GetWorkingDirectory();
+    static std::string GetWorkingDirectory();
 
     //! 创建指定目录
     static bool CreateDirectoryRecursively(std::string_view directory);
 
     //! 查询一个路径是否是regular file
-    static bool IsRegularFile(const Str8 &filename);
+    static bool IsRegularFile(std::string_view filename);
 
     //! 删除指定文件
-    static bool DeleteRegularFile(const Str8 &filename);
+    static bool DeleteRegularFile(std::string_view filename);
 };
 
 } // namespace AGZ::FileSys

@@ -13,7 +13,7 @@ public:
     /**
  * @param initHandle 是否立即创建一个GL FrameBuffer Name
  */
-    explicit FrameBuffer(bool initHandle = true) noexcept
+    explicit FrameBuffer(bool initHandle = false) noexcept
         : GLObject(0)
     {
         if(initHandle)

@@ -52,37 +52,24 @@ std::optional<FileTime> File::GetLastWriteTime(std::string_view filename)
     return ret;
 }
 
-Str8 File::GetWorkingDirectory()
+std::string File::GetWorkingDirectory()
 {
-    DWORD len = GetCurrentDirectory(0, NULL);
-    std::vector<wchar_t> buf(len + 1);
-
-    if((len = GetCurrentDirectory(len, buf.data())))
-    {
-        if(buf[len - 1] != '\\' && buf[len - 1] != '/')
-        {
-            buf[len] = '\\';
-            return Str8(WStr(buf.data(), len + 1));
-        }
-        return Str8(WStr(buf.data(), len));
-    }
-    throw OSException("Failed to get the working directory");
+    return INV_WIDEN(std::filesystem::current_path().wstring());
 }
 
 bool File::CreateDirectoryRecursively(std::string_view directory)
 {
-    return std::filesystem::create_directories(directory);
+    return std::filesystem::create_directories(WIDEN(directory));
 }
 
-bool File::IsRegularFile(const Str8 &filename)
+bool File::IsRegularFile(std::string_view filename)
 {
-    return std::filesystem::is_regular_file(filename.ToStdString());
+    return std::filesystem::is_regular_file(std::filesystem::path(WIDEN(filename)));
 }
 
-bool File::DeleteRegularFile(const Str8 &filename)
+bool File::DeleteRegularFile(std::string_view filename)
 {
-    auto s = filename.ToStdString();
-    return IsRegularFile(s) && std::filesystem::remove(s);
+    return IsRegularFile(filename) && std::filesystem::remove(WIDEN(filename));
 }
 
 } // namespace AGZ::FileSys
@@ -134,7 +121,7 @@ std::optional<FileTime> File::GetLastWriteTime(std::string_view filename)
     return ret;
 }
 
-Str8 File::GetWorkingDirectory()
+/*Str8 File::GetWorkingDirectory()
 {
     char buf[PATH_MAX + 1];
     if(!getcwd(buf, PATH_MAX))
@@ -142,6 +129,11 @@ Str8 File::GetWorkingDirectory()
     
     auto w = Str8(buf);
     return w.EndsWith("/") ? std::move(w) : w + "/";
+}*/
+
+std::string File::GetWorkingDirectory()
+{
+    return std::filesystem::current_path().string();
 }
 
 bool File::CreateDirectoryRecursively(std::string_view directory)
@@ -149,19 +141,20 @@ bool File::CreateDirectoryRecursively(std::string_view directory)
     return std::filesystem::create_directories(directory);
 }
 
-bool File::IsRegularFile(const Str8 &filename)
+bool File::IsRegularFile(std::string_view filename)
 {
-    struct stat buf;
+    /*struct stat buf;
     if(stat(filename.ToStdString().c_str(), &buf))
         return false;
-    return static_cast<bool>(S_ISREG(buf.st_mode));
+    return static_cast<bool>(S_ISREG(buf.st_mode));*/
+    return std::filesystem::is_regular_file(filename);
 }
 
-bool File::DeleteRegularFile(const Str8 &filename)
+bool File::DeleteRegularFile(std::string_view filename)
 {
     if(!IsRegularFile(filename))
         return false;
-    return !remove(filename.ToStdString().c_str());
+    return std::filesystem::remove(filename);
 }
 
 } // namespace AGZ::FileSys

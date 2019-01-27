@@ -16,7 +16,7 @@ public:
     /**
      * @param initHandle 是否立即创建一个GL RenderBuffer Name
      */
-    explicit RenderBuffer(bool initHandle = true) noexcept
+    explicit RenderBuffer(bool initHandle = false) noexcept
         : GLObject(0)
     {
         if(initHandle)
