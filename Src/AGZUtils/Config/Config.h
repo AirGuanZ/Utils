@@ -1,11 +1,13 @@
 ﻿#pragma once
 
+#include <string>
+#include <string_view>
 #include <vector>
 #include <unordered_map>
 
 #include "../Alloc/ObjArena.h"
 #include "../Misc/Exception.h"
-#include "../Utils/String.h"
+#include "../String/StdStr.h"
 
 namespace AGZ {
 
@@ -46,19 +48,19 @@ public:
      * 将this转换为参数值
      * @exception ConfigNodeInvalidCasting this并不是参数值时抛出
      */
-    virtual const Str8 &AsValue() const { throw ConfigNodeInvalidCasting("ConfigASTNode: invalid casting"); }
+    virtual const std::string &AsValue() const { throw ConfigNodeInvalidCasting("ConfigASTNode: invalid casting"); }
 
     /**
      * 转为value并parse
      */
     template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
-    T Parse() const { return AsValue().Parse<T>(); }
+    T Parse() const { return AGZ::Parse<T>(AsValue()); }
 
     /**
      * 转为value并parse
      */
     template<typename T, typename A, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
-    T Parse(A &&param) const { return AsValue().Parse<T>(std::forward<A>(param)); }
+    T Parse(A &&param) const { return Parse<T>(AsValue(), std::forward<A>(param)); }
 
     /**
      * 尝试将this转换为参数集合，类型不匹配时返回nullptr
@@ -73,7 +75,7 @@ public:
     /**
      * 尝试将this转换为参数值，类型不匹配时返回nullptr
      */
-    virtual const Str8 *TryAsValue() const noexcept { return nullptr; }
+    virtual const std::string *TryAsValue() const noexcept { return nullptr; }
 
     //! 是否是Group类型
     virtual bool IsGroup() const noexcept { return false; }
@@ -85,7 +87,7 @@ public:
     /**
      * 转换为描述性字符串
      */
-    virtual Str8 ToString() const = 0;
+    virtual std::string ToString() const = 0;
 };
 
 /**
@@ -93,13 +95,13 @@ public:
  */
 class ConfigGroup : public ConfigNode
 {
-    std::unordered_map<Str8, ConfigNode*> children_;
+    std::unordered_map<std::string, ConfigNode*> children_;
 
-    const ConfigNode *FindSection(const StrView8 &k) const;
+    const ConfigNode *FindSection(std::string_view k) const;
 
 public:
 
-    explicit ConfigGroup(std::unordered_map<Str8, ConfigNode*> &&children);
+    explicit ConfigGroup(std::unordered_map<std::string, ConfigNode*> &&children);
 
     /**
      * 扩充内容
@@ -108,35 +110,32 @@ public:
      * - 对名字相同者，若两个都是group，则递归地扩充该group
      * - 对其他情况，用more中的同名ConfigNode覆盖children_中的
      */
-    void Expand(const std::unordered_map<Str8, ConfigNode*> &more);
+    void Expand(const std::unordered_map<std::string, ConfigNode*> &more);
 
     //! 取得所有内容
-    const std::unordered_map<Str8, ConfigNode*> &GetChildren() const { return children_; }
+    const std::unordered_map<std::string, ConfigNode*> &GetChildren() const { return children_; }
 
     /**
      * 查找具有指定路径的配置参数值
      * 
      * @param k 带查找的参数路径，用“.”作为路径分隔符
      */
-    const ConfigNode *Find(const Str8 &k) const;
-
-    //! @copydoc ConfigGroup::Find(const Str8&) const
-    const ConfigNode *Find(const StrView8 &k) const;
+    const ConfigNode *Find(std::string_view k) const;
 
     /**
      * 查找具有指定路径的array，路径不存在或类型不正确时返回nullptr
      */
-    const ConfigArray *FindArray(const Str8 &k) const;
+    const ConfigArray *FindArray(std::string_view k) const;
 
     /**
      * 查找具有指定路径的group，路径不存在或类型不正确时返回nullptr
      */
-    const ConfigGroup *FindGroup(const Str8 &k) const;
+    const ConfigGroup *FindGroup(std::string_view k) const;
 
     /**
      * 查找具有指定路径的value，路径不存在或类型不正确时返回nullptr
      */
-    const Str8 *FindValue(const Str8 &k) const;
+    const std::string *FindValue(std::string_view k) const;
 
     /**
      * 查找指定路径中的值，并parse为数值类型
@@ -147,7 +146,7 @@ public:
      * 查找失败或parse失败时返回std::nullopt
      */
     template<typename T, typename A>
-    std::optional<T> FindAndParse(const Str8 &k, A &&parseParam) const;
+    std::optional<T> FindAndParse(std::string_view k, A &&parseParam) const;
 
     /**
      * 查找指定路径中的值，并parse为数值类型
@@ -157,21 +156,14 @@ public:
      * 查找失败或parse失败时返回std::nullopt
      */
     template<typename T>
-	std::optional<T> FindAndParse(const Str8 &k) const;
+	std::optional<T> FindAndParse(std::string_view k) const;
 
     /**
      * @copydoc ConfigGroup::Find(const Str8&) const
      *
      * @exception ConfigNodeKeyNotFound 参数路径不存在时抛出
      */
-    const ConfigNode &operator[](const Str8 &k) const;
-
-    /**
-     * @copydoc ConfigGroup::Find(const Str8&) const
-     *
-     * @exception ConfigNodeKeyNotFound 参数路径不存在时抛出
-     */
-    const ConfigNode &operator[](const StrView8 &k) const;
+    const ConfigNode &operator[](std::string_view k) const;
 
     /**
      * 返回作为ConfigGroup的this指针
@@ -184,7 +176,7 @@ public:
 
     bool IsGroup() const noexcept override { return true; }
 
-    Str8 ToString() const override;
+    std::string ToString() const override;
 };
 
 /**
@@ -193,11 +185,11 @@ public:
 class ConfigArray : public ConfigNode
 {
     std::vector<const ConfigNode*> array_;
-    Str8 tag_;
+    std::string tag_;
 
 public:
 
-    ConfigArray(std::vector<const ConfigNode*> &&content, Str8 tag);
+    ConfigArray(std::vector<const ConfigNode*> &&content, std::string tag);
 
     /**
      * 取得指定位置的元素
@@ -221,7 +213,7 @@ public:
     size_t Size() const;
 
     /** 取得数组tag名字，若未给出则为空字符串 */
-    const Str8 &GetTag() const { return tag_; }
+    const std::string &GetTag() const { return tag_; }
 
     /**
      * 返回作为ConfigArray的this指针
@@ -234,7 +226,7 @@ public:
 
     bool IsArray() const noexcept override { return true; }
 
-    Str8 ToString() const override;
+    std::string ToString() const override;
 
     auto begin() const { return array_.begin(); }
     auto end()   const { return array_.end(); }
@@ -245,30 +237,30 @@ public:
  */
 class ConfigValue : public ConfigNode
 {
-    Str8 str_;
+    std::string str_;
 
 public:
 
-    explicit ConfigValue(Str8 &&str);
+    explicit ConfigValue(std::string str);
 
     /** 取得字符串内容 */
-    const Str8 &GetStr() const;
+    const std::string &GetStr() const;
 
     /** 取得字符串内容 */
-    const Str8 &operator*() const;
+    const std::string &operator*() const;
 
     /**
      * 返回作为ConfigValue的this指针
      *
      * @note 仅在从父类接口调用时有意义，免得到处写dynamic_cast
      */
-    const Str8 &AsValue() const override;
+    const std::string &AsValue() const override;
 
-    const Str8 *TryAsValue() const noexcept override { return &str_; }
+    const std::string *TryAsValue() const noexcept override { return &str_; }
 
     bool IsValue() const noexcept override { return true; }
 
-    Str8 ToString() const override;
+    std::string ToString() const override;
 };
 
 /**

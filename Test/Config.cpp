@@ -59,7 +59,7 @@ TEST_CASE("Config")
             auto &root = config.Root();
 
             REQUIRE(root.Find("Window.Title")->AsValue() == "AGZ Application");
-            REQUIRE(root.Find("Others.Integer")->AsValue().Parse<int>() == 27);
+            REQUIRE(root.Find("Others.Integer")->Parse<int>() == 27);
             REQUIRE(root["Window.Bordered"].AsValue() == "True");
             REQUIRE(root["Window.Visible"].AsValue() == "False");
             REQUIRE(root["Angle"].AsArray().GetTag() == "Deg");

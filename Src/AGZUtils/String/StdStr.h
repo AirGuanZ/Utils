@@ -788,15 +788,17 @@ namespace Impl
     {
         static_assert(std::is_arithmetic_v<T>);
 
-        static T Call(const std::string_view &str)
+        template<typename...OtherArgs>
+        static T Call(const std::string_view &str, OtherArgs&&...otherArgs)
         {
             T ret;
-            auto [np, er] = std::from_chars(str.data(), str.data() + str.size(), ret);
+            auto [np, er] = std::from_chars(str.data(), str.data() + str.size(), ret, std::forward<OtherArgs>(otherArgs)...);
             if(er != std::errc() || np != str.data() + str.size())
                 throw FromException(str.data());
             return ret;
         }
     };
+
 } // namespace Impl
 
 /**
@@ -812,7 +814,8 @@ namespace Impl
 template<typename TChar, typename T, typename...Args>
 std::basic_string<TChar> To(T &&obj, Args&&...args)
 {
-    return Impl::ToImpl<TChar, remove_rcv_t<T>, remove_rcv_t<Args>...>::Call(std::forward<T>(obj), std::forward<Args>(args)...);
+    return Impl::ToImpl<TChar, remove_rcv_t<T>, remove_rcv_t<Args>...>
+            ::template Call(std::forward<T>(obj), std::forward<Args>(args)...);
 }
 
 /**

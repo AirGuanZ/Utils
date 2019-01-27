@@ -17,9 +17,9 @@ TEST_CASE("FileSys")
 {
     SECTION("File")
     {
-        REQUIRE(!File::GetWorkingDirectory().Empty());
+        REQUIRE(!File::GetWorkingDirectory().empty());
         REQUIRE(Path8(File::GetWorkingDirectory()).IsAbsolute());
-        REQUIRE(!Path8(File::GetWorkingDirectory()).HasFilename());
+        REQUIRE(!Path8(File::GetWorkingDirectory(), false).HasFilename());
     }
 
     SECTION("Path")

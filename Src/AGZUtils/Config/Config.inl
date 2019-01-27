@@ -3,18 +3,18 @@
 #include <optional>
 
 #include "../FileSys/Raw.h"
-#include "../Range/Map.h"
 #include "Config.h"
+#include "AGZUtils/String/Regex/Regex.h"
 
 namespace AGZ {
 
-inline ConfigGroup::ConfigGroup(std::unordered_map<Str8, ConfigNode*> &&children)
+inline ConfigGroup::ConfigGroup(std::unordered_map<std::string, ConfigNode*> &&children)
     : children_(std::move(children))
 {
 
 }
 
-inline void ConfigGroup::Expand(const std::unordered_map<Str8, ConfigNode*> &more)
+inline void ConfigGroup::Expand(const std::unordered_map<std::string, ConfigNode*> &more)
 {
     for(auto &moreIt : more)
     {
@@ -26,20 +26,17 @@ inline void ConfigGroup::Expand(const std::unordered_map<Str8, ConfigNode*> &mor
     }
 }
 
-inline const ConfigNode *ConfigGroup::FindSection(const StrView8 &k) const
+inline const ConfigNode *ConfigGroup::FindSection(std::string_view k) const
 {
-    auto it = children_.find(k);
+    auto it = children_.find(std::string(k));
     return it != children_.end() ? it->second : nullptr;
 }
 
-inline const ConfigNode *ConfigGroup::Find(const Str8 &k) const
+inline const ConfigNode *ConfigGroup::Find(std::string_view k) const
 {
-    return Find(k.AsView());
-}
-
-inline const ConfigNode *ConfigGroup::Find(const StrView8 &k) const
-{
-    auto sections = k.Split(".");
+    std::vector<std::string_view> sections;
+    Split(k, ".", std::back_inserter(sections), false);
+    //auto sections = k.Split(".");
     const ConfigGroup *grp = this;
 
     for(size_t i = 0, end = sections.size() - 1; i < end; ++i)
@@ -53,7 +50,7 @@ inline const ConfigNode *ConfigGroup::Find(const StrView8 &k) const
     return grp->FindSection(sections.back());
 }
 
-inline const ConfigArray *ConfigGroup::FindArray(const Str8 &k) const
+inline const ConfigArray *ConfigGroup::FindArray(std::string_view k) const
 {
     auto node = Find(k);
     if(!node)
@@ -61,7 +58,7 @@ inline const ConfigArray *ConfigGroup::FindArray(const Str8 &k) const
     return node->IsArray() ? &node->AsArray() : nullptr;
 }
 
-inline const ConfigGroup *ConfigGroup::FindGroup(const Str8 &k) const
+inline const ConfigGroup *ConfigGroup::FindGroup(std::string_view k) const
 {
     auto node = Find(k);
     if(!node)
@@ -69,7 +66,7 @@ inline const ConfigGroup *ConfigGroup::FindGroup(const Str8 &k) const
     return node->IsGroup() ? &node->AsGroup() : nullptr;
 }
 
-inline const Str8 *ConfigGroup::FindValue(const Str8 &k) const
+inline const std::string *ConfigGroup::FindValue(std::string_view k) const
 {
     auto node = Find(k);
     if(!node)
@@ -78,13 +75,13 @@ inline const Str8 *ConfigGroup::FindValue(const Str8 &k) const
 }
 
 template<typename T, typename A>
-std::optional<T> ConfigGroup::FindAndParse(const Str8 &k, A &&parseParam) const
+std::optional<T> ConfigGroup::FindAndParse(std::string_view k, A &&parseParam) const
 {
     if(auto v = FindValue(k))
     {
         try
         {
-            return v->Parse<T>(std::forward<A>(parseParam));
+            return Parse<T>(*v, std::forward<A>(parseParam));
         }
         catch(...)
         {
@@ -95,13 +92,13 @@ std::optional<T> ConfigGroup::FindAndParse(const Str8 &k, A &&parseParam) const
 }
 
 template<typename T>
-std::optional<T> ConfigGroup::FindAndParse(const Str8 &k) const
+std::optional<T> ConfigGroup::FindAndParse(std::string_view k) const
 {
     if(auto v = FindValue(k))
     {
         try
         {
-            return v->Parse<T>();
+            return Parse<T>(*v);
         }
         catch(...)
         {
@@ -111,16 +108,11 @@ std::optional<T> ConfigGroup::FindAndParse(const Str8 &k) const
     return std::nullopt;
 }
 
-inline const ConfigNode &ConfigGroup::operator[](const Str8 &k) const
-{
-    return (*this)[k.AsView()];
-}
-
-inline const ConfigNode &ConfigGroup::operator[](const StrView8 &k) const
+inline const ConfigNode &ConfigGroup::operator[](std::string_view k) const
 {
     auto node = Find(k);
     if(!node)
-        throw ConfigNodeKeyNotFound(("Key not found: " + k).ToStdString());
+        throw ConfigNodeKeyNotFound("Key not found: " + std::string(k));
     return *node;
 }
 
@@ -129,18 +121,21 @@ inline const ConfigGroup &ConfigGroup::AsGroup() const
     return *this;
 }
 
-inline Str8 ConfigGroup::ToString() const
+inline std::string ConfigGroup::ToString() const
 {
-    StringBuilder<UTF8<>> b;
-    b << "{";
-    b << Str8("").Join(
-        children_ |
-        Map([](auto &p){ return p.first + "=" + p.second->ToString() + ";"; }));
-    b << "}";
-    return b.Get();
+    std::string ret = "{";
+    std::vector<std::string> mappedChildren;
+    std::transform(begin(children_), end(children_), std::back_inserter(mappedChildren),
+        [](auto &p)
+    {
+        return p.first + "=" + p.second->ToString() + ";";
+    });
+    ret.append(Join("", begin(mappedChildren), end(mappedChildren)));
+    ret.push_back('}');
+    return ret;
 }
 
-inline ConfigArray::ConfigArray(std::vector<const ConfigNode*> &&content, Str8 tag)
+inline ConfigArray::ConfigArray(std::vector<const ConfigNode*> &&content, std::string tag)
     : array_(std::move(content)), tag_(std::move(tag))
 {
     
@@ -166,39 +161,39 @@ inline const ConfigArray &ConfigArray::AsArray() const
     return *this;
 }
 
-inline Str8 ConfigArray::ToString() const
+inline std::string ConfigArray::ToString() const
 {
-    StringBuilder<UTF8<>> b;
-    b << tag_ << "(";
-    b << Str8(",").Join(
-        array_ |
-        ::AGZ::Map([](auto node){ return node->ToString(); }));
-    b << ")";
-    return b.Get();
+    std::string ret = tag_ + "(";
+    std::vector<std::string> mappedArray;
+    std::transform(std::begin(array_), std::end(array_),
+        std::back_inserter(mappedArray), [](auto node) { return node->ToString(); });
+    ret.append(Join(",", std::begin(mappedArray), std::end(mappedArray)));
+    ret.push_back(')');
+    return ret;
 }
 
-inline ConfigValue::ConfigValue(Str8 &&str)
+inline ConfigValue::ConfigValue(std::string str)
     : str_(std::move(str))
 {
 
 }
 
-inline const Str8 &ConfigValue::GetStr() const
+inline const std::string &ConfigValue::GetStr() const
 {
     return str_;
 }
 
-inline const Str8 &ConfigValue::operator*() const
+inline const std::string &ConfigValue::operator*() const
 {
     return str_;
 }
 
-inline const Str8 &ConfigValue::AsValue() const
+inline const std::string &ConfigValue::AsValue() const
 {
     return str_;
 }
 
-inline Str8 ConfigValue::ToString() const
+inline std::string ConfigValue::ToString() const
 {
     return "\"" + str_ + "\"";
 }
@@ -216,98 +211,94 @@ namespace Impl
     struct Token
     {
         TokenType type;
-        Str8 str;
+        std::string str;
     };
 
-    inline std::optional<Token> NextToken(StrView8 &src)
+    inline std::optional<Token> NextToken(std::string &src)
     {
         // Skip whitespaces and comments
 
         while(true)
         {
-            src = src.TrimLeft();
-            if(src.StartsWith("###"))
+            src = TrimLeft(src);;
+            if(StartsWith(src, "###"))
             {
-                auto t = src.Find("###", 3);
-                if(t == StrView8::NPOS)
+                auto t = src.find("###", 3);
+                if(t == std::string_view::npos)
                     return std::nullopt;
-                else
-                    src = src.Slice(t + 3);
+                src = src.substr(t + 3);
             }
-            else if(src.StartsWith("#"))
+            else if(StartsWith(src, "#"))
             {
-                auto t = src.Find("\n", 1);
-                if(t == StrView8::NPOS)
-                    src = src.Slice(0, 0);
+                auto t = src.find("\n", 1);
+                if(t == std::string_view::npos)
+                    src = src.substr(0, 0);
                 else
-                    src = src.Slice(t + 1);
+                    src = src.substr(t + 1);
             }
             else
                 break;
         }
 
-        if(src.Empty())
+        if(src.empty())
             return std::nullopt;
 
-        switch(*src.CodePoints().begin())
+        switch(src[0])
         {
 
         case '{':
-            src = src.Slice(1);
-            return Token{ TokenType::LeftBrac, Str8() };
+            src = src.substr(1);
+            return Token{ TokenType::LeftBrac, std::string() };
 
         case '}':
-            src = src.Slice(1);
-            return Token{ TokenType::RightBrac, Str8() };
+            src = src.substr(1);
+            return Token{ TokenType::RightBrac, std::string() };
 
         case '=':
-            src = src.Slice(1);
-            return Token{ TokenType::Equal, Str8() };
+            src = src.substr(1);
+            return Token{ TokenType::Equal, std::string() };
 
         case ';':
-            src = src.Slice(1);
-            return Token{ TokenType::Semicolon, Str8() };
+            src = src.substr(1);
+            return Token{ TokenType::Semicolon, std::string() };
 
         case ',':
-            src = src.Slice(1);
-            return Token{ TokenType::Comma, Str8() };
+            src = src.substr(1);
+            return Token{ TokenType::Comma, std::string() };
 
         case '(':
-            src = src.Slice(1);
-            return Token{ TokenType::LeftPara, Str8() };
+            src = src.substr(1);
+            return Token{ TokenType::LeftPara, std::string() };
 
         case ')':
-            src = src.Slice(1);
-            return Token{ TokenType::RightPara, Str8() };
+            src = src.substr(1);
+            return Token{ TokenType::RightPara, std::string() };
 
         default:
             break;
         }
 
-        if(src.StartsWith("\""))
+        if(StartsWith(src, "\""))
         {
             static thread_local Regex8 regex(R"__("&((@{!"}|\\")*@{!\\})?&")__");
-            auto m = regex.SearchPrefix(src);
+            auto m = regex.SearchPrefix(Str8(std::string(src)));
             if(!m)
                 return std::nullopt;
-            src = src.Slice(m[1] + 1);
-            return Token{ TokenType::String, m(0, 1) };
+            src = src.substr(m[1] + 1);
+            return Token{ TokenType::String, m(0, 1).ToStdString() };
         }
 
-        auto tidx = src.FindCPIf([](auto c)
-        {
-            return StrAlgo::IsUnicodeWhitespace(c) || c == ',' || c == '=' || c == ';' || c == ')' || c == '(' || c == '#';
-        });
+        auto tidx = src.find_first_of(" \n\r\t\f\v,=;()#");
         if(!tidx)
             return std::nullopt;
-        if(tidx == StrView8::NPOS)
-            tidx = src.Length();
-        Str8 s = src.Prefix(tidx);
-        src = src.Slice(tidx);
-        return Token{ TokenType::Name, std::move(s) };
+        if(tidx == std::string_view::npos)
+            tidx = src.length();
+        std::string s = src.substr(0, tidx);
+        src = src.substr(tidx);
+        return Token{ TokenType::Name, s };
     }
 
-    std::unordered_map<Str8, ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena);
+    std::unordered_map<std::string, ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena);
 
     inline ConfigNode *ParseItemRight(std::list<Token> &toks, ObjArena<> &arena)
     {
@@ -328,8 +319,7 @@ namespace Impl
             return arena.Create<ConfigGroup>(std::move(content));
         }
 
-        Str8 arrTag;
-
+        std::string arrTag;
         if(t.type == TokenType::Name)
         {
             auto name = std::move(t.str);
@@ -385,16 +375,16 @@ namespace Impl
         throw Exception("");
     }
 
-    inline std::unordered_map<Str8, ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena)
+    inline std::unordered_map<std::string, ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena)
     {
-        std::unordered_map<Str8, ConfigNode*> ret;
+        std::unordered_map<std::string, ConfigNode*> ret;
 
         while(!toks.empty() && toks.front().type != TokenType::RightBrac)
         {
             if(toks.front().type != TokenType::Name)
                 throw Exception("");
 
-            Str8 left = std::move(toks.front().str);
+            std::string left = std::move(toks.front().str);
             toks.pop_front();
 
             if(toks.empty() || toks.front().type != TokenType::Equal)
@@ -417,10 +407,9 @@ namespace Impl
         return ret;
     }
 
-    inline ConfigGroup *ParseConfig(const StrView8 &_src, ObjArena<> &arena)
+    inline ConfigGroup *ParseConfig(std::string src, ObjArena<> &arena)
     {
         std::list<Token> toks;
-        StrView8 src = _src;
         for(;;)
         {
             auto tok = NextToken(src);
@@ -441,7 +430,7 @@ inline bool Config::LoadFromMemory(std::string_view src)
     Clear();
     try
     {
-        global_ = Impl::ParseConfig(Str8(std::string(src)), arena_);
+        global_ = Impl::ParseConfig(std::string(src), arena_);
         return true;
     }
     catch(...)
