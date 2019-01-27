@@ -250,6 +250,8 @@ public:
             isFirstCapture_ = false;
         }
 
+        mouse._setRelativeCursorPosition(0, 0);
+
         for(auto &er : eventRecords_)
         {
             MatchVariant(er,

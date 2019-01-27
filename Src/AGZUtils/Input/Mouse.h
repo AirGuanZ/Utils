@@ -66,13 +66,15 @@ class Mouse :
 {
     bool isButtonPressed_[3];
     double absX_, absY_;
+    double relX_, relY_;
 
 public:
 
     Mouse() noexcept
+        : isButtonPressed_{false, false, false},
+          absX_(0), absY_(0), relX_(0), relY_(0)
     {
-        std::memset(isButtonPressed_, 0, sizeof(isButtonPressed_));
-        absX_ = 0; absY_ = 0;
+
     }
 
     void Invoke(const MouseButtonDown &param)
@@ -101,6 +103,8 @@ public:
     {
         absX_ = param.absX;
         absY_ = param.absY;
+        relX_ += param.relX;
+        relY_ += param.relY;
         InvokeAllHandlers(param);
     }
 
@@ -135,12 +139,37 @@ public:
     }
 
     /**
+     * @brief 取得光标在上一次Capture中的水平位置变化量
+     */
+    double GetRelativeCursorPositionX() const noexcept
+    {
+        return relX_;
+    }
+
+    /**
+     * @brief 取得光标在上一次Capture中的垂直位置变化量
+     */
+    double GetRelativeCursorPositionY() const noexcept
+    {
+        return relY_;
+    }
+
+    /**
      * @warning 供Capturer使用
      */
     void _setCursorPosition(double x, double y) noexcept
     {
         absX_ = x;
         absY_ = y;
+    }
+
+    /**
+     * @warning 供Capturer使用
+     */
+    void _setRelativeCursorPosition(double x, double y) noexcept
+    {
+        relX_ = x;
+        relY_ = y;
     }
 
     /**
