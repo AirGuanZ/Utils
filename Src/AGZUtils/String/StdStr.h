@@ -914,12 +914,12 @@ using PlatformStringView = std::wstring_view;
 /**
  * @brief 将utf-8编码的字符串S转换为utf-16编码的宽字符串
  */
-#define WIDEN(S)     (ConvertBetweenUTF<char, wchar_t>(S))
+#define WIDEN(S)     (::AGZ::ConvertBetweenUTF<char, wchar_t>(S))
 
  /**
   * @brief 将utf-16编码的宽字符串S转换为utf-8编码的字符串
   */
-#define INV_WIDEN(S) (ConvertBetweenUTF<wchar_t, char>(S))
+#define INV_WIDEN(S) (::AGZ::ConvertBetweenUTF<wchar_t, char>(S))
 
 #else
 
