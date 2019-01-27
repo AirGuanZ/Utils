@@ -84,7 +84,7 @@ struct GeometryMesh
 template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
 struct GeometryMeshGroup
 {
-    std::map<Str8, GeometryMesh<T>> submeshes;
+    std::map<std::string, GeometryMesh<T>> submeshes;
 
     /**
      * @brief 自动平滑模型法线

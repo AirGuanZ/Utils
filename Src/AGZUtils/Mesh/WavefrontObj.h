@@ -8,6 +8,7 @@
 #include "../Math/Vec3.h"
 #include "../Math/Vec4.h"
 #include "../String/String/String.h"
+#include "../String/StdStr.h"
 #include "../Utils/Range.h"
 #include "Mesh.h"
 
@@ -71,22 +72,22 @@ public:
         };
 
         /** 取得具有指定名字的组 */
-		std::optional<const Group&> FindGroup(const Str8 &name) const
+		std::optional<const Group&> FindGroup(std::string_view name) const
         {
-            auto it = name2Group.find(name);
+            auto it = name2Group.find(std::string(name));
             if(it != name2Group.end())
                 return it->second;
             return std::nullopt;
         }
 
         /** 从名字到组的映射 */
-        std::map<Str8, Group> name2Group;
+        std::map<std::string, Group> name2Group;
     };
 
     /** 取得具有指定名字的物体 */
-	std::optional<const Object&> FindObject(const Str8 &name) const
+	std::optional<const Object&> FindObject(std::string_view name) const
     {
-        auto it = name2Obj.find(name);
+        auto it = name2Obj.find(std::string(name));
         if(it != name2Obj.end())
             return it->second;
         return std::nullopt;
@@ -128,19 +129,17 @@ public:
     std::vector<Math::Vec3<T>> vtxNor;
 
     /** 从名字到物体的映射 */
-    std::map<Str8, Object> name2Obj;
+    std::map<std::string, Object> name2Obj;
 
 private:
 
-    static typename Object::Group::Face::FaceVertex ParseVertexIndex(const Str8 &s);
+    static typename Object::Group::Face::FaceVertex ParseVertexIndex(std::string_view s);
 };
 
 template<typename T>
-bool WavefrontObj<T>::LoadFromMemory(std::string_view _content, bool ignoreUnknownLine) noexcept
+bool WavefrontObj<T>::LoadFromMemory(std::string_view content, bool ignoreUnknownLine) noexcept
 {
     Clear();
-
-    Str8 content = std::string(_content);
 
     // 通过obj()来获取当前正在parse的object
     // 通过grp()来获取当前正在parse的group
@@ -164,86 +163,74 @@ bool WavefrontObj<T>::LoadFromMemory(std::string_view _content, bool ignoreUnkno
     {
         // 按\n拆分并剔除空行、注释行
 
-        auto lines = content.Split("\n")
-            | FilterMap([](const Str8 &line) -> std::optional<Str8>
+        std::vector<std::string> lines;
+        {
+            std::vector<std::string> prelines;
+            Split(content, "\n", std::back_inserter(prelines), true);
+            for(auto &line : prelines)
             {
-                Str8 ret = line.Trim();
-                if(ret.Empty() || ret.StartsWith("#"))
-                    return std::nullopt;
-                return ret;
-            })
-            | Collect<std::vector<Str8>>();
+                if(!line.empty() && !StartsWith(line, "#"))
+                    lines.push_back(Trim(line));
+            }
+        }
         
         for(const auto &line : lines)
         {
-            static thread_local Regex8 oReg(
-                R"___(o\s+&@{!\s}+&)___");
-            static thread_local Regex8 gReg(
-                R"___(g\s+&@{!\s}+&)___");
-            static thread_local Regex8 vReg(
-                R"___(v\s+&@{!\s}+&\s+&@{!\s}+&\s+&@{!\s}+&(\s+@{!\s}+)?&)___");
-            static thread_local Regex8 vtReg(
-                R"___(vt\s+&@{!\s}+&\s+&@{!\s}+&(\s+@{!\s}+)?&)___");
-            static thread_local Regex8 vnReg(
-                R"___(vn\s+&@{!\s}+&\s+&@{!\s}+&\s+&@{!\s}+&)___");
-
-            if(auto m = oReg.Match(line))
+            if(StartsWith(line, "o "))
             {
-                Str8 k(m(0, 1));
-                name2Obj.erase(k);
-                _curObj = &name2Obj[k];
+                std::string name = Trim(line.substr(2));
+                name2Obj.erase(name);
+                _curObj = &name2Obj[name];
                 _curGrp = nullptr;
                 continue;
             }
 
-            if(auto m = gReg.Match(line))
+            if(StartsWith(line, "g "))
             {
-                Str8 k(m(0, 1));
-                obj().name2Group.erase(k);
-                _curGrp = &obj().name2Group[k];
+                std::string name = Trim(line.substr(2));
+                obj().name2Group.erase(name);
+                _curGrp = &obj().name2Group[name];
                 continue;
             }
 
-            if(auto m = vReg.Match(line))
+            static const TScanner<char> vScanner("v {} {} {}");
+            if(T x, y, z; vScanner.Scan(line, x, y, z))
             {
-                Math::Vec4<T> v = {
-                    m(0, 1).template Parse<T>(),
-                    m(2, 3).template Parse<T>(),
-                    m(4, 5).template Parse<T>(),
-                    m(5, 6).Empty() ? T(1) : m(5, 6).TrimLeft().template Parse<T>()
-                };
-                vtxPos.push_back(v.xyz() / v.w);
+                vtxPos.push_back(Math::Vec3<T>(x, y, z));
                 continue;
             }
 
-            if(auto m = vtReg.Match(line))
+            static const TScanner<char> vt2Scanner("vt {} {}");
+            if(T x, y; vt2Scanner.Scan(line, x, y))
             {
-                Math::Vec3<T> vt = {
-                    m(0, 1).template Parse<T>(),
-                    m(2, 3).template Parse<T>(),
-                    m(3, 4).Empty() ? T(0) : m(3, 4).TrimLeft().template Parse<T>()
-                };
-                vtxTex.push_back(vt);
+                vtxTex.push_back(Math::Vec3<T>(x, y, 0));
                 continue;
             }
 
-            if(auto m = vnReg.Match(line))
+            static const TScanner<char> vt3Scanner("vt {} {} {}");
+            if(T x, y, z; vt3Scanner.Scan(line, x, y, z))
             {
-                Math::Vec3<T> vn = {
-                    m(0, 1).template Parse<T>(),
-                    m(2, 3).template Parse<T>(),
-                    m(4, 5).template Parse<T>()
-                };
-                vtxNor.push_back(vn);
+                vtxTex.push_back(Math::Vec3<T>(x, y, z));
                 continue;
             }
 
-            if(line.StartsWith("f"))
+            static const TScanner<char> vnScanner("vn {} {} {}");
+            if(T x, y, z; vnScanner.Scan(line, x, y, z))
             {
-                auto indices = line.Slice(1).Split();
+                vtxNor.push_back(Math::Vec3<T>(x, y, z));
+                continue;
+            }
+
+            if(StartsWith(line, "f "))
+            {
+                std::vector<std::string> indices;
+                Split(line.substr(2), std::back_inserter(indices));
+                for(auto &idx : indices)
+                    idx = Trim(idx);
+
                 if(indices.size() < 3 || indices.size() > 4)
                     throw std::runtime_error("");
-                
+
                 typename Object::Group::Face face;
                 for(size_t i = 0; i < indices.size(); ++i)
                 {
@@ -256,12 +243,12 @@ bool WavefrontObj<T>::LoadFromMemory(std::string_view _content, bool ignoreUnkno
                     else if(v.nor != INDEX_NONE) --v.nor;
                     face.v[i] = v;
                 }
-                
+
                 if(indices.size() == 3)
                     face.v[3].pos = face.v[3].tex = face.v[3].nor = INDEX_NONE;
-                
+
                 face.isTriangle = indices.size() != 4;
-                
+
                 grp().faces.push_back(face);
                 continue;
             }
@@ -281,31 +268,39 @@ bool WavefrontObj<T>::LoadFromMemory(std::string_view _content, bool ignoreUnkno
 
 template<typename T>
 typename WavefrontObj<T>::Object::Group::Face::FaceVertex
-WavefrontObj<T>::ParseVertexIndex(const Str8 &str)
+WavefrontObj<T>::ParseVertexIndex(std::string_view str)
 {
     typename Object::Group::Face::FaceVertex ret = { INDEX_NONE, INDEX_NONE, INDEX_NONE };
 
-    static thread_local Regex8 reg0(R"___(-?\d+)___");
-    if(reg0.Match(str))
+    static const TScanner<char> minusIndexScanner("{}");
+    if(int32_t idx; minusIndexScanner.Scan(str, idx))
     {
-        ret.pos = str.Parse<int32_t>();
+        ret.pos = idx;
         return ret;
     }
 
-    static thread_local Regex8 reg1(R"___(&-?\d+&/&-?\d+&)___");
-    if(auto m = reg1.Match(str))
+    static const TScanner<char> posAndTexScanner("{}/{}");
+    if(int32_t pos, tex; posAndTexScanner.Scan(str, pos, tex))
     {
-        ret.pos = m(0, 1).Parse<int32_t>();
-        ret.tex = m(2, 3).Parse<int32_t>();
+        ret.pos = pos;
+        ret.tex = tex;
         return ret;
     }
 
-    static thread_local Regex8 reg2(R"___(&-?\d+&/&-?\d*&/&-?\d+&)___");
-    if(auto m = reg2.Match(str))
+    static const TScanner<char> posAndNorScanner("{}//{}");
+    if(int32_t pos, nor; posAndNorScanner.Scan(str, pos, nor))
     {
-        ret.pos = m(0, 1).Parse<int32_t>();
-        ret.tex = m(2, 3).Empty() ? INDEX_NONE : (m(2, 3).Parse<int32_t>());
-        ret.nor = m(4, 5).Parse<int32_t>();
+        ret.pos = pos;
+        ret.nor = nor;
+        return ret;
+    }
+
+    static const TScanner<char> posAndTexAndNorScanner("{}/{}/{}");
+    if(int32_t pos, nor, tex; posAndTexAndNorScanner.Scan(str, pos, tex, nor))
+    {
+        ret.pos = pos;
+        ret.tex = tex;
+        ret.nor = nor;
         return ret;
     }
 
@@ -313,8 +308,7 @@ WavefrontObj<T>::ParseVertexIndex(const Str8 &str)
 }
 
 template<typename T>
-GeometryMesh<T> WavefrontObj<T>::ToGeometryMesh(
-        const typename Object::Group &grp, bool reverseNor, bool reverseTex) const
+GeometryMesh<T> WavefrontObj<T>::ToGeometryMesh(const typename Object::Group &grp, bool reverseNor, bool reverseTex) const
 {
     std::vector<typename GeometryMesh<T>::Vertex> vtces;
 
@@ -371,7 +365,7 @@ GeometryMesh<T> WavefrontObj<T>::ToGeometryMesh(
 template<typename T>
 GeometryMeshGroup<T> WavefrontObj<T>::ToGeometryMeshGroup(bool reverseNor, bool reverseTex) const
 {
-    std::map<Str8, GeometryMesh<T>> submeshes;
+    std::map<std::string, GeometryMesh<T>> submeshes;
     for(auto &p : name2Obj)
     {
         for(auto &p2 : p.second.name2Group)
@@ -379,7 +373,7 @@ GeometryMeshGroup<T> WavefrontObj<T>::ToGeometryMeshGroup(bool reverseNor, bool 
             submeshes[p.first + "-" + p2.first] = ToGeometryMesh(p2.second, reverseNor, reverseTex);
         }
     }
-    return GeometryMeshGroup<T>{ submeshes };
+    return GeometryMeshGroup<T>{ std::move(submeshes) };
 }
 
 } // namespace AGZ::Mesh

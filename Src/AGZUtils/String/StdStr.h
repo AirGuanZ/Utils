@@ -655,7 +655,7 @@ size_t Split(
         if(end != beg || !removeEmptyResult)
         {
             ++ret;
-            outIterator = src.substr(beg, end - beg);
+            outIterator = typename TOutIterator::container_type::value_type(src.substr(beg, end - beg));
             ++outIterator;
         }
         beg = end + 1;
@@ -687,7 +687,7 @@ size_t Split(
         if(end == std::basic_string_view<TCHAR(T1)>::npos)
         {
             ++ret;
-            outIterator = src.substr(beg, src.size() - beg);
+            outIterator = typename TOutIterator::container_type::value_type(src.substr(beg, src.size() - beg));
             ++outIterator;
             break;
         }
@@ -695,7 +695,7 @@ size_t Split(
         if(end != beg || !removeEmptyResult)
         {
             ++ret;
-            outIterator = src.substr(beg, end - beg);
+            outIterator = typename TOutIterator::container_type::value_type(src.substr(beg, end - beg));
             ++outIterator;
         }
 
@@ -1259,7 +1259,7 @@ namespace Impl
     }
 
     template<typename TOut, typename TChar, std::enable_if_t<std::is_integral_v<TOut>, int> = 0>
-    struct TParseFirstImpl
+    struct TParseFirstIntImpl
     {
         static TOut Call(const TChar **pStr, const TChar *end, int base)
         {
@@ -1301,6 +1301,20 @@ namespace Impl
             return isNegative ? -static_cast<TOut>(val) : static_cast<TOut>(val);
         }
     };
+
+    template<typename TOut, std::enable_if_t<std::is_floating_point_v<TOut>, int> = 0>
+    struct TParseFirstFloatImpl
+    {
+        static TOut Call(const char **pStr, const char *end)
+        {
+            TOut ret;
+            auto [newPStr, err] = std::from_chars(*pStr, end, ret);
+            if(err != std::errc())
+                throw ParseFirstException(std::string("TParseFirstFloat: failed to parse") + typeid(TOut).name());
+            *pStr = newPStr;
+            return ret;
+        }
+    };
 }
 
 /**
@@ -1308,17 +1322,28 @@ namespace Impl
  */
 
 /**
- * @brief 从一段字符序列的开头parse出一个指定类型的对象
+ * @brief 从一段字符序列的开头parse出一个整数类型的对象
  * @param pCur 字符序列首元素指针的指针，若parse成功，会被设置为新开头的地址
  * @param end 字符序列的尾元素地址
- * @param args 其他parsing参数，根据 TOut 的不同而有所区别。
- *             当 TOut 为整数时，需提供一个 int 值作为parsing的基数。
+ * @param base 基数
  * @exception ParseFirstException parse失败时抛出
  */
-template<typename TOut, typename TChar, typename...Args>
-TOut TParseFirst(const TChar **pCur, const TChar *end, Args&&...args)
+template<typename TOut, typename TChar, std::enable_if_t<std::is_integral_v<TOut>, int> = 0>
+TOut TParseFirst(const TChar **pCur, const TChar *end, int base)
 {
-    return Impl::TParseFirstImpl<TOut, TChar>::Call(pCur, end, std::forward<Args>(args)...);
+    return Impl::TParseFirstIntImpl<TOut, TChar>::Call(pCur, end, base);
+}
+
+/**
+ * @brief 从一段字符序列的开头parse出一个浮点类型的对象
+ * @param pCur 字符序列首元素指针的指针，若parse成功，会被设置为新开头的地址
+ * @param end 字符序列的尾元素地址
+ * @exception ParseFirstException parse失败时抛出
+ */
+template<typename TOut, std::enable_if_t<std::is_floating_point_v<TOut>, int> = 0>
+TOut TParseFirst(const char **pCur, const char *end)
+{
+    return Impl::TParseFirstFloatImpl<TOut>::Call(pCur, end);
 }
 
 /**
@@ -1373,6 +1398,7 @@ class TScanner
 
     using Unit = std::variant<Output, Seg, Char>;
 
+    bool matchEnd_;
     size_t outputCount_;
     std::vector<Unit> units_;
 
@@ -1386,16 +1412,27 @@ class TScanner
         *pOutput = TParseFirst<TInt>(&str, 10);
     }
 
+    template<typename TFloat>
+    static void ProcessFloatOutput(std::basic_string_view<TChar> &str, void *output)
+    {
+        static_assert(std::is_floating_point_v<TFloat>);
+        TFloat *pOutput = static_cast<TFloat*>(output);
+        *pOutput = TParseFirst<TFloat>(&str);
+    }
+
     static void AssignProcessOutputFunc(ProcessOutputFunc_t*, void**) { }
     
     template<typename FirstOutput, typename...OtherOutputs>
     static void AssignProcessOutputFunc(ProcessOutputFunc_t *pFuncPtr, void **voidOutputs, FirstOutput &firstOutput, OtherOutputs&...otherOutputs)
     {
         using FO = remove_rcv_t<FirstOutput>;
-        static_assert(std::is_integral_v<FO>, "Each output argument must be of integral type");
+        static_assert(std::is_integral_v<FO> || std::is_floating_point_v<FO>,
+                      "Each output argument must be of integral/floating-point type");
         ;
         if constexpr(std::is_integral_v<FO>)
             *pFuncPtr = ProcessIntegerOutput<FO>;
+        else
+            *pFuncPtr = ProcessFloatOutput<FO>;
         *voidOutputs = &firstOutput;
 
         AssignProcessOutputFunc(pFuncPtr + 1, voidOutputs + 1, otherOutputs...);
@@ -1406,6 +1443,7 @@ public:
     /**
      * @brief 以格式串进行初始化
      * @param _fmt 格式串
+     * @param matchEnd 是否匹配字符串末尾。若是，则在匹配字符串时，字符串有剩余会导致匹配失败。
      * 
      * 格式串语法：
      *  - {} 表示解析输出引用，引用下标从0开始，逐个递增
@@ -1417,8 +1455,8 @@ public:
      * @exception ScannerException 格式串含有语法错误时抛出
      */
     template<typename T, CONV_T(T), std::enable_if_t<std::is_same_v<TCHAR(T), TChar>, int> = 0>
-    explicit TScanner(const T &_fmt)
-        : outputCount_(0)
+    explicit TScanner(const T &_fmt, bool matchEnd = true)
+        : outputCount_(0), matchEnd_(matchEnd)
     {
         CONV(fmt);
 
@@ -1458,13 +1496,24 @@ public:
     }
 
     /**
+     * @brief 设置是否匹配字符串末端
+     * @param matchEnd 是否匹配字符串末端
+     * @return 自身引用，方便后续操作。
+     */
+    TScanner<TChar> &MatchEnd(bool matchEnd) noexcept
+    {
+        matchEnd_ = matchEnd;
+        return *this;
+    }
+
+    /**
      * @brief 用格式串匹配给定的字符串内容
      * @param _str 被匹配的字符串
      * @param args 用于接受解析输出的参数，目前只支持整数类型(integral type)
      * @exception ScannerException 参数数量过少时抛出
      */
     template<typename T, typename...Args, CONV_T(T)>
-    bool Scan(const T &_str, Args&...args)
+    bool Scan(const T &_str, Args&...args) const
     {
         CONV(str);
 
@@ -1512,6 +1561,9 @@ public:
                 if(!m)
                     return false;
             }
+
+            if(!str.empty())
+                return false;
 
             return true;
         }
