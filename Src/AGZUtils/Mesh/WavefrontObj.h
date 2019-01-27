@@ -102,16 +102,16 @@ public:
     }
 
     /** 加载指定的obj文件 */
-    bool LoadFromFile(const Str8 &filename)
+    bool LoadFromFile(std::string_view filename)
     {
-        Str8 content;
+        std::string content;
         if(!FileSys::ReadTextFileRaw(filename, &content))
             return false;
         return LoadFromMemory(content);
     }
 
     /** 从字符串中加载obj内容 */
-    bool LoadFromMemory(const Str8 &content, bool ignoreUnknownLine = true) noexcept;
+    bool LoadFromMemory(std::string_view content, bool ignoreUnknownLine = true) noexcept;
 
     /** 将包含的某个组转换为 GeometryMesh<T> 类型 */
     GeometryMesh<T> ToGeometryMesh(
@@ -136,9 +136,11 @@ private:
 };
 
 template<typename T>
-bool WavefrontObj<T>::LoadFromMemory(const Str8 &content, bool ignoreUnknownLine) noexcept
+bool WavefrontObj<T>::LoadFromMemory(std::string_view _content, bool ignoreUnknownLine) noexcept
 {
     Clear();
+
+    Str8 content = std::string(_content);
 
     // 通过obj()来获取当前正在parse的object
     // 通过grp()来获取当前正在parse的group

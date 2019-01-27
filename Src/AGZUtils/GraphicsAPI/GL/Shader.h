@@ -85,7 +85,7 @@ public:
      * @note 原Shader会被标记为删除
      * @exception ShaderLoadingException 着色器加载失败时抛出
      */
-    void LoadFromMemory(const Str8 &src)
+    void LoadFromMemory(std::string_view src)
     {
         Destroy();
         
@@ -95,8 +95,8 @@ public:
         if(!newHandle)
             throw ShaderLoadingException("Failed to create shader object");
 
-        const char *charSrc = src.Data();
-        auto lenSrc = static_cast<GLint>(src.Length());
+        const char *charSrc = src.data();
+        auto lenSrc = static_cast<GLint>(src.length());
         glShaderSource(newHandle, 1, &charSrc, &lenSrc);
 
         GLint result;
@@ -122,13 +122,13 @@ public:
      * @note 原Shader会被标记为删除
      * @exception ShaderLoadingException 着色器加载失败时抛出
      */
-    void LoadFromFile(const Str8 &filename)
+    void LoadFromFile(std::string_view filename)
     {
         Destroy();
 
-        Str8 src;
+        std::string src;
         if(!FileSys::ReadTextFileRaw(filename, &src))
-            throw ShaderLoadingException("Failed to load file content from " + filename);
+            throw ShaderLoadingException("Failed to load file content from " + std::string(filename));
         LoadFromMemory(src);
     }
 };

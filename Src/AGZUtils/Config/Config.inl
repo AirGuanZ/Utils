@@ -436,12 +436,12 @@ namespace Impl
     }
 }
 
-inline bool Config::LoadFromMemory(const Str8 &src)
+inline bool Config::LoadFromMemory(std::string_view src)
 {
     Clear();
     try
     {
-        global_ = Impl::ParseConfig(src.AsView(), arena_);
+        global_ = Impl::ParseConfig(Str8(std::string(src)), arena_);
         return true;
     }
     catch(...)
@@ -450,9 +450,9 @@ inline bool Config::LoadFromMemory(const Str8 &src)
     }
 }
 
-inline bool Config::LoadFromFile(const Str8 &filename)
+inline bool Config::LoadFromFile(std::string_view filename)
 {
-    Str8 content;
+    std::string content;
     if(!FileSys::ReadTextFileRaw(filename, &content))
         return false;
     return LoadFromMemory(content);

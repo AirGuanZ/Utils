@@ -6,12 +6,10 @@
 #include <cstdint>
 #include <limits>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include "../Misc/Common.h"
 #include "../Misc/Exception.h"
-#include "../Misc/TypeOpr.h"
 #include "String/String.h"
 
 namespace AGZ
@@ -788,6 +786,8 @@ namespace Impl
     template<typename TChar, typename T, typename...Args> struct FromImpl { };
     template<typename T> struct FromImpl<char, T>
     {
+        static_assert(std::is_arithmetic_v<T>);
+
         static T Call(const std::string_view &str)
         {
             T ret;
@@ -826,6 +826,18 @@ T From(const T2 &_src, Args&&...args)
 {
     CONV(src);
     return Impl::FromImpl<TCHAR(T2), remove_rcv_t<T>, remove_rcv_t<Args>...>::Call(src, std::forward<Args>(args)...);
+}
+
+/**
+ * @brief 从字符串中parse出指定类型的对象
+ * @param _src 待parse的字符串
+ * @param args parsing过程的参数
+ * @return parsing得到的结果
+ */
+template<typename T, typename T2, typename...Args, CONV_T(T2)>
+T Parse(const T2 &_src, Args&&...args)
+{
+    return From<T>(_src, std::forward<Args>(args)...);
 }
 
 /**

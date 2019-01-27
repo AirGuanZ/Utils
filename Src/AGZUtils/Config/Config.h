@@ -328,7 +328,7 @@ public:
      * 
      * @return 加载成功时返回true，否则表明配置文件中有语法错误
      */
-    bool LoadFromMemory(const Str8 &src);
+    bool LoadFromMemory(std::string_view src);
 
     /**
      * 从文本文件中加载配置
@@ -337,7 +337,7 @@ public:
      * 
      * @return 加载成功时返回true，否则表明文件读取失败或有语法错误
      */
-    bool LoadFromFile(const Str8 &filename);
+    bool LoadFromFile(std::string_view filename);
 
     /** 是否包含可用的配置文件内容 */
     bool IsAvailable() const;
