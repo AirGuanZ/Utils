@@ -1,9 +1,11 @@
 ﻿#pragma once
 
 #include <cstring>
+#include <filesystem>
 #include <string>
 
 #include "../Misc/Common.h"
+#include "AGZUtils/String/StdStr.h"
 
 namespace AGZ::FileSys {
 
@@ -46,6 +48,29 @@ public:
 
     //! 删除指定文件
     static bool DeleteRegularFile(std::string_view filename);
+
+    /**
+     * @brief 取得给定路径下的所有directory和regular file
+     */
+    template<typename TOutputIterator>
+    void GetFilesInDirectory(std::string_view dir, TOutputIterator outputIterator);
 };
+
+template<typename TOutputIterator>
+void File::GetFilesInDirectory(std::string_view dir, TOutputIterator outputIterator)
+{
+    AGZ_ASSERT(std::filesystem::is_directory(dir));
+    for(auto &p : std::filesystem::directory_iterator(dir))
+    {
+        if(!p.is_regular_file() && !p.is_directory())
+            continue;
+#ifdef AGZ_OS_WIN32
+        outputIterator = INV_WIDEN(p.path().wstring());
+#else
+        outputIterator = p.path().string();
+#endif
+        ++outputIterator;
+    }
+}
 
 } // namespace AGZ::FileSys
