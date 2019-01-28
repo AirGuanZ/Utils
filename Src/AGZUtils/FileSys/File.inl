@@ -30,7 +30,7 @@ FileTime File::GetCurrentFileTime()
 
 std::optional<FileTime> File::GetLastWriteTime(std::string_view filename)
 {
-    WIN32_FIND_DATA findData;
+    WIN32_FIND_DATAW findData;
 
     auto hFind = FindFirstFileW(WIDEN(filename).c_str(), &findData);
     if(hFind == INVALID_HANDLE_VALUE)

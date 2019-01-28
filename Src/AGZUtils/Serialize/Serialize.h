@@ -545,7 +545,7 @@ AGZ::BinaryDeserializer &operator>>(AGZ::BinaryDeserializer &ds, std::basic_stri
     uint64_t size;
     if(!ds.Deserialize(size))
         return ds;
-    str.resize(size);
-    ds.Read(str.data(), size * sizeof(TChar));
+    str.resize(static_cast<size_t>(size));
+    ds.Read(str.data(), static_cast<size_t>(size) * sizeof(TChar));
     return ds;
 }

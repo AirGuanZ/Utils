@@ -45,19 +45,19 @@
 
 #if defined(AGZ_ALL_IMPL)
 
-#if not defined(AGZ_PLATFORM_IMPL)
+#ifndef AGZ_PLATFORM_IMPL
 #define AGZ_PLATFORM_IMPL
 #endif
 
-#if not defined(AGZ_TEXTURE_FILE_IMPL)
+#ifndef AGZ_TEXTURE_FILE_IMPL
 #define AGZ_TEXTURE_FILE_IMPL
 #endif
 
-#if not defined(AGZ_FILE_IMPL)
+#ifndef AGZ_FILE_IMPL
 #define AGZ_FILE_IMPL
 #endif
 
-#if not defined(AGZ_GLFWCAPTURER_IMPL)
+#ifndef AGZ_GLFWCAPTURER_IMPL
 #define AGZ_GLFWCAPTURER_IMPL
 #endif
 
