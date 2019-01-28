@@ -3,8 +3,8 @@
 #include <optional>
 
 #include "../FileSys/Raw.h"
+#include "../String/StdStr.h"
 #include "Config.h"
-#include "AGZUtils/String/Regex/Regex.h"
 
 namespace AGZ {
 
@@ -280,12 +280,24 @@ namespace Impl
 
         if(StartsWith(src, "\""))
         {
-            static thread_local Regex8 regex(R"__("&((@{!"}|\\")*@{!\\})?&")__");
+            size_t nextQuote = 1;
+            while(nextQuote < src.size())
+            {
+                if(src[nextQuote] == '\"' && src[nextQuote - 1] != '\\')
+                    break;
+                ++nextQuote;
+            }
+            if(nextQuote >= src.size())
+                return std::nullopt;
+            std::string retStr = src.substr(1, nextQuote - 1);
+            src = src.substr(nextQuote + 1);
+            return Token{ TokenType::String, std::move(retStr) };
+            /*static thread_local Regex8 regex(R"__("&((@{!"}|\\")*@{!\\})?&")__");
             auto m = regex.SearchPrefix(Str8(std::string(src)));
             if(!m)
                 return std::nullopt;
             src = src.substr(m[1] + 1);
-            return Token{ TokenType::String, m(0, 1).ToStdString() };
+            return Token{ TokenType::String, m(0, 1).ToStdString() };*/
         }
 
         auto tidx = src.find_first_of(" \n\r\t\f\v,=;()#");

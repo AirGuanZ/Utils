@@ -42,7 +42,7 @@ const unsigned char *BoyerMooreHorspool(const unsigned char *beg,
 
     // Skip table
     // IMPROVE: Consider static + thread_local to save stack space?
-    size_t T[std::numeric_limits<unsigned char>::max() + 1];
+    size_t T[(std::numeric_limits<unsigned char>::max)() + 1];
 
     // Preprocessing
     size_t pLenM1 = pLen - 1;

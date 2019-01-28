@@ -42,7 +42,7 @@ public:
      * 默认初始化为无效对象
      */
     MatchResult()
-        : interval_(0, std::numeric_limits<size_t>::max())
+        : interval_(0, (std::numeric_limits<size_t>::max)())
     {
 
     }
@@ -60,7 +60,7 @@ public:
           interval_(moveFrom.interval_),
           savePoints_(std::move(moveFrom.savePoints_))
     {
-        moveFrom.interval_.second = std::numeric_limits<size_t>::max();
+        moveFrom.interval_.second = (std::numeric_limits<size_t>::max)();
     }
 
     ~MatchResult() = default;
@@ -78,7 +78,7 @@ public:
         whole_ = std::move(moveFrom.whole_);
         interval_ = moveFrom.interval_;
         savePoints_ = std::move(moveFrom.savePoints_);
-        moveFrom.interval_.second = std::numeric_limits<size_t>::max();
+        moveFrom.interval_.second = (std::numeric_limits<size_t>::max)();
         return *this;
     }
 

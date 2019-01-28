@@ -44,7 +44,7 @@ public:
         storage_ = static_cast<SaveSlotsStorage*>(arena_.Alloc());
         storage_->refs = 1;
         for(size_t i = 0; i < slotCount_; ++i)
-            storage_->slots[i] = std::numeric_limits<size_t>::max();
+            storage_->slots[i] = (std::numeric_limits<size_t>::max)();
     }
 
     SaveSlots(const Self &copyFrom)
@@ -407,7 +407,7 @@ private:
     {
         auto it = state.cur;
         if(++it == state.cpr->end())
-            return std::numeric_limits<CP>::max();
+            return (std::numeric_limits<CP>::max)();
         return *it;
     }
 

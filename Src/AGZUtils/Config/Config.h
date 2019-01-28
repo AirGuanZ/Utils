@@ -7,7 +7,6 @@
 
 #include "../Alloc/ObjArena.h"
 #include "../Misc/Exception.h"
-#include "../String/StdStr.h"
 
 namespace AGZ {
 

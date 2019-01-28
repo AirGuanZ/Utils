@@ -240,10 +240,10 @@ public:
         for(uint32_t i = 0; i < instCount_; ++i)
         {
             if(insts_[i].type != InstType::Alter)
-                insts_[i].lastStep = std::numeric_limits<uint32_t>::max();
+                insts_[i].lastStep = (std::numeric_limits<uint32_t>::max)();
             else
             {
-                insts_[i].lastStep = std::numeric_limits<uint32_t>::max();
+                insts_[i].lastStep = (std::numeric_limits<uint32_t>::max)();
                 i += (insts_[i].dataAlter.count / INST_REL_OFFSET_CAPACITY)
                    + (insts_[i].dataAlter.count / INST_REL_OFFSET_CAPACITY != 0);
             }
