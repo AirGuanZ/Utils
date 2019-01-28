@@ -87,9 +87,6 @@
     <ClInclude Include="..\Src\AGZUtils\FileSys\File.h">
       <Filter>FileSys</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\FileSys\Path.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\FileSys\Raw.h">
       <Filter>FileSys</Filter>
     </ClInclude>

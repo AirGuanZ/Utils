@@ -1281,16 +1281,27 @@ namespace Impl
 
             using UnsignedTOut = std::make_unsigned_t<TOut>;
 
-            constexpr UnsignedTOut UMAX = (std::numeric_limits<UnsignedTOut>::max)();
-            constexpr UnsignedTOut IMAX = UMAX >> 1;
-            constexpr UnsignedTOut ABS_IMIN = IMAX + 1;
-
             UnsignedTOut val = 0;
             for(; cur != end; ++cur)
             {
-                uint8_t digit = Char2Digit(static_cast<uint8_t>(*cur));
+				TChar c = *cur;
+				
+				if constexpr((std::numeric_limits<TChar>::max)() > 255)
+				{
+					if(c > 255)
+						break;
+				}
+				
+				if constexpr(std::is_signed_v<TChar>)
+				{
+					if(c < 0)
+						break;
+				}
+				
+                uint8_t digit = Char2Digit(static_cast<uint8_t>(c));
                 if(digit >= base)
                     break;
+				
                 val = static_cast<UnsignedTOut>(base * val + digit);
             }
 
