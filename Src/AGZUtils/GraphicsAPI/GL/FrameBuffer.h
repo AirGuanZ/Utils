@@ -101,6 +101,15 @@ public:
 #       endif
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+
+    /**
+     * @brief 是检查作为framebuffer的completeness
+     */
+    bool IsComplete() const noexcept
+    {
+        AGZ_ASSERT(handle_);
+        return glCheckNamedFramebufferStatus(handle_, GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+    }
 };
 
 } // namespace AGZ::GraphicsAPI::GL

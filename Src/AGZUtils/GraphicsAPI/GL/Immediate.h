@@ -4,7 +4,9 @@
 #include "Program.h"
 #include "ProgramBuilder.h"
 #include "RenderContext.h"
+#include "Texture2D.h"
 #include "VertexArray.h"
+#include "../../Texture/Texture.h"
 
 namespace AGZ::GraphicsAPI::GL
 {
@@ -39,6 +41,15 @@ class Immediate : public Uncopiable
         UniformVariable<Vec4f> uniform_FRAG_COLOR;
         VertexArray vao;
     } triangle_;
+
+    struct
+    {
+        Program prog_;
+        UniformVariable<Texture2DUnit> uniform_TEX;
+        AttribVariable<Vec2f> attrib_iPos;
+        AttribVariable<Vec2f> attrib_iTexCoord;
+        VertexArray vao;
+    } texTriangle_;
 
     Vec2f pixelSize_;
 
@@ -121,19 +132,16 @@ class Immediate : public Uncopiable
         }
         )____";
 
-        const char *TEXTURE_PRIMITIVE_PROGRAM_VS =
+        const char *TEXTURE_TRIANGLE_PROGRAM_VS =
             R"____(
         #version 450 core
-        uniform vec2 A;
-        uniform vec2 B;
-        uniform vec2 TA;
-        uniform vec2 TB;
         in vec2 iPos;
+        in vec2 iTexCoord;
         out vec2 mTexCoord;
         void main(void)
         {
-            gl_Position = vec4(A * iPos + B, 0, 1);
-            mTexCoord   = TA * iPos + TB;
+            gl_Position = vec4(iPos, 0, 1);
+            mTexCoord   = iTexCoord;
         }
         )____";
 
@@ -163,11 +171,11 @@ class Immediate : public Uncopiable
         const char *TEXTURE_FS =
             R"____(
         #version 450 core
-        uniform sampler2D tex;
+        uniform sampler2D TEX;
         in vec2 mTexCoord;
         void main(void)
         {
-            gl_FragColor = texture(tex, mTexCoord);
+            gl_FragColor = texture(TEX, mTexCoord);
         }
         )____";
 
@@ -203,9 +211,30 @@ class Immediate : public Uncopiable
             triangle_.vao.BindVertexBufferToAttrib(iPos, primVtxBuf_, &PrimitiveVertex::pos, 0);
             triangle_.vao.BindElementBuffer(primElemBuf_);
         }
+
+        {
+            texTriangle_.prog_ = ProgramBuilder::BuildOnce(
+                VertexShader::FromMemory(TEXTURE_TRIANGLE_PROGRAM_VS),
+                FragmentShader::FromMemory(TEXTURE_FS));
+
+            texTriangle_.uniform_TEX = texTriangle_.prog_.GetUniformVariable<Texture2DUnit>("TEX");
+
+            texTriangle_.attrib_iPos      = texTriangle_.prog_.GetAttribVariable<Vec2f>("iPos");
+            texTriangle_.attrib_iTexCoord = texTriangle_.prog_.GetAttribVariable<Vec2f>("iTexCoord");
+
+            texTriangle_.vao.InitializeHandle();
+            texTriangle_.vao.EnableAttrib(texTriangle_.attrib_iPos);
+            texTriangle_.vao.EnableAttrib(texTriangle_.attrib_iTexCoord);
+        }
     }
 
 public:
+
+    struct TexturedVertex
+    {
+        Vec2f pos;
+        Vec2f tex;
+    };
 
     /**
      * @param pixelSize 屏幕宽高
@@ -228,13 +257,11 @@ public:
 
     /**
      * @brief 在屏幕上绘制指定颜色的线段
+     * 
      * 以屏幕中心为原点，坐标范围[-1, 1]^2
      */
     void DrawLine(const Vec2f &p1, const Vec2f &p2, const Vec4f &color) const
     {
-        GLenum oldFill = RenderContext::GetFillMode();
-        RenderContext::SetFillMode(GL_LINE);
-
         affine_.prog.Bind();
         affine_.vao.Bind();
 
@@ -247,12 +274,11 @@ public:
 
         affine_.vao.Unbind();
         affine_.prog.Unbind();
-
-        RenderContext::SetFillMode(oldFill);
     }
 
     /**
      * @brief 在屏幕上绘制指定颜色的线段
+     * 
      * 以屏幕左上角为原点，坐标单位为像素
      */
     void DrawLineP(const Vec2f &p1, const Vec2f &p2, const Vec4f &color) const
@@ -264,6 +290,7 @@ public:
 
     /**
      * @brief 在屏幕上绘制指定颜色的矩形
+     * 
      * 以屏幕中心为原点，坐标范围[-1, 1]^2
      */
     void DrawQuad(const Vec2f &LB, const Vec2f &RT, const Vec4f &color, bool fill = true) const
@@ -296,6 +323,7 @@ public:
 
     /**
      * @brief 在屏幕上绘制指定颜色的矩形
+     * 
      * 以屏幕左上角为原点，坐标单位为像素
      */
     void DrawQuadP(const Vec2f &LT, const Vec2f &RB, const Vec4f &color, bool fill = true) const
@@ -307,6 +335,7 @@ public:
 
     /**
      * @brief 在屏幕上绘制指定颜色的三角形
+     * 
      * 以屏幕中心为原点，坐标范围[-1, 1]^2
      */
     void DrawTriangle(const Vec2f &A, const Vec2f &B, const Vec2f &C, const Vec4f &color, bool fill = true) const
@@ -332,6 +361,7 @@ public:
 
     /**
      * @brief 在屏幕上绘制指定颜色的三角形
+     * 
      * 以屏幕左上角为原点，坐标单位为像素
      */
     void DrawTriangleP(const Vec2f &A, const Vec2f &B, const Vec2f &C, const Vec4f &color, bool fill = true) const
@@ -343,7 +373,35 @@ public:
     }
 
     /**
+     * @brief 在屏幕上绘制一组具有指定纹理的三角形
+     * 
+     * 以屏幕中心为原点，坐标范围[-1, 1]^2
+     */
+    void DrawTexturedTriangles(const TexturedVertex *vtx, uint32_t vtxCount, const Texture2D &tex)
+    {
+        AGZ_ASSERT(vtx && vtxCount && vtxCount % 3 == 0);
+
+        VertexBuffer<TexturedVertex> vtxBuf(true);
+        vtxBuf.ReinitializeData(vtx, vtxCount, GL_STATIC_DRAW);
+
+        texTriangle_.vao.BindVertexBufferToAttrib(texTriangle_.attrib_iPos, vtxBuf, &TexturedVertex::pos, 0);
+        texTriangle_.vao.BindVertexBufferToAttrib(texTriangle_.attrib_iTexCoord, vtxBuf, &TexturedVertex::tex, 1);
+
+        texTriangle_.prog_.Bind();
+        texTriangle_.vao.Bind();
+        tex.Bind(0);
+        texTriangle_.uniform_TEX.BindValue({ 0 });
+
+        RenderContext::DrawVertices(GL_TRIANGLES, 0, vtxCount);
+
+        tex.Unbind(0);
+        texTriangle_.vao.Unbind();
+        texTriangle_.prog_.Unbind();
+    }
+
+    /**
      * @brief 在屏幕上绘制指定颜色的圆
+     * 
      * 以屏幕中心为原点，坐标范围[-1, 1]^2
      */
     void DrawCircle(const Vec2f &centre, const Vec2f &size, const Vec4f &color, bool fill = true) const
@@ -378,6 +436,7 @@ public:
 
     /**
      * @brief 在屏幕上绘制指定颜色的圆
+     * 
      * 以屏幕左上角为原点，坐标单位为像素
      */
     void DrawCircleP(const Vec2f &centre, const Vec2f &size, const Vec2f &C, const Vec4f &color, bool fill = true) const
