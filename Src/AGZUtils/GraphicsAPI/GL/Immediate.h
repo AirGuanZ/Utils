@@ -6,7 +6,6 @@
 #include "RenderContext.h"
 #include "Texture2D.h"
 #include "VertexArray.h"
-#include "../../Texture/Texture.h"
 
 namespace AGZ::GraphicsAPI::GL
 {
@@ -14,7 +13,7 @@ namespace AGZ::GraphicsAPI::GL
 /**
  * @brief 用于直接在屏幕上绘制内容的工具
  */
-class Immediate : public Uncopiable
+class Immediate2D : public Uncopiable
 {
     struct PrimitiveVertex
     {
@@ -444,6 +443,139 @@ public:
         Vec2f sCentre(2 * centre.x / pixelSize_.x - 1, 1 - 2 * centre.y / pixelSize_.y);
         Vec2f sSize(2 * size / pixelSize_);
         DrawCircle(sCentre, sSize, color, fill);
+    }
+};
+
+/**
+ * @brief 用于直接在屏幕上绘制三维图形的工具
+ */
+class Immediate3D
+{
+public:
+
+    /**
+     * @brief 初始化绘制器
+     * 
+     * 在绘制前必须调用且只能调用一次
+     */
+    void Initialize()
+    {
+        InitializeProgram();
+        InitializeVAO();
+    }
+
+    /**
+     * @brief 绘制一条纯色线段，顶点数据为(0, 0, 0)-(1, 0, 0)
+     * @param transform 顶点变换矩阵
+     * @param color 绘制颜色
+     */
+    void DrawLine(const Mat4f &transform, const Vec4f &color)
+    {
+        pureColor_.prog.Bind();
+        pureColor_.vao.Bind();
+
+        pureColor_.uMAT.BindValue(transform);
+        pureColor_.uCOLOR.BindValue(color);
+
+        RenderContext::DrawVertices(GL_LINES, 0, 2);
+
+        pureColor_.vao.Unbind();
+        pureColor_.prog.Unbind();
+    }
+
+    /**
+     * @brief 绘制一个纯色圆环，顶点平铺在xOz平面上，圆心为远点，半径为1
+     * @param transform 顶点变换矩阵
+     * @param color 绘制颜色
+     */
+    void DrawCircle(const Mat4f &transform, const Vec4f &color)
+    {
+        pureColor_.prog.Bind();
+        pureColor_.vao.Bind();
+
+        pureColor_.uMAT.BindValue(transform);
+        pureColor_.uCOLOR.BindValue(color);
+
+        RenderContext::DrawVertices(GL_LINE_LOOP, 2, CIRCLE_VERTEX_COUNT);
+
+        pureColor_.vao.Unbind();
+        pureColor_.prog.Unbind();
+    }
+
+private:
+
+    struct
+    {
+        Program prog;
+
+        UniformVariable<Mat4f> uMAT;
+        UniformVariable<Vec4f> uCOLOR;
+
+        AttribVariable<Vec3f> aPos;
+
+        VertexArray vao;
+        VertexBuffer<Vec3f> vtxBuf;
+    } pureColor_;
+
+    void InitializeProgram()
+    {
+        static const char *VS = R"____(
+        #version 450 core
+        uniform mat4 WVP;
+        in vec3 iPos;
+        void main(void)
+        {
+            gl_Position = WVP * vec4(iPos, 1);
+        }
+        )____";
+
+        static const char *FS = R"____(
+        #version 450 core
+        uniform vec4 COLOR;
+        out vec4 fragColor;
+        void main(void)
+        {
+            fragColor = COLOR;
+        }
+        )____";
+
+        pureColor_.prog = ProgramBuilder::BuildOnce(
+            VertexShader::FromMemory(VS), FragmentShader::FromMemory(FS));
+        pureColor_.uMAT = pureColor_.prog.GetUniformVariable<Mat4f>("WVP");
+        pureColor_.uCOLOR = pureColor_.prog.GetUniformVariable<Vec4f>("COLOR");
+
+        pureColor_.aPos = pureColor_.prog.GetAttribVariable<Vec3f>("iPos");
+    }
+
+    static constexpr uint32_t CIRCLE_VERTEX_COUNT = 64;
+
+    static constexpr uint32_t VERTEX_LINE_BEG = 0;
+    static constexpr uint32_t VERTEX_LINE_END = VERTEX_LINE_BEG + 2;
+    static constexpr uint32_t VERTEX_CIRCLE_BEG = VERTEX_LINE_END;
+    static constexpr uint32_t VERTEX_CIRCLE_END = VERTEX_CIRCLE_BEG + CIRCLE_VERTEX_COUNT;
+
+    void InitializeVAO()
+    {
+        pureColor_.vao.InitializeHandle();
+        pureColor_.vao.EnableAttrib(pureColor_.aPos);
+
+        static Vec3f vtxData[2 + CIRCLE_VERTEX_COUNT] =
+        {
+            { 0.0f, 0.0f, 0.0f },
+            { 1.0f, 0.0f, 0.0f },
+        };
+        for(uint32_t i = 0; i < CIRCLE_VERTEX_COUNT; ++i)
+        {
+            Deg angle = Deg(360.0f * i / CIRCLE_VERTEX_COUNT);
+            vtxData[i + 2].x = Cos(angle);
+            vtxData[i + 2].y = 0;
+            vtxData[i + 2].z = Sin(angle);
+        }
+
+        pureColor_.vtxBuf.InitializeHandle();
+        pureColor_.vtxBuf.ReinitializeData(vtxData, ArraySize(vtxData), GL_STATIC_DRAW);
+
+        pureColor_.vao.BindVertexBufferToAttrib(pureColor_.aPos, pureColor_.vtxBuf, 0);
     }
 };
 
