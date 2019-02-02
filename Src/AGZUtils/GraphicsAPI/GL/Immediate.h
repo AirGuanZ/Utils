@@ -573,7 +573,7 @@ private:
         }
 
         pureColor_.vtxBuf.InitializeHandle();
-        pureColor_.vtxBuf.ReinitializeData(vtxData, ArraySize(vtxData), GL_STATIC_DRAW);
+        pureColor_.vtxBuf.ReinitializeData(vtxData, static_cast<uint32_t>(ArraySize(vtxData)), GL_STATIC_DRAW);
 
         pureColor_.vao.BindVertexBufferToAttrib(pureColor_.aPos, pureColor_.vtxBuf, 0);
     }
