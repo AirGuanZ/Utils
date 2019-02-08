@@ -279,3 +279,17 @@ using Vec3f = Vec3<float>;
 using Vec3d = Vec3<double>;
 
 } // namespace AGZ::Math
+
+namespace AGZ::Impl
+{
+    template<> struct ToImpl<char, Math::Vec3<float>>
+    {
+        static std::string Call(const Math::Vec3<float> &obj)
+        {
+            return "(" + std::to_string(obj.x) + ", "
+                + std::to_string(obj.y) + ", "
+                + std::to_string(obj.z) + ")";
+        }
+    };
+
+} // namespace AGZ::Impl
