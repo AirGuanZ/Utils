@@ -294,9 +294,6 @@ public:
      */
     void DrawQuad(const Vec2f &LB, const Vec2f &RT, const Vec4f &color, bool fill = true) const
     {
-        GLenum oldFill = RenderContext::GetFillMode();
-        RenderContext::SetFillMode(GL_FILL);
-
         affine_.prog.Bind();
         affine_.vao.Bind();
         affine_.uniform_A.BindValue(RT - LB);
@@ -316,8 +313,6 @@ public:
 
         affine_.vao.Unbind();
         affine_.prog.Unbind();
-
-        RenderContext::SetFillMode(oldFill);
     }
 
     /**
