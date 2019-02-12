@@ -161,7 +161,8 @@ public:
     bool Stop()
     {
         std::lock_guard<std::mutex> lk(taskMut_);
-        tasks_.clear();
+        std::queue<TaskType> tTasks;
+        tasks_.swap(tTasks);
         return Join();
     }
 
