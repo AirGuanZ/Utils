@@ -89,12 +89,6 @@ public:
     void InitializeFormatAndData(
         GLsizei levels, GLsizei width, GLsizei height, GLenum internalFormat, const DataTexelType *data) const noexcept
     {
-        /*AGZ_ASSERT(handle_ && width && height && data);
-        glTextureStorage2D(handle_, levels, internalFormat, width, height);
-        glTextureSubImage2D(
-            handle_, 0, 0, 0, width, height,
-            Impl::PT2DT<DataTexelType>::format, Impl::PT2DT<DataTexelType>::type, data);
-        glGenerateTextureMipmap(handle_);*/
         InitializeFormat(levels, width, height, internalFormat);
         ReinitializeData(width, height, data);
     }

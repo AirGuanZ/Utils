@@ -160,9 +160,11 @@ public:
      */
     bool Stop()
     {
-        std::lock_guard<std::mutex> lk(taskMut_);
-        std::queue<TaskType> tTasks;
-        tasks_.swap(tTasks);
+        { // worker可能等在taskMut上，所以要在join之前unlock以避免deadlock
+            std::lock_guard<std::mutex> lk(taskMut_);
+            std::queue<TaskType> tTasks;
+            tasks_.swap(tTasks);
+        }
         return Join();
     }
 

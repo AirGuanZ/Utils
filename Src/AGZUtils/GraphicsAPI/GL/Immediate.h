@@ -394,6 +394,25 @@ public:
     }
 
     /**
+     * @brief 在屏幕上绘制个具有指定纹理的矩形
+     *
+     * 以屏幕中心为原点，坐标范围[-1, 1]^2
+     */
+    void DrawTexturedQuad(const Vec2f &LB, const Vec2f &RT, const Texture2D &tex)
+    {
+        const TexturedVertex vtxData[] =
+        {
+            { { LB.x, LB.y }, { 0, 1 } },
+            { { LB.x, RT.y }, { 0, 0 } },
+            { { RT.x, RT.y }, { 1, 0 } },
+            { { LB.x, LB.y }, { 0, 1 } },
+            { { RT.x, RT.y }, { 1, 0 } },
+            { { RT.x, LB.y }, { 1, 1 } },
+        };
+        DrawTexturedTriangles(vtxData, 6, tex);
+    }
+
+    /**
      * @brief 在屏幕上绘制指定颜色的圆
      * 
      * 以屏幕中心为原点，坐标范围[-1, 1]^2
