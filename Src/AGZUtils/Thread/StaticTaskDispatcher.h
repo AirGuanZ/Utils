@@ -32,7 +32,9 @@ namespace AGZ {
         std::queue<TaskType> tasks_;
         std::vector<std::thread> workers_;
         std::vector<std::exception> exceptions_;
-        std::atomic<size_t> idleWorkerCount_;
+
+        size_t initTaskCount_;
+        std::atomic<size_t> finishedTaskCount_;
 
         struct Params
         {
@@ -43,7 +45,7 @@ namespace AGZ {
             std::vector<std::exception> &exceptions;
             std::mutex &exceptionMut;
 
-            std::atomic<size_t> &idleWorkerCount;
+            std::atomic<size_t> &finishedTaskCount;
         };
 
         std::unique_ptr<Params> params_;
@@ -57,10 +59,7 @@ namespace AGZ {
                 {
                     std::lock_guard<std::mutex> lk(param.taskMut);
                     if(param.tasks.empty())
-                    {
-                        ++param.idleWorkerCount;
                         break;
-                    }
                     task = param.tasks.front();
                     param.tasks.pop();
                 }
@@ -80,6 +79,8 @@ namespace AGZ {
                     param.exceptions.push_back(
                         std::runtime_error("StaticTaskDispatcher: unknown exception"));
                 }
+
+                ++param.finishedTaskCount;
             }
         }
 
@@ -93,7 +94,8 @@ namespace AGZ {
             if(workerCount <= 0)
                 workerCount = std::thread::hardware_concurrency();
             workerCount_ = (std::max)(1, workerCount) - 1;
-            idleWorkerCount_ = 0;
+            initTaskCount_ = 0;
+            finishedTaskCount_ = 0;
         }
 
         /**
@@ -110,8 +112,9 @@ namespace AGZ {
             AGZ_ASSERT(workers_.empty());
 
             tasks_ = std::move(tasks);
-            idleWorkerCount_ = 0;
-            params_ = std::unique_ptr<Params>(new Params{ sharedParam, tasks_, taskMut_, exceptions_, exceptionMut_, idleWorkerCount_ });
+            initTaskCount_ = tasks_.size();
+            finishedTaskCount_ = 0;
+            params_ = std::unique_ptr<Params>(new Params{ sharedParam, tasks_, taskMut_, exceptions_, exceptionMut_, finishedTaskCount_ });
 
             for(int i = 0; i < workerCount_; ++i)
                 workers_.emplace_back(&Worker<Func>, func, *params_);
@@ -135,8 +138,9 @@ namespace AGZ {
             AGZ_ASSERT(workers_.empty());
 
             tasks_ = std::move(tasks);
-            idleWorkerCount_ = 0;
-            params_ = std::unique_ptr<Params>(new Params{ sharedParam, tasks_, taskMut_, exceptions_, exceptionMut_, idleWorkerCount_ });
+            initTaskCount_ = tasks_.size();
+            finishedTaskCount_ = 0;
+            params_ = std::unique_ptr<Params>(new Params{ sharedParam, tasks_, taskMut_, exceptions_, exceptionMut_, finishedTaskCount_ });
 
             for(int i = 0; i < workerCount_ + 1; ++i)
                 workers_.emplace_back(&Worker<Func>, func, *params_);
@@ -184,7 +188,7 @@ namespace AGZ {
         bool IsCompleted() const
         {
             std::lock_guard<std::mutex> lk(taskMut_);
-            return tasks_.empty() && idleWorkerCount_ >= workerCount_;
+            return tasks_.empty() && finishedTaskCount_ >= initTaskCount_;
         }
 
         /**
