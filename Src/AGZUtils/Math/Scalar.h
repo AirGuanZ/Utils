@@ -170,6 +170,15 @@ T Min(T lhs, T rhs) noexcept { return (std::min)(lhs, rhs); }
 template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 T Max(T lhs, T rhs) noexcept { return (std::max)(lhs, rhs); }
 
+template<typename T, typename F>
+auto Mix(const T &left, const T &right, F factor) noexcept(noexcept((1 - factor) * left + factor * right))
+{
+    return (1 - factor) * left + factor * right;
+}
+
+template<typename T>
+auto Sqr(T v) noexcept(noexcept(v * v)) { return v * v; }
+
 template<typename T, typename U = decltype(T::DefaultEqEpsilon()), typename = decltype(&T::ApproxEq)>
 bool ApproxEq(const T &lhs, const T &rhs, U epsilon = T::DefaultEqEpsilon()) noexcept(noexcept(lhs.ApproxEq(rhs, epsilon)))
 {
