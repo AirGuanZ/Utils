@@ -140,6 +140,12 @@ public:
         return ret;
     }
 
+    template<typename TDst>
+    auto To() const noexcept(noexcept(TDst(x))) { return Vec3<TDst>(TDst(x), TDst(y), TDst(z)); }
+
+    auto ToFloats() const noexcept(noexcept(this->To<float>())) { return To<float>(); }
+    auto ToDoubles() const noexcept(noexcept(this->To<double>())) { return To<double>(); }
+
     auto LengthSquare()      const noexcept;
     auto Length()            const noexcept;
     Self Normalize()         const noexcept;
