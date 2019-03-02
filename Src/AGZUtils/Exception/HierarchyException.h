@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <exception>
 #include <string>
@@ -7,7 +7,7 @@ namespace AGZ
 {
     
 /**
- * @brief ²ã´ÎÊ½Òì³££¬Í¨¹ıAGZ_HIERARCHY_TRYºÍAGZ_HIERARCHY_WRAP²¶»ñºÍÔÙÅ×³ö£¬¿ÉÒÔ¼ÇÂ¼Å×³öÂ·¾¶ÉÏËùÓĞÓÉHierarchyException¼ÇÂ¼µÄÏûÏ¢
+ * @brief å±‚æ¬¡å¼å¼‚å¸¸ï¼Œé€šè¿‡AGZ_HIERARCHY_TRYå’ŒAGZ_HIERARCHY_WRAPæ•è·å’Œå†æŠ›å‡ºï¼Œå¯ä»¥è®°å½•æŠ›å‡ºè·¯å¾„ä¸Šæ‰€æœ‰ç”±HierarchyExceptionè®°å½•çš„æ¶ˆæ¯
  */
 class HierarchyException : public std::exception
 {
@@ -17,7 +17,7 @@ class HierarchyException : public std::exception
 public:
 
     /**
-     * @beief Ò»°ãÀ´ËµÓÉAGZ_HIERARCHY_WRAPµ÷ÓÃ£¬ÓÃ»§×Ô¼ºµ÷ÓÃÊ± ptr ²ÎÊıÁô¿Õ
+     * @beief ä¸€èˆ¬æ¥è¯´ç”±AGZ_HIERARCHY_WRAPè°ƒç”¨ï¼Œç”¨æˆ·è‡ªå·±è°ƒç”¨æ—¶ ptr å‚æ•°ç•™ç©º
      */
     explicit HierarchyException(std::string what, const std::exception_ptr &ptr = std::exception_ptr())
         : ptr_(ptr), what_(std::move(what))
@@ -26,7 +26,7 @@ public:
     }
 
     /**
-     * @brief È¡µÃ´íÎóÏûÏ¢
+     * @brief å–å¾—é”™è¯¯æ¶ˆæ¯
      */
     char const *what() const override
     {
@@ -34,7 +34,7 @@ public:
     }
 
     /**
-     * @brief ÓÉÍâÏòÄÚ£¬È¡µÃ¸ÃExceptionÅ×³öÂ·¾¶ÉÏµÄËùÓĞÓÉHierarchyException¼ÇÂ¼µÄ´íÎóÏûÏ¢
+     * @brief ç”±å¤–å‘å†…ï¼Œå–å¾—è¯¥ExceptionæŠ›å‡ºè·¯å¾„ä¸Šçš„æ‰€æœ‰ç”±HierarchyExceptionè®°å½•çš„é”™è¯¯æ¶ˆæ¯
      */
     template<typename OutputIterator>
     void GetAllMessages(OutputIterator outputIterator) const
