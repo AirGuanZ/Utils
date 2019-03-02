@@ -74,9 +74,10 @@ public:
     }
 };
 
-#define AGZ_HIERARCHY_TRY try
+#define AGZ_HIERARCHY_TRY try {
 
 #define AGZ_HIERARCHY_WRAP(MSG) \
+    } \
     catch(...) \
     { \
         auto ptr = std::current_exception(); \
