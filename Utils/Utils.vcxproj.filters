@@ -67,6 +67,9 @@
     <Filter Include="String\Format">
       <UniqueIdentifier>{52350196-2a40-4635-9366-659607d79be8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Exception">
+      <UniqueIdentifier>{8e20e854-27d9-4dab-8c91-fb60979830a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\AGZUtils\Alloc\Alloc.h">
@@ -402,6 +405,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\String\StdStr.h">
       <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Exception\HierarchyException.h">
+      <Filter>Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Utils\Exception.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

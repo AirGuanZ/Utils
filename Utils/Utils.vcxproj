@@ -26,6 +26,7 @@
     <ClInclude Include="..\Src\AGZUtils\Config\Config.h" />
     <ClInclude Include="..\Src\AGZUtils\Container\AccumulateBuffer.h" />
     <ClInclude Include="..\Src\AGZUtils\Container\AccumulatorAndFetcher.h" />
+    <ClInclude Include="..\Src\AGZUtils\Exception\HierarchyException.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\File.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\Raw.h" />
     <ClInclude Include="..\Src\AGZUtils\GraphicsAPI\Common.h" />
@@ -119,6 +120,7 @@
     <ClInclude Include="..\Src\AGZUtils\Utils\Alloc.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\Config.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\Container.h" />
+    <ClInclude Include="..\Src\AGZUtils\Utils\Exception.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\FileSys.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\GL.h" />
     <ClInclude Include="..\Src\AGZUtils\Utils\Input.h" />
