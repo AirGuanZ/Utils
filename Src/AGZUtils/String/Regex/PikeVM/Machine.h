@@ -20,7 +20,7 @@ class SaveSlots
     struct SaveSlotsStorage
     {
         mutable size_t refs;
-        size_t slots[1];
+        size_t savedSlots[1];
     };
 
     size_t slotCount_;
@@ -44,7 +44,7 @@ public:
         storage_ = static_cast<SaveSlotsStorage*>(arena_.Alloc());
         storage_->refs = 1;
         for(size_t i = 0; i < slotCount_; ++i)
-            storage_->slots[i] = (std::numeric_limits<size_t>::max)();
+            storage_->savedSlots[i] = (std::numeric_limits<size_t>::max)();
     }
 
     SaveSlots(const Self &copyFrom)
@@ -79,18 +79,18 @@ public:
             auto newSto = static_cast<SaveSlotsStorage*>(arena_.Alloc());
             newSto->refs = 1;
             for(size_t i = 0; i < slotCount_; ++i)
-                newSto->slots[i] = storage_->slots[i];
+                newSto->savedSlots[i] = storage_->savedSlots[i];
 
             --storage_->refs;
             storage_ = newSto;
         }
-        storage_->slots[slot] = value;
+        storage_->savedSlots[slot] = value;
     }
 
     size_t Get(size_t idx) const
     {
         AGZ_ASSERT(idx < slotCount_ && storage_);
-        return storage_->slots[idx];
+        return storage_->savedSlots[idx];
     }
 };
 
