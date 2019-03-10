@@ -17,7 +17,7 @@ public:
      */
     static void SetClearColor(const Vec4f &color) noexcept
     {
-        glClearColor(color.r, color.g, color.b, color.a);
+        AGZ_GL_CTX glClearColor(color.r, color.g, color.b, color.a);
     }
 
     /**
@@ -25,7 +25,7 @@ public:
      */
     static void ClearColor() noexcept
     {
-        glClear(GL_COLOR_BUFFER_BIT);
+        AGZ_GL_CTX glClear(GL_COLOR_BUFFER_BIT);
     }
 
     /**
@@ -33,7 +33,7 @@ public:
      */
     static void ClearDepth() noexcept
     {
-        glClear(GL_DEPTH_BUFFER_BIT);
+        AGZ_GL_CTX glClear(GL_DEPTH_BUFFER_BIT);
     }
 
     /**
@@ -41,7 +41,7 @@ public:
      */
     static void ClearColorAndDepth() noexcept
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        AGZ_GL_CTX glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     /**
@@ -49,7 +49,7 @@ public:
      */
     static void DrawVertices(GLenum primMode, uint32_t begin, uint32_t count) noexcept
     {
-        glDrawArrays(primMode, GLint(begin), GLsizei(count));
+        AGZ_GL_CTX glDrawArrays(primMode, GLint(begin), GLsizei(count));
     }
 
     /**
@@ -66,7 +66,7 @@ public:
         case GL_UNSIGNED_INT:   elemSize = sizeof(GLuint);   break;
         default: Unreachable();
         }
-        glDrawElements(primMode, count, elemType, reinterpret_cast<void*>(elemSize * size_t(begin)));
+        AGZ_GL_CTX glDrawElements(primMode, count, elemType, reinterpret_cast<void*>(elemSize * size_t(begin)));
     }
 
     /**
@@ -74,7 +74,7 @@ public:
      */
     static void EnableDepthTest() noexcept
     {
-        glEnable(GL_DEPTH_TEST);
+        AGZ_GL_CTX glEnable(GL_DEPTH_TEST);
     }
 
     /**
@@ -82,7 +82,7 @@ public:
      */
     static void DisableDepthTest() noexcept
     {
-        glDisable(GL_DEPTH_TEST);
+        AGZ_GL_CTX glDisable(GL_DEPTH_TEST);
     }
 
     /**
@@ -90,7 +90,7 @@ public:
      */
     static bool IsDepthTestEnabled() noexcept
     {
-        return glIsEnabled(GL_DEPTH_TEST) == GL_TRUE;
+        return AGZ_GL_CTX glIsEnabled(GL_DEPTH_TEST) == GL_TRUE;
     }
 
     /**
@@ -98,7 +98,7 @@ public:
      */
     static void SetFillMode(GLenum fillMode) noexcept
     {
-        glPolygonMode(GL_FRONT_AND_BACK, fillMode);
+        AGZ_GL_CTX glPolygonMode(GL_FRONT_AND_BACK, fillMode);
     }
 
     /**
@@ -107,7 +107,7 @@ public:
     static GLenum GetFillMode() noexcept
     {
         GLint ret;
-        glGetIntegerv(GL_POLYGON_MODE, &ret);
+        AGZ_GL_CTX glGetIntegerv(GL_POLYGON_MODE, &ret);
         return GLenum(ret);
     }
 };

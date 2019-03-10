@@ -46,7 +46,7 @@ public:
     {
         if(handle_)
         {
-            glDeleteSamplers(1, &handle_);
+            AGZ_GL_CTX glDeleteSamplers(1, &handle_);
             handle_ = 0;
         }
     }
@@ -58,7 +58,7 @@ public:
     void InitializeHandle() noexcept
     {
         AGZ_ASSERT(!handle_);
-        glCreateSamplers(1, &handle_);
+        AGZ_GL_CTX glCreateSamplers(1, &handle_);
     }
 
     /**
@@ -67,7 +67,7 @@ public:
     void SetParameter(GLenum paramName, GLint paramValue) const noexcept
     {
         AGZ_ASSERT(handle_);
-        glSamplerParameteri(handle_, paramName, paramValue);
+        AGZ_GL_CTX glSamplerParameteri(handle_, paramName, paramValue);
     }
 
     /**
@@ -76,7 +76,7 @@ public:
     void Bind(GLuint textureUnit) const noexcept
     {
         AGZ_ASSERT(handle_);
-        glBindSampler(textureUnit, handle_);
+        AGZ_GL_CTX glBindSampler(textureUnit, handle_);
     }
 
     /**
@@ -85,7 +85,7 @@ public:
     void Unbind(GLuint textureUnit) const noexcept
     {
         AGZ_ASSERT(handle_);
-        glBindSampler(textureUnit, 0);
+        AGZ_GL_CTX glBindSampler(textureUnit, 0);
     }
 };
    

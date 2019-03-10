@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <string_view>
 #include <vector>
 
 #include "../../Misc/ScopeGuard.h"
@@ -76,7 +77,7 @@ public:
     {
         if(!handle_)
             return;
-        glDeleteShader(handle_);
+        AGZ_GL_CTX glDeleteShader(handle_);
         handle_ = 0;
     }
 
@@ -89,26 +90,26 @@ public:
     {
         Destroy();
         
-        GLuint newHandle = glCreateShader(ShaderType);
-        ScopeGuard newHandleGuard([=]() { glDeleteShader(newHandle); });
+        GLuint newHandle = AGZ_GL_CTX glCreateShader(ShaderType);
+        ScopeGuard newHandleGuard([=]() { AGZ_GL_CTX glDeleteShader(newHandle); });
 
         if(!newHandle)
             throw ShaderLoadingException("Failed to create shader object");
 
         const char *charSrc = src.data();
         auto lenSrc = static_cast<GLint>(src.length());
-        glShaderSource(newHandle, 1, &charSrc, &lenSrc);
+        AGZ_GL_CTX glShaderSource(newHandle, 1, &charSrc, &lenSrc);
 
         GLint result;
-        glCompileShader(newHandle);
-        glGetShaderiv(newHandle, GL_COMPILE_STATUS, &result);
+        AGZ_GL_CTX glCompileShader(newHandle);
+        AGZ_GL_CTX glGetShaderiv(newHandle, GL_COMPILE_STATUS, &result);
         if(result != GL_TRUE)
         {
             GLint logLen;
-            glGetShaderiv(newHandle, GL_INFO_LOG_LENGTH, &logLen);
+            AGZ_GL_CTX glGetShaderiv(newHandle, GL_INFO_LOG_LENGTH, &logLen);
 
             std::vector<char> logBuf(logLen + 1);
-            glGetShaderInfoLog(newHandle, logLen + 1, nullptr, logBuf.data());
+            AGZ_GL_CTX glGetShaderInfoLog(newHandle, logLen + 1, nullptr, logBuf.data());
 
             throw ShaderLoadingException(logBuf.data());
         }

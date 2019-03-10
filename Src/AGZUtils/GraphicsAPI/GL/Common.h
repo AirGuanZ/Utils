@@ -1,8 +1,14 @@
 ﻿#pragma once
 
+#ifndef AGZ_DISABLE_NATIVE_GL_CONTEXT
+
 #if !(defined(__gl_h_) || defined(__GL_H__))
 #   error "Include gl.h/glew.h before this header"
 #endif
+
+#define AGZ_GL_CTX
+
+#endif // AGZ_DISABLE_NATIVE_GL_CONTEXT
 
 #include "../../Misc/Common.h"
 #include "../Common.h"
@@ -50,15 +56,15 @@ struct Texture2DUnit { GLuint unit; };
 
 namespace Impl
 {
-    inline void SetUniform(GLint loc, GLfloat x)                              { glUniform1f(loc, x);                               }
-    inline void SetUniform(GLint loc, const Vec2f &v)                         { glUniform2f(loc, v.x, v.y);                        }
-    inline void SetUniform(GLint loc, const Vec3f &v)                         { glUniform3f(loc, v.x, v.y, v.z);                   }
-    inline void SetUniform(GLint loc, const Vec4f &v)                         { glUniform4f(loc, v.x, v.y, v.z, v.w);              }
-    inline void SetUniform(GLint loc, GLint x)                                { glUniform1i(loc, x);                               }
-    inline void SetUniform(GLint loc, const Vec2i &v)                         { glUniform2i(loc, v.x, v.y);                        }
-    inline void SetUniform(GLint loc, const Vec3i &v)                         { glUniform3i(loc, v.x, v.y, v.z);                   }
-    inline void SetUniform(GLint loc, const Vec4i &v)                         { glUniform4i(loc, v.x, v.y, v.z, v.w);              }
-    inline void SetUniform(GLint loc, const Mat4f &m, bool transpose = false) { glUniformMatrix4fv(loc, 1, transpose, &m.m[0][0]); }
+    inline void SetUniform(GLint loc, GLfloat x)                              { AGZ_GL_CTX glUniform1f(loc, x);                               }
+    inline void SetUniform(GLint loc, const Vec2f &v)                         { AGZ_GL_CTX glUniform2f(loc, v.x, v.y);                        }
+    inline void SetUniform(GLint loc, const Vec3f &v)                         { AGZ_GL_CTX glUniform3f(loc, v.x, v.y, v.z);                   }
+    inline void SetUniform(GLint loc, const Vec4f &v)                         { AGZ_GL_CTX glUniform4f(loc, v.x, v.y, v.z, v.w);              }
+    inline void SetUniform(GLint loc, GLint x)                                { AGZ_GL_CTX glUniform1i(loc, x);                               }
+    inline void SetUniform(GLint loc, const Vec2i &v)                         { AGZ_GL_CTX glUniform2i(loc, v.x, v.y);                        }
+    inline void SetUniform(GLint loc, const Vec3i &v)                         { AGZ_GL_CTX glUniform3i(loc, v.x, v.y, v.z);                   }
+    inline void SetUniform(GLint loc, const Vec4i &v)                         { AGZ_GL_CTX glUniform4i(loc, v.x, v.y, v.z, v.w);              }
+    inline void SetUniform(GLint loc, const Mat4f &m, bool transpose = false) { AGZ_GL_CTX glUniformMatrix4fv(loc, 1, transpose, &m.m[0][0]); }
     inline void SetUniform(GLint loc, Texture2DUnit v)                        { SetUniform(loc, static_cast<GLint>(v.unit));       }
 
     template<typename VarType> struct Var2GL;

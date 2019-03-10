@@ -24,7 +24,7 @@ class Program : public GLObject
     explicit Program(GLuint handle) noexcept
         : GLObject(handle)
     {
-        AGZ_ASSERT(handle && glIsProgram(handle));
+        AGZ_ASSERT(handle && AGZ_GL_CTX glIsProgram(handle));
     }
 
 public:
@@ -59,7 +59,7 @@ public:
     {
         if(handle_)
         {
-            glDeleteProgram(handle_);
+            AGZ_GL_CTX glDeleteProgram(handle_);
             handle_ = 0;
         }
     }
@@ -79,16 +79,16 @@ public:
         AGZ_ASSERT(handle_);
 
         GLuint index;
-        glGetUniformIndices(handle_, 1, &name, &index);
+        AGZ_GL_CTX glGetUniformIndices(handle_, 1, &name, &index);
         if(index == GL_INVALID_INDEX)
             throw UniformVariableNameException(std::string("Invalid uniform variable name: ") + name);
         
         GLint size;  GLenum type;
-        glGetActiveUniform(handle_, index, 0, nullptr, &size, &type, nullptr);
+        AGZ_GL_CTX glGetActiveUniform(handle_, index, 0, nullptr, &size, &type, nullptr);
         if(type != Impl::Var2GL<VarType>::Type)
             throw UniformVariableTypeException(std::string("Invalid uniform variable type of ") + name);
 
-        return UniformVariable<VarType>(glGetUniformLocation(handle_, name));
+        return UniformVariable<VarType>(AGZ_GL_CTX glGetUniformLocation(handle_, name));
     }
 
     template<typename BlockType>
@@ -96,12 +96,12 @@ public:
     {
         AGZ_ASSERT(handle_);
 
-        GLuint blockIndex = glGetUniformBlockIndex(handle_, name);
+        GLuint blockIndex = AGZ_GL_CTX glGetUniformBlockIndex(handle_, name);
         if(blockIndex == GL_INVALID_INDEX)
             throw UniformBlockNameException(std::string("Invalid uniform block name: ") + name);
 
         GLint size;
-        glGetActiveUniformBlockiv(handle_, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+        AGZ_GL_CTX glGetActiveUniformBlockiv(handle_, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
         if(sizeof(BlockType) != size)
             throw UniformBlockSizeException(std::string("Invalid uniform block size of ") + name);
 
@@ -122,12 +122,12 @@ public:
     {
         AGZ_ASSERT(handle_);
 
-        GLint loc = glGetAttribLocation(handle_, name);
+        GLint loc = AGZ_GL_CTX glGetAttribLocation(handle_, name);
         if(loc < 0)
             throw AttribVariableNameException(std::string("Invalid attrib variable name: ") + name);
 
         GLint size;  GLenum type;
-        glGetActiveAttrib(handle_, loc, 0, nullptr, &size, &type, nullptr);
+        AGZ_GL_CTX glGetActiveAttrib(handle_, loc, 0, nullptr, &size, &type, nullptr);
         if(type != Impl::Var2GL<VarType>::Type)
             throw AttribVariableTypeException(std::string("Invalid attrib variable type of ") + name);
 
@@ -140,7 +140,7 @@ public:
     void Bind() const noexcept
     {
         AGZ_ASSERT(handle_);
-        glUseProgram(handle_);
+        AGZ_GL_CTX glUseProgram(handle_);
     }
 
     /**
@@ -151,10 +151,10 @@ public:
         AGZ_ASSERT(handle_);
 #       if defined(_DEBUG) || defined(DEBUG)
         GLint cur;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &cur);
+        AGZ_GL_CTX glGetIntegerv(GL_CURRENT_PROGRAM, &cur);
         AGZ_ASSERT(cur == GLint(handle_));
 #       endif
-        glUseProgram(0);
+        AGZ_GL_CTX glUseProgram(0);
     }
 };
 

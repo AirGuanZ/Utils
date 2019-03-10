@@ -92,7 +92,7 @@ public:
      */
     void Bind(GLuint bindingPoint) const noexcept
     {
-        glUniformBlockBinding(program_, idx_, bindingPoint);
+        AGZ_GL_CTX glUniformBlockBinding(program_, idx_, bindingPoint);
     }
 };
 

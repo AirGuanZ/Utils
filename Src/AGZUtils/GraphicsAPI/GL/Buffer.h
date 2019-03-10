@@ -48,7 +48,7 @@ public:
     void InitializeHandle() noexcept
     {
         AGZ_ASSERT(!handle_);
-        glCreateBuffers(1, &handle_);
+        AGZ_GL_CTX glCreateBuffers(1, &handle_);
     }
 
     /**
@@ -58,7 +58,7 @@ public:
     {
         if(handle_)
         {
-            glDeleteBuffers(1, &handle_);
+            AGZ_GL_CTX glDeleteBuffers(1, &handle_);
             handle_ = 0;
         }
     }
@@ -72,7 +72,7 @@ public:
     void ReinitializeData(const void *data, size_t byteSize, GLenum usage) noexcept
     {
 		AGZ_ASSERT(handle_);
-        glNamedBufferData(handle_, static_cast<GLsizei>(byteSize), data, usage);
+        AGZ_GL_CTX glNamedBufferData(handle_, static_cast<GLsizei>(byteSize), data, usage);
     }
 
     /**
@@ -84,7 +84,7 @@ public:
     void SetData(const void *subdata, size_t byteOffset, size_t byteSize) noexcept
     {
 		AGZ_ASSERT(handle_);
-        glNamedBufferSubData(handle_, static_cast<GLsizei>(byteOffset), static_cast<GLsizei>(byteSize), subdata);
+        AGZ_GL_CTX glNamedBufferSubData(handle_, static_cast<GLsizei>(byteOffset), static_cast<GLsizei>(byteSize), subdata);
     }
 };
 

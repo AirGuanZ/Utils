@@ -118,7 +118,7 @@ public:
      */
     Program Build() const
     {
-        GLuint handle = glCreateProgram();
+        GLuint handle = AGZ_GL_CTX glCreateProgram();
         if(!handle)
             throw ProgramBuilderProgramCreationException("Failed to create program object");
         ScopeGuard handleGuard([=]()
@@ -127,34 +127,34 @@ public:
             {
                 GLuint attachedShaders[MAX_SHADER_COUNT];
                 GLsizei count;
-                glGetAttachedShaders(handle, MAX_SHADER_COUNT, &count, attachedShaders);
+                AGZ_GL_CTX glGetAttachedShaders(handle, MAX_SHADER_COUNT, &count, attachedShaders);
 
                 for(GLsizei i = 0; i < count; ++i)
-                    glDetachShader(handle, attachedShaders[i]);
+                    AGZ_GL_CTX glDetachShader(handle, attachedShaders[i]);
 
-                glDeleteProgram(handle);
+                AGZ_GL_CTX glDeleteProgram(handle);
             }
         });
         
         for(int i = 0; i < shaderCount_; ++i)
-            glAttachShader(handle, shaderHandles_[i]);
+            AGZ_GL_CTX glAttachShader(handle, shaderHandles_[i]);
 
-        glLinkProgram(handle);
+        AGZ_GL_CTX glLinkProgram(handle);
 
         GLint result;
-        glGetProgramiv(handle, GL_LINK_STATUS, &result);
+        AGZ_GL_CTX glGetProgramiv(handle, GL_LINK_STATUS, &result);
         if(result != GL_TRUE)
         {
             GLint logLen;
-            glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &logLen);
+            AGZ_GL_CTX glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &logLen);
             std::vector<char> logBuf(logLen + 1);
-            glGetProgramInfoLog(handle, GLsizei(logBuf.size()), nullptr, logBuf.data());
+            AGZ_GL_CTX glGetProgramInfoLog(handle, GLsizei(logBuf.size()), nullptr, logBuf.data());
 
             throw ProgramBuilderLinkFailureException(logBuf.data());
         }
 
         for(int i = 0; i < shaderCount_; ++i)
-            glDetachShader(handle, shaderHandles_[i]);
+            AGZ_GL_CTX glDetachShader(handle, shaderHandles_[i]);
 
         handleGuard.Dismiss();
         return Program(handle);

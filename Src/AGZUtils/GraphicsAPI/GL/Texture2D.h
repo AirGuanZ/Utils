@@ -59,7 +59,7 @@ public:
     {
         if(handle_)
         {
-            glDeleteTextures(1, &handle_);
+            AGZ_GL_CTX glDeleteTextures(1, &handle_);
             handle_ = 0;
         }
     }
@@ -71,7 +71,7 @@ public:
     void InitializeHandle() noexcept
     {
         AGZ_ASSERT(!handle_);
-        glCreateTextures(GL_TEXTURE_2D, 1, &handle_);
+        AGZ_GL_CTX glCreateTextures(GL_TEXTURE_2D, 1, &handle_);
     }
 
     /**
@@ -120,7 +120,7 @@ public:
     void InitializeFormat(GLsizei levels, GLsizei width, GLsizei height, GLenum internalFormat) const noexcept
     {
         AGZ_ASSERT(handle_);
-        glTextureStorage2D(handle_, levels, internalFormat, width, height);
+        AGZ_GL_CTX glTextureStorage2D(handle_, levels, internalFormat, width, height);
     }
 
     /**
@@ -137,13 +137,13 @@ public:
     {
         AGZ_ASSERT(handle_);
         GLint oldAlignment;
-        glGetIntegerv(GL_UNPACK_ALIGNMENT, &oldAlignment);
+        AGZ_GL_CTX glGetIntegerv(GL_UNPACK_ALIGNMENT, &oldAlignment);
         glPixelStorei(GL_UNPACK_ALIGNMENT, Impl::PT2DT<DataTexelType>::rowAlignment);
         glTextureSubImage2D(
             handle_, 0, 0, 0, width, height,
             Impl::PT2DT<DataTexelType>::format, Impl::PT2DT<DataTexelType>::type, data);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, oldAlignment);
-        glGenerateTextureMipmap(handle_);
+        AGZ_GL_CTX glPixelStorei(GL_UNPACK_ALIGNMENT, oldAlignment);
+        AGZ_GL_CTX glGenerateTextureMipmap(handle_);
     }
 
     /**
@@ -152,7 +152,7 @@ public:
     void SetParameter(GLenum paramName, GLint paramValue) const noexcept
     {
         AGZ_ASSERT(handle_);
-        glTextureParameteri(handle_, paramName, paramValue);
+        AGZ_GL_CTX glTextureParameteri(handle_, paramName, paramValue);
     }
 
     /**
@@ -161,7 +161,7 @@ public:
     void Bind(GLuint textureUnit) const noexcept
     {
         AGZ_ASSERT(handle_);
-        glBindTextureUnit(textureUnit, handle_);
+        AGZ_GL_CTX glBindTextureUnit(textureUnit, handle_);
     }
 
     /**
@@ -170,7 +170,7 @@ public:
     void Unbind(GLuint textureUnit) const noexcept
     {
         AGZ_ASSERT(handle_);
-        glBindTextureUnit(textureUnit, 0);
+        AGZ_GL_CTX glBindTextureUnit(textureUnit, 0);
     }
 };
 

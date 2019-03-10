@@ -50,7 +50,7 @@ public:
     void InitializeHandle() noexcept
     {
         AGZ_ASSERT(!handle_);
-        glCreateVertexArrays(1, &handle_);
+        AGZ_GL_CTX glCreateVertexArrays(1, &handle_);
     }
 
     /**
@@ -60,7 +60,7 @@ public:
     {
         if(handle_)
         {
-            glDeleteVertexArrays(1, &handle_);
+            AGZ_GL_CTX glDeleteVertexArrays(1, &handle_);
             handle_ = 0;
         }
     }
@@ -80,7 +80,7 @@ public:
     void SetAttribBindingPoint(AttribVariable<VarType> var, GLuint bindingPoint) const noexcept
     {
         AGZ_ASSERT(handle_);
-        glVertexArrayAttribBinding(handle_, var.GetLocation(), bindingPoint);
+        AGZ_GL_CTX glVertexArrayAttribBinding(handle_, var.GetLocation(), bindingPoint);
     }
 
     /**
@@ -90,7 +90,7 @@ public:
     void SetAttribFormat(AttribVariable<VarType> var, GLuint byteRelativeOffset, bool normalized = false) const noexcept
     {
         AGZ_ASSERT(handle_);
-        glVertexArrayAttribFormat(
+        AGZ_GL_CTX glVertexArrayAttribFormat(
             handle_, var.GetLocation(),
             Impl::Var2GL<VarType>::USize, Impl::Var2GL<VarType>::UType,
             normalized, byteRelativeOffset);
@@ -103,7 +103,7 @@ public:
     void SetVertexBufferBindingPoint(const VertexBuffer<VtxType> &buf, GLuint bindingPoint, size_t vertexOffset = 0) const noexcept
     {
         AGZ_ASSERT(handle_);
-        glVertexArrayVertexBuffer(
+        AGZ_GL_CTX glVertexArrayVertexBuffer(
             handle_, bindingPoint, buf.GetHandle(),
             static_cast<GLintptr>(sizeof(VtxType) * vertexOffset), GLsizei(sizeof(VtxType)));
     }
@@ -115,7 +115,7 @@ public:
     void EnableAttrib(AttribVariable<VarType> var) const noexcept
     {
         AGZ_ASSERT(handle_);
-        glEnableVertexArrayAttrib(handle_, var.GetLocation());
+        AGZ_GL_CTX glEnableVertexArrayAttrib(handle_, var.GetLocation());
     }
 
     /**
@@ -151,7 +151,7 @@ public:
     void BindElementBuffer(ElementBuffer<ElemType> &buf) const noexcept
     {
         AGZ_ASSERT(handle_ && buf.GetHandle());
-        glVertexArrayElementBuffer(handle_, buf.GetHandle());
+        AGZ_GL_CTX glVertexArrayElementBuffer(handle_, buf.GetHandle());
     }
 
     /**
@@ -160,7 +160,7 @@ public:
     void UnbindElementBuffer() const noexcept
     {
         AGZ_ASSERT(handle_);
-        glVertexArrayElementBuffer(handle_, 0);
+        AGZ_GL_CTX glVertexArrayElementBuffer(handle_, 0);
     }
 
     /**
@@ -169,7 +169,7 @@ public:
     void Bind() const noexcept
     {
         AGZ_ASSERT(handle_);
-        glBindVertexArray(handle_);
+        AGZ_GL_CTX glBindVertexArray(handle_);
     }
 
     /**
@@ -180,10 +180,10 @@ public:
         AGZ_ASSERT(handle_);
 #       if defined(_DEBUG) || defined(DEBUG)
         GLint cur;
-        glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &cur);
+        AGZ_GL_CTX glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &cur);
         AGZ_ASSERT(cur == GLint(handle_));
 #       endif
-        glBindVertexArray(0);
+        AGZ_GL_CTX glBindVertexArray(0);
     }
 };
 

@@ -45,7 +45,7 @@ public:
     {
         if(handle_)
         {
-            glDeleteFramebuffers(1, &handle_);
+            AGZ_GL_CTX glDeleteFramebuffers(1, &handle_);
             handle_ = 0;
         }
     }
@@ -57,7 +57,7 @@ public:
     void InitializeHandle() noexcept
     {
         AGZ_ASSERT(!handle_);
-        glCreateFramebuffers(1, &handle_);
+        AGZ_GL_CTX glCreateFramebuffers(1, &handle_);
     }
 
     /**
@@ -66,7 +66,7 @@ public:
      */
     void Attach(GLenum attachment, const Texture2D &tex) noexcept
     {
-        glNamedFramebufferTexture(handle_, attachment, tex.GetHandle(), 0);
+        AGZ_GL_CTX glNamedFramebufferTexture(handle_, attachment, tex.GetHandle(), 0);
     }
 
     /**
@@ -76,7 +76,7 @@ public:
     void Attach(GLenum attachment, const RenderBuffer &buffer) noexcept
     {
         AGZ_ASSERT(handle_ && buffer.GetHandle());
-        glNamedFramebufferRenderbuffer(handle_, attachment, GL_RENDERBUFFER, buffer.GetHandle());
+        AGZ_GL_CTX glNamedFramebufferRenderbuffer(handle_, attachment, GL_RENDERBUFFER, buffer.GetHandle());
     }
 
     /**
@@ -85,7 +85,7 @@ public:
     void Bind() const noexcept
     {
         AGZ_ASSERT(handle_);
-        glBindFramebuffer(GL_FRAMEBUFFER, handle_);
+        AGZ_GL_CTX glBindFramebuffer(GL_FRAMEBUFFER, handle_);
     }
 
     /**
@@ -96,10 +96,10 @@ public:
         AGZ_ASSERT(handle_);
 #       if defined(_DEBUG) || defined(DEBUG)
         GLint cur;
-        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &cur);
+        AGZ_GL_CTX glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &cur);
         AGZ_ASSERT(cur == GLint(handle_));
 #       endif
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        AGZ_GL_CTX glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     /**
@@ -108,7 +108,7 @@ public:
     bool IsComplete() const noexcept
     {
         AGZ_ASSERT(handle_);
-        return glCheckNamedFramebufferStatus(handle_, GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+        return AGZ_GL_CTX glCheckNamedFramebufferStatus(handle_, GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
     }
 };
 

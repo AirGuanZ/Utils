@@ -48,7 +48,7 @@ public:
     {
         if(handle_)
         {
-            glDeleteRenderbuffers(1, &handle_);
+            AGZ_GL_CTX glDeleteRenderbuffers(1, &handle_);
             handle_ = 0;
         }
     }
@@ -60,7 +60,7 @@ public:
     void InitializeHandle() noexcept
     {
         AGZ_ASSERT(!handle_);
-        glCreateRenderbuffers(1, &handle_);
+        AGZ_GL_CTX glCreateRenderbuffers(1, &handle_);
     }
 
     /**
@@ -72,7 +72,7 @@ public:
     void SetFormat(GLsizei width, GLsizei height, GLenum internalFormat) const noexcept
     {
 		AGZ_ASSERT(handle_);
-        glNamedRenderbufferStorage(handle_, internalFormat, width, height);
+        AGZ_GL_CTX glNamedRenderbufferStorage(handle_, internalFormat, width, height);
     }
 };
 
