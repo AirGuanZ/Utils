@@ -27,7 +27,7 @@ namespace AGZ {
     {
         int workerCount_;
         mutable std::mutex taskMut_;
-        std::mutex exceptionMut_;
+        mutable std::mutex exceptionMut_;
 
         std::queue<TaskType> tasks_;
         std::vector<std::thread> workers_;
@@ -196,7 +196,7 @@ namespace AGZ {
          */
         bool HasException() const
         {
-            std::lock_guard<std::mutex> lk(taskMut_);
+            std::lock_guard<std::mutex> lk(exceptionMut_);
             return exceptions_.empty();
         }
 

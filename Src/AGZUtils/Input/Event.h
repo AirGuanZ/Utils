@@ -95,6 +95,8 @@ namespace Impl
     {
     protected:
 
+        friend class EventHandler<EventParamType>;
+
         std::unordered_set<EventHandler<EventParamType>*> handlers_;
 
         void InvokeAllHandlersImpl(const EventParamType &param)
