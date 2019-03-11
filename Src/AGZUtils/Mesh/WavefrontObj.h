@@ -70,12 +70,12 @@ public:
         };
 
         /** 取得具有指定名字的组 */
-		std::optional<const Group&> FindGroup(std::string_view name) const
+		const Group *FindGroup(std::string_view name) const
         {
             auto it = name2Group.find(std::string(name));
             if(it != name2Group.end())
-                return it->second;
-            return std::nullopt;
+                return &it->second;
+            return nullptr;
         }
 
         /** 从名字到组的映射 */
@@ -83,12 +83,12 @@ public:
     };
 
     /** 取得具有指定名字的物体 */
-	std::optional<const Object&> FindObject(std::string_view name) const
+	const Object *FindObject(std::string_view name) const
     {
         auto it = name2Obj.find(std::string(name));
         if(it != name2Obj.end())
-            return it->second;
-        return std::nullopt;
+            return &it->second;
+        return nullptr;
     }
 
     /** 清空已加载的所有数据 */
