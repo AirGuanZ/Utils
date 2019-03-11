@@ -63,7 +63,7 @@ public:
         
     }
 
-    virtual ~EventHandler() = default;
+    virtual ~EventHandler();
 
     /**
      * @brief 处理特定的事件
@@ -123,8 +123,19 @@ namespace Impl
 
     public:
 
-        virtual ~EventHandlerSet() = default;
+        virtual ~EventHandlerSet()
+        {
+            for(auto handler : handlers_)
+                handler->handlerSet_ = nullptr;
+        }
     };
+}
+
+template<typename EventParamType>
+EventHandler<EventParamType>::~EventHandler()
+{
+    if(handlerSet_)
+        handlerSet_->DetachHandlerImpl(this);
 }
 
 /**

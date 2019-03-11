@@ -161,8 +161,7 @@ struct CharEnter
 /**
  * @brief 键盘事件category
  */
-class Keyboard :
-    public EventCategoryBase<KeyDown, KeyUp, CharEnter>
+class Keyboard : public EventCategoryBase<KeyDown, KeyUp, CharEnter>
 {
     bool isKeyPressed_[KEY_MAX + 1];
 

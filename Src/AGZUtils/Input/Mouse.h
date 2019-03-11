@@ -58,11 +58,10 @@ struct WheelScroll { double offset; };
 /**
  * @brief 鼠标事件category
  */
-class Mouse :
-    public EventCategoryBase<
-                MouseButtonDown, MouseButtonUp,
-                CursorEnter, CursorLeave, CursorMove,
-                WheelScroll>
+class Mouse : public EventCategoryBase<
+                        MouseButtonDown, MouseButtonUp,
+                        CursorEnter, CursorLeave, CursorMove,
+                        WheelScroll>
 {
     bool isButtonPressed_[3];
     double absX_, absY_;
