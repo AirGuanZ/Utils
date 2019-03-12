@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cstdint>
+#include <cstring>
 
 #include "Event.h"
 #include "PredefinedHandler.h"
