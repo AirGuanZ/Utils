@@ -1,7 +1,7 @@
 CPPC = clang++
 CPPC_INCLUDE_FLAGS = -I ./Src/
 CPPC_FLAGS = $(CPPC_INCLUDE_FLAGS) -stdlib=libc++ \
-			 -std=gnu++17 -Werror -Wall -Wextra -O2 -DAGZ_USE_SSE2
+			 -std=c++17 -Werror -Wall -Wextra -O2 -DAGZ_USE_SSE2
 
 CPP_FILES = $(shell find ./Src/ -name "*.cpp")
 CPP_FILES = $(shell find ./Test/ -name "*.cpp")
@@ -11,7 +11,7 @@ DPP_FILES = $(patsubst %.cpp, %.d, $(CPP_FILES))
 TARGET = ./testProg
 
 $(TARGET) : $(OPP_FILES)
-	$(CPPC) $(CPPC_FLAGS) $^ -o $@
+	$(CPPC) $(CPPC_FLAGS) $^ -lc++fs -o $@
 
 $(OPP_FILES) : %.o : %.cpp
 	$(CPPC) $(CPPC_FLAGS) -c $< -o $@

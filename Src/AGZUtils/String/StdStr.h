@@ -5,6 +5,7 @@
 #include <charconv>
 #include <cstdint>
 #include <limits>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -784,9 +785,11 @@ namespace Impl
     template<typename TChar, size_t N> struct ToImpl<TChar, char[N]>             { static std::basic_string<TChar> Call(const char (&obj)[N])                     { return obj; } };
 
     template<typename TChar, typename T, typename...Args> struct FromImpl { };
-    template<typename T> struct FromImpl<char, T>
+
+    // 为什么不把这个也用于floating point呢，因为截至到2019.3.12，gcc和clang还没实现float和double的from_chars。。。
+    template<typename T> struct FromStr2Int
     {
-        static_assert(std::is_arithmetic_v<T>);
+        static_assert(std::is_integral_v<T>);
 
         template<typename...OtherArgs>
         static T Call(const std::string_view &str, OtherArgs&&...otherArgs)
@@ -798,6 +801,60 @@ namespace Impl
             return ret;
         }
     };
+
+    template<typename T> struct FromStr2Float
+    {
+        static_assert(std::is_floating_point_v<T>);
+
+        template<typename...OtherArgs>
+        static T Call(const std::string_view &str, OtherArgs&&...)
+        {
+            std::stringstream sst;
+            sst << str;
+            T ret;
+            sst >> ret;
+            //if(!sst.str().empty())
+            //    throw FromException(str.data());
+            if(!sst.eof() || !sst)
+                throw FromException(str.data());
+            return ret;
+        }
+    };
+
+#define FROM_STR_2_INT(TInt) \
+    template<> struct FromImpl<char, TInt> \
+    { \
+        template<typename...Args> \
+        static TInt Call(const std::string_view &str, Args&&...args) \
+        { \
+            return FromStr2Int<TInt>::template Call(str, std::forward<Args>(args)...); \
+        } \
+    }
+
+#define FROM_STR_2_FLOAT(TFloat) \
+    template<> struct FromImpl<char, TFloat> \
+    { \
+        template<typename...Args> \
+        static TFloat Call(const std::string_view &str, Args&&...args) \
+        { \
+            return FromStr2Float<TFloat>::template Call(str, std::forward<Args>(args)...); \
+        } \
+    }
+
+    FROM_STR_2_INT(int8_t);
+    FROM_STR_2_INT(uint8_t);
+    FROM_STR_2_INT(int16_t);
+    FROM_STR_2_INT(uint16_t);
+    FROM_STR_2_INT(int32_t);
+    FROM_STR_2_INT(uint32_t);
+    FROM_STR_2_INT(int64_t);
+    FROM_STR_2_INT(uint64_t);
+
+    FROM_STR_2_FLOAT(float);
+    FROM_STR_2_FLOAT(double);
+
+#undef FROM_STR_2_INT
+#undef FROM_STR_2_FLOAT
 
 } // namespace Impl
 
@@ -815,7 +872,7 @@ template<typename TChar, typename T, typename...Args>
 std::basic_string<TChar> To(T &&obj, Args&&...args)
 {
     return Impl::ToImpl<TChar, remove_rcv_t<T>, remove_rcv_t<Args>...>
-            ::template Call(std::forward<T>(obj), std::forward<Args>(args)...);
+            ::Call(std::forward<T>(obj), std::forward<Args>(args)...);
 }
 
 /**
@@ -1467,7 +1524,7 @@ public:
      */
     template<typename T, CONV_T(T), std::enable_if_t<std::is_same_v<TCHAR(T), TChar>, int> = 0>
     explicit TScanner(const T &_fmt, bool matchEnd = true)
-        : outputCount_(0), matchEnd_(matchEnd)
+        : matchEnd_(matchEnd), outputCount_(0)
     {
         CONV(fmt);
 

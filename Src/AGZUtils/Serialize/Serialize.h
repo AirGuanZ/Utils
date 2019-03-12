@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <cstring>
 #include <iostream>
 #include <optional>
 #include <string>
@@ -27,7 +28,7 @@ class BinarySerializer
     template<typename T, typename = void>
     struct HasOperatorSerialize : std::false_type { };
     template<typename T>
-    struct HasOperatorSerialize<T, std::void_t<decltype(std::declval<BinarySerializer&>() << std::declval<T>())>>
+    struct HasOperatorSerialize<T, std::void_t<decltype(std::declval<BinarySerializer&>() << std::declval<const T&>())>>
         : std::true_type { };
 
     template<typename T, std::enable_if_t<HasSerialize<T>::value, int> = 0>
@@ -399,49 +400,6 @@ public:
 } // namespace AGZ
 
 /**
- * @brief 二进制序列化std::vector
- * 
- * 先存下一个uint64_t的元素数量，然后逐个将元素序列化
- */
-template<typename T>
-AGZ::BinarySerializer &operator<<(AGZ::BinarySerializer &s, const std::vector<T> &v)
-{
-    if(!s.Serialize(static_cast<uint64_t>(v.size())))
-        return s;
-    for(auto &x : v)
-    {
-        if(!s.Serialize(x))
-            return s;
-    }
-    return s;
-}
-
-/**
- * @brief 二进制反序列化std::vector
- * 
- * 先读取一个uint64_t类型的元素数量，然后逐个将元素反序列化
- */
-template<typename T>
-AGZ::BinaryDeserializer &operator>>(AGZ::BinaryDeserializer &ds, std::vector<T> &v)
-{
-    v.clear();
-    uint64_t size;
-    if(!ds.Deserialize(size))
-        return ds;
-    v.reserve(static_cast<size_t>(size));
-
-    for(uint64_t i = 0; i < size; ++i)
-    {
-        auto t = ds.Deserialize<T>();
-        if(!t)
-            return ds;
-        v.push_back(std::move(*t));
-    }
-
-    return ds;
-}
-
-/**
  * @cond
  */
 
@@ -484,6 +442,52 @@ namespace AGZ::Impl
 /**
  * @endcond
  */
+
+namespace AGZ
+{
+
+/**
+ * @brief 二进制序列化std::vector
+ * 
+ * 先存下一个uint64_t的元素数量，然后逐个将元素序列化
+ */
+template<typename T>
+AGZ::BinarySerializer &operator<<(AGZ::BinarySerializer &s, const std::vector<T> &v)
+{
+    if(!s.Serialize(static_cast<uint64_t>(v.size())))
+        return s;
+    for(auto &x : v)
+    {
+        if(!s.Serialize(x))
+            return s;
+    }
+    return s;
+}
+
+/**
+ * @brief 二进制反序列化std::vector
+ * 
+ * 先读取一个uint64_t类型的元素数量，然后逐个将元素反序列化
+ */
+template<typename T>
+AGZ::BinaryDeserializer &operator>>(AGZ::BinaryDeserializer &ds, std::vector<T> &v)
+{
+    v.clear();
+    uint64_t size;
+    if(!ds.Deserialize(size))
+        return ds;
+    v.reserve(static_cast<size_t>(size));
+
+    for(uint64_t i = 0; i < size; ++i)
+    {
+        auto t = ds.Deserialize<T>();
+        if(!t)
+            return ds;
+        v.push_back(std::move(*t));
+    }
+
+    return ds;
+}
 
 /**
  * @brief 二进制序列化std::variant
@@ -549,3 +553,5 @@ AGZ::BinaryDeserializer &operator>>(AGZ::BinaryDeserializer &ds, std::basic_stri
     ds.Read(str.data(), static_cast<size_t>(size) * sizeof(TChar));
     return ds;
 }
+
+} // namespace AGZ

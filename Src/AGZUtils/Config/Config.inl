@@ -3,7 +3,7 @@
 #include <optional>
 
 #include "../FileSys/Raw.h"
-#include "../String/StdStr.h"
+#include "../Utils/String.h"
 #include "Config.h"
 
 namespace AGZ {
