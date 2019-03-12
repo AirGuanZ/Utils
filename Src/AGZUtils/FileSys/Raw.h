@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string_view>
 
+#include "../Alloc/Malloc.h"
 #include "../Misc/Common.h"
 #include "../String/StdStr.h"
 
