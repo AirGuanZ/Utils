@@ -186,7 +186,7 @@ template <typename EventParamType>
 void EventHandler<EventParamType>::Detach()
 {
     if(handlerSet_)
-        handlerSet_->DetachHandler(this);
+        handlerSet_->DetachHandlerImpl(this);
 }
 
 template<typename...EventCategoryTypes>
