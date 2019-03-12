@@ -28,7 +28,7 @@ public:
     /**
      * @brief 取得错误消息
      */
-    char const *what() const override
+    char const *what() const noexcept override
     {
         return what_.c_str();
     }
