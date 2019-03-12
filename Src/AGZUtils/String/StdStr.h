@@ -1375,12 +1375,25 @@ namespace Impl
     {
         static TOut Call(const char **pStr, const char *end)
         {
+#if defined(AGZ_CC_CLANG) || defined(AGZ_CC_GCC)
+
+            // clang和gcc 8都没有实现from_chars的浮点版本
+            // 真是心碎
+
+            (void)pStr;
+            (void)end;
+            throw ParseFirstException(std::string("TParseFirstFloat is unimplemented") + typeid(TOut).name());
+
+#else
+
             TOut ret;
             auto [newPStr, err] = std::from_chars(*pStr, end, ret);
             if(err != std::errc())
                 throw ParseFirstException(std::string("TParseFirstFloat: failed to parse") + typeid(TOut).name());
             *pStr = newPStr;
             return ret;
+
+#endif // if defined(AGZ_CC_CLANG) || defined(AGZ_CC_GCC) else
         }
     };
 }
