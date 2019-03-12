@@ -7,6 +7,7 @@
 #include "../Math/Vec3.h"
 #include "../Math/Vec4.h"
 #include "../String/StdStr.h"
+#include "../Utils/FileSys.h"
 #include "../Utils/Range.h"
 #include "Mesh.h"
 
