@@ -1380,9 +1380,21 @@ namespace Impl
             // clang和gcc 8都没有实现from_chars的浮点版本
             // 真是心碎
 
-            (void)pStr;
-            (void)end;
-            throw ParseFirstException(std::string("TParseFirstFloat is unimplemented") + typeid(TOut).name());
+            //(void)pStr;
+            //(void)end;
+            //throw ParseFirstException(std::string("TParseFirstFloat is unimplemented") + typeid(TOut).name());
+
+            std::stringstream sst;
+            std::string_view sv = std::string_view(*pStr, end - *pStr);
+            sst << sv;
+            AGZ_ASSERT(sst.str().length() == sv.length());
+            sst >> std::noskipws;
+            TOut ret;
+            sst >> ret;
+            if(!sst)
+                throw ParseFirstException(std::string("TParseFirstFloat: failed to parse") + typeid(TOut).name());
+            *pStr += sv.length() - sst.str().length();
+            return ret;
 
 #else
 
