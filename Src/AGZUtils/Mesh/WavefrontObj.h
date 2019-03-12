@@ -192,31 +192,61 @@ bool WavefrontObj<T>::LoadFromMemory(std::string_view content, bool ignoreUnknow
                 continue;
             }
 
-            static const TScanner<char> vScanner("v {} {} {}");
-            if(T x, y, z; vScanner.Scan(line, x, y, z))
+            //static const TScanner<char> vScanner("v {} {} {}");
+            //if(T x, y, z; vScanner.Scan(line, x, y, z))
+            //{
+            //    vtxPos.push_back(Math::Vec3<T>(x, y, z));
+            //    continue;
+            //}
+            if(StartsWith(line, "v "))
             {
-                vtxPos.push_back(Math::Vec3<T>(x, y, z));
+                std::vector<std::string_view> ps;
+                Split(line, std::back_inserter(ps));
+                if(ps.size() != 4)
+                    throw std::runtime_error("");
+                vtxPos.push_back(Math::Vec3<T>(Parse<T>(ps[1]), Parse<T>(ps[2]), Parse<T>(ps[3])));
                 continue;
             }
 
-            static const TScanner<char> vt2Scanner("vt {} {}");
-            if(T x, y; vt2Scanner.Scan(line, x, y))
+            //static const TScanner<char> vt2Scanner("vt {} {}");
+            //if(T x, y; vt2Scanner.Scan(line, x, y))
+            //{
+            //    vtxTex.push_back(Math::Vec3<T>(x, y, 0));
+            //    continue;
+            //}
+
+            //static const TScanner<char> vt3Scanner("vt {} {} {}");
+            //if(T x, y, z; vt3Scanner.Scan(line, x, y, z))
+            //{
+            //    vtxTex.push_back(Math::Vec3<T>(x, y, z));
+            //    continue;
+            //}
+            if(StartsWith(line, "vt "))
             {
-                vtxTex.push_back(Math::Vec3<T>(x, y, 0));
+                std::vector<std::string_view> ps;
+                Split(line, std::back_inserter(ps));
+                if(ps.size() == 3)
+                    vtxTex.push_back(Math::Vec3<T>(Parse<T>(ps[1]), Parse<T>(ps[2]), 0));
+                else if(ps.size() == 4)
+                    vtxTex.push_back(Math::Vec3<T>(Parse<T>(ps[1]), Parse<T>(ps[2]), Parse<T>(ps[3])));
+                else
+                    throw std::runtime_error("");
                 continue;
             }
 
-            static const TScanner<char> vt3Scanner("vt {} {} {}");
-            if(T x, y, z; vt3Scanner.Scan(line, x, y, z))
+            //static const TScanner<char> vnScanner("vn {} {} {}");
+            //if(T x, y, z; vnScanner.Scan(line, x, y, z))
+            //{
+            //    vtxNor.push_back(Math::Vec3<T>(x, y, z));
+            //    continue;
+            //}
+            if(StartsWith(line, "vn "))
             {
-                vtxTex.push_back(Math::Vec3<T>(x, y, z));
-                continue;
-            }
-
-            static const TScanner<char> vnScanner("vn {} {} {}");
-            if(T x, y, z; vnScanner.Scan(line, x, y, z))
-            {
-                vtxNor.push_back(Math::Vec3<T>(x, y, z));
+                std::vector<std::string_view> ps;
+                Split(line, std::back_inserter(ps));
+                if(ps.size() != 4)
+                    throw std::runtime_error("");
+                vtxNor.push_back(Math::Vec3<T>(Parse<T>(ps[1]), Parse<T>(ps[2]), Parse<T>(ps[3])));
                 continue;
             }
 
