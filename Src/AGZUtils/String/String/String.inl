@@ -1536,7 +1536,7 @@ namespace ToStringImpl
     template<typename CS, typename T, bool = false>
     struct TryToUseStringBuilder
     {
-        static Str<CS> Call(const T&) { static_assert(CanUseStringBuilder<CS, T>::value, "ToString unimplemented"); }
+        static Str<CS> Call(const T&) { static_assert(CanUseStringBuilder<CS, T>::value, "ToString unimplemented"); return Str<CS>(); }
     };
 
     template<typename CS, typename T>
