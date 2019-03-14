@@ -2,7 +2,7 @@
 
 /**
  * @file Math/DistributionTransform.h
- * @brief 常见分布转换，如从[0, 1]^2上的均匀分布转换为单位球面上的均匀分布等
+ * @brief 常见分布转换
  * 
  * - 将[0, 1]^2上的均匀分布转换到单位圆内的均匀分布
  * - 将[0, 1]^2上的均匀分布转换为半立体角上的均匀分布
@@ -25,24 +25,26 @@
 
 namespace AGZ::Math::DistributionTransform {
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnUnitDisk;
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnUnitHemisphere;
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnUnitSphere;
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class ZWeightedOnUnitHemisphere;
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnTriangle;
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformOnCone;
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class SampleExtractor;
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class UniformInteger;
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class TableSampler;
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class PiecewiseConstantDistribution1D;
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int>> class PiecewiseConstantDistribution2D;
+template<typename T> class UniformOnUnitDisk;
+template<typename T> class UniformOnUnitHemisphere;
+template<typename T> class UniformOnUnitSphere;
+template<typename T> class ZWeightedOnUnitHemisphere;
+template<typename T> class UniformOnTriangle;
+template<typename T> class UniformOnCone;
+template<typename T> class SampleExtractor;
+template<typename T> class UniformInteger;
+template<typename T> class TableSampler;
+template<typename T> class PiecewiseConstantDistribution1D;
+template<typename T> class PiecewiseConstantDistribution2D;
 
 /**
  * @brief 在单位圆内均匀采样
  */
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T>
 class UniformOnUnitDisk
 {
+    static_assert(std::is_floating_point_v<T>);
+
 public:
 
     /** 采样结果 */
@@ -70,9 +72,11 @@ public:
 /**
  * @brief 在单位半球面上均匀采样
  */
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T>
 class UniformOnUnitHemisphere
 {
+    static_assert(std::is_floating_point_v<T>);
+
 public:
 
     /** 采样结果 */
@@ -103,9 +107,11 @@ public:
 /**
  * @brief 在单位球面上均匀采样
  */
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T>
 class UniformOnUnitSphere
 {
+    static_assert(std::is_floating_point_v<T>);
+
 public:
 
     /** 采样结果 */
@@ -136,9 +142,11 @@ public:
 /**
  * @brief 在单位半球面上进行Cos-weighed采样
  */
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T>
 class ZWeightedOnUnitHemisphere
 {
+    static_assert(std::is_floating_point_v<T>);
+
 public:
 
     /** 采样结果 */
@@ -183,9 +191,11 @@ public:
 /**
  * @brief 在三角形上均匀采样
  */
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T>
 class UniformOnTriangle
 {
+    static_assert(std::is_floating_point_v<T>);
+
 public:
 
     /** 将一对[0, 1]间的随机数转换为三角坐标均匀采样 */
@@ -199,9 +209,11 @@ public:
 /**
  * @brief 在单位球面上具有一定顶角的范围内采样，且在立体角意义上是均匀的
  */
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T>
 class UniformOnCone
 {
+    static_assert(std::is_floating_point_v<T>);
+
 public:
 
     /** 采样结果 */
@@ -236,9 +248,11 @@ public:
 /**
  * @brief 随机数萃取器，将一个[0, 1]间的均匀随机数转换为一个整数和一个随机数
  */
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T>
 class SampleExtractor
 {
+    static_assert(std::is_floating_point_v<T>);
+
 public:
 
     template<typename I, std::enable_if_t<std::is_integral_v<I>, int> = 0>
@@ -255,9 +269,11 @@ public:
 /**
  * @brief 将[0, 1]间的浮点随机数转换为指定范围内的均匀整数
  */
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T>
 class UniformInteger
 {
+    static_assert(std::is_floating_point_v<T>);
+
 public:
 
     template<typename I, std::enable_if_t<std::is_integral_v<I>, int> = 0>
@@ -272,9 +288,11 @@ public:
  * 
  * 记inverse CDF表格为A，大小为N，则A[0]对应CDF^{-1}(0)，A[N-1]对应CDF^{-1}(1)，中间的值用最近的表项作线性插值得到
  */
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T>
 class TableSampler
 {
+    static_assert(std::is_floating_point_v<T>);
+
 public:
 
     static T Sample(T u, const T *invCDF, size_t tabSize) noexcept
@@ -294,9 +312,11 @@ public:
  * 令tab[i] = w[0] + ... + n[i]，则tab[i]记录了第i段及其左边所有段的权值之和，tab[N-1]记录了全部权值之和
  * 现在在线段上以均匀分布随机选择一点，返回该点落在哪一段上，落在该段上的分布律值，以及具体落在该段上的哪个位置
  */
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T>
 class PiecewiseConstantDistribution1D
 {
+    static_assert(std::is_floating_point_v<T>);
+
 public:
 
     struct Result
@@ -332,10 +352,12 @@ public:
     }
 };
 
-template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+template<typename T>
 class PiecewiseConstantDistribution2D
 {
+    static_assert(std::is_floating_point_v<T>);
 
+    // TODO
 };
 
 } // namespace AGZ::Math::DistributionTransform
