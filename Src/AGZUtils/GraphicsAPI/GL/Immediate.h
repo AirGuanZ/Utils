@@ -371,7 +371,7 @@ public:
      * 
      * 以屏幕中心为原点，坐标范围[-1, 1]^2
      */
-    void DrawTexturedTriangles(const TexturedVertex *vtx, uint32_t vtxCount, const Texture2D &tex)
+    void DrawTexturedTriangles(const TexturedVertex *vtx, uint32_t vtxCount, const Texture2D &tex) const
     {
         AGZ_ASSERT(vtx && vtxCount && vtxCount % 3 == 0);
 
@@ -398,7 +398,7 @@ public:
      *
      * 以屏幕中心为原点，坐标范围[-1, 1]^2
      */
-    void DrawTexturedQuad(const Vec2f &LB, const Vec2f &RT, const Texture2D &tex)
+    void DrawTexturedQuad(const Vec2f &LB, const Vec2f &RT, const Texture2D &tex) const
     {
         const TexturedVertex vtxData[] =
         {
@@ -410,6 +410,18 @@ public:
             { { RT.x, LB.y }, { 1, 1 } },
         };
         DrawTexturedTriangles(vtxData, 6, tex);
+    }
+
+    /**
+     * @brief 在屏幕上绘制指定颜色的矩形
+     *
+     * 以屏幕左上角为原点，坐标单位为像素
+     */
+    void DrawTexturedQuadP(const Vec2f &LT, const Vec2f &RB, const Texture2D &tex) const
+    {
+        Vec2f tLB(2 * LT.x / pixelSize_.x - 1, 1 - 2 * LT.y / pixelSize_.y);
+        Vec2f tRT(2 * RB.x / pixelSize_.x - 1, 1 - 2 * RB.y / pixelSize_.y);
+        DrawTexturedQuad(tLB, tRT, tex);
     }
 
     /**
