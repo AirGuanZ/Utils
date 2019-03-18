@@ -159,7 +159,7 @@ public:
 	std::optional<T> FindAndParse(std::string_view k) const;
 
     /**
-     * @copydoc ConfigGroup::Find(const Str8&) const
+     * @copydoc ConfigGroup::Find(const string_view&) const
      *
      * @exception ConfigNodeKeyNotFound 参数路径不存在时抛出
      */

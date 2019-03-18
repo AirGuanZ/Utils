@@ -27,7 +27,7 @@ public:
      * @exception FileException 加载失败时抛出
      */
     static Texture2D<Math::Color3b> LoadRGBFromFile(
-        const Str8 &filename, bool flipVertically = false);
+        std::string_view filename, bool flipVertically = false);
 
     /**
      * @brief 从文件中加载一个二维RGBA纹理对象
@@ -35,7 +35,7 @@ public:
      * @exception FileException 加载失败时抛出
      */
     static Texture2D<Math::Color4b> LoadRGBAFromFile(
-        const Str8 &filename, bool flipVertically = false);
+        std::string_view filename, bool flipVertically = false);
     
     /**
      * @brief 从.hdr文件中加载一个二维RGB纹理对象
@@ -43,7 +43,7 @@ public:
      * @exception FileException 加载失败时抛出
      */
     static Texture2D<Math::Color3f> LoadRGBFromHDR(
-        const Str8 &filename, bool flipVertically = false);
+        std::string_view filename, bool flipVertically = false);
 
     /**
      * @brief 将一个二维RGB纹理对象写入到指定格式的文件
@@ -51,7 +51,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteTo(
-        const Str8 &filename,
+        std::string_view filename,
         const TextureCore<2, Math::Color3b> &tex,
         WriteFormat format);
 
@@ -61,7 +61,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteTo(
-        const Str8 &filename,
+        std::string_view filename,
         const TextureCore<2, Math::Color4b> &tex,
         WriteFormat format);
 
@@ -71,7 +71,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBToPNG(
-        const Str8 &filename,
+        std::string_view filename,
         const TextureCore<2, Math::Color3b> &tex);
 
     /**
@@ -80,7 +80,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBAToPNG(
-        const Str8 &filename,
+        std::string_view filename,
         const TextureCore<2, Math::Color4b> &tex);
 
     /**
@@ -89,7 +89,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBToJPG(
-        const Str8 &filename,
+        std::string_view filename,
         const TextureCore<2, Math::Color3b> &tex);
 
     /**
@@ -98,7 +98,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBAToJPG(
-        const Str8 &filename,
+        std::string_view filename,
         const TextureCore<2, Math::Color4b> &tex);
 
     /**
@@ -107,7 +107,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBToBMP(
-        const Str8 &filename,
+        std::string_view filename,
         const TextureCore<2, Math::Color3b> &tex);
 
     /**
@@ -116,7 +116,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBAToBMP(
-        const Str8 &filename,
+        std::string_view filename,
         const TextureCore<2, Math::Color4b> &tex);
 
     /**
@@ -125,7 +125,7 @@ public:
      * @exception FileException 保存失败时抛出
      */
     static void WriteRGBToHDR(
-        const Str8 &filename,
+        std::string_view filename,
         const TextureCore<2, Math::Color3f> &tex);
 };
 
@@ -152,7 +152,7 @@ public:
 namespace AGZ {
 
 Texture2D<Math::Color3b> TextureFile::LoadRGBFromFile(
-    const Str8 &filename, bool flipVertically)
+    std::string_view filename, bool flipVertically)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
@@ -190,7 +190,7 @@ Texture2D<Math::Color3b> TextureFile::LoadRGBFromFile(
 }
 
 Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
-    const Str8 &filename, bool flipVertically)
+    std::string_view filename, bool flipVertically)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
@@ -229,7 +229,7 @@ Texture2D<Math::Color4b> TextureFile::LoadRGBAFromFile(
 }
 
 Texture2D<Math::Color3f> TextureFile::LoadRGBFromHDR(
-    const Str8 &filename, bool flipVertically)
+    std::string_view filename, bool flipVertically)
 {
     auto [len, content] = FileSys::ReadBinaryFileRaw(filename);
     if(!content)
@@ -265,7 +265,7 @@ Texture2D<Math::Color3f> TextureFile::LoadRGBFromHDR(
 }
 
 void TextureFile::WriteTo(
-    const Str8 &filename,
+    std::string_view filename,
     const TextureCore<2, Math::Color3b> &tex,
     WriteFormat format)
 {
@@ -283,7 +283,7 @@ void TextureFile::WriteTo(
 }
 
 void TextureFile::WriteTo(
-    const Str8 &filename,
+    std::string_view filename,
     const TextureCore<2, Math::Color4b> &tex,
     WriteFormat format)
 {
@@ -318,7 +318,7 @@ namespace
 }
 
 void TextureFile::WriteRGBToPNG(
-    const Str8 &filename,
+    std::string_view filename,
     const TextureCore<2, Math::Color3b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());
@@ -338,7 +338,7 @@ void TextureFile::WriteRGBToPNG(
 }
 
 void TextureFile::WriteRGBAToPNG(
-    const Str8 &filename,
+    std::string_view filename,
     const TextureCore<2, Math::Color4b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());
@@ -358,7 +358,7 @@ void TextureFile::WriteRGBAToPNG(
 }
 
 void TextureFile::WriteRGBToJPG(
-    const Str8 &filename,
+    std::string_view filename,
     const TextureCore<2, Math::Color3b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());
@@ -378,7 +378,7 @@ void TextureFile::WriteRGBToJPG(
 }
 
 void TextureFile::WriteRGBAToJPG(
-    const Str8 &filename,
+    std::string_view filename,
     const TextureCore<2, Math::Color4b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());
@@ -398,7 +398,7 @@ void TextureFile::WriteRGBAToJPG(
 }
 
 void TextureFile::WriteRGBToBMP(
-    const Str8 &filename,
+    std::string_view filename,
     const TextureCore<2, Math::Color3b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());
@@ -418,7 +418,7 @@ void TextureFile::WriteRGBToBMP(
 }
 
 void TextureFile::WriteRGBAToBMP(
-    const Str8 &filename,
+    std::string_view filename,
     const TextureCore<2, Math::Color4b> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());
@@ -438,7 +438,7 @@ void TextureFile::WriteRGBAToBMP(
 }
 
 void TextureFile::WriteRGBToHDR(
-    const Str8 &filename,
+    std::string_view filename,
     const TextureCore<2, Math::Color3f> &tex)
 {
     AGZ_ASSERT(tex.IsAvailable());

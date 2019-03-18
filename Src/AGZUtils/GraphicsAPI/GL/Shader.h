@@ -46,7 +46,7 @@ public:
      * @brief 创建一个shader对象并从源代码中编译
      * @exception ShaderLoadingException 着色器创建/编译失败时抛出
      */
-    static TShader<ShaderType> FromMemory(const Str8 &src)
+    static TShader<ShaderType> FromMemory(std::string_view src)
     {
         TShader<ShaderType> ret;
         ret.LoadFromMemory(src);
@@ -57,7 +57,7 @@ public:
      * @brief 创建一个shader对象并从文件中编译
      * @exception ShaderLoadingException 着色器创建/编译失败时抛出
      */
-    static TShader<ShaderType> FromFile(const Str8 &filename)
+    static TShader<ShaderType> FromFile(std::string_view filename)
     {
         TShader<ShaderType> ret;
         ret.LoadFromFile(filename);

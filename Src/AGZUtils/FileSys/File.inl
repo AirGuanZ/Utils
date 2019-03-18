@@ -121,16 +121,6 @@ std::optional<FileTime> File::GetLastWriteTime(std::string_view filename)
     return ret;
 }
 
-/*Str8 File::GetWorkingDirectory()
-{
-    char buf[PATH_MAX + 1];
-    if(!getcwd(buf, PATH_MAX))
-        throw OSException("Failed to get the working directory");
-    
-    auto w = Str8(buf);
-    return w.EndsWith("/") ? std::move(w) : w + "/";
-}*/
-
 std::string File::GetWorkingDirectory()
 {
     return std::filesystem::current_path().string();
@@ -143,10 +133,6 @@ bool File::CreateDirectoryRecursively(std::string_view directory)
 
 bool File::IsRegularFile(std::string_view filename)
 {
-    /*struct stat buf;
-    if(stat(filename.ToStdString().c_str(), &buf))
-        return false;
-    return static_cast<bool>(S_ISREG(buf.st_mode));*/
     return std::filesystem::is_regular_file(filename);
 }
 
