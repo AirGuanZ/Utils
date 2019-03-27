@@ -88,6 +88,13 @@ public:
      * 转换为描述性字符串
      */
     virtual std::string ToString() const = 0;
+
+    /**
+     * 转换为带换行与缩进的描述性字符串
+     * @param prefix 每一行的公共前缀
+     * @param delim 缩进符，缺省为4个空格
+     */
+    virtual std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ") const = 0;
 };
 
 /**
@@ -177,6 +184,8 @@ public:
     bool IsGroup() const noexcept override { return true; }
 
     std::string ToString() const override;
+
+    std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ") const override;
 };
 
 /**
@@ -228,6 +237,8 @@ public:
 
     std::string ToString() const override;
 
+    std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ") const override;
+
     auto begin() const { return array_.begin(); }
     auto end()   const { return array_.end(); }
 };
@@ -261,6 +272,8 @@ public:
     bool IsValue() const noexcept override { return true; }
 
     std::string ToString() const override;
+
+    std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ") const override;
 };
 
 /**

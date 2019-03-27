@@ -135,6 +135,16 @@ inline std::string ConfigGroup::ToString() const
     return ret;
 }
 
+inline std::string ConfigGroup::ToPrettyString(const std::string &prefix, const std::string &delim) const
+{
+    std::string ret = "{\n";
+    std::string nprefix = prefix + delim;
+    for(auto &p : children_)
+        ret.append(nprefix + p.first + " = " + p.second->ToPrettyString(nprefix, delim) + ";\n");
+    ret.append(prefix + "}");
+    return ret;
+}
+
 inline ConfigArray::ConfigArray(std::vector<const ConfigNode*> &&content, std::string tag)
     : array_(std::move(content)), tag_(std::move(tag))
 {
@@ -172,6 +182,16 @@ inline std::string ConfigArray::ToString() const
     return ret;
 }
 
+inline std::string ConfigArray::ToPrettyString(const std::string &prefix, const std::string &delim) const
+{
+    std::string ret = tag_ + "(\n";
+    std::string nprefix = prefix + delim;
+    for(auto p : array_)
+        ret.append(nprefix + p->ToPrettyString(nprefix, delim) + ";\n");
+    ret.append(prefix + ")");
+    return ret;
+}
+
 inline ConfigValue::ConfigValue(std::string str)
     : str_(std::move(str))
 {
@@ -196,6 +216,11 @@ inline const std::string &ConfigValue::AsValue() const
 inline std::string ConfigValue::ToString() const
 {
     return "\"" + str_ + "\"";
+}
+
+inline std::string ConfigValue::ToPrettyString(const std::string& prefix, const std::string& delim) const
+{
+    return ToString();
 }
 
 namespace Impl
