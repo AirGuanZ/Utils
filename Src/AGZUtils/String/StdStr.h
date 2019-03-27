@@ -1283,6 +1283,9 @@ public:
     }
 };
 
+using Fmt  = TFormatter<char>;
+using WFmt = TFormatter<wchar_t>;
+
 /**
  * @cond
  */

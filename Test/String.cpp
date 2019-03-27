@@ -173,10 +173,4 @@ TEST_CASE("String")
 
         REQUIRE(ToStr8(TS{}) == "HaHaHa");
     }
-
-    SECTION("Format")
-    {
-        REQUIRE(Fmt8("minecraft is {} {} game", "a", "good") == "minecraft is a good game");
-        REQUIRE(Fmt8("A{0}-{1}-{0}", 32, 74) == "A32-74-32");
-    }
 }

@@ -397,9 +397,6 @@
     <ClInclude Include="..\Src\AGZUtils\Container\AccumulatorAndFetcher.h">
       <Filter>Container</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\AGZUtils\String\Format\Format.h">
-      <Filter>String\Format</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\AGZUtils\Serialize\Serialize.h">
       <Filter>Serialize</Filter>
     </ClInclude>
