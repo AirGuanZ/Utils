@@ -190,7 +190,7 @@ inline std::string ConfigArray::ToPrettyString(const std::string &prefix, const 
     std::string ret = tag_ + "(\n";
     std::string nprefix = prefix + delim;
     for(auto p : array_)
-        ret.append(nprefix + p->ToPrettyString(nprefix, delim) + ";\n");
+        ret.append(nprefix + p->ToPrettyString(nprefix, delim) + ",\n");
     ret.append(prefix + ")");
     return ret;
 }
