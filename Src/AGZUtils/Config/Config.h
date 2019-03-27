@@ -94,7 +94,7 @@ public:
      * @param prefix 每一行的公共前缀
      * @param delim 缩进符，缺省为4个空格
      */
-    virtual std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ") const = 0;
+    virtual std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ", bool wrap = true) const = 0;
 };
 
 /**
@@ -185,7 +185,7 @@ public:
 
     std::string ToString() const override;
 
-    std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ") const override;
+    std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ", bool wrap = true) const override;
 };
 
 /**
@@ -237,7 +237,7 @@ public:
 
     std::string ToString() const override;
 
-    std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ") const override;
+    std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ", bool wrap = true) const override;
 
     auto begin() const { return array_.begin(); }
     auto end()   const { return array_.end(); }
@@ -273,7 +273,7 @@ public:
 
     std::string ToString() const override;
 
-    std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ") const override;
+    std::string ToPrettyString(const std::string &prefix = "", const std::string &delim = "    ", bool wrap = true) const override;
 };
 
 /**
@@ -352,6 +352,12 @@ public:
 
     /** 取得全局参数集合 */
     const ConfigGroup &Root() const;
+
+    /** 转换为具有一定可读性的描述字符串 */
+    std::string ToPrettyString(const std::string &delim = "    ") const
+    {
+        return Root().ToPrettyString("", delim, false);
+    }
 };
 
 } // namespace AGZ

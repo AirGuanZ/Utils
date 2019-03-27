@@ -135,13 +135,16 @@ inline std::string ConfigGroup::ToString() const
     return ret;
 }
 
-inline std::string ConfigGroup::ToPrettyString(const std::string &prefix, const std::string &delim) const
+inline std::string ConfigGroup::ToPrettyString(const std::string &prefix, const std::string &delim, bool wrap) const
 {
-    std::string ret = "{\n";
-    std::string nprefix = prefix + delim;
+    std::string ret;
+    if(wrap)
+        ret = "{\n";
+    std::string nprefix = wrap ? (prefix + delim) : prefix;
     for(auto &p : children_)
         ret.append(nprefix + p.first + " = " + p.second->ToPrettyString(nprefix, delim) + ";\n");
-    ret.append(prefix + "}");
+    if(wrap)
+        ret.append(prefix + "}");
     return ret;
 }
 
@@ -182,7 +185,7 @@ inline std::string ConfigArray::ToString() const
     return ret;
 }
 
-inline std::string ConfigArray::ToPrettyString(const std::string &prefix, const std::string &delim) const
+inline std::string ConfigArray::ToPrettyString(const std::string &prefix, const std::string &delim, bool wrap) const
 {
     std::string ret = tag_ + "(\n";
     std::string nprefix = prefix + delim;
@@ -218,7 +221,7 @@ inline std::string ConfigValue::ToString() const
     return "\"" + str_ + "\"";
 }
 
-inline std::string ConfigValue::ToPrettyString(const std::string& prefix, const std::string& delim) const
+inline std::string ConfigValue::ToPrettyString(const std::string& prefix, const std::string& delim, bool wrap) const
 {
     return ToString();
 }
