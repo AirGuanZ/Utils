@@ -8,13 +8,13 @@
 
 namespace AGZ {
 
-inline ConfigGroup::ConfigGroup(std::unordered_map<std::string, ConfigNode*> &&children)
+inline ConfigGroup::ConfigGroup(std::map<std::string, ConfigNode*> &&children)
     : children_(std::move(children))
 {
 
 }
 
-inline void ConfigGroup::Expand(const std::unordered_map<std::string, ConfigNode*> &more)
+inline void ConfigGroup::Expand(const std::map<std::string, ConfigNode*> &more)
 {
     for(auto &moreIt : more)
     {
@@ -332,7 +332,7 @@ namespace Impl
         return Token{ TokenType::Name, s };
     }
 
-    std::unordered_map<std::string, ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena);
+    std::map<std::string, ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena);
 
     inline ConfigNode *ParseItemRight(std::list<Token> &toks, ObjArena<> &arena)
     {
@@ -409,9 +409,9 @@ namespace Impl
         throw Exception("");
     }
 
-    inline std::unordered_map<std::string, ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena)
+    inline std::map<std::string, ConfigNode*> ParseGroupContent(std::list<Token> &toks, ObjArena<> &arena)
     {
-        std::unordered_map<std::string, ConfigNode*> ret;
+        std::map<std::string, ConfigNode*> ret;
 
         while(!toks.empty() && toks.front().type != TokenType::RightBrac)
         {

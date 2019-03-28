@@ -1,9 +1,9 @@
 ﻿#pragma once
 
+#include <map>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <unordered_map>
 
 #include "../Alloc/ObjArena.h"
 #include "../Misc/Exception.h"
@@ -102,13 +102,13 @@ public:
  */
 class ConfigGroup : public ConfigNode
 {
-    std::unordered_map<std::string, ConfigNode*> children_;
+    std::map<std::string, ConfigNode*> children_;
 
     const ConfigNode *FindSection(std::string_view k) const;
 
 public:
 
-    explicit ConfigGroup(std::unordered_map<std::string, ConfigNode*> &&children);
+    explicit ConfigGroup(std::map<std::string, ConfigNode*> &&children);
 
     /**
      * 扩充内容
@@ -117,10 +117,10 @@ public:
      * - 对名字相同者，若两个都是group，则递归地扩充该group
      * - 对其他情况，用more中的同名ConfigNode覆盖children_中的
      */
-    void Expand(const std::unordered_map<std::string, ConfigNode*> &more);
+    void Expand(const std::map<std::string, ConfigNode*> &more);
 
     //! 取得所有内容
-    const std::unordered_map<std::string, ConfigNode*> &GetChildren() const { return children_; }
+    const std::map<std::string, ConfigNode*> &GetChildren() const { return children_; }
 
     /**
      * 查找具有指定路径的配置参数值
