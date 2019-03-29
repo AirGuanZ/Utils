@@ -10,6 +10,26 @@ constexpr size_t TypeListLength_v = std::tuple_size_v<std::tuple<TypeList...>>;
 template<size_t Index, typename...TypeList>
 using SelectInTypeList_t = std::tuple_element_t<Index, std::tuple<TypeList...>>;
 
+namespace Impl
+{
+    template<typename TDst>
+    constexpr int FindInTypeListImpl()
+    {
+        return -1;
+    }
+
+    template<typename TDst, typename Type0, typename...OtherTypes>
+    constexpr int FindInTypeListImpl()
+    {
+        return std::is_same_v<TDst, Type0> ? 0 :
+                    (FindInTypeListImpl<TDst, OtherTypes...>() < 0 ? -1 :
+                        (FindInTypeListImpl<TDst, OtherTypes...>() + 1));
+    }
+}
+
+template<typename TDst, typename...Types>
+constexpr int FindInTypeList = Impl::FindInTypeListImpl<TDst, Types...>();
+
 template<template<typename> typename FuncClass>
 constexpr bool Any() { return false; }
 
