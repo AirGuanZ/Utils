@@ -14,7 +14,8 @@ class RefList
 
 public:
 
-    explicit RefList(Types&...refs) noexcept
+    template<typename...Args>
+    explicit RefList(Args&...refs) noexcept
         : refs_{ refs... }
     {
         

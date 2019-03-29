@@ -71,6 +71,7 @@
     <ClInclude Include="..\Src\AGZUtils\Misc\COWObject.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Either.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Exception.h" />
+    <ClInclude Include="..\Src\AGZUtils\Misc\RefList.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\ScopeGuard.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\Singleton.h" />
     <ClInclude Include="..\Src\AGZUtils\Misc\TypeOpr.h" />
