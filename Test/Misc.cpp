@@ -44,7 +44,7 @@ TEST_CASE("Misc")
 
         static_assert(std::is_same_v<decltype(L0.Get<unsigned char>()), const unsigned char&>);
 
-        auto L1 = L0.GetSubList<unsigned char>();
+        [[maybe_unused]] auto L1 = L0.GetSubList<unsigned char>();
         static_assert(std::is_same_v<decltype(L1), RefList<const unsigned char>>);
 
         auto L2 = L0.GetSubList<int>();
