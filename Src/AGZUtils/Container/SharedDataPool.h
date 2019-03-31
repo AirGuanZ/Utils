@@ -53,13 +53,16 @@ public:
         return ret;
     }
 
-    template<typename...AddFunc>
+    template<typename AddFunc>
     VPtr GetOrAdd(const TK &k, AddFunc &&addFunc)
     {
         if(auto ret = Find(k))
             return ret;
 
         TV *data = addFunc();
+        if(!data)
+            return nullptr;
+
         VPtr ret;
         try
         {
