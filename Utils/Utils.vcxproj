@@ -26,6 +26,7 @@
     <ClInclude Include="..\Src\AGZUtils\Config\Config.h" />
     <ClInclude Include="..\Src\AGZUtils\Container\AccumulateBuffer.h" />
     <ClInclude Include="..\Src\AGZUtils\Container\AccumulatorAndFetcher.h" />
+    <ClInclude Include="..\Src\AGZUtils\Container\SharedPtrPool.h" />
     <ClInclude Include="..\Src\AGZUtils\Exception\HierarchyException.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\File.h" />
     <ClInclude Include="..\Src\AGZUtils\FileSys\Raw.h" />

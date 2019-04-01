@@ -412,6 +412,9 @@
     <ClInclude Include="..\Src\AGZUtils\Misc\RefList.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Container\SharedPtrPool.h">
+      <Filter>Container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\AGZUtils\Config\Config.inl">
