@@ -185,7 +185,7 @@ inline std::string ConfigArray::ToString() const
     return ret;
 }
 
-inline std::string ConfigArray::ToPrettyString(const std::string &prefix, const std::string &delim, bool wrap) const
+inline std::string ConfigArray::ToPrettyString(const std::string &prefix, const std::string &delim, [[maybe_unused]] bool wrap) const
 {
     std::string ret = tag_ + "(\n";
     std::string nprefix = prefix + delim;
@@ -221,7 +221,8 @@ inline std::string ConfigValue::ToString() const
     return "\"" + str_ + "\"";
 }
 
-inline std::string ConfigValue::ToPrettyString(const std::string& prefix, const std::string& delim, bool wrap) const
+inline std::string ConfigValue::ToPrettyString(
+    [[maybe_unused]] const std::string& prefix, [[maybe_unused]] const std::string& delim, [[maybe_unused]] bool wrap) const
 {
     return ToString();
 }
