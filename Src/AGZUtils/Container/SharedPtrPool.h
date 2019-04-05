@@ -46,7 +46,7 @@ public:
     VPtr Find(const TK &k) const
     {
         auto it = map_.find(k);
-        return it == map_.end() ? it->second : nullptr;
+        return it != map_.end() ? it->second : nullptr;
     }
 
     /**
