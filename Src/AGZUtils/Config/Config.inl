@@ -499,4 +499,12 @@ inline const ConfigGroup &Config::Root() const
     return *global_;
 }
 
+std::string Config::ToPrettyForm(std::string_view src)
+{
+    Config config;
+    if(!config.LoadFromMemory(src))
+        return "";
+    return config.ToPrettyString();
+}
+
 } // namespace AGZ

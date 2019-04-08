@@ -358,6 +358,9 @@ public:
     {
         return Root().ToPrettyString("", delim, false);
     }
+
+    /** 把给定的config字符串转换为格式化后的形式，转换失败时返回空串 */
+    static std::string ToPrettyForm(std::string_view src);
 };
 
 } // namespace AGZ
