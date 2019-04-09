@@ -499,7 +499,7 @@ inline const ConfigGroup &Config::Root() const
     return *global_;
 }
 
-std::string Config::ToPrettyForm(std::string_view src)
+inline std::string Config::ToPrettyForm(std::string_view src)
 {
     Config config;
     if(!config.LoadFromMemory(src))
