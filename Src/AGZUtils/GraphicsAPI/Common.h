@@ -5,6 +5,9 @@
 namespace AGZ::GraphicsAPI
 {
 
+namespace GL
+{
+
 using Math::Vec2;
 using Math::Vec3;
 using Math::Vec4;
@@ -26,5 +29,7 @@ using Vec4i = Vec4<int>;
 
 using Rad = Math::Rad<float>;
 using Deg = Math::Deg<float>;
+
+} // namespace GL
 
 } // namespace AGZ::GraphicsAPI
