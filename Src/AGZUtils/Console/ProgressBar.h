@@ -11,7 +11,7 @@ class ProgressBar
     int finished_;
     int total_;
 
-    unsigned int width_;
+    int width_;
     char complete_;
     char incomplete_;
 
@@ -72,7 +72,7 @@ class ProgressBarF
 {
     float percent_;
 
-    unsigned int width_;
+    int width_;
     char complete_;
     char incomplete_;
 
