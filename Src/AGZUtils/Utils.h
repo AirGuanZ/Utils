@@ -2,6 +2,7 @@
 
 #include "Utils/Alloc.h"
 #include "Utils/Config.h"
+#include "Utils/Console.h"
 #include "Utils/Container.h"
 #include "Utils/Exception.h"
 #include "Utils/FileSys.h"
