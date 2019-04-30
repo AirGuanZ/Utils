@@ -415,6 +415,9 @@
     <ClInclude Include="..\Src\AGZUtils\Container\SharedPtrPool.h">
       <Filter>Container</Filter>
     </ClInclude>
+    <ClInclude Include="..\Src\AGZUtils\Math\Permute.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Src\AGZUtils\Config\Config.inl">

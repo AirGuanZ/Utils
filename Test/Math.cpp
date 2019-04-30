@@ -218,4 +218,30 @@ TEST_CASE("Math")
                     .Determinant(),
                  105.0, 1e-5);
     }
+
+    SECTION("Permute")
+    {
+        std::vector<int> data = {
+            1, 2, 3,
+            4, 5, 6,
+
+            7, 8, 9,
+            10, 11, 12
+        };
+
+        Vec<3, int> newShape;
+        Permute<3>(data.data(), { 2, 2, 3 }, { 2, 0, 1 }, &newShape);
+
+        REQUIRE(data == std::vector<int>{
+            1, 4,
+            7, 10,
+
+            2, 5,
+            8, 11,
+
+            3, 6,
+            9, 12
+        });
+        REQUIRE(newShape == Vec<3, int>(3, 2, 2));
+    }
 }

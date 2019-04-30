@@ -56,6 +56,7 @@
     <ClInclude Include="..\Src\AGZUtils\Math\DistributionTransform.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\F32x4.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\Mat3.h" />
+    <ClInclude Include="..\Src\AGZUtils\Math\Permute.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\RM_Mat4.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\Quaternion.h" />
     <ClInclude Include="..\Src\AGZUtils\Math\Random.h" />

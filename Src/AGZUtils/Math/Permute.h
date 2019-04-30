@@ -9,7 +9,7 @@ namespace AGZ::Math
 
 namespace PermuteImpl
 {
-    template<DimType N>
+    template<int N>
     int ToLinearIndex(const Vec<N, int> &shape, const Vec<N, int> &idx)
     {
         int ret = 0, base = 1;
@@ -21,7 +21,7 @@ namespace PermuteImpl
         return ret;
     }
 
-    template<DimType N>
+    template<int N>
     Vec<N, int> PermuteIndex(const Vec<N, int> &idx, const Vec<N, int> &perm)
     {
         Vec<N, int> ret;
@@ -30,7 +30,7 @@ namespace PermuteImpl
         return ret;
     }
 
-    template<DimType N>
+    template<int N>
     Vec<N, int> NextIndex(const Vec<N, int> &shape, const Vec<N, int> &idx)
     {
         auto ret = idx;
@@ -45,8 +45,8 @@ namespace PermuteImpl
     }
 }
     
-template<DimType N, typename T>
-void Permute(T *pData, const Vec<N, int> &shape, const Vec<N, int> &perm, Vec<N, int> *pNewShape)
+template<int N, typename T>
+void Permute(T *pData, const Vec<N, int> &shape, const Vec<N, int> &perm, Vec<N, int> *pNewShape = nullptr)
 {
     using namespace PermuteImpl;
 
@@ -63,14 +63,17 @@ void Permute(T *pData, const Vec<N, int> &shape, const Vec<N, int> &perm, Vec<N,
     Vec<N, int> idx;
     for(int i = 0; i < dataCount; ++i)
     {
-        int dstLinearIdx = ToLinearIndex(newShape, idx);
-        int srcLinearIdx = ToLinearIndex(shape, PermuteIndex(idx, perm));
+        int srcLinearIdx = ToLinearIndex(shape, idx);
+        int dstLinearIdx = ToLinearIndex(newShape, PermuteIndex(idx, perm));
         tData[dstLinearIdx] = std::move(pData[srcLinearIdx]);
-        idx = NextIndex(newShape, idx);
+        idx = NextIndex(shape, idx);
     }
 
     for(int i = 0; i < dataCount; ++i)
         pData[i] = std::move(tData[i]);
+
+    if(pNewShape)
+        *pNewShape = newShape;
 }
 
 } // namespace AGZ::Math
