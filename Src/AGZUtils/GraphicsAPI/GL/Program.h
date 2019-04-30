@@ -91,6 +91,22 @@ public:
         return UniformVariable<VarType>(AGZ_GL_CTX glGetUniformLocation(handle_, name));
     }
 
+    /**
+     * @brief 取得具有指定类型和名字的Uniform Variable
+     * 
+     * @tparam VarType 变量类型
+     * @param name 变量名
+     * 
+     * @exception UniformVariableNameException 找不到名为 name 的uniform变量时抛出
+     * @exception UniformVariableTypeException 变量类型与Shader中的不匹配时抛出
+     */
+    template<typename VarType>
+    UniformVariable<VarType> GetUniformVariableUnchecked(const char *name) const
+    {
+        AGZ_ASSERT(handle_);
+        return UniformVariable<VarType>(AGZ_GL_CTX glGetUniformLocation(handle_, name));
+    }
+
     template<typename BlockType>
     Std140UniformBlock<BlockType> GetStd140UniformBlock(const char *name) const
     {
