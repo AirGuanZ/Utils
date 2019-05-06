@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <vector>
 
@@ -46,11 +46,11 @@ namespace PermuteImpl
 }
 
 /**
- * @brief ½»»»ÈÎÒâÎ¬ÕÅÁ¿µÄÎ¬¶È
- * @param pData Ö¸ÏòÕÅÁ¿Ê×ÔªËØµÄÖ¸Õë
- * @param shape Ô­ÕÅÁ¿´óĞ¡£¬pData²¼¾ÖÓ¦ºÍÊı×éT[shape[0]][shape[1]]...[shape[N-1]]ÏàÍ¬
- * @param perm ½»»»ºóµÄÎ¬¶ÈÅÅ²¼£¬Èç{ 2, 0, 1 }¾ÍÊÇ°ÑÔ­À´µÄ{ 0, 1, 2 }»»³É{ 2, 0, 1 }
- * @param pNewShape ÓÃÓÚ»ñÈ¡ĞÂÕÅÁ¿µÄ´óĞ¡£¬Ä¬ÈÏÎª¿ÕÖ¸Õë
+ * @brief äº¤æ¢ä»»æ„ç»´å¼ é‡çš„ç»´åº¦
+ * @param pData æŒ‡å‘å¼ é‡é¦–å…ƒç´ çš„æŒ‡é’ˆ
+ * @param shape åŸå¼ é‡å¤§å°ï¼ŒpDataå¸ƒå±€åº”å’Œæ•°ç»„T[shape[0]][shape[1]]...[shape[N-1]]ç›¸åŒ
+ * @param perm äº¤æ¢åçš„ç»´åº¦æ’å¸ƒï¼Œå¦‚{ 2, 0, 1 }å°±æ˜¯æŠŠåŸæ¥çš„{ 0, 1, 2 }æ¢æˆ{ 2, 0, 1 }
+ * @param pNewShape ç”¨äºè·å–æ–°å¼ é‡çš„å¤§å°ï¼Œé»˜è®¤ä¸ºç©ºæŒ‡é’ˆ
  */
 template<int N, typename T>
 void Permute(T *pData, const Vec<N, int> &shape, const Vec<N, int> &perm, Vec<N, int> *pNewShape = nullptr)
