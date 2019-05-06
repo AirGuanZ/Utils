@@ -44,7 +44,14 @@ namespace PermuteImpl
         return ret;
     }
 }
-    
+
+/**
+ * @brief 交换任意维张量的维度
+ * @param pData 指向张量首元素的指针
+ * @param shape 原张量大小，pData布局应和数组T[shape[0]][shape[1]]...[shape[N-1]]相同
+ * @param perm 交换后的维度排布，如{ 2, 0, 1 }就是把原来的{ 0, 1, 2 }换成{ 2, 0, 1 }
+ * @param pNewShape 用于获取新张量的大小，默认为空指针
+ */
 template<int N, typename T>
 void Permute(T *pData, const Vec<N, int> &shape, const Vec<N, int> &perm, Vec<N, int> *pNewShape = nullptr)
 {
