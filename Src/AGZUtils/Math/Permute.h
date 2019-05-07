@@ -63,10 +63,10 @@ void Permute(T *pData, const Vec<N, int> &shape, const Vec<N, int> &perm, Vec<N,
     Vec<N, int> idx;
     for(int i = 0; i < dataCount; ++i)
     {
-        int srcLinearIdx = ToLinearIndex(shape, idx);
-        int dstLinearIdx = ToLinearIndex(newShape, PermuteIndex(idx, perm));
+        int srcLinearIdx = ToLinearIndex<N>(shape, idx);
+        int dstLinearIdx = ToLinearIndex<N>(newShape, PermuteIndex<N>(idx, perm));
         tData[dstLinearIdx] = std::move(pData[srcLinearIdx]);
-        idx = NextIndex(shape, idx);
+        idx = NextIndex<N>(shape, idx);
     }
 
     for(int i = 0; i < dataCount; ++i)
