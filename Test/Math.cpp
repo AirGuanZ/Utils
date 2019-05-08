@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include <AGZUtils/Utils/Math.h>
 
 #include "Catch.hpp"
